@@ -5,14 +5,14 @@
     "type": "project",
     "license": "MIT",
     "time": "2020-12-25",
-    "readme": "https://github.com/TheCodingWorkshop/_MagmaCore/blob/main/README.md",
+    "readme": "https://github.com/TheCodingWorkshop/MagmaCore__/blob/main/README.md",
     "support": {
-        "email": "support@lavastudio.co.uk",
-        "source": "https://github.com/TheCodingWorkshop/_MagmaCore.git",
-        "wiki": "https://github.com/TheCodingWorkshop/_MagmaCore/wiki",
-        "issues": "https://github.com/TheCodingWorkshop/_MagmaCore/issues"
+        "email": "lavastudio.v1@gmail.com",
+        "source": "https://github.com/TheCodingWorkshop/MagmaCore__.git",
+        "wiki": "https://github.com/TheCodingWorkshop/MagmaCore__/wiki",
+        "issues": "https://github.com/TheCodingWorkshop/MagmaCore__/issues"
     },
-    "homepage": "http://www.lavastudio.co.uk",
+    "homepage": "https://thecodingworkshop.github.io/MagmaCore__/",
     "authors": [{
         "name": "TheCodingWorkshop",
         "email": "riccodingworkshop@gmail.com",
