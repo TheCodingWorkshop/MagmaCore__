@@ -2,7 +2,7 @@
     "name": "magmacore/magmacore",
     "description": "A Small modular PHP framework Build for web applications",
     "keywords": ["php", "framework", "magmacore", "lavastudio"],
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "time": "2020-12-25",
     "readme": "https://github.com/TheCodingWorkshop/MagmaCore__/blob/main/README.md",
