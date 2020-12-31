@@ -41,7 +41,7 @@ class Yaml
      */
     public function getYaml(string $yamlFile)
     {
-        foreach (glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yaml') as $file) {
+        foreach (glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') as $file) {
             $this->isFileExists($file);
             $parts = parse_url($file);
             $path = $parts['path'];
