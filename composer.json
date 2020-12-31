@@ -18,9 +18,8 @@
         "email": "riccodingworkshop@gmail.com",
         "role": "Developer"
     }],
-    "minimum-stability": "alpha",
+    "minimum-stability": "beta",
     "require": {
-        "php": "7.4.2|^8.0",
         "ext-mbstring": "*",
         "ext-iconv": "*",
         "ext-pdo": "*",
