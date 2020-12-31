@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>
+			{% block title %}
+				{{ block('content_title')|capitalize|striptags|raw }}
+			{% endblock title %}
+		</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Nunito:ital@0;1&display=swap" rel="stylesheet">
+		<style>
+			body {
+				font-family: 'Nunito', sans-serif;
+			}
+		</style>
+	</head>
+
+
+	<body>
+		{% block body %}
+			<div class="uk-section-secondary uk-preserve-color">
+
+				<div uk-sticky="animation: uk-animation-slide-top; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; cls-inactive: uk-navbar-transparent uk-light; top: 200">
+
+					<nav class="uk-navbar-container">
+						<div class="uk-container uk-container-expand">
+							<div uk-navbar>
+								<div class="uk-margin-medium-top uk-margin-bottom-remove">
+									<h3>
+										{% block page_title %}{% endblock page_title %}
+									</h3>
+								</div>
+								
+							</div>
+						</div>
+					</nav>
+				</div>
+				{% block content %}{% endblock content %}
+
+			</div>
+
+			<!-- UIkit JS -->
+			<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
+		{% endblock body %}
+
+	</body>
+
+</html>
+<!-- IE needs 512+ bytes: https://docs.microsoft.com/archive/blogs/ieinternals/friendly-http-error-pages -->

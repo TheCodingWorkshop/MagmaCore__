@@ -1,0 +1,54 @@
+{
+    "name": "magmacore/magmacore",
+    "description": "A Small modular PHP framework Build for web applications",
+    "keywords": ["php", "framework", "magmacore", "lavastudio"],
+    "type": "project",
+    "license": "MIT",
+    "time": "2020-12-25",
+    "readme": "https://github.com/TheCodingWorkshop/_MagmaCore/blob/main/README.md",
+    "support": {
+        "email": "support@lavastudio.co.uk",
+        "source": "https://github.com/TheCodingWorkshop/_MagmaCore.git",
+        "wiki": "https://github.com/TheCodingWorkshop/_MagmaCore/wiki",
+        "issues": "https://github.com/TheCodingWorkshop/_MagmaCore/issues"
+    },
+    "homepage": "http://www.lavastudio.co.uk",
+    "authors": [{
+        "name": "TheCodingWorkshop",
+        "email": "riccodingworkshop@gmail.com",
+        "role": "Developer"
+    }],
+    "minimum-stability": "alpha",
+    "require": {
+        "php": "7.4.2|^8.0",
+        "ext-mbstring": "*",
+        "ext-iconv": "*",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-simplexml": "*",
+        "symfony/yaml": "^5.2",
+        "twig/twig": "^3.1",
+        "symfony/http-foundation": "^5.2",
+        "paragonie/anti-csrf": "^2.3",
+        "symfony/dotenv": "^5.2",
+        "symfony/asset": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "MagmaCore\\": "src/"
+        },
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MagmaCore\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "suggest": {
+        "paragonise/anti-csrf": "Added for csrf form protection"
+    }
+}
