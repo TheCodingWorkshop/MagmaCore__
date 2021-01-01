@@ -201,7 +201,7 @@ class BaseApplication
      */
     public function setConfig(array $appConfig) : void
     {
-        if (!file_exists($this->appPath . '/Config/app.yaml')) {
+        if (!file_exists(CONFIG_PATH . '/app.yml')) {
             throw new BaseInvalidArgumentException('No app.yaml file was detected within your application Config directory.');
         }
         $this->appConfig = $appConfig;
