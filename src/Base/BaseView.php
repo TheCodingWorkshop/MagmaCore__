@@ -51,11 +51,11 @@ class BaseView
      * @throws SyntaxError
      * @throws Exception
      */
-    public function getTemplate(string $template, array $args = [], string $directory = TEMPLATE_PATH)
+    public function getTemplate(string $template, array $args = [])
     {
         static $twig = null;
         if ($twig === null) {
-            $loader = new FilesystemLoader('templates', $directory);
+            $loader = new FilesystemLoader('templates', TEMPLATE_PATH);
             $twig = new Environment($loader, [Yaml::file('twig')]);
 
             $twig->addExtension(new DebugExtension());
@@ -73,18 +73,13 @@ class BaseView
      * @param string $directory
      * @return void
      */
-    public function  getErrorResource(
-        string $template, 
-        array $args = [], 
-        string $directory = ERROR_RESOURCE) 
+    public function  getErrorResource(string $template, array $args = []) 
     {
         static $twig = null;
         if ($twig === null) {
-            $loader = new FilesystemLoader('templates', $directory);
-            $twig = new Environment($loader, [Yaml::file('twig')]);
-
+            $loader = new FilesystemLoader('templates',  ERROR_RESOURCE);
+            $twig = new Environment($loader);
             $twig->addExtension(new DebugExtension());
-            //$twig->addExtension(new TwigExtension());
         }
 
         return $twig->render($template, $args);

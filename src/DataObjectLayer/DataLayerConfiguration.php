@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerException;
-
 final class DataLayerConfiguration
 {
 
@@ -30,11 +28,7 @@ final class DataLayerConfiguration
     {
         $this->dataLayerConfiguration = $dataLayerConfiguration;
         if ($dotEnvString !==null) {
-            if (defined('ROOT_PATH')) {
-                (new $dotEnvString())->load(ROOT_PATH . '/.env');
-            } else {
-                throw new DataLayerException('Cannot read .env file. Ensure you\'ve set the ROOT_PATH constant.');
-            }
+            (new $dotEnvString())->load(ROOT_PATH . '/.env');
         }
 
     }

@@ -18,6 +18,9 @@ use ErrorException;
 class ErrorHandler
 {
 
+    public function __construct()
+    { }
+
     /**
      * Error Handler. Convert all errors to exception by throwing an 
      * ErrorException
@@ -34,7 +37,6 @@ class ErrorHandler
 
     public static function isMode()
     {
-        //$error = false;
         $mode = Yaml::file('app')['debug_error'];
         return $mode;
     }
@@ -53,9 +55,9 @@ class ErrorHandler
             $code = 500;
         }
         http_response_code($code);
-        
+        $view = new BaseView();
         if (self::isMode()['mode'] === 'dev' && self::isMode()['mode'] !=='prod') {
-            echo (new BaseView)->getErrorResource("/dev.html.twig", 
+            echo $view->getErrorResource("/dev.html.twig", 
                 [
                     "exception" => $exception,
                     "exception_class" => get_class($exception)
@@ -70,7 +72,7 @@ class ErrorHandler
             $message .= "\nThrown in " . $exception->getFile() . " on line " . $exception->getLine();
             error_log($message);
 
-            echo (new BaseView)->getErrorResource("/{$code}.html.twig", ["error_message" => $message]);
+            echo $view->getErrorResource("/{$code}.html.twig", ["error_message" => $message]);
         }
     }
 
