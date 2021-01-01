@@ -20,7 +20,7 @@ abstract class AbstractDatatable implements DatatableInterface
     protected const TABLE_PROPERTIES = [
         'status' => '',
         'orderby' => '',
-        'table_class' => ['uk-table'],
+        'table_class' => ['uk-table uk-table-middle uk-table-hover uk-table-striped uk-table-responsive uk-table-condensed'],
         'table_id' => 'datatable',
         'show_table_thead' => true,
         'show_table_tfoot' => false,
