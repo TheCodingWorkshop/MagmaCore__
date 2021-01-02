@@ -13,7 +13,7 @@ namespace MagmaCore\EventDispatcher;
 
 use MagmaCore\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcher implements EventDispatcherInterface
+class EventDispatcher implements EventDispatcherInterface, StoppableEventInterface
 {
 
     /** @var array */
@@ -43,12 +43,22 @@ class EventDispatcher implements EventDispatcherInterface
     {
         if (is_array($listeners) && count($listeners) > 0) {
             foreach ($listeners as $listener) {
-                $stopPropogating = call_user_func_array($listener, $args);
-                if ($stopPropogating) {
+                $this->stopPropogating = call_user_func_array($listener, $args);
+                if ($this->stopPropogating) {
                     return true;
                 }
             }
+            return false;
         }
+    }
+
+    /**
+     * @inheritdoc
+     * @return boolean
+     */
+    public function isPropagationStopped() : bool
+    {
+        return $this->stopPropogating;
     }
 
     /**
@@ -92,7 +102,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param Object $event
      * @return array
      */
-    public function getListeners(Object $event = null) : array
+    public function getListeners(Object $event = null) : iterable
     {
         if (null !== $event) {
             if (!isset($this->sorted[$event])) {
@@ -157,4 +167,6 @@ class EventDispatcher implements EventDispatcherInterface
     {
         return $this->currentEvent;
     }
+
+
 }
