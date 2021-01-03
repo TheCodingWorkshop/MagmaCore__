@@ -62,8 +62,10 @@ final class SessionFacade
         ?string $storage = null
     )
     {
-        $this->throwexceptionIfCookieParamsInvalid($sessionEnvironment);
-        $this->sessionEnvironment = (new SessionEnvironment(($sessionEnvironment !=null) ? $sessionEnvironment : (new SessionConfig())->baseConfiguration()));
+        //$this->throwexceptionIfCookieParamsInvalid($sessionEnvironment);
+        $sessionArray = array_merge((new SessionConfig())->baseConfiguration(), $sessionEnvironment);
+        $this->sessionEnvironment = new SessionEnvironment($sessionArray);
+
         $this->sessionIdentifier = $sessionIdentifier ? $sessionIdentifier : self::__MAGMA_SESSION__;
         $this->storage = $storage ? $storage : \MagmaCore\Session\Storage\NativeSessionStorage::class;
     }
