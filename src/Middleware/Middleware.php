@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\Middleware;
 
 use MagmaCore\Middleware\Exception\MiddlewareInvalidArgumentException;
+use MagmaCore\Base\BaseApplication;
 use Closure;
 
 class Middleware
@@ -21,21 +22,34 @@ class Middleware
     private array $middlewares;
 
     /**
-     * Undocumented function
+     * Main constructor method which pipes the class property to the
+     * constructor argument. We are using the container object to instantiate
+     * the middleware classes and defined it with a property. new object instance
+     * is then stored as an array and piped to the class middlewares property
      *
      * @param array $middlewares
      * @return void
      */
     public function __construct(array $middlewares = [])
     {
-        $this->middlewares = $middlewares;
+        $output = [];
+        if ($middlewares) {
+            foreach ($middlewares as $key => $middleware) {
+                if (strpos($middleware, $key) !== false) {
+                    if ($middleware) {
+                        $output[] = $this->$key = BaseApplication::diGet($middleware);
+                    }
+                }
+            }
+        }
+        $this->middlewares = $output;
     }
 
     /**
      * Add middlewares
      *
-     * @param [type] $middlewares
-     * @return void
+     * @param mixed $middlewares
+     * @return self
      */
     public function middlewares(array $middlewares) : self
     {
@@ -55,23 +69,24 @@ class Middleware
      * Run the middle before and after the called method and pass and Object
      * through.
      *
-     * @param Object $middleware
+     * @param mixed $object
      * @param Closure $next
-     * @return void
+     * @return mixed
      */
-    public function middleware(Object $middleware, Closure $next)
+    public function middleware(Object $object, Closure $func)
     {
-        $funcNext = $this->getNextFunc($next);
+        $function = $this->getNextFunc($func);
         /*
          reverse the order of how the middles are called so the first 
          in the array will be executed first
          */
         $middlewares = array_reverse($this->middlewares);
-        $func = array_reduce($middlewares, function($nextMiddleware, $middlewares) {
-            return $this->createMiddleware($nextMiddleware, $middlewares);
-        }, $funcNext);
+        /** */
+        $funcMiddleware = array_reduce($middlewares, function($nextMiddleware, $middleware) {
+            return $this->createMiddleware($nextMiddleware, $middleware);
+        }, $function);
         /* return the middleware with the object */
-        return $func($middleware);
+        return $funcMiddleware($object);
 
     }
 
@@ -86,15 +101,15 @@ class Middleware
     }
 
     /**
-     * Undocumented function
+     * The inner function of the middleware
      *
-     * @param Closure $next
-     * @return void
+     * @param Closure $func - the function calling
+     * @return Closure
      */
-    public function getNextFunc(Closure $next)
+    private function getNextFunc(Closure $func) : Closure
     {
-        return function($funcNext) use ($next) {
-            return $next($funcNext);
+        return function($object) use ($func) {
+            return $func($object);
         };
     }
 
@@ -102,14 +117,14 @@ class Middleware
      * Get a middleware function. This function will get the object from the previous
      * middleware and pass it inwards
      *
-     * @param [type] $nextMiddleware
-     * @param [type] $middlewares
-     * @return void
+     * @param $nextMiddleware
+     * @param $middleware
+     * @return Closure
      */
-    public function createMiddleware($nextMiddleware, $middlewares)
+    private function createMiddleware($nextMiddleware, $middleware) : Closure
     {   
-        return function($funcNext) use ($nextMiddleware, $middlewares) {
-            return $middlewares->middleware($funcNext, $nextMiddleware);
+        return function($object) use ($nextMiddleware, $middleware) {
+            return $middleware->middleware($object, $nextMiddleware);
         };
     }
 }

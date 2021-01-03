@@ -44,32 +44,6 @@ class AuthSecurityController extends BaseController
     }
 
     /**
-     * Before filter which is called before every controller
-     * method. Use to check is user as privileges to be in the backend
-     * or use to log data on requesting of methods
-     *
-     * @return void
-     */
-    protected function before()
-    {
-        if ($this->thisRouteController() === 'Security' && $this->thisRouteAction() === 'index') {
-            $userID = $this->getSession()->get('user_id');#
-            if (isset($userID) && $userID !== 0) {
-                $this->redirect('/');
-            }
-        }
-    }
-
-    /**
-     * After filter which is called after every controller. Can be used
-     * for garbage collection
-     *
-     * @return void
-     */
-    protected function after()
-    {}
-
-    /**
      * Entry method which is hit on request. This method should be implement within
      * all sub controller class as a default landing point when a request is 
      * made.
@@ -102,13 +76,11 @@ class AuthSecurityController extends BaseController
      */
     protected function loginAction()
     {
-        $authenticatedUser = $this
-        ->authenticator
+        $authenticatedUser = $this->authenticator
         ->authenticate($_POST['email'], $_POST['password_hash']);
 
         $remember = $this->request->handler()->get('remember_me');
         if (isset($this->form)) :    
-            // Checks the request can be handle and the form is submittable
             if ($this->form->canHandleRequest() && $this->form->isSubmittable('signin')) : {
                 if ($this->form->csrfValidate()) {
                     if ($authenticatedUser) {

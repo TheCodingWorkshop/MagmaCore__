@@ -15,13 +15,15 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
-use MagmaCore\Base\BaseAuthentication;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Session\Flash\Flash;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\SessionTrait;
+use MagmaCore\Middleware\Middleware;
+use ReflectionMethod;
+use StdClass;
 
 class BaseController
 {
@@ -40,6 +42,10 @@ class BaseController
     protected string $flashSuccess;
     /** @var string - flash warning type */
     protected string $flashWarning;
+    /** @var array */
+    protected array $callBeforeMiddlewares = [];
+    /** @var array */
+    protected array $callAfterMiddlewares = [];
 
     /**
      * Main class constructor
@@ -58,7 +64,7 @@ class BaseController
         $this->container(
             [
                 "request" => RequestHandler::class,
-                "response" => ResponseHandler::class
+                "response" => ResponseHandler::class,
             ]
         );
     }
@@ -80,27 +86,7 @@ class BaseController
             $method = $name . 'Action';
             if (method_exists($this, $method)) {
                 if ($this->before() !== false) {
-                    $reflectionMethod = new \ReflectionMethod($this, $method);
-                    $args = [];
-                    ///$request = (new RequestHandler())->handler();
-                    $request = [];
-                    foreach ($reflectionMethod->getParameters() as $param) {
-                        $name = $param->getName();
-                        $class = $param->getClass();
-                        if ($class === null) {
-                            $args[] = $this->routeParams[$name];
-                        } else {
-                            if ($class->isInstance($request)) {
-                                $args[] = $request;
-                            } else {
-                                throw new \BadMethodCallException("Method {$method} does not exists.");
-                            }
-                            return call_user_func_array([$this, $method], $argument);
-
-                        }
-                    }
                     call_user_func_array([$this, $method], $argument);
-
                     $this->after();
                 }
             }else {
@@ -108,6 +94,33 @@ class BaseController
             }
         } else {
             throw new \Exception();
+        }
+    }
+
+    /**
+     * Get the reflection action method
+     *
+     * @param [type] $method
+     * @param array $argument
+     * @return void
+     */
+    private function getReflectionAction($method, array $argument)
+    {
+        $reflectionMethod = new ReflectionMethod($this, $method);
+        $args = [];
+        foreach ($reflectionMethod->getParameters() as $param) {
+            $name = $param->getName();
+            $class = $param->getClass();
+            if ($class === null) {
+                $args[] = $this->routeParams[$name];
+            } else {
+                if ($class->isInstance('')) {
+                    $args[] = '';
+                } else {
+                    throw new \BadMethodCallException("Method {$method} does not exists.");
+                }
+                return call_user_func_array([$this, $method], $argument);
+            }
         }
     }
 
@@ -141,18 +154,53 @@ class BaseController
     }
 
     /**
+     * Returns an array of middlewares for the current object which will
+     * execute before the action is called
+     *
+     * @return array
+     */
+    protected function callBeforeMiddlewares() : array
+    {
+        return $this->callBeforeMiddlewares;
+    }
+
+    /**
+     * Returns an array of middlewares for the current object which will
+     * execute after the action is called
+     *
+     * @return array
+     */
+    protected function callAfterMiddlewares() : array
+    {
+        return $this->callAfterMiddlewares;
+    }
+
+    /**
      * Before method. Call before controller action method
      * @return void
      */
     protected function before()
-    { }
+    { 
+        $object = new self($this->routeParams);
+        (new Middleware())->middlewares($this->callBeforeMiddlewares())
+        ->middleware($object, function($object){
+            return $object;
+        });
+    }
 
     /**
      * After method. Call after controller action method
      * @return void
      */
     protected function after()
-    { }
+    { 
+        $object = new self($this->routeParams);
+        (new Middleware())->middlewares($this->callAfterMiddlewares())
+        ->middleware($object, function($object){
+            return $object;
+        });
+
+    }
 
     /**
      * Return the current controller name as a string
@@ -264,15 +312,6 @@ class BaseController
                         break;
                 }
             }
-        }
-    }
-
-
-    public function loginRequired(string $url = '/', bool $replace = true, int $responseCode = 303)
-    {
-        $authenticate = (new BaseAuthentication(new BaseRedirect($url, $this->routeParams, $replace, $responseCode)))->loginRequired($url);
-        if ($authenticate) {
-            return $authenticate;
         }
     }
 
