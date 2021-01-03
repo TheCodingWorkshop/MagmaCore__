@@ -44,26 +44,6 @@ class HomeController extends BaseController
     }
 
     /**
-     * Before filter which is called before every controller
-     * method. Use to check is user as privileges to be in the backend
-     * or use to log data on requesting of methods
-     *
-     * @return void
-     */
-    protected function before()
-    {}
-
-    /**
-     * After filter which is called after every controller. Can be used
-     * for garbage collection
-     *
-     * @return void
-     */
-    protected function after()
-    {}
-
-
-    /**
      * Entry method which is hit on request. This method should be implement within
      * all sub controller class as a default landing point when a request is 
      * made.
