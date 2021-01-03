@@ -155,7 +155,10 @@ class BaseController
 
     /**
      * Returns an array of middlewares for the current object which will
-     * execute before the action is called
+     * execute before the action is called. Middlewares are also resolved
+     * via the container object. So you can also type hint any dependency
+     * you need within your middleware constructor. Note constructor arguments
+     * cannot be resolved only other objects
      *
      * @return array
      */
@@ -166,7 +169,10 @@ class BaseController
 
     /**
      * Returns an array of middlewares for the current object which will
-     * execute after the action is called
+     * execute before the action is called. Middlewares are also resolved
+     * via the container object. So you can also type hint any dependency
+     * you need within your middleware constructor. Note constructor arguments
+     * cannot be resolved only other objects
      *
      * @return array
      */

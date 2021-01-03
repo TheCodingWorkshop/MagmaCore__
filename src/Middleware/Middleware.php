@@ -38,6 +38,8 @@ class Middleware
                 if (strpos($middleware, $key) !== false) {
                     if ($middleware) {
                         $output[] = $this->$key = BaseApplication::diGet($middleware);
+                    } else {
+                        $output[] = BaseApplication::diGet($middleware);
                     }
                 }
             }
