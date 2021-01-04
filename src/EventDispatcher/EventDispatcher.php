@@ -12,8 +12,9 @@ declare(strict_types=1);
 namespace MagmaCore\EventDispatcher;
 
 use MagmaCore\EventDispatcher\EventDispatcherInterface;
+use MagmaCore\EventDispatcher\EventSubscriberInterface;
 
-class EventDispatcher implements EventDispatcherInterface, StoppableEventInterface
+class EventDispatcher implements EventDispatcherInterface
 {
 
     /** @var array */
@@ -36,15 +37,15 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
             return;
         }
         $this->currentEvent = $event;
-        return $this->dispatched($this->listeners[$event], $args);
+        return $this->callListenders($this->listeners[$event], $args);
     }
 
-    private function dispatched(array $listeners, $args)
+    private function callListenders(iterable $listeners, $args)
     {
         if (is_array($listeners) && count($listeners) > 0) {
             foreach ($listeners as $listener) {
-                $this->stopPropogating = call_user_func_array($listener, $args);
-                if ($this->stopPropogating) {
+                $stopPropogating = call_user_func_array($listener, $args);
+                if ($stopPropogating) {
                     return true;
                 }
             }
@@ -53,22 +54,13 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
     }
 
     /**
-     * @inheritdoc
-     * @return boolean
-     */
-    public function isPropagationStopped() : bool
-    {
-        return $this->stopPropogating;
-    }
-
-    /**
      * Remove an event listener from the event array list
      *
-     * @param Object $event
+     * @param mixed $event
      * @param string $listener
      * @return void
      */
-    public function removeListeners(Object $event, string $listener) : void
+    public function removeListeners($event, string $listener) : void
     {
         if (!isset($this->listeners[$event])) {
             return;
@@ -85,12 +77,12 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
     /**
      * Add a listener
      *
-     * @param Object $event
-     * @param string $listener
+     * @param mixed $event
+     * @param mixed $listener
      * @param integer $priority
      * @return void
      */
-    public function addListener(Object $event, string $listener, int $priority = 0) : void
+    public function addListener($event, $listener, int $priority = 0) : void
     {
         $this->listeners[$event][$priority][] = $listener;
         unset($this->sorted[$event]);
@@ -99,10 +91,10 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
     /**
      * Returns a list of sorted events.
      *
-     * @param Object $event
+     * @param $event
      * @return array
      */
-    public function getListeners(Object $event = null) : iterable
+    public function getListeners($event = null) : iterable
     {
         if (null !== $event) {
             if (!isset($this->sorted[$event])) {
@@ -135,10 +127,10 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
     /**
      * Check if we have a particular event
      *
-     * @param Object $event
+     * @param $event
      * @return boolean
      */
-    public function hasListener(Object $event = null) : bool
+    public function hasListener($event = null) : bool
     {
         return (bool)count($this->getListeners($event));
     }
@@ -146,11 +138,11 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
     /**
      * Check if a an actual event was called
      *
-     * @param Object $event
+     * @param mixed $event
      * @param integer $priority
      * @return boolean
      */
-    public function isListening(Object $event, int $priority = 0) : bool
+    public function isListening($event, int $priority = 0) : bool
     {
         if (isset($this->listeners[$event][$priority])) {
             return true;
@@ -168,5 +160,32 @@ class EventDispatcher implements EventDispatcherInterface, StoppableEventInterfa
         return $this->currentEvent;
     }
 
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
+            if (is_string($params)) {
+                $this->addListener([$subscriber, $params], $eventName);
+            } elseif (is_string($params[0])) {
+                $this->addListener([$subscriber, $params[0]], $eventName, $params[1] ?? 0);
+            } else {
+                foreach ($params as $listener) {
+                    $this->addListener([$subscriber, $listener[0]], $eventName, $listener[1] ?? 0);
+                }
+            }
+        }
+    }
+
+    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    {
+        foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
+            if (is_array($params) && is_array($params[0])) {
+                foreach ($params as $listener) {
+                    $this->removeListeners([$subscriber, $listener[0]], $eventName);
+                }
+            } else {
+                $this->removeListeners([$subscriber, is_string($params) ? $params : $params[0]], $eventName);
+            }
+        }
+    }
 
 }
