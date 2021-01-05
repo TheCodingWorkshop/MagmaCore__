@@ -19,11 +19,10 @@ interface EventDispatcherInterface
     /**
      * Provide all relevant listeners with an event to process.
      *
-     * @param object $event
-     *   The object to process.
-     *
-     * @return object
-     *   The Event that was passed, now modified by listeners.
+     * @param object $event - The object to process.
+     * @param string $eventName - the name of the event created
+     * @return object - The Event that was passed, now modified by listeners.
      */
-    public function dispatch(object $event, array $args = []);
+    public function dispatch(object $event, string $eventName = null) : Object;
+    
 }
