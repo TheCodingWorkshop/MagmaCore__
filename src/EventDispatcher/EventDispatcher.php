@@ -13,6 +13,11 @@ namespace MagmaCore\EventDispatcher;
 
 use MagmaCore\EventDispatcher\EventDispatcherInterface;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\EventDispatcher\StoppableEventInterface;
+use Closure;
+use is_array;
+use array_filter;
+use count;
 
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -30,162 +35,238 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * @inheritdoc
-     */
-    public function dispatch(object $event, array $args = [])
-    {
-        if (!isset($this->listeners[$event])) {
-            return;
-        }
-        $this->currentEvent = $event;
-        return $this->callListenders($this->listeners[$event], $args);
-    }
-
-    private function callListenders(iterable $listeners, $args)
-    {
-        if (is_array($listeners) && count($listeners) > 0) {
-            foreach ($listeners as $listener) {
-                $stopPropogating = call_user_func_array($listener, $args);
-                if ($stopPropogating) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Remove an event listener from the event array list
-     *
-     * @param mixed $event
-     * @param string $listener
-     * @return void
-     */
-    public function removeListeners($event, string $listener) : void
-    {
-        if (!isset($this->listeners[$event])) {
-            return;
-        }
-        if (count($this->listeners) > 0) {
-            foreach ($this->listeners[$event] as $priority => $listeners) {
-                if (false !== ($key = array_search($listener, $listeners, true))) {
-                    unset($this->listeners[$event][$priority][$key], $this->sorted[$event]);
-                }
-            }
-        }
-    }
-
-    /**
-     * Add a listener
-     *
-     * @param mixed $event
-     * @param mixed $listener
-     * @param integer $priority
-     * @return void
-     */
-    public function addListener($event, $listener, int $priority = 0) : void
-    {
-        $this->listeners[$event][$priority][] = $listener;
-        unset($this->sorted[$event]);
-    }
-
-    /**
-     * Returns a list of sorted events.
-     *
-     * @param $event
-     * @return array
-     */
-    public function getListeners($event = null) : iterable
-    {
-        if (null !== $event) {
-            if (!isset($this->sorted[$event])) {
-                $this->sortListeners($event);
-            }
-            return $this->sorted[$event];
-        }
-        foreach (array_keys($this->listeners) as $event) {
-            if (!isset($this->sorted[$event])) {
-                $this->sortLIsteners($event);
-            }
-        }
-    }
-
-    /**
-     * Sort the listeners by their key
-     *
      * @param Object $event
-     * @return void
+     * @param string $eventName
+     * @return Object
      */
-    private function sortListeners(Object $event) : void
+    public function dispatch(object $event, string $eventName = null): object
     {
-        $this->sorted[$event] = [];
-        if (isset($this->listeners[$event])) {
-            ksort($this->listeners[$event]);
-            $this->sorted[$event] = call_user_func_array('array_merge', $this->listeners[$event]);
+        $eventName = $eventName ?? \get_class($event);
+        if (empty($this->listeners[$eventName])) {
+            $listeners = $this->listeners[$eventName];
+        } else {
+            $listeners = $this->getListeners($eventName);
         }
-    }
 
+        if ($listeners) {
+            $this->callListeners($listeners, $eventName, $event);
+        }
+
+        return $event;
+    }
     /**
-     * Check if we have a particular event
+     * Gets the listeners of a specific event or all listeners sorted by descending priority.
      *
-     * @param $event
-     * @return boolean
+     * @param string $eventName
+     * @return array - The event listeners for the specified event, 
+     *                  or all event listeners by event name
      */
-    public function hasListener($event = null) : bool
+    public function getListeners(string $eventName = null) : array
     {
-        return (bool)count($this->getListeners($event));
+        if (null !== $eventName) {
+            if (empty($this->listeners[$eventName])) {
+                return [];
+            }
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+            return $this->sorted[$eventName];
+        }
+
+        foreach ($this->listeners as $eventName => $eventListeners) {
+            if (!isset($this->sorted[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+        }
+
+        return array_filter($this->sorted);
+    }
+    /**
+     * Checks whether an event has any registered listeners.
+     *
+     * @param string $eventName
+     * @return boolean - true if the specified event has any listeners, false otherwise
+     */
+    public function hasListeners(string $eventName = null)
+    {
+        if (null !== $eventName) {
+            return !empty($this->listeners[$eventName]);
+        }
+        foreach ($this->listeners as $eventListeners) {
+            if ($eventListeners) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Check if a an actual event was called
      *
-     * @param mixed $event
+     * @param string $eventName
      * @param integer $priority
      * @return boolean
      */
-    public function isListening($event, int $priority = 0) : bool
+    public function isListening(string $eventName = null, int $priority = 0)
     {
-        if (isset($this->listeners[$event][$priority])) {
+        if (isset($this->listeners[$eventName][$priority])) {
             return true;
         }
         return false;
     }
 
     /**
-     * Returns the currently listening event
+     * Adds an event listener that listens on the specified events.
      *
-     * @return string
+     * @param string $eventName
+     * @param callable $listener - the listener
+     * @param integer $priority - The higher this value, the earlier an event
+     *                           listener will be triggered in the chain (defaults to 0)
+     * @return void
      */
-    public function nowListening() : string
+    public function addListener(string $eventName, $listener, int $priority = 0)
     {
-        return $this->currentEvent;
+        $this->listeners[$eventName][$priority][] = $listener;
+        unset($this->sorted[$eventName]);
     }
 
+    /**
+     * Add an event to a subscribed lists of events
+     *
+     * @param EventSubscriberInterface $subscriber
+     * @return void
+     */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {
-                $this->addListener([$subscriber, $params], $eventName);
+                $this->addListener($eventName, [$subscriber, $params]);
             } elseif (is_string($params[0])) {
-                $this->addListener([$subscriber, $params[0]], $eventName, $params[1] ?? 0);
+                $this->addListener($eventName, [$subscriber, $params[0]], $params[1] ?? 0);
             } else {
                 foreach ($params as $listener) {
-                    $this->addListener([$subscriber, $listener[0]], $eventName, $listener[1] ?? 0);
+                    $this->addListener($eventName, [$subscriber, $listener[0]], $listener[1] ?? 0);
                 }
             }
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param iterable $listeners
+     * @param string $eventName
+     * @param Object $event
+     * @return void
+     */
+    protected function callListeners(iterable $listeners, string $eventName, object $event)
+    {
+        $stoppable = $event instanceof StoppableEventInterface;
+        foreach ($listeners as $listener) {
+            if ($stoppable && $event->isPropagationStopped()) {
+                break;
+            }
+            $listener($event, $eventName, $this);
+        }
+    }
+
+    /**
+     * Sorts the internal list of listeners for the given event by priority.
+     *
+     * @param string $eventName
+     * @return void
+     */
+    private function sortListeners(string $eventName)
+    {
+        krsort($this->listeners[$eventName]);
+        $this->sorted[$eventName] = [];
+
+        foreach ($this->listeners[$eventName] as &$listeners) {
+            foreach ($listeners as $k => &$listener) {
+                /*if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= count($listener)) {
+                    $listener[0] = $listener[0]();
+                    $listener[1] = $listener[1] ?? '__invoke';
+                }*/
+                $this->arrayClosure($listener);
+                $this->sorted[$eventName][] = $listener;
+            }
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $value
+     * @return void
+     */
+    private function arrayClosure($value)
+    {
+        if (
+            \is_array($value) &&
+            isset($value[0]) &&
+            $value[0] instanceof Closure &&
+            2 >= \count($value)
+        ) {
+            $value[0] = $value[0]();
+            $value[1] = $value[1] ?? '__invoke';
+        }
+    }
+
+    /**
+     * Removes an event listener from the specified events.
+     *
+     * @param string $eventName
+     * @param callable $listener - the listener to remove
+     * @return void
+     */
+    public function removeListeners(string $eventName, $listener)
+    {
+        if (empty($this->listeners[$eventName])) {
+            return;
+        }
+
+        /*if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof Closure && 2 >= count($listener)) {
+            $listener[0] = $listener[0]();
+            $listener[1] = $listener[1] ?? '__invoke';
+        }*/
+        $this->arrayClosure($listener);
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            foreach ($listeners as $key => $value) {
+                if ($value !== $listener) {
+                    $this->arrayClosure($value);
+                }
+                /*if ($value !== $listener && is_array($value) && isset($value[0]) && $value[0] instanceof Closure && 2 >= count($value)) {
+                    $value[0] = $value[0]();
+                    $value[1] = $value[1] ?? '__invoke';
+                }*/
+                if ($value === $listener) {
+                    unset($listener[$key], $this->sorted[$eventName]);
+                }
+            }
+            if (!$listener) {
+                unset($this->listeners[$eventName][$priority]);
+            }
+        }
+    }
+
+    /**
+     * Remove Subscribed events
+     *
+     * @param EventSubscriberInterface $subscriber
+     * @return void
+     */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_array($params) && is_array($params[0])) {
                 foreach ($params as $listener) {
-                    $this->removeListeners([$subscriber, $listener[0]], $eventName);
+                    $this->removeListeners($eventName, [$subscriber, $listener[0]]);
                 }
             } else {
-                $this->removeListeners([$subscriber, is_string($params) ? $params : $params[0]], $eventName);
+                $this->removeListeners($eventName, [$subscriber, is_string($params) ? $params : $params[0]]);
             }
         }
+
     }
 
 }
