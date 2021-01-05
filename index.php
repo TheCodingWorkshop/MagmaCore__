@@ -6,7 +6,7 @@ if (is_file($autolaod)) {
     require $autolaod;
 }
 
-use MagmaCore\Middleware\Middleware;
+/*use MagmaCore\Middleware\Middleware;
 use MagmaCore\Middleware\BeforeMiddleware;
 use MagmaCore\Middleware\AfterMiddleware;
 
@@ -26,4 +26,4 @@ $end = $middleware->middlewares(
     return $object;
 });
 
-var_dump($end);
+var_dump($end);*/
