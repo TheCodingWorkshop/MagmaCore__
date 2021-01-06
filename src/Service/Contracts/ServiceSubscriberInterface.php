@@ -14,6 +14,6 @@ namespace MagmaCore\Service\Contracts;
 interface ServiceSubscriberInterface
 {
 
-    public function getSubscribedServices() : array;
+    public static function getSubscribedServices() : array;
 
 }
