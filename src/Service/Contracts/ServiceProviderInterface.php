@@ -26,6 +26,6 @@ interface ServiceProviderInterface extends ContainerInterface
      *
      * @return array
      */
-    public function getProvidedServices() : array;
+    public static function getProvidedServices() : array;
 
 }

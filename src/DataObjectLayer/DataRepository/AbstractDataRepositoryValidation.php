@@ -21,10 +21,10 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @inheritdoc
      * 
      * @param object $cleanData - the incoming data
-     * @param object $dataRepository - the repository for the entity
-     * @return array
+     * @param object|null $dataRepository - the repository for the entity
+     * @return mixed
      */
-    abstract public function validateBeforePersist(Object $cleanData, Object $dataRepository = null) : array;
+    abstract public function validateBeforePersist(Object $cleanData, ?Object $dataRepository = null);
 
     /**
      * @inheritdoc
@@ -61,7 +61,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * error. We will however just remove it from here
      *
      * @param array $cleanData
-     * @return void
+     * @return array
      */
     public function getCsrf(array $cleanData)
     {
@@ -70,7 +70,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
             '_CSRF_TOKEN' => $cleanData['_CSRF_TOKEN'],
         ];
 
-        $cleanData = array_diff_key($cleanData, !empty($this->splice()) ? array_merge($csrf, $this->splice()) : $csrf);
+        return array_diff_key($cleanData, !empty($this->splice()) ? array_merge($csrf, $this->splice()) : $csrf);
     }
 
     /**
@@ -106,11 +106,11 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * Undocumented function
      *
      * @param array $cleanData
-     * @param array $field
+     * @param string $field
      * @param mixed $default
      * @return mixed
      */
-    public function setDefaultValue(array $cleanData, array $field, $default)
+    public function setDefaultValue(array $cleanData, string $field, $default)
     {
         $value = $default;
         if (isset($cleanData[$field]) && $cleanData[$field] !='') {

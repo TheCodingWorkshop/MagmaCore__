@@ -303,7 +303,7 @@ class DataRepository implements DataRepositoryInterface
             throw new DataLayerInvalidArgumentException('Please add a valid argument');
         }
         try {
-            $this->findAndReturn = $this->findObjectBy($selectors, ['id' => $id]);
+            $this->findAndReturn = $this->findObjectBy(['id' => $id], $selectors);
             return $this;
         }catch(Throwable $throwable) {
             throw $throwable;

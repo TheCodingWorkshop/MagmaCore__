@@ -19,10 +19,10 @@ interface DataRepositoryValidationInterface
      * the entity return valid email and password fields
      * 
      * @param object $cleanData - the incoming data
-     * @param object $dataRepository - the repository for the entity
-     * @return array
+     * @param object|null $dataRepository - the repository for the entity
+     * @return mixed
      */
-    public function validateBeforePersist(Object $cleanData, Object $dataRepository = null) : array;
+    public function validateBeforePersist(object $cleanData, ?object $dataRepository = null);
 
     /**
      * Returns an array of generated errors from the validation method

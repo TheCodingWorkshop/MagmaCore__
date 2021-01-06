@@ -46,7 +46,7 @@ trait ControllerTrait
      * @throws BaseInvalidArgumentException
      * @throws ReflectionException
      */
-    protected function resolvedServices(?array $args = null)
+    protected function container(?array $args = null)
     {
         if ($args !==null && !is_array($args)) {
             throw new BaseInvalidArgumentException('Invalid argument called in container. Your dependencies should return a key/value pair array.');

@@ -48,6 +48,16 @@ class Datatable extends AbstractDatatable
         list($this->dataOptions, $this->currentPage, $this->totalPages, $this->totalRecords, $this->direction, $this->sortDirection, $this->tdClass, $this->tableColumn, $this->tableOrder) = $dataRepository;
     }
 
+    public function totalRecords()
+    {
+        return $this->totalRecords;
+    }
+
+    public function getColumns()
+    {
+        return $this->tableColumn;
+    }
+
     public function table() : ?string
     {
         extract($this->attr, EXTR_SKIP);

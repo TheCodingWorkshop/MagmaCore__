@@ -39,8 +39,9 @@ trait DataRepositoryTrait
                         }
                         list(
                             $this->cleanData, 
-                            $this->validatedDataBag, 
-                            $this->returnedErrors) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
+                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
+                        $this->validationErrors = $newValidationObject->getErrors();
+                            
                     }
                     break;
                 default :
@@ -71,7 +72,10 @@ trait DataRepositoryTrait
     }
 
     /**
-     * Undocumented function
+     * Persist the sanitized and validated data to the database. Also merge the return last inserted ID
+     * along with the validated data. The user activation hash is already part of the returned data array
+     * from the validation class.
+     * Return all data for the event dispatcher
      *
      * @param array $fields
      * @return boolean
@@ -81,7 +85,7 @@ trait DataRepositoryTrait
         if (empty($this->returnedErrors)) {
             if (is_array($this->cleanData) && count($this->cleanData) > 0) {
                 $withOptions = !empty($fields) ? array_merge($fields, $this->cleanData) : $this->cleanData;
-                $push = $this->em->getCrud->create($withOptions);
+                $push = $this->em->getCrud()->create($withOptions);
                 if ($push) {
                     /* Populate data bag and return in a separate method validatedDataBag() */
                     $this->dataBag = array_merge($this->validatedDataBag, ['last_id' => $this->em->getCrud()->lastID()]);
@@ -112,8 +116,8 @@ trait DataRepositoryTrait
      */
     public function getValidationErrors()
     {
-        if ($this->returnedErrors) {
-            return $this->returnedErrors;
+        if (count($this->validationErrors) > 0) {
+            return $this->validationErrors;
         }
     }
 
