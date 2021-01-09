@@ -146,7 +146,7 @@ class Session implements SessionInterface
     {
         $this->ensureSessionKeyIsValid($key);
         try{
-            $this->storage->flush($key, $value);
+            return $this->storage->flush($key, $value);
         }catch(Throwable $throwable) {
             throw $throwable;
         }

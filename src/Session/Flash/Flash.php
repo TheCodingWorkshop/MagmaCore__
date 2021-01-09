@@ -79,7 +79,7 @@ class Flash implements FlashInterface
     public function get()
     {
         if ($this->session->has($this->flashKey)) {
-            $this->session->flush($this->flashKey);
+            return $this->session->flush($this->flashKey);
         }
     }
 

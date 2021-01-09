@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\Service\Contracts\ServiceSubscriberInterface;
+use MagmaCore\Utility\Yaml;
 use ReflectionMethod;
 
 trait ControllerTrait
@@ -67,6 +70,48 @@ trait ControllerTrait
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function registerSubscribedServices()
+    {
+        $subscriberLocation = Yaml::file('subscribers');
+        $subscribers = $subscriberLocation ? $subscriberLocation : self::getSubscribedServices();
+        if (is_array($subscribers) && count($subscribers) > 0) {
+            foreach ($subscribers as $subscriberParams) {
+                foreach ($subscriberParams as $property => $params) {
+                    if (isset($property) && is_string($property) && $property !=='') {
+                        $subscriberObject = BaseApplication::diGet($params['class']);
+
+                        if (!$subscriberObject instanceof EventSubscriberInterface) {
+                            throw new BaseInvalidArgumentException('Invalid Subscriber object ' . $subscriberObject);
+                        }
+
+                        $this->eventDispatcher->addSubscriber($subscriberObject);
+                    }
+                }
+            }
+        }
+    }
+
+    public function registerEventSubscribers(?array $subscriberArgs = [])
+    {
+        $YamlSubscribers = Yaml::file('events');
+        $subscribers = array_merge($subscriberArgs, $YamlSubscribers);
+        if ($subscribers) {
+            foreach ($subscribers as $class => $parameters) {
+                if (!class_exists($class)) {
+                    throw new BaseInvalidArgumentException('Invalid Subscriber class. This doesn\'t exists');
+                }
+                $subscribed = BaseApplication::diGet($class);
+                $this->eventDispatcher->addSubscriber($subscribed);
+            }
+        }
+    }
+
+
     public function onSelf()
     {
         $controller = $this->routeParams['controller'];
@@ -85,12 +130,13 @@ trait ControllerTrait
                             $path = "{$namespace}/{$controller}/{$action}";
                         }
                         if (isset($path) && $path !='') {
-                            return rtrim($path);
+                            return strtolower($path);
                         }
                         break;
                 }
             }
         }
     }
+
 
 }

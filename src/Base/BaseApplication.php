@@ -21,7 +21,6 @@ use MagmaCore\Container\ContainerFactory;
 
 class BaseApplication
 {
-
     /** @var string - the current application version */
     protected const MAGMA_MIN_VERSION = '1.0.0';
 

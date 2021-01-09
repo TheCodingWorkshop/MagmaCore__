@@ -235,6 +235,16 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
+    public function getData()
+    {
+        list(
+            $_method, 
+            $_post, 
+            $_json) = $this->canHandleRequest(null);
+        if (isset($_method))
+            return $_post;
+    }
+
     /**
      * Check whether the form is submittable. Submit button should represent
      * the argument name

@@ -60,9 +60,10 @@ trait DataRepositoryTrait
      */
     public function saveAfterValidation(array $fields) : bool
     {
-        if (empty($this->returnedErrors)) {
+        if (empty($this->validationErrors)) {
             if (is_array($fields) && is_array($this->cleanData)) {
-                $update = $this->em->getCrud()->update(array_merge($fields, $this->cleanData), $this->em->getCrud()->getSchemaID());
+                $combinedData = array_merge($fields, $this->cleanData);
+                $update = $this->em->getCrud()->update($combinedData, $this->em->getCrud()->getSchemaID());
                 if ($update) {
                     return $update;
                 }
@@ -82,7 +83,7 @@ trait DataRepositoryTrait
      */
     public function persistAfterValidation(array $fields = []) : bool
     { 
-        if (empty($this->returnedErrors)) {
+        if (empty($this->validationErrors)) {
             if (is_array($this->cleanData) && count($this->cleanData) > 0) {
                 $withOptions = !empty($fields) ? array_merge($fields, $this->cleanData) : $this->cleanData;
                 $push = $this->em->getCrud()->create($withOptions);

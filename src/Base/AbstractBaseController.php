@@ -21,12 +21,19 @@ use MagmaCore\Base\ControllerTrait;
 
 abstract class AbstractBaseController implements ServiceSubscriberInterface
 {
-
+    /** @var Trait */
     use ControllerTrait;
-
+    /** @var ContainerInterface */
     protected ContainerInterface $container;
+    /** @var array */
     protected array $routeParams;
 
+    /**
+     * Abstract controller constructor method
+     *
+     * @param array $routeParams
+     * @return void
+     */
     public function __construct(array $routeParams)
     {
         if ($routeParams)
@@ -43,10 +50,6 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface
     public static function getSubscribedServices() : array
     {
         return [
-            'session' => '?' . SessionInterface::class,
-            'cache' => '?' . CacheInterface::class,
-            'router' => '?' . RouterInterface::class,
-            'flash' => '?' . FlashInterface::class
         ];
     }
 
@@ -92,7 +95,7 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface
      */
     public function thisRouteID() : int
     {
-        return $this->routeParams['id'];
+        return (int)$this->routeParams['id'];
     }
 
 

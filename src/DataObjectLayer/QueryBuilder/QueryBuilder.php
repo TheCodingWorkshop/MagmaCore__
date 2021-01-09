@@ -71,7 +71,7 @@ class QueryBuilder extends AbstractQueryBuilder
         if ($this->isQueryTypeValid('update')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
                 $values = '';
-                foreach ($this->key['fields'] as $field) {
+                foreach (array_keys($this->key['fields']) as $field) {
                     if ($field !== $this->key['primary_key']) {
                         $values .= $field . " = :" . $field . ", ";
                     }

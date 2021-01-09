@@ -17,6 +17,7 @@ use Symfony\Component\Asset\Package;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use MagmaCore\Session\Flash\Flash;
 
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
@@ -115,7 +116,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     public function flashMessages()
     {
         $html = '';
-        $messages = SessionTrait::sessionFromGlobal()->flush('flash_message');
+        $messages = (new Flash(SessionTrait::sessionFromGlobal()))->get();
         if (is_array($messages) && count($messages) > 0) {
             foreach ($messages as $message) {
                 extract($message);

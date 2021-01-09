@@ -11,16 +11,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Base\Exception\BaseLogicException;
-use MagmaCore\Base\BaseView;
-use MagmaCore\Base\BaseRedirect;
-use MagmaCore\Base\BaseApplication;
+use MagmaCore\EventDispatcher\EventDispatcher;
+use MagmaCore\FormBuilder\FormBuilder;
+use MagmaCore\Datatable\Datatable;
+use MagmaCore\Session\SessionTrait;
+use MagmaCore\Session\SessionFactory;
 use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Session\Flash\Flash;
+use MagmaCore\Cookie\CookieFactory;
+use MagmaCore\Base\BaseView;
+use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\RequestHandler;
-use MagmaCore\Session\SessionTrait;
 use MagmaCore\Middleware\Middleware;
 
 class BaseController extends AbstractBaseController
@@ -32,14 +35,6 @@ class BaseController extends AbstractBaseController
     protected array $routeParams;
     /** @var Object */
     protected Object $twig;
-    /** @var string - flash danger type */
-    protected string $flashDanger;
-    /** @var string - flash info type */
-    protected string $flashInfo;
-    /** @var string - flash success type */
-    protected string $flashSuccess;
-    /** @var string - flash warning type */
-    protected string $flashWarning;
     /** @var array */
     protected array $callBeforeMiddlewares = [];
     /** @var array */
@@ -54,18 +49,22 @@ class BaseController extends AbstractBaseController
     {
         parent::__construct($routeParams);
         $this->routeParams = $routeParams;
-        $this->flashDanger = FlashType::DANGER;
-        $this->flashWarning = FlashType::WARNING;
-        $this->flashSuccess = FlashType::SUCCESS;
-        $this->flashInfo = FlashType::INFO;
         $this->twig = new BaseView();
 
         $this->container(
             [
                 "request" => RequestHandler::class,
                 "response" => ResponseHandler::class,
+                "formBuilder" => FormBuilder::class,
+                "eventDispatcher" => EventDispatcher::class,
+                "session" => "",
+                "cache" => "",
+                "cookie" => "",
+                "tableGird" => Datatable::class
             ]
         );
+
+        $this->registerSubscribedServices();
     }
 
     /**
@@ -215,7 +214,7 @@ class BaseController extends AbstractBaseController
      */
     public function flashWarning() : string
     {
-        return $this->flashWarning;
+        return FlashType::WARNING;
     }
 
     /**
@@ -225,7 +224,7 @@ class BaseController extends AbstractBaseController
      */
     public function flashSuccess() : string
     {
-        return $this->flashSuccess;
+        return FlashType::SUCCESS;
     }
 
     /**
@@ -235,7 +234,7 @@ class BaseController extends AbstractBaseController
      */
     public function flashDanger() : string
     {
-        return $this->flashDanger;
+        return FlashType::DANGER;
     }
 
     /**
@@ -245,7 +244,7 @@ class BaseController extends AbstractBaseController
      */
     public function flashInfo() : string
     {
-        return $this->flashInfo;
+        return FlashType::INFO;
     }
 
     /**
