@@ -279,6 +279,9 @@ class DataRepository implements DataRepositoryInterface
         } else if ($status) {
             $conditions = [$args['query'] => $status];
             $totalRecords = $this->em->getCrud()->countRecords($conditions);
+        } elseif (count($args['additional_conditions']) > 0) {
+            $conditions = $args['additional_conditions'];
+            $totalRecords = $this->em->getCrud()->countRecords($conditions);
         } else {
             $conditions = [];
             $totalRecords = $this->em->getCrud()->countRecords($conditions);

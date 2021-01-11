@@ -13,6 +13,7 @@ namespace MagmaCore\Datatable;
 
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 use MagmaCore\Datatable\AbstractDatatable;
+use MagmaCore\Twig\TwigExtension;
 
 class Datatable extends AbstractDatatable
 {
@@ -73,7 +74,7 @@ class Datatable extends AbstractDatatable
                                     if (isset($column['show_column']) && $column['show_column'] != false) {
                                         $this->element .= '<td class="' . $column['class'] . '">';
                                             if (is_callable($column['formatter'])) {
-                                                $this->element .= call_user_func_array($column['formatter'], [$row]);
+                                                $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                                             } else {
                                                 $this->element .= (isset($row[$column['db_row']]) ? $row[$column['db_row']] : '');
                                             }

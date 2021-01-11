@@ -17,11 +17,14 @@ use Symfony\Component\Asset\Package;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use MagmaCore\Session\Flash\Flash;
+use MagmaCore\Twig\Extensions\FlashMessageExtension;
+use MagmaCore\Twig\Extensions\IconNavExtension;
 
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\Singleton;
 use MagmaCore\Session\SessionTrait;
+use MagmaCore\Translation\Translation;
 
 use Throwable;
 use Exception;
@@ -46,10 +49,10 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     {
         return [
             new TwigFunction('asset', [$this, 'asset']),
-            //new TwigFunction('locale', [$this, 'locale']),
+            new TwigFunction('locale', [$this, 'locale']),
             new TwigFunction('varDump', [$this, 'varDump']),
             new TwigFunction('Config', [$this, 'Config']),
-            new TwigFunction('flashMessages', [$this, 'flashMessages']),
+            new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
 
         ];
     }
@@ -82,6 +85,11 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
                 'v1', '%s?version=%s')))->getUrl($path);*/
     }
 
+    public function locale(string $string)
+    {
+        return Translation::getInstance()->$string;
+    }
+
     /**
      * @param $var
      * @return bool
@@ -105,9 +113,13 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         return Yaml::file($file);
     }
 
+
+    /*=======================================================================================*/
+    /* TWIG EXTENSIONS */
+    /*=======================================================================================*/
+
     /**
-     * Get the session flash messages on the fly.
-     *
+     * @inheritdoc
      * @return string
      * @throws GlobalManager
      * @throws Exception
@@ -115,19 +127,25 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      */
     public function flashMessages()
     {
-        $html = '';
-        $messages = (new Flash(SessionTrait::sessionFromGlobal()))->get();
-        if (is_array($messages) && count($messages) > 0) {
-            foreach ($messages as $message) {
-                extract($message);
-                $html .= '<div class="uk-alert-' . (isset($type) ? $type : '') . ' uk-animation-toggle uk-animation-shake fade-alert" uk-alert tabindex="0">
-                        <a class="uk-alert-close" uk-close></a>
-                        <p class="uk-text-bolder">' . (isset($message) ? $message : '') . '</p>
-                    </div>';
-            }
-            return $html;
-        }
-        return false;
+        return $this->flashMessages();
+    }
+
+    /**
+     * @inheritdoc
+     * @param array $icons
+     * @param array|Object $row
+     * @param string $controller
+     * @param boolean $vertical
+     * @return void
+     */
+    public function iconNav(array $icons, $row = null, string $controller, bool $vertical = false)
+    {
+        return (new IconNavExtension())->iconNav(
+            $icons,
+            $row,
+            $controller,
+            $vertical
+        );
     }
 
 }

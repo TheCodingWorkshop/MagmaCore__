@@ -25,6 +25,7 @@ use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Middleware\Middleware;
+use MagmaCore\Translation\Translation;
 
 class BaseController extends AbstractBaseController
 {
@@ -60,7 +61,7 @@ class BaseController extends AbstractBaseController
                 "session" => "",
                 "cache" => "",
                 "cookie" => "",
-                "tableGird" => Datatable::class
+                "tableGird" => Datatable::class,
             ]
         );
 
@@ -250,12 +251,14 @@ class BaseController extends AbstractBaseController
     /**
      * Returns a translation string to convert to default or choosen locale
      *
-     * @param string $text
+     * @param string $locale
      * @return string
      */
-    public function locale(string $text) : string
+    public function locale(?string $locale = null) : ?string
     {
-        return $text;
+        /*if (null !== $locale)
+            return Translation::getInstance()->$locale;*/
+        return $locale;
     }
 
     /**

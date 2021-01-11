@@ -92,7 +92,7 @@ class AuthSecurityController extends BaseController
                         $this->redirect($this->onSelf());
                     }
                 } else {
-                    $this->flashMessage($this->locale('invalid_csrf', $this->flashDanger()));
+                    $this->flashMessage($this->locale('fail_csrf_validation', $this->flashDanger()));
                     $this->redirect($this->onSelf());
                 }
             }
