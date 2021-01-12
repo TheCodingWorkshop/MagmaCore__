@@ -32,7 +32,7 @@ class Mailer implements MailerInterface
     public function __construct(Object $transporterObject, ?array $settings = null, ?string $dotEnvString = null)
     {
         if ($dotEnvString !==null) {
-            (new $dotEnvString())->load(dirname(dirname(dirname(__FILE__))) . '/.env');
+            (new $dotEnvString())->load(ROOT_PATH . '/.env');
         }
         $this->transporterObject = $transporterObject;
         if (is_array($settings) && count($settings) > 0) {

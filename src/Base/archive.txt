@@ -1,0 +1,21 @@
+/*use MagmaCore\EventDispatcher\EventDispatcher;
+use App\EventSubscriber\UserSubscriber;
+use App\EventListener\NewUserListener;
+use App\Event\NewUserEvent;
+use App\Event\UserEdittedEvent;
+use App\Event\UserDeletedEvent;
+
+use App\Model\UserModel;
+
+$dispatcher = new EventDispatcher();
+$listener = new NewUserListener();
+//$dispatcher->addListener(NewUserEvent::NAME, [$listener, 'onUserRegisterAction']);
+$subscriber = new UserSubscriber();
+$dispatcher->addSubscriber($subscriber);
+//$dispatcher->addListener(NewUserEvent::NAME, function(){
+    //echo __FUNCTION__;
+//});
+
+// /$dispatcher->dispatch(new NewUserEvent(new UserModel()), NewUserEvent::NAME);
+$dispatcher->dispatch(new UserEdittedEvent(new UserModel()), UserEdittedEvent::NAME);
+$dispatcher->dispatch(new UserDeletedEvent(new UserModel()), UserDeletedEvent::NAME);*/

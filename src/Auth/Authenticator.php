@@ -30,6 +30,8 @@ class Authenticator
             if (password_verify($passqwordHash, $user->password_hash)) {
                 return $user;
             }
+        } else {
+            die('account not activated');
         }
     }
 
