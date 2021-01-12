@@ -80,9 +80,9 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      */
     public function asset($path)
     {
-       /* return (new Package(
+        return (new Package(
             new StaticVersionStrategy(
-                'v1', '%s?version=%s')))->getUrl($path);*/
+                'v1', '%s?version=%s')))->getUrl($path);
     }
 
     public function locale(string $string)

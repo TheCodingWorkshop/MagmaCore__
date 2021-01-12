@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Container;
 
+use MagmaCore\Container\ContainerExceptionInterface;
+
+
 /** PSR-11 Container */
 interface ContainerInterface
 {

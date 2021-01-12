@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace MagmaCore\Http\Event;
 
 use MagmaCore\EventDispatcher\Event;
-use MagmaCore\Http\RequestHandler as Request;
+//use MagmaCore\Http\RequestHandler;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class BaseEvent extends Event
 {
 
-    private $request;
+    private Request $request;
     private $requestType;
     protected const BASE_REQUEST = 1;
 
@@ -27,7 +29,7 @@ class BaseEvent extends Event
      */
     public function __construct(Request $request, ?int $requestType)
     {
-        $this->request = $request->handler();
+        $this->request = $request;
         $this->requestType = $requestType;
     }
 

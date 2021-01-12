@@ -9,11 +9,13 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\EventDispatcher\Event;
+namespace MagmaCore\Http\Event;
 
-use MagmaCore\Http\RequestHandler as Request;
-use MagmaCore\Http\ResponseHandler as Response;
+use MagmaCore\Http\RequestHandler;
+use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\Event\BaseEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Allows to filter a Response object.
@@ -23,7 +25,7 @@ use MagmaCore\Http\Event\BaseEvent;
  * browser.
  * @credit Symfony
  */
-final class ResponseEvent extends BaseEvent
+class ResponseEvent extends BaseEvent
 {
     private $response;
 
@@ -33,7 +35,7 @@ final class ResponseEvent extends BaseEvent
         $this->setResponse($response);
     }
 
-    public function getResponse(): Response
+    public function getResponse()
     {
         return $this->response;
     }

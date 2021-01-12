@@ -14,6 +14,7 @@ namespace MagmaCore\Datatable;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 use MagmaCore\Datatable\AbstractDatatable;
 use MagmaCore\Twig\TwigExtension;
+use MagmaCore\Http\RequestHandler;
 
 class Datatable extends AbstractDatatable
 {
@@ -46,7 +47,16 @@ class Datatable extends AbstractDatatable
 
     private function getRepositoryParts(array $dataRepository) : void
     {
-        list($this->dataOptions, $this->currentPage, $this->totalPages, $this->totalRecords, $this->direction, $this->sortDirection, $this->tdClass, $this->tableColumn, $this->tableOrder) = $dataRepository;
+        list(
+            $this->dataOptions, 
+            $this->currentPage, 
+            $this->totalPages, 
+            $this->totalRecords, 
+            $this->direction, 
+            $this->sortDirection, 
+            $this->tdClass, 
+            $this->tableColumn, 
+            $this->tableOrder) = $dataRepository;
     }
 
     public function totalRecords()
@@ -62,6 +72,11 @@ class Datatable extends AbstractDatatable
     public function table() : ?string
     {
         extract($this->attr, EXTR_SKIP);
+        $status = (new RequestHandler())
+        ->handler()
+        ->query
+        ->getAlnum($this->sortController['query']);
+
         $this->element .= $before;
         if (is_array($this->dataColumns) && count($this->dataColumns) > 0) {
             if (is_array($this->dataOptions) && $this->dataOptions !=null) {
@@ -116,9 +131,13 @@ class Datatable extends AbstractDatatable
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
             $element .= '<a class="uk-link-reset" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
+
             $element .= $column['dt_row'];
+
             $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
+
             $element .= '</a>';
+            
         } else {
             $element .= $column['dt_row'];
         }

@@ -15,6 +15,7 @@ use MagmaCore\Container\Exception\DependencyIsNotInstantiableException;
 use MagmaCore\Container\Exception\DependencyHasNoDefaultValueException;
 use MagmaCore\Container\Exception\ContainerInvalidArgumentException;
 use MagmaCore\Container\Exception\ContainerException;
+use MagmaCore\Container\ContainerExceptionInterface;
 use MagmaCore\Container\ContainerInterface;
 use MagmaCore\Container\SettableInterface;
 use ReflectionParameter;
@@ -22,7 +23,7 @@ use ReflectionClass;
 use Closure;
 
 /** PSR-11 Container */
-class Container implements  ContainerInterface, SettableInterface, ContainerServicesInterface
+class Container implements  ContainerInterface, SettableInterface
 { 
 
     /** @var array */
@@ -171,28 +172,5 @@ class Container implements  ContainerInterface, SettableInterface, ContainerServ
         $this->unregister = $args;
         return $this;
     }
-
-    /**
-     * @inheritdoc
-     * @return Object
-     */
-    public function register()
-    {
-        if (!is_array($this->services)) {
-            throw new ContainerInvalidArgumentException('Invalid service. This list must be of an associative array.');
-        }
-        if ($this->services) {
-            foreach ($this->services as $property => $className) {
-                if (strpos($className, $property) !== false) {
-                    if (class_exists($className)) {
-                        $this->service = ($property === 'dataColumn' || $property === 'column') ? $this->$property = $className() : $this->$property = $this->get($className);
-                    }
-                }
-            }
-            var_dump($this->TestClass);
-            //return $this->service;
-        }
-    }
-
 
 }

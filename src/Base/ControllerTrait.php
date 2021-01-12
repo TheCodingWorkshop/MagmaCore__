@@ -59,11 +59,11 @@ trait ControllerTrait
             $output = '';
             foreach ($args as $arg) {
                 foreach ($arg as $property => $class) {
-                    if (strpos($class, $arg[$property]) !== false) {
-                        if ($class) {
-                            $output = ($property === 'dataColumns' || $property === 'column') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
-                        }
+                    //if (strpos($class, $arg[$property]) !== false) {
+                    if ($class) {
+                        $output = ($property === 'dataColumns' || $property === 'column') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
                     }
+                    //}
                 }
             }
             return $output;
@@ -90,27 +90,14 @@ trait ControllerTrait
                         }
 
                         $this->eventDispatcher->addSubscriber($subscriberObject);
+
                     }
                 }
             }
+            
+
         }
     }
-
-    public function registerEventSubscribers(?array $subscriberArgs = [])
-    {
-        $YamlSubscribers = Yaml::file('events');
-        $subscribers = array_merge($subscriberArgs, $YamlSubscribers);
-        if ($subscribers) {
-            foreach ($subscribers as $class => $parameters) {
-                if (!class_exists($class)) {
-                    throw new BaseInvalidArgumentException('Invalid Subscriber class. This doesn\'t exists');
-                }
-                $subscribed = BaseApplication::diGet($class);
-                $this->eventDispatcher->addSubscriber($subscribed);
-            }
-        }
-    }
-
 
     public function onSelf()
     {

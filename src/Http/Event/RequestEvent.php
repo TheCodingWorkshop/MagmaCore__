@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Http\Event;
 
-use MagmaCore\Http\ResponseHandler as Response;
+use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\Event\BaseEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class RequestEvent extends BaseEvent
 {
@@ -34,7 +36,7 @@ class RequestEvent extends BaseEvent
      */
     public function setResponse(Response $response)
     {
-        $this->response = $response;
+        $this->response = $response->handler();
         $this->stopPropagation();
     }
 
@@ -45,7 +47,7 @@ class RequestEvent extends BaseEvent
      */
     public function hasResponse()
     {
-        return null !== $this->response;
+        return null !== $this->response->handler();
     }
 
 

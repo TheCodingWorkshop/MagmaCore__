@@ -13,6 +13,8 @@ namespace MagmaCore\Container;
 
 use MagmaCore\Container\Exception\ContainerInvalidArgumentException;
 use MagmaCore\Container\ContainerInterface;
+use MagmaCore\Container\ContainerExceptionInterface;
+
 use MagmaCore\Container\Container;
 
 /** PSR-11 Container */

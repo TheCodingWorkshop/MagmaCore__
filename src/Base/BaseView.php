@@ -19,6 +19,7 @@ use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Twig\TwigExtension;
+use MagmaCore\Inertia\Twig\InertiaTwigExtension;
 
 class BaseView
 { 
@@ -60,6 +61,7 @@ class BaseView
 
             $twig->addExtension(new DebugExtension());
             $twig->addExtension(new TwigExtension());
+            $twig->addExtension(new InertiaTwigExtension());
         }
 
         return $twig->render($template, $args);

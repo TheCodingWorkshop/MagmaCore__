@@ -18,7 +18,7 @@ class BeforeMiddleware implements MiddlewareInterface
      */
     public function middleware(Object $middleware, Closure $next)
     {
-        $middleware->runs[] = 'before';
+        //$middleware->runs[] = 'before';
         return $next($middleware);
     }
 }
