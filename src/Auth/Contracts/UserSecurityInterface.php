@@ -11,12 +11,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Contracts;
 
-interface UserActivationInterface
+interface UserSecurityInterface
 { 
 
-    public function findByActivationToken(string $token) : ?Object;
-    public function sendUserActivationEmail(string $hash) : self;
-    public function validateActivation(Object $respoitory) : self;
-    public function activate() : bool;
+    public function emailExists(string $email, int $ignoreID = null);
+    public function validatePassword(object $cleanData, ?object $repository = null);
 
 }
