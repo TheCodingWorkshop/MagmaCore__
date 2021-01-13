@@ -189,7 +189,7 @@ class BaseController extends AbstractBaseController
             $responseCode);
 
         if ($this->redirect) {
-            return $this->redirect->redirect();
+            $this->redirect->redirect();
         }
     }
 

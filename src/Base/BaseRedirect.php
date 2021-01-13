@@ -96,6 +96,7 @@ class BaseRedirect
         if (!headers_sent()) {
             header('HTTP/1.1 301 Moved Permanently');
             header('Location: ' . $this->url, $this->replace, $this->responseCode);
+            exit;
         }
     }
 
