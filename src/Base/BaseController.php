@@ -62,6 +62,7 @@ class BaseController extends AbstractBaseController
                 "cache" => "",
                 "cookie" => "",
                 "tableGird" => Datatable::class,
+                "flatDb" => \MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage::class
             ]
         );
 

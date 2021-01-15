@@ -246,6 +246,17 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * @return boolean
+     */
+    public function isAjax()
+    {
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        if ($isAjax) {
+            return $isAjax;
+        }
+    }
+
+    /**
      * Check whether the form is submittable. Submit button should represent
      * the argument name
      *

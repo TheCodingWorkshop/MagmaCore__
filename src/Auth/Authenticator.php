@@ -16,6 +16,8 @@ use MagmaCore\Auth\Model\UserModel;
 class Authenticator
 {
 
+    protected array $errors = [];
+
     /**
      * Authenticate the user by their email and password and only if their account status is active
      * 
@@ -23,16 +25,18 @@ class Authenticator
      * @param string $password
      * @return Object
      */
-    public static function authenticate(string $email, string $passqwordHash) : Object
+    public function authenticate(string $email, string $passqwordHash)
     {
         $user = (new UserModel())->getRepo()->findObjectBy(['email' => $email]);
         if ($user && $user->status == 'active') {
             if (password_verify($passqwordHash, $user->password_hash)) {
                 return $user;
-            }
-        } else {
-            die('account not activated');
-        }
+            } 
+        } 
     }
 
+    public function getErrors() : array
+    {
+        return $this->errors;
+    }
 }
