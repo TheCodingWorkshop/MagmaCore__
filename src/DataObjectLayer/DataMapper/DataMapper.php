@@ -11,17 +11,20 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnection;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
 
 use PDOStatement;
 use Throwable;
 use PDO;
+use PDOException;
 
-class DataMapper implements DataMapperInterface
+class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {
 
     /** @var DatabaseConnectionInterface */
@@ -39,6 +42,7 @@ class DataMapper implements DataMapperInterface
     public function __construct(DatabaseConnectionInterface $dbh)
     {
         $this->dbh = $dbh;
+        parent::__construct($this->dbh); /* Pass to DatabaseTransaction class */
     }
 
     /**
@@ -252,9 +256,12 @@ class DataMapper implements DataMapperInterface
     public function persist(string $sqlQuery, array $parameters)
     {
         try {
-            return $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
-        } catch(Throwable $throwable){
-            throw $throwable;
+            $this->start();
+            $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
+            $this->commit();
+        } catch(PDOException $pdoex){
+            $this->revert();
+            throw $pdoex;
         }
     }
 }
