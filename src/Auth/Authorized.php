@@ -4,7 +4,7 @@
  *
  * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE 
  * file that was distributed with this source code.
  */
 declare(strict_types=1);
@@ -95,11 +95,15 @@ class Authorized
             $priviUser->email = $user->email;
             $priviUser->firstname = $user->firstname;
             $priviUser->lastname = $user->lastname;
+            $priviUser->name = "{$user->firstname} {$user->lastname}";
+            $priviUser->role = ["all"];
             $priviUser->password_hash = $user->password_hash;
             $priviUser->gravatar = $user->gravatar;
             $priviUser->status = $user->status;
 
             $priviUser->initRoles($user->id);
+            var_dump($priviUser);
+            die();
             return $priviUser;
         } else {
             $user = self::loginFromRemembermeCookie();

@@ -16,16 +16,16 @@ use MagmaCore\EventDispatcher\EventDispatcher;
 use MagmaCore\FormBuilder\FormBuilder;
 use MagmaCore\Datatable\Datatable;
 use MagmaCore\Session\SessionTrait;
-use MagmaCore\Session\SessionFactory;
+//use MagmaCore\Session\SessionFactory;
 use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Session\Flash\Flash;
-use MagmaCore\Cookie\CookieFactory;
+//use MagmaCore\Cookie\CookieFactory;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Middleware\Middleware;
-use MagmaCore\Translation\Translation;
+//use MagmaCore\Translation\Translation;
 
 class BaseController extends AbstractBaseController
 {
