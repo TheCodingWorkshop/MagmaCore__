@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\Auth;
 
 use MagmaCore\Auth\Model\UserModel;
+use Throwable;
 
 class Authenticator
 {
@@ -25,14 +26,20 @@ class Authenticator
      * @param string $password
      * @return Object
      */
-    public function authenticate(string $email, string $passqwordHash)
+    public function authenticate(string $email, string $passqwordHash, ?Object $currentObject = null)
     {
-        $user = (new UserModel())->getRepo()->findObjectBy(['email' => $email]);
-        if ($user && $user->status == 'active') {
-            if (password_verify($passqwordHash, $user->password_hash)) {
-                return $user;
-            } 
-        } 
+        try {
+            $user = (new UserModel())->getRepo()->findObjectBy(['email' => $email]);
+            if ($user && $user->status == 'active') {
+                if (password_verify($passqwordHash, $user->password_hash)) {
+                    return $user;
+                } 
+            }     
+
+        } catch(Throwable $th) {
+            $currentObject->flashMessage('Invalid user credentials. Please check your details and tru again.', $currentObject->flashWarning());
+            $currentObject->redirect('/login');
+        }
     }
 
     public function getErrors() : array

@@ -53,9 +53,9 @@ interface DataRepositoryInterface
      * 
      * @param array $conditions
      * @param array $selectors
-     * @return Object
+     * @return Object|null
      */
-    public function findObjectBy(array $conditions = [], array $selectors = []) : Object;
+    public function findObjectBy(array $conditions = [], array $selectors = []) : ?Object;
 
     /**
      * Returns the search results based on the user search conditions and parameters

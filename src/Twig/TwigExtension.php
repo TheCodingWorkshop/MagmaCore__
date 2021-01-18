@@ -19,6 +19,7 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 use MagmaCore\Twig\Extensions\FlashMessageExtension;
 use MagmaCore\Twig\Extensions\IconNavExtension;
+use MagmaCore\Twig\Extensions\NavBarExtension;
 
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
@@ -52,7 +53,10 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('locale', [$this, 'locale']),
             new TwigFunction('varDump', [$this, 'varDump']),
             new TwigFunction('Config', [$this, 'Config']),
+            new TwigFunction('assetPath', [$this, 'assetPath']),
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
+            new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
+            new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
 
         ];
     }
@@ -87,7 +91,8 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
 
     public function locale(string $string)
     {
-        return Translation::getInstance()->$string;
+        //return Translation::getInstance()->$string;
+        return $string;
     }
 
     /**
@@ -111,6 +116,11 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     public function Config($file)
     {
         return Yaml::file($file);
+    }
+
+    public function assetPath(string $path)
+    {
+        return $this->asset(RESOURCES . $path);
     }
 
 
@@ -147,5 +157,15 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             $vertical
         );
     }
+
+    /**
+     * @inheritdoc
+     * @return void
+     */
+    public function navMenu(array $items)
+    {
+        return (new NavBarExtension())->navMenu($items);
+    }
+
 
 }

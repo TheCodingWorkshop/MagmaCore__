@@ -144,9 +144,9 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param array $conditions
      * @param array $selectors
-     * @return Object
+     * @return Object|null
      */
-    public function findObjectBy(array $conditions = [], array $selectors = []) : Object
+    public function findObjectBy(array $conditions = [], array $selectors = []) : ?Object
     {
         $this->isArray($conditions);
         try{

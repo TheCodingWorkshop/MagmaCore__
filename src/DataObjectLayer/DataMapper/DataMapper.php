@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnection;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
