@@ -36,7 +36,7 @@ class IconNavExtension
      * @param boolean $vertical
      * @return string
      */
-    public function iconNav(array $icons = [], $row = null, string $controller, bool $vertical = false) : string
+    public function iconNav(array $icons = [], array $row = null, string $controller = null, bool $vertical = false) : string
     {
         $html = '';
         if (is_array($icons) && count($icons) > 0) {

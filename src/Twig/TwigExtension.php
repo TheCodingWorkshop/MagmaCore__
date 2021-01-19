@@ -31,6 +31,8 @@ use MagmaCore\Translation\Translation;
 use Throwable;
 use Exception;
 use InvalidArgumentException;
+use MagmaCore\Twig\Extensions\SearchBoxExtension;
+use MagmaCore\Twig\Extensions\SubheaderExtension;
 
 /**
  * Class TwigExtension
@@ -59,6 +61,9 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
             new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
             new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
+            new TwigFunction('subHeader', [new SubheaderExtension(), 'subHeader']),
+            new TwigFunction('subHeader', [new SubheaderExtension(), 'subHeader']),
+            new TwigFunction('searchBox', [new SearchBoxExtension(), 'searchBox']),
 
         ];
     }
@@ -165,7 +170,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param boolean $vertical
      * @return void
      */
-    public function iconNav(array $icons, $row = null, string $controller, bool $vertical = false)
+    public function iconNav(array $icons = [], array $row = null, string $controller = null, bool $vertical = false)
     {
         return (new IconNavExtension())->iconNav(
             $icons,
@@ -182,6 +187,44 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     public function navMenu(array $items)
     {
         return (new NavBarExtension())->navMenu($items);
+    }
+
+    /**
+     * @inheritdoc
+     * @return void
+     */
+    public function searchBox(string $filter = 's', string $placeholder = 'Search...')
+    {
+        return (new SearchBoxExtension())->searchBox($filter, $placeholder);
+    }
+
+    /**
+     * @inheritdoc
+     * @param string $searchFilter
+     * @param string $icon
+     * @param string $iconColor
+     * @param string $iconSize
+     * @param string $prefix
+     * @param string $controller
+     * @param integer $totalRecords
+     * @param array $actions
+     * @param boolean $actionVertical
+     * @param array $row
+     * @return string
+     */
+    public function subHeader(        
+        string $searchFilter = null, 
+        string $icon = null, 
+        string $iconColor = null,
+        string $iconSize = null,
+        string $prefix = null,
+        string $controller = null,
+        int $totalRecords = null,
+        array $actions = null,
+        bool $actionVertical = false,
+        array $row = null) : string
+    {
+        return (new SubheaderExtension())->subHeader($searchFilter, $icon, $iconColor, $iconSize, $prefix, $controller, $totalRecords, $actions, $actionVertical, $row);
     }
 
 

@@ -98,5 +98,10 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface
         return (int)$this->routeParams['id'];
     }
 
+    public function toArray(Object $data)
+    {
+        return (array)$data;
+    }
+
 
 }
