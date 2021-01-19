@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\Auth;
+namespace MagmaCore\Auth\Contracts;
 
 interface RememberedLoginInterface
 {

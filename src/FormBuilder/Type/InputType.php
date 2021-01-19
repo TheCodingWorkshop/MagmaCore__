@@ -167,7 +167,8 @@ class InputType implements FormBuilderTypeInterface
             'new_label' => '',
             'inline_icon' => '',
             'inline_icon_class' => '',
-            'inline_flip_icon' => false
+            'inline_flip_icon' => false,
+            'description' => ''
         ];
         return (!empty($this->settings) ? array_merge($defaults, $this->settings) : $defaults);
     }

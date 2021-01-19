@@ -20,6 +20,7 @@ use Twig\TwigFunction;
 use MagmaCore\Twig\Extensions\FlashMessageExtension;
 use MagmaCore\Twig\Extensions\IconNavExtension;
 use MagmaCore\Twig\Extensions\NavBarExtension;
+use MagmaCore\Base\BaseController;
 
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
@@ -54,6 +55,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('varDump', [$this, 'varDump']),
             new TwigFunction('Config', [$this, 'Config']),
             new TwigFunction('assetPath', [$this, 'assetPath']),
+            new TwigFunction('routePath', [$this, 'routePath']),
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
             new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
             new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
@@ -121,6 +123,21 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     public function assetPath(string $path)
     {
         return $this->asset(RESOURCES . $path);
+    }
+
+    public function routePath(Object $object, string $action) : string
+    {
+        if ($object instanceof BaseController) {
+            if (in_array($action, ['new', 'trash'], true)) {
+                $path = '/admin' . '/' . $object->thisRouteController() . '/' . $object->thisRouteAction();
+            } elseif (in_array($action, ['edit', 'show', 'delete'], true)) {
+                $path = '/admin' . '/' . $object->thisRouteController() . '/' . $object->thisRouteID() . '/' . $object->thisRouteAction();
+            }
+
+            if ($path) {
+                return $path;
+            }
+        }
     }
 
 

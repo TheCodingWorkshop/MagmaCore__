@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\EventDispatcher\EventDispatcher;
 use MagmaCore\FormBuilder\FormBuilder;
@@ -62,7 +63,7 @@ class BaseController extends AbstractBaseController
                 "cache" => "",
                 "cookie" => "",
                 "tableGird" => Datatable::class,
-                "flatDb" => \MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage::class
+                "flatDb" => FileStorage::class
             ]
         );
 

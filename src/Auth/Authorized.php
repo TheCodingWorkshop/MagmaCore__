@@ -13,10 +13,10 @@ namespace MagmaCore\Auth;
 
 use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Auth\Model\RememberedLoginModel as RememberedLogin;
-use MagmaCore\Auth\Model\UserModel;
 use MagmaCore\Auth\Roles\Roles;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Cookie\CookieFacade;
+use App\Model\UserModel;
 use Throwable;
 
 /**
@@ -102,8 +102,6 @@ class Authorized
             $priviUser->status = $user->status;
 
             $priviUser->initRoles($user->id);
-            var_dump($priviUser);
-            die();
             return $priviUser;
         } else {
             $user = self::loginFromRemembermeCookie();

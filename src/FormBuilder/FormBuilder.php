@@ -51,12 +51,12 @@ class FormBuilder extends AbstractFormBuilder
     public function form(array $args = []) : self
     {
         if ($args) {
-            $attr = array_merge(self::FORM_PARTS, $args);
+            $this->formAttr = array_merge(self::FORM_PARTS, $args);
         } else {
-            $attr = self::FORM_PARTS;
+            $this->formAttr = self::FORM_PARTS;
         }
         if (is_array($attr)) {
-            foreach ($attr as $key => $value) {
+            foreach ($this->formAttr as $key => $value) {
                 if (!$this->setAttributes($key, $value)) {
                     $this->setAttributes($key, self::FORM_PARTS[$key]);
                 }
@@ -130,8 +130,6 @@ class FormBuilder extends AbstractFormBuilder
     private function processFormFields(Object $objectType) : string
     {
         $html = '';
-        
-        
         foreach (self::SUPPORT_INPUT_TYPES as $field) :    
             switch ($objectType->getType()) :
                 case $field :
@@ -147,14 +145,16 @@ class FormBuilder extends AbstractFormBuilder
                         
                         //[before, after, element, element_id, element_class, element_style]
                         extract ($this->htmlAttr);
-                        if ($element) {
+                        if (!empty($element)) {
                     
                             /* Main wrapper element html tag are set with in the $before variable */
                             $html .= (isset($before_after_wrapper) && $before_after_wrapper == true) ? "\n{$before}" : "";
-
                             /* Form label wrapping element */
-                            $html .= ($show_label == true) ? $this->formLabel($objectType->getOptions(), '', $new_label) : '';
+                            $html .= ($show_label === true) ? $this->formLabel($objectType->getOptions(), '', $new_label) : '';
 
+                            if (!empty($description) && in_array('uk-form-stacked', $this->formAttr['class'])) {
+                                $html .= "<div class=\"uk-text-meta uk-text-truncate uk-margin-small-bottom\">{$description}</div>";
+                            }
                             /* If we are adding inline icon to the element lets add the class for it */
                             if (isset($inline_icon) && $inline_icon !=='') {
                                 $html .= "\n" . '<div class="' . (isset($inline_icon_class) ? 'uk-inline' : $inline_icon_class) . '">' . "\n";

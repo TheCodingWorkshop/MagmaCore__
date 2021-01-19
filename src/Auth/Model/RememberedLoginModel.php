@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Model;
 
-use MagmaCore\Auth\RememberedLoginInterface;
+use MagmaCore\Auth\Contracts\RememberedLoginInterface;
 use MagmaCore\Base\AbstractBaseModel;
 use MagmaCore\Utility\Token;
 use Throwable;

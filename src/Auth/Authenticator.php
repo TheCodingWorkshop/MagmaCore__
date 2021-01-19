@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
-use MagmaCore\Auth\Model\UserModel;
+use App\Model\UserModel;
 use Throwable;
 
 class Authenticator
@@ -34,7 +34,9 @@ class Authenticator
                 if (password_verify($passqwordHash, $user->password_hash)) {
                     return $user;
                 } 
-            }     
+            }  else {
+                die('Invalid Password');
+            }   
 
         } catch(Throwable $th) {
             $currentObject->flashMessage('Invalid user credentials. Please check your details and tru again.', $currentObject->flashWarning());
