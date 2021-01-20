@@ -56,8 +56,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('locale', [$this, 'locale']),
             new TwigFunction('varDump', [$this, 'varDump']),
             new TwigFunction('Config', [$this, 'Config']),
-            new TwigFunction('assetPath', [$this, 'assetPath']),
-            new TwigFunction('routePath', [$this, 'routePath']),
+            new TwigFunction('path', [$this, 'path']),
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
             new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
             new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
@@ -125,20 +124,14 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         return Yaml::file($file);
     }
 
-    public function assetPath(string $path)
-    {
-        return $this->asset(RESOURCES . $path);
-    }
-
-    public function routePath(Object $object, string $action) : string
+    public function path(Object $object, string $action, int $row_id = 0) : string
     {
         if ($object instanceof BaseController) {
-            if (in_array($action, ['new', 'trash'], true)) {
-                $path = '/admin' . '/' . $object->thisRouteController() . '/' . $object->thisRouteAction();
-            } elseif (in_array($action, ['edit', 'show', 'delete'], true)) {
-                $path = '/admin' . '/' . $object->thisRouteController() . '/' . $object->thisRouteID() . '/' . $object->thisRouteAction();
+            if ($row_id === 0) {
+                $path = "/admin/{$object->thisRouteController()}/{$action}" ;
+            } else {
+                $path = "/admin/{$object->thisRouteController()}/{$row_id}/{$action}";
             }
-
             if ($path) {
                 return $path;
             }
@@ -214,17 +207,13 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      */
     public function subHeader(        
         string $searchFilter = null, 
-        string $icon = null, 
-        string $iconColor = null,
-        string $iconSize = null,
-        string $prefix = null,
         string $controller = null,
         int $totalRecords = null,
         array $actions = null,
         bool $actionVertical = false,
         array $row = null) : string
     {
-        return (new SubheaderExtension())->subHeader($searchFilter, $icon, $iconColor, $iconSize, $prefix, $controller, $totalRecords, $actions, $actionVertical, $row);
+        return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row);
     }
 
 

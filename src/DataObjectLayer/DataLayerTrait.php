@@ -16,8 +16,6 @@ trait DataLayerTrait
      */
     public function flattenArray(array $array = null)
     {
-        //Validator::isArray($array);
-
         if (is_array($array)) {
             $arraySingle = [];
             foreach ($array as $arr) {
@@ -37,8 +35,6 @@ trait DataLayerTrait
      */
     public function flattenArrayRecursive(array $array = null)
     {
-        //Validator::isArray($array);
-
         $flatArray = array();
         foreach (new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array)) as $value) {
             $flatArray[] = $value;

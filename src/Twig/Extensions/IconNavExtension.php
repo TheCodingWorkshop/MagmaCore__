@@ -137,6 +137,10 @@ class IconNavExtension
                 case 'file-edit' :
                         $target = "/admin/{$controller}/{$row['id']}/edit";
                     break;
+                case 'show' :
+                case 'user' :
+                        $target = "/admin/{$controller}/{$row['id']}/show";
+                    break;    
                 default :
                     $target = (isset($path) ? $path : '');
                     break;

@@ -7,25 +7,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare (strict_types = 1);
+
+declare(strict_types=1);
 
 namespace MagmaCore\Twig\Extensions;
 
 class SearchBoxExtension
 {
 
-    public function searchBox(string $filter = 's', string $placeholder = 'Search...') : string
+    public function searchBox(string $filter = 's', string $placeholder = 'Search...'): string
     {
         return '
-        <div class="uk-margin uk-margin-remove-bottom">
-        <form class="uk-search uk-search-default" id="searchForm">
-            <a href="" uk-search-icon></a>
-            <input class="uk-search-input" type="search" name="' . $filter . '" placeholder="' . $placeholder . '">
+        <div class="uk-navbar-item">
+        <form class="uk-search uk-search-navbar">
+            <span uk-search-icon></span>
+            <input class="uk-search-input" name="' . $filter . '" type="search" placeholder="' . $placeholder . '">
         </form>
     </div>
 
         ';
-
     }
-
 }
