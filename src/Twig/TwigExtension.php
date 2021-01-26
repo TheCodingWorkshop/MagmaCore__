@@ -11,28 +11,29 @@ declare(strict_types=1);
 
 namespace MagmaCore\Twig;
 
-use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
-use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
-use Symfony\Component\Asset\Package;
-use Twig\Extension\AbstractExtension;
+use Exception;
+use Throwable;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use MagmaCore\Twig\Extensions\FlashMessageExtension;
-use MagmaCore\Twig\Extensions\IconNavExtension;
-use MagmaCore\Twig\Extensions\NavBarExtension;
-use MagmaCore\Base\BaseController;
-
-use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
-use MagmaCore\Utility\Singleton;
-use MagmaCore\Session\SessionTrait;
-use MagmaCore\Translation\Translation;
-
-use Throwable;
-use Exception;
 use InvalidArgumentException;
+use MagmaCore\Auth\Authorized;
+use MagmaCore\Utility\Singleton;
+use MagmaCore\Base\BaseController;
+use MagmaCore\Session\SessionTrait;
+
+use MagmaCore\Utility\DateFormatter;
+use Symfony\Component\Asset\Package;
+use Twig\Extension\AbstractExtension;
+use MagmaCore\Translation\Translation;
+use MagmaCore\Twig\Extensions\NavBarExtension;
+
+use MagmaCore\Twig\Extensions\IconNavExtension;
 use MagmaCore\Twig\Extensions\SearchBoxExtension;
 use MagmaCore\Twig\Extensions\SubheaderExtension;
+use MagmaCore\Twig\Extensions\FlashMessageExtension;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 /**
  * Class TwigExtension
@@ -57,6 +58,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('varDump', [$this, 'varDump']),
             new TwigFunction('Config', [$this, 'Config']),
             new TwigFunction('path', [$this, 'path']),
+            new TwigFunction('tableDateFormat', [$this, 'tableDateFormat']),
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
             new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
             new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
@@ -135,6 +137,27 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             if ($path) {
                 return $path;
             }
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @param string $field
+     * @param boolean $short
+     * @return string
+     */
+    public function tableDateFormat(array $row, string $field, bool $short = true)
+    {
+        if ($row) {
+            $time = $row[$field];
+            if ($short) {
+                $format = DateFormatter::formatShort(strtotime($time));
+            } else {
+                $format = DateFormatter::formatLong(strtotime($time));
+            }
+            return $format;
         }
     }
 

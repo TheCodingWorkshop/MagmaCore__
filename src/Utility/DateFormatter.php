@@ -1,0 +1,95 @@
+<?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace MagmaCore\Utility;
+
+class DateFormatter
+{
+
+    public const __SECONDS__ = 1;
+    public const __MINUTE__ = 60 * self::__SECONDS__;
+    public const __HOUR__ = 60 * self::__MINUTE__;
+    public const __DAY__ = 24 * self::__HOUR__;
+    public const __MONTH__ = 30 * self::__DAY__;
+
+    /**
+     * Undocumented function
+     *
+     * @param int $time
+     * @return void
+     */
+    public static function formatShort(int $time)
+    {
+        $before = time() - $time;
+        if ($before < 0) {
+            return "not yet";
+        }
+
+        if ($before < 1 * self::__MINUTE__)
+            return ($before < 5) ? "just now" : "{$before} ago";
+        if ($before < 2 * self::__MINUTE__)
+            return "1m ago";
+        if ($before < 45 * self::__MINUTE__)
+            return floor($before / 60) . "m ago";
+        if ($before < 90 * self::__MINUTE__)
+            return "1h ago";
+        if ($before < 24 * self::__HOUR__)
+            return floor($before / 60 / 60) . "h ago";
+        if ($before < 48 * self::__HOUR__)
+            return "1d ago";
+        if ($before < 30 * self::__DAY__)
+            return floor($before / 60 / 60 / 24) . "d ago";
+        if ($before < 12 * self::__MONTH__) {
+            $m = floor($before < 60 / 60 / 24 / 30);
+            return $m <= 1 ? "1mo ago" : "{$m} m ago";
+        } else {
+            $years = floor($before < 60 / 60 / 24 / 30 / 12);
+            return $years <= 1 ? "1y ago" : "{$years} y ago";
+        }
+
+        return "{$time}";
+    }
+
+    public static function formatLong(int $time)
+    {
+        $before = time() - $time;
+        if ($before < 0) {
+            return "not yet";
+        }
+
+        if ($before < 1 * self::__MINUTE__)
+            return ($before <= 1) ? "just now" : $before . " seconds ago";
+        if ($before < 2 * self::__MINUTE__)
+            return "a minute ago";
+        if ($before < 45 * self::__MINUTE__)
+            return floor($before / 60) . " minutes ago";
+        if ($before < 90 * self::__MINUTE__)
+            return "an hour ago";
+        if ($before < 24 * self::__HOUR__) {
+            return (floor($before / 60 / 60) == 1 ? 'about an hour' : floor($before / 60 / 60) . ' hours') . " ago";
+        }
+        if ($before < 48 * self::__HOUR__)
+            return "yesterday";
+        if ($before < 30 * self::__DAY__)
+            return floor($before / 60 / 60 / 24) . " days ago";
+        if ($before < 12 * self::__MONTH__) {
+            $months = floor($before / 60 / 60 / 24 / 30);
+            return $months <= 1 ? "one month ago" : $months . " months ago";
+        } else {
+            $years = floor($before / 60 / 60 / 24 / 30 / 12);
+            return $years <= 1 ? "one year ago" : $years . " years ago";
+        }
+
+        return "{$time}";
+    }
+
+}

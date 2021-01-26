@@ -169,6 +169,10 @@ class Datatable extends AbstractDatatable
             $this->totalRecords
         );
         $element .= '<span class="uk-text-meta uk-text-warning uk-margin-small-left"></span>';
+        $element .= '<form oninput="result.value=parseInt(a.value)">';
+            $element .= '<input onchange="saveChanges(this);" type="range" id="a" name="a" value="50" />';
+            $element .= '<span style="margin-top: -13px;" class="uk-badge uk-badge-primary"><output name="result" for="b">' . $this->sortController['records_per_page'] . '</output></span>';
+        $element .= '</form>';
         $element .= '</div>';
 
         $queryStatus = ($this->sortController['query'] ? $this->sortController['query'] : '');

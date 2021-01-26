@@ -28,10 +28,17 @@ trait TableSettingsTrait
         return "id";
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $autoController
+     * @return array
+     */
     private function tableOptions(string $autoController): array
     {
-        $cleanData = Sanitizer::clean($_POST);
         $config = Yaml::file('controller')[$autoController];
+        $cleanData = Sanitizer::clean($_POST);
+        //$cleanData = $_POST;
 
         /* records per page */
         $recordsPerPage = (isset($cleanData['records_per_page']) ? $cleanData['records_per_page'] : $config['records_per_page']);
@@ -120,7 +127,7 @@ trait TableSettingsTrait
         $option = [];
         if ($settings) {
             foreach ($settings as $setting) {
-                $option[] = $settings;
+                $option[] = $setting;
             }
             return (isset($option[$settingName]) ? $option[$settingName] : Yaml::file('controller')[$controller][$settingName]);
         }

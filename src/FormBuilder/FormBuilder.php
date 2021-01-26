@@ -55,7 +55,7 @@ class FormBuilder extends AbstractFormBuilder
         } else {
             $this->formAttr = self::FORM_PARTS;
         }
-        if (is_array($attr)) {
+        if (is_array($this->formAttr)) {
             foreach ($this->formAttr as $key => $value) {
                 if (!$this->setAttributes($key, $value)) {
                     $this->setAttributes($key, self::FORM_PARTS[$key]);
@@ -177,7 +177,6 @@ class FormBuilder extends AbstractFormBuilder
 
                             /* Main element closing tag */
                             $html .= "</{$element}>\n";
-
                             /* container element wrapper */
                             $html .= (isset($before_after_wrapper) && $before_after_wrapper == true) ? "{$after}\n" : false;
  
@@ -296,16 +295,5 @@ class FormBuilder extends AbstractFormBuilder
         return $addCsrf->validateRequest();
 
     }
-
-    public function alreadyLoggedIn()
-    {
-        $userID = SessionTrait::SessionFromGlobal()->get('user_id');
-        if (isset($userID) && $userID !==0) {
-            $redirect = (new BaseRedirect('/', [], true, 303))->redirect();
-            return $redirect;
-        }
-    }
-
-
 
 }

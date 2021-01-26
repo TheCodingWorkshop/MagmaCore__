@@ -109,24 +109,23 @@ class QueryBuilder extends AbstractQueryBuilder
 
     public function searchQuery() : string
     {
-        if ($this->isQueryTypeValid('search ')) {
+        if ($this->isQueryTypeValid('search')) {
             if (is_array($this->key['selectors']) && $this->key['selectors'] != '') {
                 $this->sqlQuery = "SELECT * FROM {$this->key['table']} WHERE ";
                 if ($this->has('selectors')) {
                     $values = [];
                     foreach ($this->key['selectors'] as $selector) {
-                        $values[] = $selector . " LIKE " . "{$selector}";
+                        $values[] = $selector . " LIKE " . ":{$selector}";
                     }
                     if (count($this->key['selectors']) >= 1) {
                         $this->sqlQuery .= implode(" OR ", $values);
                     }
                 }
-                //$this->sqlQuery .= $this->orderByQuery();
-                //$this->sqlQuery .= $this->queryOffset();
+                $this->sqlQuery .= $this->orderByQuery();
+                $this->sqlQuery .= $this->queryOffset();
             }
             return $this->sqlQuery;
         }
-        return false;
     }
 
     public function rawQuery(): string

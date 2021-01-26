@@ -44,14 +44,16 @@ class SubheaderExtension
         $html .= '</div>';
 
         $html .= '<div class="uk-navbar-center">';
+        $html .= '';
         $html .= '</div>';
 
         $html .= '<div class="uk-navbar-right">';
-        if (!empty($searchFilter)) {
-            $html .= '<p class="uk-text-lead">';
-            $html .= '<span class="uk-text-teal" uk-icon="icon: search; ratio: 3"></span>&nbsp;';
-            $html .= $totalRecords . ' ' . 'Records Found';
+        if (isset($searchFilter) && !empty($searchFilter)) {
+            $html .= '<p class="uk-text-large" style="margin-top: 20px;">';
+            $html .= '<span class="uk-text-teal" uk-icon="icon: search; ratio: 2"></span>&nbsp;';
+            $html .= $totalRecords . ' ' . 'Records Found for <span class="uk-text-primary">`' . $searchFilter . '`</span>';
             $html .= '</p>';
+            
         } else {
             if (is_array($actions) && count($actions) > 0) {
                 if (is_null($row)) {
@@ -60,7 +62,7 @@ class SubheaderExtension
                     /* send a warning */
                 }
             }
-    
+
         }
         $html .= '</div>';
         $html .= '</nav>';

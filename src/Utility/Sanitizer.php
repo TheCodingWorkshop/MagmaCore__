@@ -27,7 +27,7 @@ class Sanitizer
      * @return array
      * @throws BaseInvalidArgumentException
      */
-    public static function clean(array $dirtyData) : array
+    public static function clean(array $dirtyData = []) : ?array
     {
         $input = [];
         if (count($dirtyData) > 0) {
@@ -65,6 +65,7 @@ class Sanitizer
                 return $input;
             }
         }
+        return [];
     }
 
 }
