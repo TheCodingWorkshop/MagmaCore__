@@ -27,6 +27,7 @@ use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Middleware\Middleware;
 //use MagmaCore\Translation\Translation;
+use MagmaCore\Error\Error;
 
 class BaseController extends AbstractBaseController
 {
@@ -59,6 +60,7 @@ class BaseController extends AbstractBaseController
                 "response" => ResponseHandler::class,
                 "formBuilder" => FormBuilder::class,
                 "eventDispatcher" => EventDispatcher::class,
+                "error" => Error::class,
                 "session" => "",
                 "cache" => "",
                 "cookie" => "",
@@ -68,6 +70,7 @@ class BaseController extends AbstractBaseController
         );
 
         $this->registerSubscribedServices();
+        //$this->registerEventListenerServices();
     }
 
     /**

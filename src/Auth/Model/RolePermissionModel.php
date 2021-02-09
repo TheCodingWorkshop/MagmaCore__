@@ -17,7 +17,7 @@ class RolePermissionModel extends AbstractBaseModel
 { 
 
     /** @var string */
-    protected const TABLESCHEMA = 'role_perm';
+    protected const TABLESCHEMA = 'role_permission';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
 

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use MagmaCore\Service\Contracts\ServiceSubscriberInterface;
-use MagmaCore\Utility\Yaml;
 use ReflectionMethod;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\Base\Exception\BaseBadMethodCallException;
+use MagmaCore\Base\Exception\BaseBadFunctionCallException;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 trait ControllerTrait
 {
@@ -99,31 +100,52 @@ trait ControllerTrait
         }
     }
 
-    public function onSelf()
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function registerEventListenerServices()
     {
-        $controller = $this->routeParams['controller'];
-        $namespace = $this->routeParams['namespace'];
-        $action = $this->routeParams['action'];
-        $id = $this->routeParams['id'];
-        $sep = '/';
+        $eventListenerLocation = Yaml::file('listeners');
+        $eventListeners = $eventListenerLocation ? $eventListenerLocation : self::getListenersForEvent();
+        if (is_array($eventListeners) && count($eventListeners) > 0) {
+            foreach ($eventListeners as $eventListener) {
+                foreach ($eventListener as $event => $listeners) {
+                    if (isset($event) && is_string($event) && $event !=='') {
 
-        if (isset($controller) && is_string($controller) && $controller !=null) {
-            if (isset($action) && is_string($action)) {
-                switch ($action) {
-                    default :
-                        if ($this->id !==null || $this->id !==0) {
-                            $path = "{$namespace}/{$controller}/{$id}/{$action}";
-                        } else {
-                            $path = "{$namespace}/{$controller}/{$action}";
+                        foreach ($listeners['listeners'] as $key => $value) {
+
+                            $listenerObject = BaseApplication::diGet($value[0]);
+                            if (!$listenerObject) {
+                                throw new BaseInvalidArgumentException('Invalid Event Listener object.');
+                            }
+
+                            $newEvent = "\App\Event\\" . $event;
+                            if (!class_exists($newEvent)) {
+                                throw new BaseBadFunctionCallException("The event class {$newEvent} does not exists.");
+                            }
+
+                            if (!method_exists($listenerObject, $value[2])) {
+                                throw new BaseBadMethodCallException("The listener method {$value[2]} does not exists.");
+                            }
+
+                            if($this->eventDispatcher) {
+                                $this->eventDispatcher->addListener($newEvent::NAME, [$listenerObject, $value[2]]);
+                            }
+    
                         }
-                        if (isset($path) && $path !='') {
-                            return strtolower($path);
-                        }
-                        break;
+                        /*
+                            $this->eventDispatcher->dispatch(new $newEvent(new $params['listener'][2]()), $newEvent::NAME);
+                        }*/
+                        
+                    }
                 }
             }
         }
+        return false;
     }
+
 
 
 }

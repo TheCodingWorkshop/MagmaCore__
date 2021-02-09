@@ -35,7 +35,8 @@ class SubheaderExtension
         int $totalRecords = null,
         array $actions = null,
         bool $actionVertical = false,
-        array $row = null
+        array $row = null,
+        Object $twigExt = null
     ): string {
         $html = '';
         $html .= '<nav uk-navbar class="uk-margin-small-top">';
@@ -57,7 +58,7 @@ class SubheaderExtension
         } else {
             if (is_array($actions) && count($actions) > 0) {
                 if (is_null($row)) {
-                    $html .= (new IconNavExtension())->iconNav($actions, $row, $controller, $actionVertical);
+                    $html .= (new IconNavExtension())->iconNav($actions, $row, $twigExt, $controller, $actionVertical);
                 } else {
                     /* send a warning */
                 }

@@ -39,7 +39,8 @@ trait DataRepositoryTrait
                         }
                         list(
                             $this->cleanData, 
-                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
+                            $this->validatedDataBag,
+                            $this->randomPassword) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
                         $this->validationErrors = $newValidationObject->getErrors();
                             
                     }
@@ -120,6 +121,11 @@ trait DataRepositoryTrait
         if (count($this->validationErrors) > 0) {
             return $this->validationErrors;
         }
+    }
+
+    public function getRandomPassword()
+    {
+        return $this->randomPassword;
     }
 
 }

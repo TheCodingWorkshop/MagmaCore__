@@ -109,24 +109,15 @@ class BaseApplication
      * @param Object $routerObject
      * @return void
      */
-    public function setRouter(
-        array $routes, 
-        ?Object $routerObject = null, 
-        ?string $urlRoute = null
-        ) : void
+    public function setRouter(array $routes, ?Object $routerObj = null, ?string $urlRoute = null) : void
     {
-        if (
-            empty($routes) || 
-            is_array($routes) && 
-            count($routes) < 0 ||
-            !is_array($routes)
-            ) {
+        if (empty($routes) || is_array($routes) && count($routes) < 0 || !is_array($routes)) {
             throw new BaseInvalidArgumentException(
                 "Invalid or no routes set. This is an absolute must in order to render any routes within the application."
             );
         }
         $this->routes = $routes;
-        $this->routerObject = $routerObject;
+        $this->routerObject = $routerObj;
         $this->urlRoute = ($urlRoute !=null) ? $urlRoute : NULL;
 
     }
@@ -147,7 +138,7 @@ class BaseApplication
             throw new \BadFunctionCallException(RouterFactory::class . " Class does not exists. Ensure this package is installed through Composer.");
         }
         $factory = new RouterFactory($this->urlRoute);
-        $factory->create($this->routerObject);
+        $factory->create($this->routerObj);
         if (count($this->routes) > 0)
             return $factory->buildRoutes($this->routes);    
     }

@@ -26,11 +26,13 @@ use MagmaCore\Utility\DateFormatter;
 use Symfony\Component\Asset\Package;
 use Twig\Extension\AbstractExtension;
 use MagmaCore\Translation\Translation;
-use MagmaCore\Twig\Extensions\NavBarExtension;
+use MagmaCore\Auth\Model\PermissionModel;
 
+use MagmaCore\Twig\Extensions\NavBarExtension;
 use MagmaCore\Twig\Extensions\IconNavExtension;
 use MagmaCore\Twig\Extensions\SearchBoxExtension;
 use MagmaCore\Twig\Extensions\SubheaderExtension;
+use MagmaCore\Twig\Extensions\ColumnActionExtension;
 use MagmaCore\Twig\Extensions\FlashMessageExtension;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
@@ -59,6 +61,8 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
             new TwigFunction('Config', [$this, 'Config']),
             new TwigFunction('path', [$this, 'path']),
             new TwigFunction('tableDateFormat', [$this, 'tableDateFormat']),
+            new TwigFunction('getPermissionName', [$this, 'getPermissionName']),
+
             new TwigFunction('flashMessages', [new FlashMessageExtension(), 'flashMessages']),
             new TwigFunction('navMenu', [new NavBarExtension(), 'navMenu']),
             new TwigFunction('iconNav', [new IconNavExtension(), 'iconNav']),
@@ -161,6 +165,18 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         }
     }
 
+    /**
+     * Return the name of the permission based on the permission ID
+     *
+     * @param integer $permID
+     * @return string
+     */
+    public function getPermissionName(int $permID) : string
+    {
+        $permName = (new PermissionModel())->getRepo()->findObjectBy(['id' => $permID], ['permission_name']);
+        return $permName->permission_name;
+    }
+
 
     /*=======================================================================================*/
     /* TWIG EXTENSIONS */
@@ -186,14 +202,25 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param boolean $vertical
      * @return void
      */
-    public function iconNav(array $icons = [], array $row = null, string $controller = null, bool $vertical = false)
+    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false)
     {
         return (new IconNavExtension())->iconNav(
             $icons,
             $row,
+            $twigExt,
             $controller,
             $vertical
         );
+    }
+
+    /**
+     * @inheritdoc
+     * @param mixed $values
+     * @return string
+     */
+    public function getModal($values) : string
+    {
+        return (new IconNavExtension())->getModal($values);
     }
 
     /**
@@ -237,6 +264,29 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         array $row = null) : string
     {
         return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row);
+    }
+
+    /**
+     * @inheritdoc
+     * @param array $action
+     * @param array $row
+     * @param Object $twigExt
+     * @param string $controller
+     * @param boolean $vertical
+     * @param string $title
+     * @param string $description
+     * @return string
+     */
+    public function action(
+        array $action, 
+        array $row = null, 
+        Object $twigExt = null, 
+        string $controller, 
+        bool $vertical = false,
+        string $title = null,
+        string $description = null): string
+    {
+        return (new ColumnActionExtension())->action($action, $row, $twigExt, $controller, $vertical, $title, $description);
     }
 
 

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use MagmaCore\Session\SessionTrait;
+
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
 {
 
@@ -121,6 +123,12 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
             return $value;
         }
     }
+
+    public function getCreatedBy(array $cleanData)
+    {
+        $createdById = $this->setDefaultValue($cleanData, 'created_byid', SessionTrait::sessionFromGlobal()->get('user_id') ?? 0);
+        return $createdById;
+    }
     
     /**
      * @param $cleanData
@@ -132,7 +140,6 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         return $cleanData;
     }
 
-    public function dataUnset()
-    { }
+
 
 }

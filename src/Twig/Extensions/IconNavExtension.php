@@ -18,7 +18,7 @@ class IconNavExtension
     /** @var string */
     protected const TRASH_KEY = 'trash';
     /** @var string */
-    protected const EDIT_MODAL = 'edit_model';
+    protected const EDIT_MODAL = 'edit_modal';
     /** @var string */
     protected const TRASH_CLASS = 'uk-text-danger';
     /** @var string */
@@ -37,7 +37,7 @@ class IconNavExtension
      * @param boolean $vertical
      * @return string
      */
-    public function iconNav(array $icons = [], array $row = null, string $controller = null, bool $vertical = false): string
+    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false): string
     {
         $html = '';
         if (is_array($icons) && count($icons) > 0) {
@@ -79,7 +79,7 @@ class IconNavExtension
                 if ($row != null) {
                     if (isset($callback) && $callback != null) {
                         if (is_callable($callback)) {
-                            $html .= call_user_func($callback, $row);
+                            $html .= call_user_func_array($callback, [$row, $twigExt]);
                         }
                     }
                 }
@@ -128,7 +128,7 @@ class IconNavExtension
                     $target = "#delete-modal-{$controller}-{$row['id']}";
                     break;
                 case 'edit_modal':
-                    if (isset($toggleModalEdit) && $toggleModalEdit == true) {
+                    if (isset($toggle_modal_edit) && $toggle_modal_edit == true) {
                         $target = "#edit-modal-{$controller}-{$row['id']}";
                     } else {
                         $target = "/admin/{$controller}/{$row['id']}/edit";
@@ -165,11 +165,9 @@ class IconNavExtension
             $html .= '<div id="' . (isset($iconValue['toggle_id']) ? str_replace('#', '', $iconValue['toggle_id']) : '') . '"' . (isset($iconValue['modal_size']) ? ' class="' . $iconValue['modal_size'] . '"' : ' uk-modal') . '>';
 
             $html .= '<div class="uk-modal-dialog uk-modal-body">';
-            $html .= '<button class="uk-modal-close-default" type="button" uk-close></button>';
-            $html .= '<h2 class="uk-modal-title">' . (isset($iconValue['modal_title']) ? $iconValue['modal_title'] : '') . '</h2>';
-
-            $html .= (isset($iconValue['modal_content']) ? $iconValue['modal_content'] : '');
-
+                $html .= '<button class="uk-modal-close-default" type="button" uk-close></button>';
+                $html .= '<h2 class="uk-modal-title">' . (isset($iconValue['modal_title']) ? $iconValue['modal_title'] : '') . '</h2>';
+                $html .= (isset($iconValue['modal_content']) ? $iconValue['modal_content'] : '');
             $html .= '</div>';
 
             $html .= '</div>' . "\n";
@@ -215,7 +213,7 @@ class IconNavExtension
      * @param string $desc
      * @return string
      */
-    public function confirmationModal(int $rowID, string $controller, string $title, string $desc): string
+    public function confirmationModal(int $rowID, string $controller, string $title = null, string $desc = null): string
     {
         $html = '';
         if (!empty($rowID)) {
@@ -223,7 +221,7 @@ class IconNavExtension
 
             $html .= '<div class="uk-modal-dialog uk-modal-body">';
             $html .= '<h2 class="uk-modal-title">' . (isset($title) ? $title : '') . '</h2>';
-            $html .= "<form method=\"POST\" action=\"/admin/{$controller}/{$rowID}/delete}\" id=\"confirm-delete-modal-form-{$controller}-{$rowID}\">";
+            $html .= "<form method=\"POST\" action=\"/admin/{$controller}/{$rowID}/delete\" id=\"confirm-delete-modal-form-{$controller}-{$rowID}\">";
 
             $html .= "<p>{$desc}</p>";
             $html .= "<p>";
@@ -241,4 +239,5 @@ class IconNavExtension
             return $html;
         }
     }
+
 }

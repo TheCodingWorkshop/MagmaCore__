@@ -11,15 +11,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Service\Contracts\ServiceSubscriberInterface;
-use MagmaCore\Container\ContainerInterface;
-use MagmaCore\Session\SessionInterface;
+use MagmaCore\Base\ControllerTrait;
 use MagmaCore\Cache\CacheInterface;
 use MagmaCore\Router\RouterInterface;
+use MagmaCore\Session\SessionInterface;
+use MagmaCore\Container\ContainerInterface;
 use MagmaCore\Session\Flash\FlashInterface;
-use MagmaCore\Base\ControllerTrait;
+use MagmaCore\EventDispatcher\ListenerProviderInterface;
+use MagmaCore\Service\Contracts\ServiceSubscriberInterface;
 
-abstract class AbstractBaseController implements ServiceSubscriberInterface
+abstract class AbstractBaseController implements ServiceSubscriberInterface, ListenerProviderInterface
 {
     /** @var Trait */
     use ControllerTrait;
@@ -52,6 +53,21 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface
         return [
         ];
     }
+
+    /**
+     * @param object $event
+     *   An event for which to return the relevant listeners.
+     * @return iterable<callable>
+     *   An iterable (array, iterator, or generator) of callables.  Each
+     *   callable MUST be type-compatible with $event.
+     */
+    public function getListenersForEvent(object $event): iterable
+    {
+        return [
+
+        ];
+    }   
+
 
     /**
      * Return the current controller name as a string
