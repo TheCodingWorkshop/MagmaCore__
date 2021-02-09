@@ -94,8 +94,8 @@ class BaseApplication
         defined('CONFIG_PATH') or define('CONFIG_PATH', APP_ROOT . DS . 'Config');
         defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
         defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
-        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'Logs');
-        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources');
+        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
+        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
 
     }
 

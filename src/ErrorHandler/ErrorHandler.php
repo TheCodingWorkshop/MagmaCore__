@@ -64,14 +64,16 @@ class ErrorHandler
                 ]
             );
         } else {
-            $errorLog = LOG_PATH . "/" . date("Y-m-d H:is") . ".txt";
-            ini_set('error_log', $errorLog);    
+  
+            $logFile = LOG_PATH . "/error-" . date('Y-m-d') . "-.log"; 
+            ini_set("log_errors", 'On');  
+            ini_set('error_log', $logFile); 
+  
             $message = "Uncaught exception: " . get_class($exception);
             $message .= "with message " . $exception->getMessage();
             $message .= "\nStack trace: " . $exception->getTraceAsString();
             $message .= "\nThrown in " . $exception->getFile() . " on line " . $exception->getLine();
             error_log($message);
-
             echo $view->getErrorResource("/{$code}.html.twig", ["error_message" => $message]);
         }
     }

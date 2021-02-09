@@ -79,7 +79,7 @@ class BaseView
     {
         static $twig = null;
         if ($twig === null) {
-            $loader = new FilesystemLoader('templates',  ERROR_RESOURCE);
+            $loader = new FilesystemLoader(ERROR_RESOURCE);
             $twig = new Environment($loader);
             $twig->addExtension(new DebugExtension());
         }
