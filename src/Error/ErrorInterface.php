@@ -14,11 +14,12 @@ namespace MagmaCore\Error;
 interface ErrorInterface
 {
 
-    public function addError($error, array $errorParams = []);
+    public function addError($error, Object $object, array $errorParams = []) : self;
     public function getErrors() : array;
     public function getErrorParams() : array;
-    public function dispatchError(Object $object);
-    public function hasError(int $errorCode) : bool;
+    public function dispatchError(string $redirectPath);
+    public function or(string $redirect, ?string $message = null) : bool;
+    public function hasError() : bool;
     public function getErrorCode() : string;
 
 }

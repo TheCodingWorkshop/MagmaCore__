@@ -198,6 +198,42 @@ class BaseController extends AbstractBaseController
         }
     }
 
+    public function onSelf()
+    {
+        if (isset($_SERVER['REQUEST_URI'])) {
+            return $_SERVER['REQUEST_URI'];
+        }
+
+    }
+
+    public function getSiteUrl(?string $path = null) : string
+    {
+        return sprintf(
+            "%s://%s%s",
+            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+            $_SERVER['SERVER_NAME'],
+            ($path !==null) ? $path : $_SERVER['REQUEST_URI']
+        );
+    }
+
+    /**
+     * Conbination method which encapsulate the flashing and redirecting all within
+     * a single method. Use the relevant arguments to customized the output
+     *
+     * @param boolean $action
+     * @param string|null $redirect
+     * @param string $message
+     * @param string $type
+     * @return void
+     */
+    public function flashAndRedirect(bool $action, ?string $redirect = null, string $message, string $type = FlashType::SUCCESS) : void
+    {
+        if (is_bool($action)) {
+            $this->flashMessage($message, $type);
+            $this->redirect(($redirect === null) ? $this->onSelf() : $redirect);
+        }
+    }
+
     /**
      * Returns the session based flash message
      *

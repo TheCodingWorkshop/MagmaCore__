@@ -70,6 +70,15 @@ interface DataRepositoryInterface
     public function findBySearch(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []) : array;
 
     /**
+     * Delete bulk item from a database table by simple providing an array of IDs to
+     * which you want to delete.
+     *
+     * @param array $items
+     * @return boolean
+     */
+    public function findAndDelete(array $items = []) : bool;
+
+    /**
      * Find and delete a row by its ID from storage device
      * 
      * @param array $condition

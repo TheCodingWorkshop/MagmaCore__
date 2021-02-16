@@ -107,15 +107,17 @@ class BaseRedirect
      *
      * @return string
      */
-    public function onSelf() : string
+    public function _onSelf() : string
     {
         $controller = $this->routeParams['controller'];
         $namespace = $this->routeParams['namespace'];
         $action = $this->routeParams['action'];
         $id = $this->routeParams['id'];
         $sep = '/';
-
-        if (isset($controller) && is_string($controller) && $controller !=null) {
+        if (isset($_SERVER['REQUEST_URI'])) {
+            return $_SERVER['REQUEST_URI'];
+        }
+        /*if (isset($controller) && is_string($controller) && $controller !=null) {
             if (isset($action) && is_string($action)) {
                 switch ($action) {
                     default :
@@ -130,7 +132,7 @@ class BaseRedirect
                         break;
                 }
             }
-        }
+        }*/
     
     }
 

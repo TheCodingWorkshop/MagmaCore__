@@ -17,7 +17,7 @@ class UserRoleModel extends AbstractBaseModel
 { 
 
     /** @var string */
-    protected const TABLESCHEMA = 'user_roles';
+    protected const TABLESCHEMA = 'user_role';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
 

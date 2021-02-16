@@ -123,9 +123,9 @@ trait DataRepositoryTrait
         }
     }
 
-    public function getRandomPassword()
+    public function getRandomPassword() : array
     {
-        return $this->randomPassword;
+        return ['random_pass' => $this->randomPassword];
     }
 
 }

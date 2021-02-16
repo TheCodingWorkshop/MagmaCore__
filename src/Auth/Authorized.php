@@ -29,6 +29,16 @@ class Authorized
 
     /** @var string */
     protected const TOKEN_COOKIE_NAME = "remember_me";
+    protected const FIELD_SESSIONS = [
+        'id',
+        'email',
+        'firstname',
+        'lastname',
+        'password_hash',
+        'gravatar',
+        'status'
+
+    ];
 
     /**
      * Login the user
@@ -75,18 +85,7 @@ class Authorized
         if (isset($userSessionID) && $userSessionID !==0) {
             $user = (new UserModel())
             ->getRepo()
-            ->findObjectBy( /* We only want to return a few columns */
-                ['id' => $userSessionID],
-                [
-                    'id',
-                    'email',
-                    'firstname',
-                    'lastname',
-                    'password_hash',
-                    'gravatar',
-                    'status'
-                ]
-            );
+            ->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
             if ($user === null) {
                 throw new BaseUnexpectedValueException('Empty user object returned. Please try again');
             }
@@ -120,7 +119,7 @@ class Authorized
      * @throws GlobalManagerException
      * @throws Throwable
      */
-    public static function logout()
+    public static function logout() : void
     {
         if (self::getCurrentSessionID() !=null) {
             SessionTrait::SessionFromGlobal()->invalidate();
@@ -135,7 +134,7 @@ class Authorized
      * @return void
      * @throws GlobalManagerException
      */
-    public static function rememberRequestedPage()
+    public static function rememberRequestedPage() : void
     {
         SessionTrait::sessionFromGlobal()->set('return_to', $_SERVER['REQUEST_URI']);
     }
@@ -144,10 +143,10 @@ class Authorized
      * Get the originally-requested page to return to after requiring login,
      * or default to the homepage
      *
-     * @return void
+     * @return string
      * @throws GlobalManagerException
      */
-    public static function getReturnToPage()
+    public static function getReturnToPage() : string
     {
         $page = SessionTrait::sessionFromGlobal()->get('return_to');
         return $page ?? '/';
@@ -156,11 +155,11 @@ class Authorized
     /**
      * Login the user from a remembered login cookie
      *
-     * @return object or null
+     * @return Null|Object
      * @throws GlobalManagerException
      * @throws Throwable
      */
-    protected static function loginFromRemembermeCookie()
+    protected static function loginFromRemembermeCookie() : Null|Object
     {
         $cookie = $_COOKIE[self::TOKEN_COOKIE_NAME] ?? false;
         if ($cookie) {
@@ -174,6 +173,7 @@ class Authorized
                 } 
             }
         }
+        return null;
     }
 
     /**
@@ -182,7 +182,7 @@ class Authorized
      * @return bool
      * @throws Throwable
      */
-    protected static function forgetLogin()
+    protected static function forgetLogin() : bool
     {
         $cookie = $_COOKIE[self::TOKEN_COOKIE_NAME] ?? false;
         if ($cookie) {    
@@ -194,7 +194,9 @@ class Authorized
             /* expire cookie here */
             $cookie = (new CookieFacade(['name' => self::TOKEN_COOKIE_NAME]))->initialize();
             $cookie->delete();
+            return true;
         }    
+        return false;
     }
 
 }

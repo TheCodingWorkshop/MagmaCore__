@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * This file is part of the MagmaCore package.
  *
@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Twig;
@@ -48,8 +49,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
 
     public function getFilters(): array
     {
-        return [
-        ];
+        return [];
     }
 
     public function getFunctions(): array
@@ -98,7 +98,10 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     {
         return (new Package(
             new StaticVersionStrategy(
-                'v1', '%s?version=%s')))->getUrl($path);
+                'v1',
+                '%s?version=%s'
+            )
+        ))->getUrl($path);
     }
 
     public function locale(string $string)
@@ -130,11 +133,11 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         return Yaml::file($file);
     }
 
-    public function path(Object $object, string $action, int $row_id = 0) : string
+    public function path(Object $object, string $action, int $row_id = 0): string
     {
         if ($object instanceof BaseController) {
             if ($row_id === 0) {
-                $path = "/admin/{$object->thisRouteController()}/{$action}" ;
+                $path = "/admin/{$object->thisRouteController()}/{$action}";
             } else {
                 $path = "/admin/{$object->thisRouteController()}/{$row_id}/{$action}";
             }
@@ -152,16 +155,16 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param boolean $short
      * @return string
      */
-    public function tableDateFormat(array $row, string $field, bool $short = true)
+    public function tableDateFormat(array $row, string $field, bool $short = false) : string
     {
         if ($row) {
             $time = $row[$field];
-            if ($short) {
-                $format = DateFormatter::formatShort(strtotime($time));
-            } else {
-                $format = DateFormatter::formatLong(strtotime($time));
-            }
-            return $format;
+            //if ($short) {
+                return DateFormatter::timeFormat(strtotime($time), $short);
+            //} else {
+               // return DateFormatter::formatLong(strtotime($time));
+            //}
+            
         }
     }
 
@@ -171,7 +174,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param integer $permID
      * @return string
      */
-    public function getPermissionName(int $permID) : string
+    public function getPermissionName(int $permID): string
     {
         $permName = (new PermissionModel())->getRepo()->findObjectBy(['id' => $permID], ['permission_name']);
         return $permName->permission_name;
@@ -218,7 +221,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param mixed $values
      * @return string
      */
-    public function getModal($values) : string
+    public function getModal($values): string
     {
         return (new IconNavExtension())->getModal($values);
     }
@@ -255,14 +258,14 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param array $row
      * @return string
      */
-    public function subHeader(        
-        string $searchFilter = null, 
+    public function subHeader(
+        string $searchFilter = null,
         string $controller = null,
         int $totalRecords = null,
         array $actions = null,
         bool $actionVertical = false,
-        array $row = null) : string
-    {
+        array $row = null
+    ): string {
         return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row);
     }
 
@@ -278,16 +281,14 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @return string
      */
     public function action(
-        array $action, 
-        array $row = null, 
-        Object $twigExt = null, 
-        string $controller, 
+        array $action,
+        array $row = null,
+        Object $twigExt = null,
+        string $controller,
         bool $vertical = false,
         string $title = null,
-        string $description = null): string
-    {
+        string $description = null
+    ): string {
         return (new ColumnActionExtension())->action($action, $row, $twigExt, $controller, $vertical, $title, $description);
     }
-
-
 }

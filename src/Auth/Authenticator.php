@@ -30,7 +30,7 @@ class Authenticator
      * @param string $password
      * @return mixed
      */
-    public function authenticate(string $email, string $passqwordHash, ?Object $currentObject = null)
+    public function authenticate(string $email, string $passqwordHash, Null|Object $currentObject = null)
     {
         $this->repository = (new UserModel());
         $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
