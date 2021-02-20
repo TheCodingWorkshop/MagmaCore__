@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Error;
@@ -27,10 +28,10 @@ class Error implements ErrorInterface
 
     /** @var string */
     public const    SHORT_PASSWORD     = 'ERR_100MC',
-                    PASSWORD_LETTER    = 'ERR_150MC',
-                    PASSWORD_NUMBER    = 'ERR_200MC',
-                    INVALID_EMAIL      = 'ERR_250MC',
-                    EMPTY_FIELDS       = 'ERR_300MC';
+        PASSWORD_LETTER    = 'ERR_150MC',
+        PASSWORD_NUMBER    = 'ERR_200MC',
+        INVALID_EMAIL      = 'ERR_250MC',
+        EMPTY_FIELDS       = 'ERR_300MC';
 
     /**
      * Add a error to the error array
@@ -39,14 +40,13 @@ class Error implements ErrorInterface
      * @param array $errorParams
      * @return void
      */
-    public function addError($error, Object $object, array $errorParams = []) : ErrorInterface
+    public function addError($error, Object $object, array $errorParams = []): ErrorInterface
     {
         if ($error)
             $this->errors = $error;
         if ($object)
             $this->object = $object;
         return $this;
-
     }
 
     /**
@@ -54,7 +54,7 @@ class Error implements ErrorInterface
      * 
      * @return ErrorInterface
      */
-    public function dispatchError(string $redirectPath) : ErrorInterface
+    public function dispatchError(string $redirectPath): ErrorInterface
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
@@ -65,11 +65,9 @@ class Error implements ErrorInterface
                     $this->object->redirect($redirectPath);
                 }
             }
-
         }
         $this->hasError = false;
         return $this;
-
     }
 
     /**
@@ -79,10 +77,10 @@ class Error implements ErrorInterface
      * @param string|null $message
      * @return boolean
      */
-    public function or(string $redirect, ?string $message = null) : bool
+    public function or(string $redirect, ?string $message = null): bool
     {
         if (!$this->hasError) {
-            $message = (null==! $message) ? $message : 'Changes Saved!';
+            $message = (null == !$message) ? $message : 'Changes Saved!';
             $this->object->flashMessage($message, $this->object->flashSuccess());
             $this->object->redirect($redirect);
 
@@ -96,7 +94,7 @@ class Error implements ErrorInterface
      *
      * @return boolean
      */
-    public function hasError() : bool
+    public function hasError(): bool
     {
         return $this->hasError;
     }
@@ -106,7 +104,7 @@ class Error implements ErrorInterface
      *
      * @return array
      */
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -116,15 +114,14 @@ class Error implements ErrorInterface
      *
      * @return array
      */
-    public function getErrorParams() : array
+    public function getErrorParams(): array
     {
         return $this->errorParams;
     }
 
 
-    public function getErrorCode() : string
+    public function getErrorCode(): string
     {
         return $this->errorCode;
     }
-
 }

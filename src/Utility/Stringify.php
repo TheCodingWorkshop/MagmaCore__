@@ -80,6 +80,8 @@ class Stringify
         } else {
             $plural = $string . 's'; // just attach an s
         }
+
+        return $plural;
     }
 
     /**

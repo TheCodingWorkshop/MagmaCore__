@@ -54,7 +54,7 @@ class BaseController extends AbstractBaseController
         $this->routeParams = $routeParams;
         $this->twig = new BaseView();
 
-        $this->container(
+        $this->diContainer(
             [
                 "request" => RequestHandler::class,
                 "response" => ResponseHandler::class,
@@ -70,7 +70,6 @@ class BaseController extends AbstractBaseController
         );
 
         $this->registerSubscribedServices();
-        //$this->registerEventListenerServices();
     }
 
     /**

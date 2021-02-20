@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Twig\Extensions;
 
+use Closure;
+
 class IconNavExtension
 {
 
@@ -37,7 +39,7 @@ class IconNavExtension
      * @param boolean $vertical
      * @return string
      */
-    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false): string
+    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false, Closure $callback = null): string
     {
         $html = '';
         if (is_array($icons) && count($icons) > 0) {

@@ -205,14 +205,15 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      * @param boolean $vertical
      * @return void
      */
-    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false)
+    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false, \Closure $callback = null)
     {
         return (new IconNavExtension())->iconNav(
             $icons,
             $row,
             $twigExt,
             $controller,
-            $vertical
+            $vertical,
+            $callback
         );
     }
 
@@ -264,9 +265,11 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         int $totalRecords = null,
         array $actions = null,
         bool $actionVertical = false,
-        array $row = null
+        array $row = null,
+        ?string $headerIcon = null,
+        \Closure $callback = null,
     ): string {
-        return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row);
+        return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row, $headerIcon, $callback);
     }
 
     /**

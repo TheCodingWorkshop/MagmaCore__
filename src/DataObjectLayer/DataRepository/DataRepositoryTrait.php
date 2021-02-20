@@ -66,6 +66,7 @@ trait DataRepositoryTrait
                 $combinedData = array_merge($fields, $this->cleanData);
                 $update = $this->em->getCrud()->update($combinedData, $this->em->getCrud()->getSchemaID());
                 if ($update) {
+                    $this->dataBag = array_merge($this->validatedDataBag);
                     return $update;
                 }
             }    

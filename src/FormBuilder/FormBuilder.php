@@ -11,14 +11,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
-use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-use MagmaCore\FormBuilder\AbstractFormBuilder;
-use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
-use MagmaCore\FormBuilder\FormBuilderTrait;
-use ParagonIE\AntiCSRF\AntiCSRF;
-use MagmaCore\Session\SessionTrait;
-use MagmaCore\Base\BaseRedirect;
 use Throwable;
+use MagmaCore\Error\Error;
+use MagmaCore\Base\BaseRedirect;
+use ParagonIE\AntiCSRF\AntiCSRF;
+use MagmaCore\Http\RequestHandler;
+use MagmaCore\Session\SessionTrait;
+use MagmaCore\FormBuilder\FormBuilderTrait;
+use MagmaCore\FormBuilder\AbstractFormBuilder;
+use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
+use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
 
 class FormBuilder extends AbstractFormBuilder
 {
@@ -31,15 +33,17 @@ class FormBuilder extends AbstractFormBuilder
     protected string $html = '';
     protected bool $addCsrf = true;
     protected string $element = '';
+    protected Object $error;
     
     /**
      * Main class constructor
      * 
      * @return void
      */
-    public function __construct()
+    public function __construct(Error $error)
     {
         parent::__construct();
+        $this->error = $error;
     }
 
     /**
@@ -194,10 +198,9 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
-     * @param Object $request
      * @return array
      */
-    public function canHandleRequest(Object $request = null) : array
+    public function canHandleRequest() : array
     { 
         $method = (isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '');
         if ($method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
@@ -212,7 +215,7 @@ class FormBuilder extends AbstractFormBuilder
         try {
             return [
                 $method,
-                $_POST,
+                (class_exists(RequestHandler::class)) ? (new RequestHandler())->handler()->request->all() : $_POST,
                 $this->getStream()
             ];
         } catch (Throwable $th) {
@@ -234,14 +237,29 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
-    public function getData()
+    public function getMethod(string $method) : string
     {
-        list(
-            $_method, 
-            $_post, 
-            $_json) = $this->canHandleRequest(null);
-        if (isset($_method))
+        list($_method, $_post, $_json) = $this->canHandleRequest();
+        if ($_method === $method) {
+            return $_method;
+        }
+    }
+
+    public function getJson()
+    {
+        list($_method, $_post, $_json) = $this->canHandleRequest();
+        if ($_json) {
+            return $_json;
+        }
+    }
+
+    public function getData() : array
+    {
+        list($_method, $_post, $_json) = $this->canHandleRequest();
+        if ($_post) {
             return $_post;
+        }
+
     }
 
     /**
@@ -254,7 +272,7 @@ class FormBuilder extends AbstractFormBuilder
             return $isAjax;
         }
     }
-
+    
     /**
      * Check whether the form is submittable. Submit button should represent
      * the argument name

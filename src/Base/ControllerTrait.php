@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types=1);
 
@@ -10,6 +18,7 @@ use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\EventDispatcher\ListenerProviderInterface;
 
 trait ControllerTrait
 {
@@ -50,9 +59,9 @@ trait ControllerTrait
      * @throws BaseInvalidArgumentException
      * @throws ReflectionException
      */
-    protected function container(?array $args = null)
+    protected function diContainer(?array $args = null)
     {
-        if ($args !==null && !is_array($args)) {
+        if ($args !== null && !is_array($args)) {
             throw new BaseInvalidArgumentException('Invalid argument called in container. Your dependencies should return a key/value pair array.');
         }
         $args = func_get_args();
@@ -78,25 +87,50 @@ trait ControllerTrait
      */
     public function registerSubscribedServices()
     {
-        $subscriberLocation = Yaml::file('subscribers');
-        $subscribers = $subscriberLocation ? $subscriberLocation : self::getSubscribedServices();
-        if (is_array($subscribers) && count($subscribers) > 0) {
-            foreach ($subscribers as $subscriberParams) {
-                foreach ($subscriberParams as $property => $params) {
-                    if (isset($property) && is_string($property) && $property !=='') {
-                        $subscriberObject = BaseApplication::diGet($params['class']);
+        $fileServices = Yaml::file('events');
+        $services = $fileServices ? $fileServices : self::getSubscribedEvents();
+        if (is_array($services) && count($services) > 0) {
+            foreach ($services as $serviceParams) {
+                foreach ($serviceParams as $key => $params) {
+                    if (isset($key) && is_string($key) && $key !== '') {
+                        switch ($key) {
+                            case 'listeners':
+                                foreach ($params as $listeners => $values) {
+                                    if (isset($listeners)) {
 
-                        if (!$subscriberObject instanceof EventSubscriberInterface) {
-                            throw new BaseInvalidArgumentException('Invalid Subscriber object ' . $subscriberObject);
+                                        if (!class_exists($values['class'])) {
+                                            throw new BaseBadFunctionCallException($values['class'] . ' Listener class was not found within /App/EventListener');
+                                        }
+
+                                        $listenerObject = BaseApplication::diGet($values['class']);
+                                        /*if (!$listenerObject instanceof ListenerProviderInterface) {
+                                            throw new BaseInvalidArgumentException($listenerObject . ' is not a valid Listener Object.');
+                                        }*/
+                                        if ($this->eventDispatcher) {
+                                            if (in_array('name', $values['props'])) {
+                                                $this->eventDispatcher->addListener($values['props']['name']::NAME, [$listenerObject, $values['props']['event']]);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case 'subscribers':
+                                foreach ($params as $subscribers => $values) {
+                                    if (isset($subscribers)) {
+                                        $subscriberObject = BaseApplication::diGet($values['class']);
+                                        if (!$subscriberObject instanceof EventSubscriberInterface) {
+                                            throw new BaseInvalidArgumentException($subscriberObject . ' is not a valid subscriber object.');
+                                        }
+                                        if ($this->eventDispatcher) {
+                                            $this->eventDispatcher->addSubscriber($subscriberObject);
+                                        }
+                                    }
+                                }
+                                break;
                         }
-
-                        $this->eventDispatcher->addSubscriber($subscriberObject);
-
                     }
                 }
             }
-            
-
         }
     }
 
@@ -112,7 +146,7 @@ trait ControllerTrait
         if (is_array($eventListeners) && count($eventListeners) > 0) {
             foreach ($eventListeners as $eventListener) {
                 foreach ($eventListener as $event => $listeners) {
-                    if (isset($event) && is_string($event) && $event !=='') {
+                    if (isset($event) && is_string($event) && $event !== '') {
 
                         foreach ($listeners['listeners'] as $key => $value) {
 
@@ -130,22 +164,17 @@ trait ControllerTrait
                                 throw new BaseBadMethodCallException("The listener method {$value[2]} does not exists.");
                             }
 
-                            if($this->eventDispatcher) {
+                            if ($this->eventDispatcher) {
                                 $this->eventDispatcher->addListener($newEvent::NAME, [$listenerObject, $value[2]]);
                             }
-    
                         }
                         /*
                             $this->eventDispatcher->dispatch(new $newEvent(new $params['listener'][2]()), $newEvent::NAME);
                         }*/
-                        
                     }
                 }
             }
         }
         return false;
     }
-
-
-
 }

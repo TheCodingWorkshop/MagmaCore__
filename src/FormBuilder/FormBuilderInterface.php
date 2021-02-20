@@ -45,7 +45,7 @@ interface FormBuilderInterface
      * @param Object $request
      * @return array
      */
-    public function canHandleRequest(Object $request = null) : array;
+    public function canHandleRequest() : array;
 
     /**
      * Check whether the form is submittable. Submit button should represent

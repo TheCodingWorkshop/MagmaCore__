@@ -69,7 +69,7 @@ class Datatable extends AbstractDatatable
         return $this->tableColumn;
     }
 
-    public function table() : ?string
+    public function table() : null|string
     {
         extract($this->attr, EXTR_SKIP);
         $status = (new RequestHandler())

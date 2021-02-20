@@ -41,7 +41,7 @@ class RoleModel extends AbstractBaseModel
      */
     public function guardedID() : array
     {
-        return [];
+        return [1,2];
     }
 
 }
