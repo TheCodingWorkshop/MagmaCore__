@@ -54,7 +54,7 @@ class Error implements ErrorInterface
      * 
      * @return ErrorInterface
      */
-    public function dispatchError(string $redirectPath): ErrorInterface
+    public function dispatchError(string|null $redirectPath = null): ErrorInterface
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
@@ -62,7 +62,7 @@ class Error implements ErrorInterface
                 if (is_string($code)) {
                     $this->errorCode = $code;
                     $this->object->flashMessage($error, $this->object->flashWarning());
-                    $this->object->redirect($redirectPath);
+                    $this->object->redirect(($redirectPath !==null) ? $redirectPath : $this->object->onSelf());
                 }
             }
         }

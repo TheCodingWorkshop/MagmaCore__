@@ -26,11 +26,12 @@ class Breadcrumbs
         // This gets the REQUEST_URI (/path/to/file.php), splits the string (using '/') into an array, and then filters out any empty values
         $path  = array_filter(explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));
         // This will build our "base URL" ... Also accounts for HTTPS :)
-        $base = ($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/';
+        $base = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/';
         // Initialize a temporary array with our breadcrumbs. (starting with our home page, which I'm assuming will be the base URL)
         $breadcrumbs = Array("<a href=\"$base\">$home</a>");
         // Find out the index for the last value in our path array
-        $last = end(array_keys($path));
+        //$last = end(array_keys($path));
+        $last = array_key_last(array_keys($path));
 
         // Build the rest of the breadcrumbs
         foreach ($path as $x => $crumb) {

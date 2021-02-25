@@ -105,6 +105,16 @@ class Stringify
         return false;
     }
 
+    public function studlyCaps(string $string) : string
+    {
+        return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $string)));
+    }
+
+    public function camelCase(string $string) : string
+    {
+        return lcfirst($this->studlyCaps($string));
+    }
+
     /**
      * Regular expression function that replaces spaces between words with hyphens.
      *

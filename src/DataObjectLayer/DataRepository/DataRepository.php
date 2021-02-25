@@ -12,14 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryTrait;
-use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
-use MagmaCore\Utility\Paginator;
-use MagmaCore\Utility\Sortable;
 use Throwable;
+use MagmaCore\Utility\Sortable;
+use MagmaCore\Utility\Paginator;
+use MagmaCore\DataObjectLayer\EntityManager\EntityManager;
+use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryTrait;
+use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
+use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
+use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
+use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
 /**
  * Methods
@@ -49,7 +50,12 @@ class DataRepository implements DataRepositoryInterface
         $this->em = $em;
     }
 
-    public function getEm()
+    /**
+     * Returns the entityManager object
+     *
+     * @return object|false
+     */
+    public function getEm() : EntityManager|false
     {
         return $this->em;
     }
@@ -267,9 +273,9 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param array $args
      * @param Object $request
-     * @return array
+     * @return array|false
      */
-    public function findWithSearchAndPaging(Object $request, array $args = []): array
+    public function findWithSearchAndPaging(Object $request, array $args = []): array|false
     {
         list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
 
@@ -308,9 +314,9 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param Object $request
      * @param array $args
-     * @return array
+     * @return array|false
      */
-    private function getCurrentQueryStatus(Object $request, array $args) : array
+    private function getCurrentQueryStatus(Object $request, array $args) : array|false
     {
         $totalRecords = 0;
         $req = $request->query;

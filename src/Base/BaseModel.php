@@ -70,8 +70,9 @@ class BaseModel
         }
         // As we are expecting the object name using dot notations we need to convert it
         if (is_string($objectName)) {
-            $objectName = 'app.' . $objectName;
+            $objectName = 'app.' . $objectName;    
             $objectName = ucwords(str_replace('.', '\\', $objectName));
+
             return BaseApplication::diGet($objectName);
         }
 

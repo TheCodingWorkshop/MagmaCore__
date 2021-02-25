@@ -13,10 +13,19 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain;
 
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\Stringify;
+use MagmaCore\Base\Domain\DomainLogicRules;
+use MagmaCore\Base\Exception\BaseOutOfBoundsException;
+use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 trait DomainTraits
 {
+
+    protected array $allowedRules = [
+        'password_required',
+        'password_equal'
+    ];
 
     /**
      * Retunns the current template directory path
@@ -25,7 +34,7 @@ trait DomainTraits
      */
     private function templateDir(): string
     {
-        return TEMPLATE_PATH . DS . 'Templates';
+        return TEMPLATE_PATH . DS . Yaml::file('routes')['template_dir'];
     }
 
     /**
@@ -75,8 +84,22 @@ trait DomainTraits
      */
     public function getFileExt(int $indexPos): string
     {
-
         return Yaml::file('twig')['template_ext'][$indexPos];
+    }
+
+    /**
+     * Append the client directory name when dealing with non dynamic routes ie
+     * routes which doesn't defined a dynamic namespace within the route.yml file
+     *
+     * @return void
+     */
+    public function fileDirectoryFromNamespace()
+    {
+        $append = '';
+        if (empty($this->getNamespace()) || $this->getNamespace() == '') {
+            return Yaml::file('routes')['client_dir'] . '/';
+        }
+        return $this->getNamespace();
     }
 
     /**
@@ -88,8 +111,8 @@ trait DomainTraits
      */
     private function getFile(int $ext): array
     {
-        $fullPath = "{$this->templateDir()}/{$this->getNamespace()}/{$this->controllerLowercase()}/{$this->getFileName()}{$this->getFileExt($ext)}";
-        $filePath = "/{$this->getNamespace()}/{$this->controllerLowercase()}/{$this->getFileName()}{$this->getFileExt($ext)}";
+        $fullPath = "{$this->templateDir()}/{$this->fileDirectoryFromNamespace()}/{$this->controllerLowercase()}/{$this->getFileName()}{$this->getFileExt($ext)}";
+        $filePath = "{$this->fileDirectoryFromNamespace()}/{$this->controllerLowercase()}/{$this->getFileName()}{$this->getFileExt($ext)}";
         return [
             $fullPath,
             $filePath
@@ -109,13 +132,17 @@ trait DomainTraits
      */
     public function render(string|null $filename = null, int $extension = 2): self
     {
-        list($fullPath, $filePath) = $this->getFile($extension);
-        if (!file_exists($fullPath)) {
-            throw new \Exception(
-                "Your template <code>{$filePath}</code> could be located within <code>{$this->templateDir()}</code>"
-            );
+        if ($filename !== null) {
+            $this->fileToRender = $filename;
+        } else {
+            list($fullPath, $filePath) = $this->getFile($extension);
+            if (!file_exists($fullPath)) {
+                throw new \Exception(
+                    "{$filePath} template file could be located within {$this->templateDir()}"
+                );
+            }
+            $this->fileToRender = $filePath;
         }
-        $this->fileToRender = ($filename !== null) ? $filename : $filePath;
         return $this;
     }
 
@@ -143,27 +170,36 @@ trait DomainTraits
      * @param string|null $formAction
      * @return self
      */
-    public function form(Object $formRendering, string|null $formAction = null): self
+    public function form(Object $formRendering, string|null $formAction = null, mixed $data = null): self
     {
-        if (!is_array($this->context)) {
-            throw new BaseInvalidArgumentException(
-                'Invalid context pass to <code>with()</code> method.'
-            );
-        }
-        if (count($this->context) > 0) {
-            $this->superContext = array_merge(
-                $this->context,
-                [
-                    'form' => $formRendering->createForm(
-                        $this->domainRoute(),
-                        ($this->controller->thisRouteAction() === 'edit') ? $this->controller->findOr404() : NULL
-                    )
-                ]
-            );
-        } else {
-            $this->superContext = $this->context;
-        }
+        $this->superContext = array_merge(
+            $this->context,
+            [
+                'form' => $formRendering->createForm(
+                    ($formAction !== null) ? $formAction : $this->domainRoute(),
+                    ($data !== null) ? $data : $this->findSomeData()
+                )
+            ]
+        );
         return $this;
+    }
+
+    /**
+     * Return the object for any edit route from any controller which has a findOr404
+     * method else will just return null and thats if we are not passing a third
+     * argument to our $this->form() method above.
+     *
+     * @return object|null
+     */
+    private function findSomeData()
+    {
+        if (method_exists($this->controller, 'findOr404')) {
+            if (!empty($this->controller->thisRouteID())) {
+                return $this->controller->findOr404();
+            } else {
+                return NULL;
+            }
+        }
     }
 
     /**
@@ -172,15 +208,28 @@ trait DomainTraits
      * attributes
      *
      * @param array $tableParams
+     * @param object|null $column = null
      * @param array $tableData
      * @return self
      */
-    public function table(array $tableParams = [], array $tableData = []): self
-    {
-        if (count($this->context) < 0) {
-            $this->superContext = $this->context;
-        }
-        $table = $this->tableData->setAttr($tableParams)->table();
+    public function table(
+        array $tableParams = [],
+        Object|null $column = null,
+        Object|null $repository = null,
+        array $tableData = []
+    ): self {
+
+        /* Create the table object and pass the dataColumn and repository object */
+        $table = $this->tableData
+            ->create(
+                ($column !== null) ? $column : $this->controller->column,
+                ($repository !== null) ? $repository : $this->tableRepository,
+                $this->args
+            )
+            ->setAttr($tableParams)
+            ->table();
+
+        /* Create data table context which gets pass to the twig rendering template */
         if ($this->tableData) {
             $tableContext = [
                 'results' => $this->tableRepository,
@@ -197,6 +246,22 @@ trait DomainTraits
     }
 
     /**
+     * Singular can be used to display information about single object. Method 
+     * which chains the singular() method would be able to access the data 
+     * using the variable (row) within the rendered twig template.
+     *
+     * @return self
+     */
+    public function singular(): self
+    {
+        $this->superContext = array_merge(
+            $this->context,
+            ['row' => $this->controller->toArray($this->controller->findOr404())]
+        );
+        return $this;
+    }
+
+    /**
      * The end method which finally renders the BaseController render method and 
      * pass the populated arguments based on the method chaining
      *
@@ -204,10 +269,16 @@ trait DomainTraits
      */
     public function end(): void
     {
-        $this->controller->render($this->fileToRender, $this->superContext);
+        $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
+        $this->controller->render($this->fileToRender, $context);
     }
 
-    public function hasRouteWithID() : bool
+    /**
+     * Checks whether the queried route has a valid id token
+     *
+     * @return boolean
+     */
+    public function hasRouteWithID(): bool
     {
         if (!empty($this->controller->thisRouteID())) {
             return true;
@@ -215,7 +286,12 @@ trait DomainTraits
         return false;
     }
 
-    private function isRouteIDEqual() : bool
+    /**
+     * Checks whether the current route matches the queried object route
+     *
+     * @return boolean
+     */
+    private function isRouteIDEqual(): bool
     {
         if ($this->controller->thisRouteID() === $this->controller->findOr404()->id) {
             return true;
@@ -223,26 +299,35 @@ trait DomainTraits
         return false;
     }
 
-    private function idRoute(int|null $ID = null, ?string $ds = null) : string
+    /**
+     * Construct the action routes. returns the relevant strings based on
+     * first argument being present.
+     *
+     * @param integer|null $id
+     * @param string|null $ds
+     * @return string
+     */
+    private function idRoute(int|null $id = null, ?string $ds = null): string
     {
         $out = '';
-        $out .= $ds;
+        $out .= (!empty($this->controller->thisRouteNamespace()) ? $ds : '');
         $out .= $this->getNamespace() . $ds;
         $out .= $this->controllerLowercase() . $ds;
-        $out .= ($ID !== null) ? $ID . $ds : '';
+        $out .= ($id !== null) ? $id . $ds : '';
         $out .= $this->getFileName();
 
         return $out;
     }
 
     /**
-     * Undocumented function
+     * Dynamically construct the action routes
      *
      * @param Object $controller
      * @return string
      */
-    public function domainRoute(string $ds = '/') : string
+    public function domainRoute(string $ds = '/'): string
     {
+
         if ($this->controller->thisRouteAction() === $this->getFileName()) {
             if ($this->hasRouteWithID()) {
                 if ($this->isRouteIDEqual()) {
@@ -251,9 +336,54 @@ trait DomainTraits
             } else {
                 $route = $this->idRoute(null, $ds);
             }
+        } else {
+            $route = $this->idRoute($this->controller->findOr404()->id, $ds);
+        }
+        return $route;
+    }
 
-            return $route;
+    /**
+     * Undocumented function
+     *
+     * @param array $rules
+     * @param object $controller
+     * @return Closure
+     */
+    public function enforceRules(array $rules = [], Object $controller)
+    {
+        if (sizeof($rules) > 0) {
+            foreach ($rules as $rule) {
+                if (isset($rule)) {
+                    if (!is_string($rule))
+                        throw new BaseInvalidArgumentException('Rules should be defined as strings');
+                    if (!in_array($rule, $this->allowedRules, true))
+                        throw new BaseOutOfBoundsException('Invalid "' . $rule . '" is not allowed.');
+                    return array_walk(
+                        $rules,
+                        function ($callbackValue, $callbackKey, $controller) {
+                            if ($callbackValue) {
+                                $validCallback = (new Stringify())->camelCase($callbackValue);
+                                if (!method_exists(new DomainLogicRules, $validCallback)) {
+                                    throw new BaseBadMethodCallException(
+                                        $validCallback . '() does not exists within ' . __CLASS__
+                                    );
+                                }
+                                call_user_func_array(
+                                    array(new DomainLogicRules, $validCallback),
+                                    [
+                                        $callbackValue,
+                                        $callbackKey,
+                                        $controller
+                                    ]
+                                );
+                            }
+                        },
+                        $controller
+                    );
+                }
+            }
         }
     }
+
 
 }

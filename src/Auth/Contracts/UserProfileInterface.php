@@ -34,29 +34,7 @@ interface UserProfileInterface
      * @param Null|object $repository
      * @return array
      */
-    public function updateProfileNameOnceValidated(Object $cleanData, ?Object $repository) : array;
-
-    /**
-     * Update the useremail from their profile accounts page. Users email address
-     * will be subject to the same validation as registering a new account meaning 
-     * users can only use valid and allowed characters
-     *
-     * @param object $cleanData
-     * @param object $repository
-     * @return array
-     */
-    public function updateProfileEmailOnceValidated(Object $cleanData, ?Object $repository) : array;
-
-    /**
-     * Update the user password from their profile accounts page. Users password
-     * will be subject to the same validation as registering a new account meaning 
-     * users can only use valid and allowed characters
-     *
-     * @param object $cleanData
-     * @param object $repository
-     * @return array
-     */
-    public function updateProfilePasswordOnceValidated(Object $clean, ?Object $repository) : array;
+    public function updateProfileAfterValidation(Object $cleanData, Object $repository) : array;
 
     /**
      * delete the user profile account

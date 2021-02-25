@@ -19,7 +19,26 @@ trait DataRepositoryTrait
 {
 
     /**
-     * Undocumented function
+     * Validate a model before persisting data to the database. These models are 
+     * auto loaded once they are created. Models must follow the framework principle
+     * meaing model should adopt a naming convention ie. if your model is called UserModel
+     * then your validation class should be called UserValidate and should be located under 
+     * namespace App\Validate. This directory is located within your App directory
+     * within the Validate sub-directory.
+     * 
+     * Validation classes must extends AbstractDataRepositoryValidation and will be force to
+     * employ the following methods (validateBeforePersist(), getErrors(), fields() validate()
+     * validateDataBag()). Developers
+     * can create their own helper methods to help with validating your data.
+     * 
+     * The AbstractDataRepositoryValidation() class also provides some small helper method which
+     * will be accessible within your validation class so long as you extends this class within 
+     * yours. Please see documentation for all available helper methods within this class. for
+     * more on what they do and how you can use them
+     * 
+     * this method returns an array of the validated data and any errors that was generated. You can 
+     * also fill your data bag with what ever data you want to return or expose to your controller
+     * objects for event dispatching
      *
      * @param Object $entityCleanData
      * @param Object|null $dataRepository
@@ -39,8 +58,7 @@ trait DataRepositoryTrait
                         }
                         list(
                             $this->cleanData, 
-                            $this->validatedDataBag,
-                            $this->randomPassword) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
+                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
                         $this->validationErrors = $newValidationObject->getErrors();
                             
                     }
@@ -54,7 +72,8 @@ trait DataRepositoryTrait
     }
 
     /**
-     * Undocumented function
+     * Save the data once it goes through validation. post data would have already
+     * been sanitize through the entity object
      *
      * @param array $fields
      * @return boolean
@@ -101,32 +120,30 @@ trait DataRepositoryTrait
     }
 
     /**
-     * Undocumented function
+     * Returns an array of validated data which can be passed back to the controller 
+     * classes which can then be injected within an event dispatcher
      *
-     * @return void
+     * @return array|null
      */
-    public function validatedDataBag()
+    public function validatedDataBag() : array|null
     {
         if (is_array($this->cleanData) && count($this->cleanData) > 0) {
             return $this->dataBag;
         }
+        return null;
     }
 
     /**
-     * Undocumented function
+     * return an array validation errors from any App/Validation/*Validate class
      *
-     * @return void
+     * @return array|null
      */
-    public function getValidationErrors()
+    public function getValidationErrors() : array|null
     {
         if (count($this->validationErrors) > 0) {
             return $this->validationErrors;
         }
-    }
-
-    public function getRandomPassword() : array
-    {
-        return ['random_pass' => $this->randomPassword];
+        return null;
     }
 
 }

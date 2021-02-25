@@ -93,25 +93,31 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function thisRouteNamespace() : string
     {
-        return $this->routeParams['namespace'];
+        return isset($this->routeParams['namespace']) ? $this->routeParams['namespace'] : '';
     }
 
     /**
      * Return the current controller token as a string
      * @return string
      */
-    public function thisRouteToken() : string
+    public function thisRouteToken() : string|null
     {
-        return $this->routeParams['token'];
+        $token = isset($this->routeParams['token']) ? $this->routeParams['token'] : null;
+        $token = (string)$token;
+        return $token;
+
     }
 
     /**
      * Return the current controller route ID if set as a int
-     * @return int
+     * @return int|false
      */
-    public function thisRouteID() : int
+    public function thisRouteID() : int|false
     {
-        return (int)$this->routeParams['id'];
+
+        $ID = isset($this->routeParams['id']) ? $this->routeParams['id'] : false;
+        $ID = intval($ID);
+        return $ID;
     }
 
     public function toArray(Object $data)

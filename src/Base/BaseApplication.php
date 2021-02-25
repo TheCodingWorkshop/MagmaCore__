@@ -24,18 +24,18 @@ class BaseApplication
     /** @var string - the current application version */
     protected const MAGMA_MIN_VERSION = '1.0.0';
 
-    /** @var Object|null - The Router Object - Leaving null will return the default Router Object */
-    protected ?Object $routerObject = null;
+    /** @var object|null - The Router Object - Leaving null will return the default Router Object */
+    protected Object|null $routerObj = null;
     /** @var array - an associative array of user defined routes */
     protected array $routes = [];
     /** @var string|null  */
-    protected ?string $urlRoute = null;
+    protected string|null $urlRoute = null;
     /** @var array - session environment */
     protected array $sessionEnvironment = [];
     /** @var string - session identifier */
-    protected ?string $sessionIdentifier = null;
+    protected string|null $sessionIdentifier = null;
     /** @var string - session storage */
-    protected ?string $sessionStorage = null;
+    protected string|null $sessionStorage = null;
     /** @var string $appPath */
     protected string $appPath;
     /** @var array */

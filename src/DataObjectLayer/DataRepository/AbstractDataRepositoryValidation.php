@@ -131,15 +131,43 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
     }
     
     /**
+     * Contains an array of returned data from the fields() method and merges it with an 
+     * array pass to the argument within this getAttr(array $data) method. 
+     * The fields() method is an abstract method defined within AbstractDataRepositoryValidation()
+     * and should be employed within each App/Validation/**Validation class 
+     * example. array_merge($this->fields(), $data)
+     * 
      * @param $cleanData
      * @return array
      */
-    protected function getArr(array $cleanData): array
+    protected function mergeWithFields(array $cleanData): array
     {
         $cleanData = (!empty($this->fields()) ? array_merge($cleanData, $this->fields()) : $cleanData);
         return $cleanData;
     }
 
+    /**
+     * Check if the data is set before passing to the database handler. This helps to 
+     * prevent 'undefined index' errors. We can also pass back default values using the 
+     * third argument. Useful when updating records as we can pass back default values which
+     * should prevent database field from accidently being changed to a different value as we 
+     * are passing back the same value if nothing was set or changed within the submitted form.
+     *
+     * @param string $key
+     * @param mixed $cleanData
+     * @param mixed $dataRepository
+     * @return mixed
+     */
+    public function isSet(string $key, mixed $cleanData, mixed $dataRepository = null): mixed
+    {
+        if (is_object($cleanData)) {
+            return isset($cleanData->$key) ? $cleanData->$key : (($dataRepository !== null) ? $dataRepository->$key : null);
+        } elseif (is_array($cleanData)) {
+            return array_key_exists($key, $cleanData) ? $cleanData[$key] : (($dataRepository !== null) ? $dataRepository->$key : null);
+        } else {
+            return $cleanData[$key];
+        }
+    }
 
 
 }

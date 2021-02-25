@@ -159,6 +159,7 @@ class FormBuilder extends AbstractFormBuilder
                             if (!empty($description) && in_array('uk-form-stacked', $this->formAttr['class'])) {
                                 $html .= "<div class=\"uk-text-meta uk-text-truncate uk-margin-small-bottom\">{$description}</div>";
                             }
+                            $inline_icon_class = '';
                             /* If we are adding inline icon to the element lets add the class for it */
                             if (isset($inline_icon) && $inline_icon !=='') {
                                 $html .= "\n" . '<div class="' . (isset($inline_icon_class) ? 'uk-inline' : $inline_icon_class) . '">' . "\n";
@@ -221,8 +222,8 @@ class FormBuilder extends AbstractFormBuilder
         } catch (Throwable $th) {
             throw $th;
         }
-
     }
+
     protected function getStream()
     {
         $contentType = isset($_SERVER['CONTENT_TYPE']) && $_SERVER['REQUEST_METHOD'] == 'POST' ? trim($_SERVER['CONTENT_TYPE']) : '';
@@ -233,6 +234,16 @@ class FormBuilder extends AbstractFormBuilder
                 echo $decode;
             } else {
                 throw new FormBuilderUnexpectedValueException('Invalid Data');
+            }
+        }
+    }
+
+    public function getFormAttr(string $attr)
+    {
+        if ($attr) {
+            $field = (new RequestHandler())->handler()->get($attr);
+            if ($field) {
+                return $field;
             }
         }
     }
