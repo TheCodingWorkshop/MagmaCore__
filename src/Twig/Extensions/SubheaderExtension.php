@@ -44,37 +44,33 @@ class SubheaderExtension
         ?string $headerIcon = null,
         Closure $callback = null
     ): string {
-        $filter = (isset($searchFilter) && !empty($searchFilter)) ? true : false;
         $html = '';
-        $html .= '<nav uk-navbar class="uk-margin-small-top">';
-        $html .= '<div class="nav-overlay uk-navbar-left">';
+        $html .= '<nav uk-navbar-container" uk-navbar>';
+        $html .= '<div class="uk-navbar-left">';
+        $html .= '<div class="uk-grid-small uk-flex-middle" uk-grid style="margin-top: -10px;">';
+        $html .= '<div class="uk-width-auto">';
         $html .= '
-        <div class="uk-grid-small uk-flex-middle" uk-grid style="margin-top: -10px;">
-            <div class="uk-width-auto uk-label uk-background-teal-s3 uk-padding-small uk-margin-remove-top">
-                    <span uk-icon="icon:' . (($filter) ? 'search' : strtolower($headerIcon)) . '; ratio:1.5"></span>
-                </div>
-                <div class="uk-width-expand">
-                <h2 class="uk-text-normal uk-text-emphasis uk-margin-remove-bottom">' . (($filter) ? $totalRecords . ' Records found' : (new Stringify())->pluralize($controller)) . '</h2>
-                <p class="uk-text-meta uk-margin-remove-top">
-                    <span class"uk-text-justify">
-                        <span class="uk-text-bolder uk-text-warning">' . (($filter) ? '<span class="uk-text-muted">Searching For </span>' . (new Stringify())->justify($searchFilter, 'ucwords') . ' - <a href="/admin/user/index">Clear</a>'  : (new Breadcrumbs())->breadcrumbs()) . '</span>
-                    </span>
-                </p>
-                </div>
-            </div>';
+                        <h1><span uk-icon="icon:' . strtolower($headerIcon) . '; ratio:2.5">
+                        </span> ' . (new Stringify())->pluralize(ucwords($controller)) . '</h1>';
+        $html .= '<p>Welcome back, Èrik Campobadal. You have 15 new notifications</p>';
+        $html .= '<ul class="uk-breadcrumb">
+                            <li><a href="index.html">Home</a></li>
+                            <li><span href="">Dashboard</span></li>
+                        </ul>';
+
+        $html .= '</div>';
+        $html .= '</div>';
         $html .= '</div>';
 
-        $html .= '<div class="nav-overlay uk-navbar-right">';
-        $html .= (new SearchBoxExtension())->triggerSearchBox();
+        $html .= '<div class="uk-navbar-right">';
         if (is_array($actions) && count($actions) > 0) {
             if (is_null($row)) {
-                $html .= (new IconNavExtension())->iconNav($actions, $row, $twigExt, $controller, $actionVertical);
+                $html .= (new IconNavExtension())->iconNav($actions, $row, $twigExt, $controller, true);
             } else {
                 // send a warning
             }
         }
         $html .= '</div>';
-        $html .= (new SearchBoxExtension())->searchBox();
         $html .= '</nav>';
 
         return $html;

@@ -14,7 +14,7 @@ namespace MagmaCore\RestFul;
 
 use MagmaCore\RestFul\RestResponse;
 
-class RestHandler
+class RestHandler extends RestResponse
 {
 
     protected string $contentType;
@@ -27,10 +27,10 @@ class RestHandler
     /**
      * Undocumented function
      *
-     * @param array $data
+     * @param mixed $data
      * @param string|null $contentType
      */
-    public function __construct(array $data, ?string $contentType = self::DEFAULT_CONTENT)
+    public function __construct(mixed $data, ?string $contentType = self::DEFAULT_CONTENT)
     {
         $this->data = $data;
         $this->contentType = $contentType;
@@ -42,48 +42,46 @@ class RestHandler
             $code = self::CODE_404;
             $this->data = ['error' => 'No data found!'];
         } else {
-            $code = self::CODE_404;
+            $code = 200;
         }
-        (new RestResponse())->setHttpHeaders($this->contentType, $code);
+        $this->setHttpHeaders($this->contentType, $code);
         if (strpos($this->contentType, 'json') !== false) {
-            $this->response = $this->jsonEncodedData($this->data);
+            $response = $this->jsonEncodedData($this->data);
         } elseif (strpos($this->contentType, 'html') !== false) {
-            $this->response = $this->htmlEncodedData($this->data);
+            $response = $this->htmlEncodedData($this->data);
         } elseif (strpos($this->contentType, 'xml') !== false) {
-            $this->response = $this->xmlEncodedData($this->data);
+            $response = $this->xmlEncodedData($this->data);
         } else {
-            $this->response = $this->data;
+            $response = $this->data;
         }
 
-        if (isset($this->response) && null !== $this->response || $this->response !='') {
-            return $this->response;
-        }
+        return $response;
     }
 
-    private function jsonEncodedData(array $data)
+    private function jsonEncodedData($data)
     {
-        if (null !== $data) {
-            $json = json_encode($data);
-            if ($json) {
-                return $json;
-            }
+        //if (null !== $data) {
+        $json = json_encode($data);
+        if ($json) {
+            return $json;
         }
+        // }
 
-        return null;
+        // return null;
     }
 
     private function htmlEncodedData(array $data)
     {
         if (null !== $data) {
             $html = "<table border=\"1\">";
-                if (count($data) > 0) {
-                    foreach ($data as $key => $value) {
-                        $html .= "<tr>";
-                            $html .= "<td>{$key}</td>";
-                            $html .= "<td>{$value}</td>";
-                        $html .= "</tr>";
-                    }
+            if (count($data) > 0) {
+                foreach ($data as $key => $value) {
+                    $html .= "<tr>";
+                    $html .= "<td>{$key}</td>";
+                    $html .= "<td>{$value}</td>";
+                    $html .= "</tr>";
                 }
+            }
             $html .= "</table>";
 
             return $html;
@@ -104,5 +102,4 @@ class RestHandler
 
         return null;
     }
-
 }

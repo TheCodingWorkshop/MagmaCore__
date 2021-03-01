@@ -36,6 +36,7 @@ class FlashMessageExtension
                         <a class="uk-alert-close" uk-close></a>
                         <p class="uk-text-bolder">' . (isset($message) ? $message : '') . '</p>
                     </div>';
+                    
             }
             return $html;
         }

@@ -28,7 +28,8 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'rel' => '',
         'target' => '_self', /* defaults loads into itself */
         'novalidate' => false,
-        "autocomplete" => false
+        "autocomplete" => false,
+        //"onSubmit" => "UIkitNotify()"
     ];
 
     /** class constants for allowable field/input types */
