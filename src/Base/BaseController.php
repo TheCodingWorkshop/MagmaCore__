@@ -11,23 +11,24 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
-use MagmaCore\Base\Exception\BaseLogicException;
-use MagmaCore\EventDispatcher\EventDispatcher;
-use MagmaCore\FormBuilder\FormBuilder;
-use MagmaCore\Datatable\Datatable;
-use MagmaCore\Session\SessionTrait;
-//use MagmaCore\Session\SessionFactory;
-use MagmaCore\Session\Flash\FlashType;
-use MagmaCore\Session\Flash\Flash;
-//use MagmaCore\Cookie\CookieFactory;
+use MagmaCore\Error\Error;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
-use MagmaCore\Http\ResponseHandler;
+use MagmaCore\Datatable\Datatable;
 use MagmaCore\Http\RequestHandler;
+use MagmaCore\Session\Flash\Flash;
+//use MagmaCore\Session\SessionFactory;
+use MagmaCore\Http\ResponseHandler;
+use MagmaCore\Session\SessionTrait;
+//use MagmaCore\Cookie\CookieFactory;
+use MagmaCore\Collection\Collection;
 use MagmaCore\Middleware\Middleware;
+use MagmaCore\FormBuilder\FormBuilder;
+use MagmaCore\Session\Flash\FlashType;
+use MagmaCore\EventDispatcher\EventDispatcher;
 //use MagmaCore\Translation\Translation;
-use MagmaCore\Error\Error;
+use MagmaCore\Base\Exception\BaseLogicException;
+use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
 
 class BaseController extends AbstractBaseController
 {
@@ -65,7 +66,8 @@ class BaseController extends AbstractBaseController
                 "cache" => "",
                 "cookie" => "",
                 "tableGird" => Datatable::class,
-                "flatDb" => FileStorage::class
+                "flatDb" => FileStorage::class,
+                "collection" => Collection::class
             ]
         );
 

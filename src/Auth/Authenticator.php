@@ -7,13 +7,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
 use App\Model\UserModel;
-use MagmaCore\Utility\Validator;
+use MagmaCore\Error\Error;
 use MagmaCore\Utility\Sanitizer;
+use MagmaCore\Utility\Validator;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
 class Authenticator
@@ -30,7 +32,7 @@ class Authenticator
      * @param string $password
      * @return mixed
      */
-    public function authenticate(string $email, string $passqwordHash, Null|Object $currentObject = null)
+    public function authenticate(string $email, string $passqwordHash)
     {
         $this->repository = (new UserModel());
         $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
@@ -47,6 +49,51 @@ class Authenticator
     }
 
     /**
+     * Returned the validatedd user object. If the credentials passed in matches
+     * a database record. else will generate a erorr from the validate() method
+     * below.
+     *
+     * @param string|null $email
+     * @param string|null $password
+     * @return object
+     */
+    public function getValidatedUser(object $object, string|null $email = null, string|null $password = null)
+    {
+        $this->object = $object;
+        $req = $object->request->handler();
+        $this->validatedUser = $this->authenticate(
+            ($email !== null) ? $req->get($email) : $req->get('email'),
+            ($password !== null) ? $req->get($password) : $req->get('password_hash'),
+            $this->object
+        );
+        if (!$this->validatedUser) {
+            if ($object->error) {
+                $object->error->addError($this->getErrors(), $object)->dispatchError();
+            }
+        }
+        return $this->validatedUser;
+    }
+
+    /**
+     * Get the remember_me value from the request if the checkbox was checked
+     *
+     * @return boolean
+     */
+    public function isRememberingLogin()
+    {
+        $remember = $this->object->request->handler()->get('remember_me');
+        if ($remember) {
+            return $remember;
+        }
+    }
+
+    public function getLogin(): void
+    {
+        Authorized::login($this->validatedUser, $this->isRememberingLogin());
+    }
+
+
+    /**
      * Validate the user login credentials. Ensure the email is valid and exists
      * and checks the password validates against user stored password. We are also
      * ensuring that both password and email is not left empty. This a second defence
@@ -56,32 +103,32 @@ class Authenticator
      * @param array $dirtyData
      * @return array - an array of error messages
      */
-    private function validate(array $dirtyData) : array
+    public function validate(array $dirtyData): array
     {
         $cleanData = Sanitizer::clean($dirtyData);
         if (is_array($cleanData)) {
             foreach ($cleanData as $key => $value) {
                 switch ($key) {
-                    case 'email' :
+                    case 'email':
                         if (!Validator::email($value)) {
-                            $this->errors[] = 'Please enter a valid email address.';
+                            $this->errors = Error::display('err_invalid_email');
                         }
                         if (!$this->repository->emailExists($value, null)) {
-                            $this->errors[] = 'User Account does not exists';
+                            $this->errors = Error::display('err_invalid_account');
                         }
                         $this->email = $value;
                         break;
-                    case 'password_hash' :
+                    case 'password_hash':
                         if (empty($value)) {
-                            $this->errors[] = 'Please enter your password';
-                        }       
+                            $this->errors = Error::display('err_password_require');
+                        }
                         $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash']);
                         if (!password_verify($value, $user->password_hash)) {
-                            $this->errors[] = 'Unmatched credentials. Please try again';
+                            $this->errors = Error::display('err_invalid_credentials');
                         }
                         break;
-                    default :
-                        $this->errors[] = 'Invalid user credentials';
+                    default:
+                        $this->errors = Error::display('err_invalid_user');
                         break;
                 }
             }
@@ -94,18 +141,18 @@ class Authenticator
      *
      * @return array
      */
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return $this->errors;
     }
-    
+
     /**
      * Returns true if user credentials is correct and if the password is verified 
      * else return false otherwise
      *
      * @return boolean
      */
-    public function getAction() : bool
+    public function getAction(): bool
     {
         return $this->action;
     }

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\ClientRepository;
@@ -39,17 +40,17 @@ class ClientRepository implements ClientRepositoryInterface
      * @param string|null $primaryKey
      * @return boolean
      */
-    public function save(array $fields = [], ?string $primaryKey = null) : bool
+    public function save(array $fields = [], ?string $primaryKey = null): bool
     {
         try {
             if (is_array($fields) && count($fields) > 0) {
-                if ($primaryKey !=null && is_string($primaryKey)) {
+                if ($primaryKey != null && is_string($primaryKey)) {
                     return $this->em->getCrud()->update($fields, $primaryKey);
                 } elseif ($primaryKey === null) {
                     return $this->em->getCrud()->create($fields);
                 }
             }
-        } catch(Throwable $throw) {
+        } catch (Throwable $throw) {
             throw $throw;
         }
     }
@@ -60,17 +61,17 @@ class ClientRepository implements ClientRepositoryInterface
      * @param array $condition
      * @return boolean
      */
-    public function drop(array $condition) : bool
+    public function drop(array $condition): bool
     {
         try {
             if (is_array($condition) && count($condition) > 0) {
                 return $this->em->getCrud()->delete($condition);
             }
-        } catch(Throwable $throw) {
+        } catch (Throwable $throw) {
             throw $throw;
         }
     }
-    
+
 
 
     /**
@@ -79,24 +80,24 @@ class ClientRepository implements ClientRepositoryInterface
      * @param array $conditions
      * @return array
      */
-    public function get(array $conditions = []) : array
+    public function get(array $conditions = []): array
     {
         try {
             if (count($conditions) > 0) {
-               return $this->em->getCrud()->read(
-                   (isset($conditions['selectors']) ? $conditions['selectors'] : []), 
-                   (isset($conditions['condition']) ? $conditions['condition'] : []), 
+                return $this->em->getCrud()->read(
+                    (isset($conditions['selectors']) ? $conditions['selectors'] : []),
+                    (isset($conditions['condition']) ? $conditions['condition'] : []),
                 );
             } else {
                 return $this->em->getCrud()->read();
             }
-        } catch(Throwable $throw) {
+        } catch (Throwable $throw) {
             throw $throw;
         }
     }
 
 
-    public function validate() : void {}
-
-
+    public function validate(): void
+    {
+    }
 }

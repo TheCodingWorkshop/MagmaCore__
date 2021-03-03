@@ -92,7 +92,7 @@ trait EventDispatcherTrait
                         $event->getObject()
                             ->redirect(
                                 ($this->onRoute($event, $actionRoute) ?
-                                    '/' . $event->getObject()->getSession()->get('redirect_parameters') : (($_redirect === true) ? $routesArray[$event->getMethod()]['redirect'] : $event->getObject()->onSelf()))
+                                    '/' . $event->getObject()->getSession()->get('redirect_parameters') : (($_redirect === true) ? $routesArray[$event->getMethod()]['redirect'] : (($actionRoute !==null) ? $actionRoute : $event->getObject()->onSelf())))
                             );
                     }
                 }

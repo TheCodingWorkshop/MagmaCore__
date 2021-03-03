@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Error;
 
+use MagmaCore\Utility\Yaml;
+
 class Error implements ErrorInterface
 {
 
@@ -32,6 +34,7 @@ class Error implements ErrorInterface
         PASSWORD_NUMBER    = 'ERR_200MC',
         INVALID_EMAIL      = 'ERR_250MC',
         EMPTY_FIELDS       = 'ERR_300MC';
+
 
     /**
      * Add a error to the error array
@@ -119,9 +122,28 @@ class Error implements ErrorInterface
         return $this->errorParams;
     }
 
-
+    /**
+     * Undocumented function
+     *
+     * @return string
+     */
     public function getErrorCode(): string
     {
         return $this->errorCode;
+    }
+
+    /**
+     * Returns the error whcih matches the error code and returned a formatted array
+     * to be dispatched
+     *
+     * @param string $code
+     * @return array
+     */
+    public static function display(string $code) : array
+    {
+        $error = Yaml::file('error')[$code];
+        if ($error) {
+            return [$code => $error];
+        }
     }
 }

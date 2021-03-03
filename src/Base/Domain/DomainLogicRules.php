@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain;
 
 use App\Entity\UserEntity;
+use MagmaCore\Error\Error;
 
 class DomainLogicRules
 {
 
-    private const CONTROLLER_CLASS = [];
-
     /**
-     * Undocumented function
+     * Ensure the password is verified before the action is carried out
      *
      * @return void
      */
@@ -20,18 +19,26 @@ class DomainLogicRules
     {
         if (!$controller->repository->verifyPassword($controller, $controller->findOr404()->id)) {
             if ($controller->error) {
-                $controller->error->addError(['incorrect_password' => 'Incorrect Password for this account.!'], $controller)->dispatchError();
+                $controller->error->addError(Error::display('err_invalid_credentials'), $controller)->dispatchError();
             }
         }
     }
 
+    /**
+     * Douvble checks the user password before persisting to database
+     *
+     * @param string $value
+     * @param string $key
+     * @param Object $controller
+     * @return void
+     */
     public function passwordEqual(string $value, string $key, Object $controller)
     {
         $this->passwordRequired($value, $key, $controller);
 
         if (!$controller->repository->isPasswordMatching($controller, new UserEntity($controller->formBuilder->getData()))) {
             if ($controller->error) {
-                $controller->error->addError(['mismatched_password' => 'Your password does not match.'], $controller)->dispatchError();
+                $controller->error->addError(Error::display('err_mismatched_password'), $controller)->dispatchError();
             }
         }
     }
