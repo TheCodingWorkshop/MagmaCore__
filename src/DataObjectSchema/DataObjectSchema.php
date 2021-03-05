@@ -7,17 +7,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\DataObjectSchema;
 
-use MagmaCore\DataObjectSchema\Exception\DataObjectSchemaUnexpectedValueException;
-use MagmaCore\DataObjectSchema\DataObjectSchemaTypeInterface;
-use MagmaCore\DataObjectSchema\DataObjectSchemaConstraints;
 use MagmaCore\DataObjectSchema\AbstractDataObjectSchema;
+use MagmaCore\DataObjectSchema\DataObjectSchemaConstraints;
+use MagmaCore\DataObjectSchema\DataObjectSchemaTypeInterface;
+use MagmaCore\DataObjectSchema\Exception\DataObjectSchemaUnexpectedValueException;
 
 class DataObjectSchema extends AbstractDataObjectSchema
-{ 
+{
 
     /** @var array - stores and array of schema type object */
     protected array $schemaObject = [];
@@ -34,7 +35,7 @@ class DataObjectSchema extends AbstractDataObjectSchema
      * @param array|null $attributes
      */
     public function __construct(?string $dataModel = null, ?array $attributes = null)
-    { 
+    {
         $this->dataModelObject = new $dataModel();
         if (!$this->dataModelObject) {
             throw new DataObjectSchemaUnexpectedValueException('You need to specify a user model repository.');
@@ -48,7 +49,7 @@ class DataObjectSchema extends AbstractDataObjectSchema
      * @param array $schema
      * @return void
      */
-    public function schema(array $schema = []) : self
+    public function schema(array $schema = []): self
     {
         if ($schema) {
             $attr = array_merge(self::SCHEMA, $schema);
@@ -72,7 +73,7 @@ class DataObjectSchema extends AbstractDataObjectSchema
      * @param array $args
      * @return self
      */
-    public function row(array $args = []) : self
+    public function row(array $args = []): self
     {
         if (is_array($args)) {
             foreach ($args as $schemaObjectType => $schemaObjectOptions) {
@@ -97,14 +98,14 @@ class DataObjectSchema extends AbstractDataObjectSchema
     {
         if (is_array($this->schemaObject) && count($this->schemaObject) > 0) {
             $this->element .= "CREATE TABLE IF NOT EXISTS `{$this->dataModel->tableSchema()}`.`{$this->dataModel->databaseName()}` (\n";
-                foreach ($this->schemaObject as $schema) {
-                    $this->element .= $schema->build() . ',';
-                }
-                $this->element .= (
-                    new DataObjectSchemaConstraints(
+            foreach ($this->schemaObject as $schema) {
+                $this->element .= $schema->build() . ',';
+            }
+            $this->element .= (new DataObjectSchemaConstraints(
                     $schema,
-                    $args))
-                    ->getConstraints();
+                    $args
+                ))
+                ->getConstraints();
             $this->element .= ")\n";
         }
         if (isset($this->element) && !empty($this->element)) {
@@ -112,4 +113,5 @@ class DataObjectSchema extends AbstractDataObjectSchema
         }
         return false;
     }
+
 }

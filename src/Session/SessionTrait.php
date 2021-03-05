@@ -88,25 +88,6 @@ trait SessionTrait
     }
 
     /**
-     * Initialize the system session at the system entry point
-     *
-     * @param bool $useGlobal - Whether to use the global manager to retrieve the cache object
-     * @return mixed
-     * @throws Exception
-     */
-    public static function Session(bool $useGlobal = true)
-    {
-        $session = (new SessionFacade())->setSession();
-        if (!$session) {
-            throw new SessionException('Please enable session within the session.yaml configuration in order to use this Sessions.');
-        } elseif ($useGlobal === true) {
-            GlobalManager::set('session_global', $session);
-        } else {
-            return $session;
-        }
-    }
-
-    /**
      * The session global is automatically set from the session facade class We 
      * can fetch the global variable and use this trait method in any class
      * which reference this trait

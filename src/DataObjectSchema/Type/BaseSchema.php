@@ -199,6 +199,58 @@ class BaseSchema implements DataObjectSchemaTypeInterface
         }
     }
 
+    public function key(string $primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+        return $this;
+    }
+    
+    public function unique(mixed $unique)
+    {
+        if (is_array($unique)) {
+            $this->unique = implode(', ', $unique);
+        }
+        $this->uniqueKey = $unique;
+        return $this;
+    }
+
+    public function foreign(string $constraint, Callable $callback)
+    {
+        if (is_callable($callback)) {
+            call_user_func($callback, $this);
+        }
+        $this->constraint = $constraint;
+        return $this;
+    }
+
+    public function foreignKey(string $key)
+    {
+        $this->foreignKey = $key;
+        return $this;
+    }
+
+    public function on(string $table)
+    {
+        $this->foreignTable = $table;
+        return $this;
+    }
+
+    public function reference(string $tableID)
+    {
+        $this->foreignTableID = $tableID;
+        return $this;
+    }
+
+    public function onDelete()
+    {
+        return $this;
+    }
+
+    public function onUpdate()
+    {
+        return $this;
+    }
+
     /**
      * @inheritdoc
      */

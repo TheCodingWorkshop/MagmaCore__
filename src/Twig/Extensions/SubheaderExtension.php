@@ -43,15 +43,21 @@ class SubheaderExtension
         Object $twigExt = null,
         ?string $headerIcon = null,
         Closure $callback = null
-    ): string {
+    ): string { //
         $html = '';
         $html .= '<nav uk-navbar-container" uk-navbar>';
         $html .= '<div class="uk-navbar-left">';
         $html .= '<div class="uk-grid-small uk-flex-middle" uk-grid style="margin-top: -10px;">';
         $html .= '<div class="uk-width-auto">';
-        $html .= '
-                        <h1><span uk-icon="icon:' . strtolower($headerIcon) . '; ratio:2.5">
-                        </span> ' . (new Stringify())->pluralize(ucwords($controller)) . '</h1>';
+        if (str_contains($headerIcon, 'ion')) {
+            $html .= '
+                <h1><span class="' . $headerIcon . '" style="font-size:48px;">
+                </span> ' . (new Stringify())->pluralize(ucwords($controller)) . '</h1>';
+        } else {
+            $html .= '
+            <h1><span uk-icon="icon:' . strtolower($headerIcon) . '; ratio:2.5">
+            </span> ' . (new Stringify())->pluralize(ucwords($controller)) . '</h1>';
+        }
         $html .= '<p>Welcome back, Èrik Campobadal. You have 15 new notifications</p>';
         $html .= '<ul class="uk-breadcrumb">
                             <li><a href="index.html">Home</a></li>
