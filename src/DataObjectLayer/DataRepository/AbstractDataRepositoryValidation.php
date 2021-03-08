@@ -169,5 +169,16 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         }
     }
 
+    public function errorIfExists(string $model, string $fieldName, mixed $value)
+    {
+        if (is_string($fieldName)) {
+            $result = (new $model())->getRepo()->findObjectBy([$fieldName => $value], ['*']);
+            if ($result) {
+                $this->errors['err_duplicate_name'] = str_replace('_', ' ', ucwords($fieldName)) . ' already exists';
+            }
+        }
+
+    }
+
 
 }

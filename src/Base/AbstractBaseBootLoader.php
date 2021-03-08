@@ -54,12 +54,16 @@ abstract class AbstractBaseBootLoader
      */
     protected function loadConstants(): void
     {
+        defined('DS') or define('DS', DIRECTORY_SEPARATOR);
         defined('APP_ROOT') or define('APP_ROOT', $this->application->getPath());
-        defined('CONFIG_PATH') or define('CONFIG_PATH', APP_ROOT . DS . 'Config');
         defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
         defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
         defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
         defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
+        defined('ROOT_URI') or define('ROOT_URI', '');
+        defined('RESOURCES') or define('RESOURCES', ROOT_URI);
+        defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
+        
     }
 
     protected function loadEnvironment()

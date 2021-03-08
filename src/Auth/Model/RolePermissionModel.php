@@ -44,4 +44,25 @@ class RolePermissionModel extends AbstractBaseModel
         return [];
     }
 
+    /**
+     * Returns the databae table schema name
+     * 
+     * @return string
+     */
+    public function getSchemaID(): string
+    {
+        return self::TABLESCHEMAID;
+    }
+
+    /**
+     * Returns the database table schema primary key 
+     * 
+     * @return string
+     */
+    public function getSchema(): string
+    {
+        return self::TABLESCHEMA;
+    }
+
+
 }
