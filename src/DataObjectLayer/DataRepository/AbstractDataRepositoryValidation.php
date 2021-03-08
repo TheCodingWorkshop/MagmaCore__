@@ -12,12 +12,17 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use MagmaCore\Session\SessionTrait;
+use MagmaCore\ValidationRule\ValidationRule;
 
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
 {
 
     protected const FIRST = 0;
     protected const LAST = 1;
+
+    public function __construct()
+    {
+    }
 
     /**
      * @inheritdoc
@@ -34,13 +39,6 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @return array
      */
     abstract public function getErrors() : array;
-
-    /**
-     * @inheritdoc
-     *
-     * @return array
-     */
-    abstract public function fields() : array;
 
     /**
      * Allows controller to supply and key/value pair to splice from an array
