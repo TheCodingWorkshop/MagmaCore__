@@ -136,6 +136,9 @@ abstract class AbstractBaseBootLoader
         }
     }
 
+    /**
+     * 
+     */
     protected function loadRoutes()
     {
         $factory = new RouterFactory($this->application->getRouteHandler());
@@ -143,5 +146,17 @@ abstract class AbstractBaseBootLoader
         if (count($this->application->getRoutes()) > 0) {
             return $factory->buildRoutes($this->application->getRoutes());
         }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    protected function loadErrorHandlers()
+    {
+        error_reporting($this->application->getErrorHandlerLevel());
+        set_error_handler($this->application->getErrorHandling()['error']);
+        set_exception_handler($this->application->getErrorHandling()['exception']);
     }
 }

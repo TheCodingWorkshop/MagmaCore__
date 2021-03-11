@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\ControllerTrait;
+use MagmaCore\Base\Traits\ControllerTrait;
 use MagmaCore\Cache\CacheInterface;
 use MagmaCore\Router\RouterInterface;
 use MagmaCore\Session\SessionInterface;

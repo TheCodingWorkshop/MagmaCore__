@@ -8,7 +8,13 @@
 {% endblock page_title %}
 
 {% block content %}
-	<div class="uk-section uk-light">
+{{ exception.getTrace()|length }}
+{{ exception.getMessage() }}
+{{ exception.getTraceAsString() }}
+{{ exception.getLine() }}
+{{ exception.getFile() }}
+
+	{#<div class="uk-section uk-light">
 		<div class="uk-container">
 
 			<ul uk-accordion>
@@ -36,6 +42,6 @@
 				</li>
 			</ul>
 		</div>
-	</div>
+	</div>#}
 
 {% endblock content %}

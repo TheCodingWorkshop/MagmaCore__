@@ -235,10 +235,40 @@ class BaseApplication extends AbstractBaseBootLoader
         return $this->newRouter;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $errorClass
+     * @param mixed $level
+     * @return self
+     */
+    public function setErrorHandler(array $errorHandling, mixed $level = null): self
+    {
+        $this->errorHandling = $errorHandling;
+        $this->errorLevel = $level;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    public function getErrorHandling(): array
+    {
+        return $this->errorHandling;
+    }
+
+    public function getErrorHandlerLevel(): mixed
+    {
+        return $this->errorLevel;
+    }
+
     public function run(): void
     {
         $this->loadConstants();
         $this->phpVersion();
+        $this->loadErrorHandlers();
         $this->loadSession();
         $this->loadEnvironment();
         $this->loadRoutes();

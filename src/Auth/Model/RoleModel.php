@@ -7,14 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Auth\Model;
 
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\AbstractBaseModel;
 
 class RoleModel extends AbstractBaseModel
-{ 
+{
 
     /** @var string */
     protected const TABLESCHEMA = 'roles';
@@ -39,9 +41,12 @@ class RoleModel extends AbstractBaseModel
      *
      * @return array
      */
-    public function guardedID() : array
+    public function guardedID(): array
     {
-        return [1,2];
+        return [
+            Yaml::file('app')['system']['super_role']['props']['id'],
+            Yaml::file('app')['system']['default_role']['props']['id']
+        ];
     }
 
     /**
@@ -63,6 +68,4 @@ class RoleModel extends AbstractBaseModel
     {
         return self::TABLESCHEMA;
     }
-
-
 }

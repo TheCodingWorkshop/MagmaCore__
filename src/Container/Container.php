@@ -18,7 +18,6 @@ use MagmaCore\Container\Exception\ContainerException;
 use MagmaCore\Container\ContainerExceptionInterface;
 use MagmaCore\Container\ContainerInterface;
 use MagmaCore\Container\SettableInterface;
-use ReflectionParameter;
 use ReflectionClass;
 use Closure;
 

@@ -25,15 +25,17 @@ use MagmaCore\Collection\Collection;
 use MagmaCore\Middleware\Middleware;
 use MagmaCore\FormBuilder\FormBuilder;
 use MagmaCore\Session\Flash\FlashType;
-use MagmaCore\EventDispatcher\EventDispatcher;
 //use MagmaCore\Translation\Translation;
+use MagmaCore\EventDispatcher\EventDispatcher;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
+use MagmaCore\Base\Traits\ControllerCastingTrait;
 
 class BaseController extends AbstractBaseController
 {
 
     use SessionTrait;
+    use ControllerCastingTrait;
 
     /** @var array */
     protected array $routeParams;

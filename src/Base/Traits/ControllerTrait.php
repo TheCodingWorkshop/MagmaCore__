@@ -10,15 +10,15 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Base;
+namespace MagmaCore\Base\Traits;
 
 use ReflectionMethod;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\EventDispatcher\ListenerProviderInterface;
 
 trait ControllerTrait
 {

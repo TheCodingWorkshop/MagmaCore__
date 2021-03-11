@@ -20,7 +20,7 @@ class Collection implements CollectionInterface
 {
 
     use CollectionTrait;
-    
+
     /** @var array - collection items */
     protected mixed $items = [];
 
@@ -46,7 +46,7 @@ class Collection implements CollectionInterface
      * @param string $key
      * @return boolean
      */
-    public function has(string $key) : bool
+    public function has(string $key): bool
     {
         return isset($this->items[$key]);
     }
@@ -77,10 +77,9 @@ class Collection implements CollectionInterface
     {
         if ($size = $this->size()) {
             $array = array_filter($this->items);
-            $avg = array_sum($array)/$size;
+            $avg = array_sum($array) / $size;
             return $avg;
         }
-
     }
 
     /**
@@ -96,12 +95,10 @@ class Collection implements CollectionInterface
 
     public function min()
     {
-
     }
 
     public function max()
     {
-
     }
 
     /**
@@ -300,17 +297,47 @@ class Collection implements CollectionInterface
      * @param Callable $callback
      * @return static
      */
-    public function diffKeysUsing(mixed $items, Callable $callback): static
+    public function diffKeysUsing(mixed $items, callable $callback): static
     {
         return new static(array_diff_ukey($this->items, $items, $callback));
     }
 
-    public function filter(Callable|null $callback = null)
+    /**
+     * Run a filter over each of the collection item
+     * 
+     * @param Callable $callback
+     * @return static
+     */
+    public function filter(callable $callback = null): static
     {
-        /*if ($callback) {
+        if ($callback) {
             return new static($this->where($this->items, $callback));
-        }*/
+        }
         return new static(array_filter($this->items));
+    }
+
+    /**
+     * Get the first item from the collection passing the given truth test.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function first(callable|null $callback = null, $default = null)
+    {
+        return $this->first($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the collection of items as a plain array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->map(function ($value) {
+            return $value;
+        })->all();
     }
 
     public function offsetExists(mixed $key)

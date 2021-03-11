@@ -208,7 +208,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
      */
     public function diffKeysUsing(mixed $items, callable $callback): static;
 
-    public function filter(callable|null $callback = null);
+    public function filter(callable $callback = null);
 
     public function offsetExists(mixed $key);
 

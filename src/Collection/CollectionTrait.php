@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Collection;
 
+use Closure;
 use MagmaCore\Collection\Collection;
 use MagmaCore\Collection\CollectionProxy;
 use MagmaCore\Base\Exception\BaseException;
@@ -111,6 +112,59 @@ trait CollectionTrait
         return $this->map(function($value){
             //return $value  ? $value->toArray() : $value;
         });
+    }
+
+/**
+     * Return the default value of the given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function value($value, ...$args)
+    {
+        return $value instanceof Closure ? $value(...$args) : $value;
+    }
+
+
+/**
+     * Return the first element in an array passing a given truth test.
+     *
+     * @param  iterable  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function first($array, callable $callback = null, $default = null)
+    {
+        if (is_null($callback)) {
+            if (empty($array)) {
+                return $this->value($default);
+            }
+
+            foreach ($array as $item) {
+                return $item;
+            }
+        }
+
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+        }
+
+        return $this->value($default);
+    }
+
+    /**
+     * Filter the array using the given callback
+     *
+     * @param array $input
+     * @param Callable $callback
+     * @return void
+     */
+    public function where(array $input, Callable $callback)
+    {
+        return array_filter($input, $callback, ARRAY_FILTER_USE_BOTH);
     }
 
     public function flatten()
