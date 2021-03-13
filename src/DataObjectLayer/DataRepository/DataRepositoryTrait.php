@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
+use MagmaCore\Base\BaseApplication;
+use MagmaCore\Collection\Collection;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
+use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryValidationInterface;
 
 trait DataRepositoryTrait
@@ -40,25 +42,25 @@ trait DataRepositoryTrait
      * also fill your data bag with what ever data you want to return or expose to your controller
      * objects for event dispatching
      *
-     * @param Object $entityCleanData
+     * @param Collection $entityCollection
+     * @param string $entityObject - use to create the validation object namespace
      * @param Object|null $dataRepository
      * @return self
      */
-    public function validateRepository(Object $entityCleanData, ?Object $dataRepository = null) : self
+    public function validateRepository(Collection $entityCollection, string $entityObject, ?Object $dataRepository = null) : self
     {
-        $entityNamespace = get_class($entityCleanData);
-        if (is_string($entityNamespace) && !empty($entityNamespace)) {
-            switch ($entityNamespace) :
-                case $entityNamespace :
-                    $validationClassName = str_replace('Entity', 'Validate', $entityNamespace);
+        if (is_string($entityObject) && !empty($entityObject)) {
+            switch ($entityObject) :
+                case $entityObject :
+                    $validationClassName = str_replace('Entity', 'Validate', $entityObject);
                     if ($validationClassName) {
-                        $newValidationObject = new $validationClassName($entityCleanData);
+                        $newValidationObject = BaseApplication::diGet($validationClassName);
                         if (!$newValidationObject instanceof DataRepositoryValidationInterface) {
                             throw new DataLayerUnexpectedValueException($validationClassName . ' is not a valid data repository validation object.');
                         }
                         list(
                             $this->cleanData, 
-                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCleanData, $dataRepository);
+                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCollection, $dataRepository);
                         $this->validationErrors = $newValidationObject->getErrors();
                             
                     }

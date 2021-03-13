@@ -24,7 +24,7 @@ class BaseApplication extends AbstractBaseBootLoader
     protected array $cache = [];
     protected array $routes = [];
     protected array $containerProviders = [];
-    protected string $routeHandler;
+    protected string|null $routeHandler;
     protected string|null $newRouter;
 
     /** @return void */
@@ -268,7 +268,7 @@ class BaseApplication extends AbstractBaseBootLoader
     {
         $this->loadConstants();
         $this->phpVersion();
-        $this->loadErrorHandlers();
+        //$this->loadErrorHandlers();
         $this->loadSession();
         $this->loadEnvironment();
         $this->loadRoutes();

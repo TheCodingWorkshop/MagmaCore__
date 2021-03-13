@@ -75,7 +75,8 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function thisRouteController() : string
     {
-         return $this->routeParams['controller'];
+         //return strtolower($this->routeParams['controller']);
+         return isset($this->routeParams['controller']) ? strtolower($this->routeParams['controller']) : '';
     }
 
     /**
@@ -84,7 +85,8 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function thisRouteAction() : string
     {
-        return $this->routeParams['action'];
+        //return strtolower($this->routeParams['action']);
+        return isset($this->routeParams['action']) ? strtolower($this->routeParams['action']) : '';
     }
 
     /**
@@ -93,7 +95,7 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function thisRouteNamespace() : string
     {
-        return isset($this->routeParams['namespace']) ? $this->routeParams['namespace'] : '';
+        return isset($this->routeParams['namespace']) ? strtolower($this->routeParams['namespace']) : '';
     }
 
     /**

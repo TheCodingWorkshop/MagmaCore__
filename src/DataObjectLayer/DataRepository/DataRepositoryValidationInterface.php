@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use MagmaCore\Collection\Collection;
+
 interface DataRepositoryValidationInterface
 {
 
@@ -18,11 +20,11 @@ interface DataRepositoryValidationInterface
      * Validate the data before persisting to the database ensure
      * the entity return valid email and password fields
      * 
-     * @param object $cleanData - the incoming data
+     * @param Collection $entityCollection - collection object
      * @param object|null $dataRepository - the repository for the entity
      * @return mixed
      */
-    public function validateBeforePersist(object $cleanData, ?object $dataRepository = null);
+    public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null);
 
     /**
      * Returns an array of generated errors from the validation method
@@ -30,6 +32,8 @@ interface DataRepositoryValidationInterface
      * @return array
      */
     public function getErrors() : array;
+
+    public function validationRedirect(): string;
 
     /**
      * returns an array of additional fields we can apply when inserting data within
@@ -48,18 +52,18 @@ interface DataRepositoryValidationInterface
      * @param array $newCleanData
      * @return array
      */
-    public function validatedDataBag($newCleanData): array;
+    public function validatedDataBag(array $newCleanData): array;
 
     /**
      * The validation method which should be called within the validateBeforePersist() method. 
      * As this needs to be executed before any persisting to database. Use this method to create 
      * your validation rules for your submitted data.
      *
-     * @param array $cleanData
+     * @param Collection $entityCollection
      * @param object|null $dataRepository
      * @return void
      */
-    public function validate(array $cleanData, object|null $dataRepository = null): array|null;
+    public function validate(Collection $entityCollection, object|null $dataRepository = null): void;
 
 
 }

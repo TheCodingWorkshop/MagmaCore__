@@ -16,7 +16,7 @@ use MagmaCore\Utility\Yaml;
 class GravatarGenerator
 {
 
-    public function Gravatar()
+    public static function Gravatar()
     {
         $str = file_get_contents('https://www.gravatar.com/205e460b479e2e5b48aec07710c08d50.php');
         $profile = unserialize($str);
@@ -34,7 +34,7 @@ class GravatarGenerator
      * @source https://gravatar.com/site/implement/images/php/
      * @throws Exception
      */
-    public function setGravatar($email, $img = false, $atts = [])
+    public static function setGravatar($email, $img = false, $atts = [])
     {
         $gravatar = Yaml::file('app')['gravatar'];
 

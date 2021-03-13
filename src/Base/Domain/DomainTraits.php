@@ -27,6 +27,7 @@ trait DomainTraits
         'password_equal'
     ];
 
+
     /**
      * Retunns the current template directory path
      *
@@ -383,6 +384,11 @@ trait DomainTraits
                 }
             }
         }
+    }
+
+    public function getSubmitValue(): string
+    {
+        return $this->getFileName() . '-' . strtolower($this->controller->thisRouteController());
     }
 
 

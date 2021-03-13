@@ -14,7 +14,7 @@ namespace MagmaCore\Utility;
 class ClientIP
 {
 
-    public function getClientIp()
+    public static function getClientIp()
     {
         if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];

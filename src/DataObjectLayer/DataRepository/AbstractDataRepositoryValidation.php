@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use MagmaCore\Session\SessionTrait;
+use MagmaCore\Collection\Collection;
 use MagmaCore\ValidationRule\ValidationRule;
 
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
@@ -27,11 +28,11 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
     /**
      * @inheritdoc
      * 
-     * @param object $cleanData - the incoming data
+     * @param Collection $entityCollection - the incoming data as a collection object
      * @param object|null $dataRepository - the repository for the entity
      * @return mixed
      */
-    abstract public function validateBeforePersist(Object $cleanData, ?Object $dataRepository = null);
+    abstract public function validateBeforePersist(Collection $entityCollection, ?Object $dataRepository = null);
 
     /**
      * @inheritdoc
@@ -53,6 +54,11 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         } else {
             return [];
         }
+    }
+
+    public function getCreator($dataCollection)
+    {
+        return $this->setDefaultValue($dataCollection, 'created_byid', isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0);
     }
 
     /**

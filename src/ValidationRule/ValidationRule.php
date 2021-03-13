@@ -21,30 +21,27 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 class ValidationRule implements ValidationRuleInterface
 {
 
-    protected object $object;
     protected object $controller;
-    protected object $model;
-    protected mixed $rule;
+    protected object $validationClass;
+    protected ValidationRuleMethods $validationRules;
     protected const ALLOWABLE_RULES = [
         'strings',
         'integre',
         'array',
         'object',
         'required',
-        'unique'
+        'unique',
+        'equal'
     ];
 
     /**
      * Undocumented function
      *
-     * @param string $controller
-     * @param object $validatorObject
+     * @param ValidationRuleMethods $validationRuleFuncs
+     * @return void
      */
-    public function __construct(string|null $controller = null, string|null $model = null, object|null $validatorObject = null)
-    {
-        $this->controller = new $controller([]);
-        $this->object = $validatorObject;
-        $this->model = ($model !== null) ? (new $model())->getRepo() : '';
+    public function __construct(ValidationRuleMethods $validationRuleFuncs) {
+        $this->validationRuleFuncs = $validationRuleFuncs;
     }
 
     /**
@@ -60,21 +57,19 @@ class ValidationRule implements ValidationRuleInterface
     }
 
     /**
-     * Returns the validaton rules class with the required arguments pass to
-     * the constructor
+     * Add additional object from the validation class which our validation rule methods
+     * can use.
      *
-     * @return ValidationRuleMethods
+     * @param string $controller
+     * @param object $validationClass
+     * @return void
      */
-    public function getValidationMethods(): ValidationRuleMethods
+    public function addObject(string $controller, object $validationClass): void
     {
-        $validateionMethods = new ValidationRuleMethods(
-            $this->object->validateKey,
-            $this->object->validateValue,
-            $this->model,
-            $this->controller
-        );
-        if ($validateionMethods)
-            return $validateionMethods;
+        if ($controller)
+            $this->controller = new $controller([]);
+        if ($validationClass)
+            $this->validationClass = $validationClass;
     }
 
     /**
@@ -102,14 +97,18 @@ class ValidationRule implements ValidationRuleInterface
                 return array_walk($rulePieces, function ($callback) {
                     if ($callback) {
                         list($method, $argument) = $this->resolveCallback($callback);
-                        if (!method_exists($this->getValidationMethods(), $method)) {
+                        if (!method_exists($this->validationRuleFuncs, $method)) {
                             throw new BaseBadMethodCallException(
                                 $method . '() does not exists within ' . __CLASS__
                             );
                         }
                         call_user_func_array(
-                            array($this->getValidationMethods(), $method),
-                            [$argument]
+                            array($this->validationRuleFuncs, $method),
+                            [
+                                $this->controller, 
+                                $this->validationClass, 
+                                $argument
+                            ]
                         );
                     }
                 });

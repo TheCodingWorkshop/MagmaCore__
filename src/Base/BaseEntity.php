@@ -7,18 +7,21 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Utility\Sanitizer;
+use MagmaCore\Collection\Collection;
+use MagmaCore\Base\Exception\BaseException;
 
 class BaseEntity
 {
 
     /** @var array */
     protected array $cleanData;
+    protected array $dirtyData;
 
     /**
      * BaseEntity constructor.
@@ -27,31 +30,33 @@ class BaseEntity
      * @param array $dirtyData
      * @throws BaseException
      */
-    public function __construct(array $dirtyData)
+    public function __construct()
+    {
+    }
+
+    public function wash(array $dirtyData): self
     {
         if (empty($dirtyData)) {
             throw new BaseException($dirtyData . 'has return null which means nothing was submitted.');
         }
-        if (is_array($dirtyData)) {
-            foreach ($this->cleanData($dirtyData) as $key => $value) {
-                $this->$key = $value;
-            }
-        }
+        $this->dirtyData = $dirtyData;
+        return $this;
     }
 
-    /**
-     * Return the sanitize post data back to the main constructor
-     * 
-     * @param array $dirtyData
-     * @return array
-     */
-    public function cleanData(array $dirtyData) : array
+    public function rinse()
     {
-        $cleanData = Sanitizer::clean($dirtyData);
-        if ($cleanData) {
-            return $cleanData;
+        if (!is_array($this->dirtyData)) {
+            throw new BaseException(getType($this->dirtyData) . ' is an invalid type for this object. Please return an array of submitted data.');
         }
+        $this->cleanData = Sanitizer::clean($this->dirtyData);
+        return $this;
     }
 
-
+    public function dry(): object
+    {
+        foreach ($this->cleanData as $key => $value) {
+            $this->$key = $value;
+        }
+        return new Collection($this->cleanData);
+    }
 }

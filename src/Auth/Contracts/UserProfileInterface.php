@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Contracts;
 
+use MagmaCore\Collection\Collection;
+
 interface UserProfileInterface
 {
 
@@ -30,20 +32,20 @@ interface UserProfileInterface
      * will be subject to the same validation as registering a new account meaning 
      * users can only use valid and allowed characters
      *
-     * @param object $cleanData
-     * @param Null|object $repository
+     * @param Collection $entityCollection
+     * @param object|null $repository
      * @return array
      */
-    public function updateProfileAfterValidation(Object $cleanData, Object $repository) : array;
+    public function updateProfileAfterValidation(Collection $entityCollection, Object $repository) : array;
 
     /**
      * delete the user profile account
      *
-     * @param Object $cleanData
-     * @param Object|null $repository
+     * @param Collection $entityCollection
+     * @param object|null $repository
      * @return array
      */
-    public function deleteAccountOnceValidated(Object $cleanData, ?Object $repository) : array;
+    public function deleteAccountOnceValidated(Collection $entityCollection, ?Object $repository) : array;
 
     /**
      * Return an array of user profile errors
