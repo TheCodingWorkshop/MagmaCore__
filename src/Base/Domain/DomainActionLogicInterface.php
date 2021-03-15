@@ -26,6 +26,7 @@ interface DomainActionLogicInterface
         array $rules = [],
         array $additionalContext = []
     ): self;
+    
     public function render(string|null $filename = null, int $extension = 2): self;
     public function with(array $context = []): self;
     public function form(Object $formRendering, string|null $formAction = null, mixed $data = null): self;
