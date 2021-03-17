@@ -43,7 +43,7 @@ class Error implements ErrorInterface
      * @param array $errorParams
      * @return void
      */
-    public function addError($error, Object $object, array $errorParams = []): ErrorInterface
+    public function addError($error, Object $object, array $errorParams = []): Error
     {
         if ($error)
             $this->errors = $error;

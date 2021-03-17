@@ -59,17 +59,17 @@ class BaseController extends AbstractBaseController
 
         $this->diContainer(
             [
-                "request" => RequestHandler::class,
-                "response" => ResponseHandler::class,
-                "formBuilder" => FormBuilder::class,
-                "eventDispatcher" => EventDispatcher::class,
-                "error" => Error::class,
-                "session" => "",
-                "cache" => "",
-                "cookie" => "",
-                "tableGird" => Datatable::class,
-                "flatDb" => FileStorage::class,
-                "collection" => Collection::class
+                'request' => RequestHandler::class,
+                'response' => ResponseHandler::class,
+                'formBuilder' => FormBuilder::class,
+                'eventDispatcher' => EventDispatcher::class,
+                'error' => Error::class,
+                'session' => '',
+                'cache' => '',
+                'cookie' => '',
+                'tableGrid' => Datatable::class,
+                'flatDb' => FileStorage::class,
+                'collection' => Collection::class
             ]
         );
 

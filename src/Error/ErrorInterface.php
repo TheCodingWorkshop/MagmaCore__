@@ -14,7 +14,7 @@ namespace MagmaCore\Error;
 interface ErrorInterface
 {
 
-    public function addError($error, Object $object, array $errorParams = []) : self;
+    public function addError($error, Object $object, array $errorParams = []) : Error;
     public function getErrors() : array;
     public function getErrorParams() : array;
     public function dispatchError(string $redirectPath);

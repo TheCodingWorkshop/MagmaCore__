@@ -7,16 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Router;
 
-use MagmaCore\Router\Exception\RouterBadFunctionCallException;
-use MagmaCore\Router\Exception\RouterBadMethodCallException;
-use MagmaCore\Router\Exception\RouterNoRoutesFound;
-use MagmaCore\Router\RouterInterface;
-use MagmaCore\Router\RouterTrait;
 use Closure;
+use ReflectionMethod;
+use MagmaCore\Router\RouterTrait;
+use MagmaCore\Http\RequestHandler;
+use MagmaCore\Http\ResponseHandler;
+use MagmaCore\Router\RouterInterface;
+use MagmaCore\Router\Exception\RouterNoRoutesFound;
+use MagmaCore\Router\Exception\RouterBadMethodCallException;
+use MagmaCore\Router\Exception\RouterBadFunctionCallException;
 
 class Router implements RouterInterface
 {
@@ -39,7 +43,7 @@ class Router implements RouterInterface
      */
     public function add(string $route, array $params = [], Closure $cb = null)
     {
-        if ($cb !=null) {
+        if ($cb != null) {
             return $cb($params);
         }
         // Convert the route to a regular expression: escape forward slashes
@@ -58,7 +62,7 @@ class Router implements RouterInterface
      * @inheritDoc
      * @throws RouterException
      */
-    public function dispatch(string $url, $args = null, ?Object $request = null)
+    public function dispatch(string $url, $args = null, object|null $request = null)
     {
         $url = $this->removeQueryStringVariables($url);
         if ($this->match($url)) {
@@ -70,19 +74,45 @@ class Router implements RouterInterface
                 $controllerObject = new $controllerName($this->params);
                 $action = $this->params['action'];
                 $action = $this->transformLowerCamelCase($action);
-
-                if (is_callable([$controllerObject, $action])) {
+                if (preg_match('/action$/i', $action) == 0) {
                     $controllerObject->$action();
                 } else {
-                    throw new RouterBadMethodCallException("Method {$action} does not exists.");
+                    throw new RouterBadMethodCallException("Method $action in controller $controllerName cannot be called directly - remove the Action suffix to call this method");;
                 }
             } else {
                 throw new RouterBadFunctionCallException("Class {$controllerName} does not exists.");
             }
-
         } else {
             throw new RouterNoRoutesFound("Route {$url} does not match any valid route.", 404);
         }
+    }
+
+    /**
+     * Pass method arguments by name
+     *
+     * @param object $object
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
+    public function resolvedMethods($object, $method, array $args = array())
+    {
+        $reflection = new ReflectionMethod($object, $method);
+        $reflection->setAccessible(true);
+        $pass = [];
+        foreach ($reflection->getParameters() as $param) {
+            if (isset($args[$param->getName()])) {
+                $pass[] = $args[$param->getName()];
+            } else {
+                if ($param->isDefaultValueAvailable()) {
+                    $pass[] = $param->getDefaultValue();
+                } else {
+                    $pass[] = '';
+                }
+            }
+        }
+
+        return $reflection->invokeArgs($object, $pass);
     }
 
     /**
@@ -92,7 +122,7 @@ class Router implements RouterInterface
      * @param string $url The route URL
      * @return boolean  true if a match found, false otherwise
      */
-    public function match(string $url) : bool
+    public function match(string $url): bool
     {
         foreach ($this->routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
@@ -113,7 +143,7 @@ class Router implements RouterInterface
      * @inheritDoc
      * @return array
      */
-    public function getParams() : array
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -122,7 +152,7 @@ class Router implements RouterInterface
      * @inheritdoc
      * @return array
      */
-    public function getRoutes() : array
+    public function getRoutes(): array
     {
         return $this->routes;
     }
@@ -149,7 +179,7 @@ class Router implements RouterInterface
      * @param string $url The full URL
      * @return string The URL with the query string variables removed
      */
-    protected function removeQueryStringVariables($url) : string
+    protected function removeQueryStringVariables($url): string
     {
         if ($url != '') {
             $parts = explode('&', $url, 2);
@@ -177,6 +207,4 @@ class Router implements RouterInterface
         }
         return $this->namespace;
     }
-
-
 }

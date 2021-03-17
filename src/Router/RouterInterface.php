@@ -33,7 +33,7 @@ interface RouterInterface
      * @param mixed $args
      * @return void
      */
-    public function dispatch(string $url, $args = null, ?Object $request = null);
+    public function dispatch(string $url, $args = null, object|null $request = null);
 
     /**
      * Get the currently matched parameters

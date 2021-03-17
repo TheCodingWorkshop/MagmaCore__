@@ -199,6 +199,35 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Check the form can be submitted and the request if correct
+     *
+     * @param string $submit
+     * @return boolean
+     */
+    public function isFormValid(string $submit): bool
+    {
+        if ($this->canHandleRequest() && $this->isSubmittable($submit)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Throw an error if the csrf validation fails. 
+     *
+     * @param object $controller
+     * @return void
+     */
+    public function validateCsrf(object $controller)
+    {
+        if (!$this->csrfValidate()) {
+            if (isset($this->error)) {
+                $this->error->addError(Error::display('err_invalid_csrf'), $controller)->dispatchError();
+            }
+        }
+    }
+
+    /**
      * @return array
      */
     public function canHandleRequest() : array
