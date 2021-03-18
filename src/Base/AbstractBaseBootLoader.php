@@ -57,7 +57,9 @@ abstract class AbstractBaseBootLoader
         defined('DS') or define('DS', DIRECTORY_SEPARATOR);
         defined('APP_ROOT') or define('APP_ROOT', $this->application->getPath());
         defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
+        defined('TEMPLATES') or define('TEMPLATES', APP_ROOT . DS . 'App/Templates');
         defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
+        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
         defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
         defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
         defined('ROOT_URI') or define('ROOT_URI', '');
