@@ -121,7 +121,7 @@ class Collection implements CollectionInterface
      */
     public function merge(mixed $items): static
     {
-        return new static($this->items, $items);
+        return new static(array_merge($this->items, $items));
     }
 
     /**
