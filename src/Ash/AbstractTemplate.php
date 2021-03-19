@@ -113,7 +113,7 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param mixed $code
      * @return void
      */
-    public function phpCompiler(mixed $code)
+    public function phpCompiler($code)
     {
         return preg_replace('~\{%\s*(.+?)\s*\%}~is', '<?php $1 ?>', $code);
     }
@@ -124,7 +124,7 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param mixed $code
      * @return void
      */
-    public function echosCompiler(mixed $code)
+    public function echosCompiler($code)
     {
         return preg_replace('~\{{\s*(.+?)\s*\}}~is', '<?php echo $1 ?>', $code);
     }
@@ -135,7 +135,7 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param mixed $code
      * @return void
      */
-    public function escapedEchosCompiler(mixed $code)
+    public function escapedEchosCompiler($code)
     {
         return preg_replace('~\{{{\s*(.+?)\s*\}}}~is', '<?php echo htmlentities($1, ENT_QUOTES, \'UTF-8\') ?>', $code);
     }
@@ -146,14 +146,14 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param mixed $code
      * @return void
      */
-    public function blockCompiler(mixed $code)
+    public function blockCompiler($code)
     {
         preg_match_all('/{% ?block ?(.*?) ?%}(.*?){% ?endblock ?%}/is', $code, $matches, PREG_SET_ORDER);
         foreach ($matches as $value) {
             if (!array_key_exists($value[1], $this->blocks)) {
                 $this->blocks[$value[1]] = '';
             }
-            if (!strpos($value[2], '@parent') === false) {
+            if (strpos($value[2], '@parent') === false) {
                 $this->blocks[$value[1]] = $value[2];
             } else {
                 $this->blocks[$value[1]] = str_replace('@parent', $this->blocks[$value[1]], $value[2]);
