@@ -12,12 +12,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataSchema;
 
+use MagmaCore\DataSchema\Traits\DataSchemaTypesTrait;
 use MagmaCore\DataSchema\DataSchemaTypeInterface;
 use MagmaCore\DataSchema\Exception\DataSchemaInvalidArgumentException;
 
 class DataSchemaBaseType implements DataSchemaTypeInterface
 {
 
+    use DataSchemaTypesTrait;
+
+    /** @var const array */
     protected const SCHEMA_COLUMNS = [
         'name',
         'type',
@@ -31,14 +35,17 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
         'comments'
     ];
 
+    /** @var array */
     protected array $types = [];
+    /** @var array */
     protected array $row = [];
 
     /**
-     * Undocumented function
+     * Main class constructor
      *
      * @param array $row
      * @param array $types
+     * @return void
      */
     public function __construct(array $row, array $types)
     {
@@ -57,58 +64,8 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
         }
     }
 
-    public function validateSchemaColumns(mixed $key, mixed $value)
-    {
-        switch ($key) {
-            case 'name' :
-                if ($value === '') {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'type' :
-                if (!in_array($value, $this->types)) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'length' :
-                if (!is_int($value)) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'index' :
-                if (!in_array($value, ['primary', 'unique', 'index', 'fulltext'])) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'auto_increment' :
-                if (!is_bool($value)) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'null' :
-                if (!is_bool($value)) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'default' :
-                if (!in_array($value, ['none', 'null', 'CURRENT_TIMESTAMP', $value])) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-            case 'attributes' :
-                if (!in_array($value, ['binary', 'unsigned', 'unsigned zerofill', 'on update CURRENT_TIMESTAMP'])) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
-        }
-        $this->row[$key] = $value;
-        return true;
-
-    }
-
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @return array
      */
     public function getSchemaTypes(): array
@@ -117,8 +74,7 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
     }
 
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @return array
      */
     public function getSchemaColumns(): array
@@ -127,8 +83,7 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
     }
 
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @return array
      */
     public function getRow(): array
@@ -136,60 +91,13 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
         return $this->row;
     }
 
-    public function _name(): string
-    {
-        extract ($this->getRow());
-        if ($name)
-            return "`{$name}` {$type}";
-    }
-
-    public function _length(): string
-    {
-        extract ($this->getRow());
-        return (isset($length) && $length !==0) ? "({$length})" : '';
-    }
-
-    public function _extra()
-    {
-        extract($this->getRow());
-        return (isset($auto_increment) && $auto_increment === true) ? ' AUTO_INCREMENT' : '';
-
-    }
-
-    public function _attributes()
-    {
-        extract($this->getRow());
-        return (isset($attributes) && $attributes !=='') ? ' ' . strtoupper($attributes) . ' ' : '';
-    }
-
-    public function _null()
-    {
-        extract($this->getRow());
-        return (isset($null) && $null === false) ? ' NOT NULL' : '';
-    }
-
-    public function _default()
-    {
-        extract($this->getRow());
-        if (isset($default)) {
-            switch ($default) {
-                case 'none' :
-                case 'null' :
-                    return ' DEFAULT NULL';
-                    break;
-                case 'ct' :
-                    return ' DEFAULT CURRENT_TIMESTAMP';
-                    break;
-                default :
-                    return ' DEFAULT ' . $default;
-                    break;
-            }
-        }
-    }
-
+    /**
+     * @inheritdoc
+     * @return string
+     */
     public function render(): string
     {
-        extract ($this->getRow());
+        extract($this->getRow());
         if (empty($type) || empty($name)) {
             throw new DataSchemaInvalidArgumentException('Invalid argument no schema type or name specified.');
         }
@@ -208,5 +116,4 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
 
         return sprintf('%s', $segment);
     }
-
 }

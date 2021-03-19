@@ -27,7 +27,6 @@ interface DomainActionLogicInterface
         array $additionalContext = []
     ): self;
     
-<<<<<<< HEAD
     /**
      * Undocumented function
      *
@@ -35,8 +34,6 @@ interface DomainActionLogicInterface
      * @param integer $extension
      * @return self
      */
-=======
->>>>>>> ffe230913ec2acc63c43d930495c8ce353b0c1a0
     public function render(string|null $filename = null, int $extension = 2): self;
 
     /**

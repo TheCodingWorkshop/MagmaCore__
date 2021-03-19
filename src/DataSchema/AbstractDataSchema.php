@@ -18,8 +18,7 @@ use MagmaCore\DataObjectSchema\Exception\DataObjectSchemaInvalidArgumentExceptio
 abstract class AbstractDataSchema implements DataSchemaInterface
 {
 
-    protected object $objectModel;
-    protected array $attributes;
+    /** @var array - database schema settings */
     protected const DEFAULT_SCHEMA = [
         'collate' => 'utf8mb4_unicode_ci',
         'engine' => 'innoDB',
@@ -27,12 +26,9 @@ abstract class AbstractDataSchema implements DataSchemaInterface
         'row_format' => 'dynamic'
     ];
 
-
     /**
-     * Undocumented function
+     * Main constructor method
      *
-     * @param string|null $model
-     * @param array|null $attributes
      * @return void
      */
     public function __construct()
@@ -40,7 +36,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
     }   
 
     /**
-     * Undocumented function
+     * Throw an exception of the key is empty
      *
      * @param mixed $key
      * @return boolean
@@ -70,7 +66,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
                 }
                 break;
             case 'engine' :
-                if (!in_array($value, ['innoDB'])) {
+                if (!in_array($value, ['innoDB', 'MyISAM', 'XtraDB', 'Falcon', 'TokuDB', 'Aria'])) {
                     throw new DataObjectSchemaInvalidArgumentException('Invalid engine within schema');
                 }
                 break;
@@ -80,13 +76,23 @@ abstract class AbstractDataSchema implements DataSchemaInterface
                 }
                 break;
             case 'row_format' :
-                if (!in_array($value, ['dynamic'])) {
+                if (!in_array($value, ['dynamic', 'compact', 'redundant', 'compressed'])) {
                     throw new DataObjectSchemaInvalidArgumentException('Invalid row format within schema');
                 }
                 break;
         }
         $this->schemaAttr[$key] = $value;
         return true;
+    }
+
+    /**
+     * Return the database engine schema
+     *
+     * @return string
+     */
+    public function getSchemaAttr(): string
+    {
+        return "ENGINE={$this->schemaAttr['engine']} DEFAULT_CHARSET={$this->schemaAttr['charset']} COLLATE={$this->schemaAttr['collate']} ROW_FORMAT=" . strtoupper($this->schemaAttr['row_format']);
     }
 
 

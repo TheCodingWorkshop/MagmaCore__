@@ -37,6 +37,8 @@ class BaseModel
         if (empty($tableSchema) || empty($tableSchemaID)) {
             throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
         }
+        $this->tableSchema = $tableSchema;
+        $this->tableSchemaID = $tableSchemaID;
         $factory = new DataRepositoryFactory('baseModel', $tableSchema, $tableSchemaID);
         $this->repository = $factory->create(DataRepository::class);
     }
@@ -48,6 +50,26 @@ class BaseModel
     public function getRepo()
     {
         return $this->repository;
+    }
+
+    /**
+     * Returns the databae table schema name
+     * 
+     * @return string
+     */
+    public function getSchemaID(): string
+    {
+        return $this->tableSchema;
+    }
+
+    /**
+     * Returns the database table schema primary key 
+     * 
+     * @return string
+     */
+    public function getSchema(): string
+    {
+        return $this->tableSchemaID;
     }
 
     /**

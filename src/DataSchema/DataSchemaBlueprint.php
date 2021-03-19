@@ -19,8 +19,21 @@ use MagmaCore\DataSchema\Types\StringType;
 class DataSchemaBlueprint implements DataSchemaBlueprintInterface
 {
 
+    protected string $primaryKey;
+
     /**
-     * Undocumented function
+     * Set the table primary key
+     *
+     * @param string $primaryKey
+     * @return void
+     */
+    private function setPrimaryKey(string $primaryKey): void
+    {
+        $this->primaryKey = $primaryKey;
+    }
+
+    /**
+     * create an varchar based row. with optiona length/value assignment
      *
      * @param string $name
      * @param integer $length
@@ -36,21 +49,49 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
     }
 
     /**
-     * Undocumented function
+     * create an integre based row. Length field is set to null, so this is a required
+     * argument which must be set within the class which is using this method
      *
      * @param string $name
      * @param integer $length
      * @param boolean $null
      * @param string $attributes
      * @param mixed $default
+     * @param boolean $autoIncrement - defautls to false
      * @return void
      */
-    public function int(string $name, int $length = null, bool $null = true, string $attributes = 'unsigned', mixed $default = null): array
+    public function int(string $name, int $length = null, bool $null = true, string $attributes = 'unsigned', mixed $default = null, bool $autoIncrement = false): array
     {
         return [
-            NumericType::class => ['name' => $name, 'type' => 'int', 'length' => $length, 'null' => $null, 'default' => $default, 'attributes' => $attributes],
+            NumericType::class => ['name' => $name, 'type' => 'int', 'length' => $length, 'null' => $null, 'default' => $default, 'attributes' => $attributes, 'auto_increment' => $autoIncrement],
         ];
 
+    }
+
+    /**
+     * Automatically generated the auto increment id column for each table
+     * if no default name is set this method will assume your primary key
+     * field will be called generic `id`.
+     *
+     * @param string|null $name
+     * @param integer $length
+     * @return array
+     */
+    public function autoID(string $name = 'id', int $length = 10): array
+    {
+        $this->setPrimaryKey($name);
+        return $this->int($name, $length, false, 'unsigned', 'none', true);
+    }
+
+    /**
+     * Return the auto generated primary key field which allows us to use 
+     * else where within the class
+     *
+     * @return string
+     */
+    public function getPrimaryKey(): string
+    {
+        return $this->primaryKey;
     }
 
 }

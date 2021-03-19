@@ -40,7 +40,7 @@ class Template extends AbstractTemplate
      */
     public function view(string $file, array $context = [])
     {
-        $fileCache = $this->cache(TEMPLATES . '/'.$file);
+        $fileCache = $this->cache(TEMPLATES . $file);
         extract($context, EXTR_SKIP);
         require $fileCache;
     }

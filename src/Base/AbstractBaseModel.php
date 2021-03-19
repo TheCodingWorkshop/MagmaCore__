@@ -24,19 +24,4 @@ Abstract class AbstractBaseModel extends BaseModel
      */
     abstract public function guardedID() : array;
 
-    /**
-     * Returns the databae table schema name
-     * 
-     * @return string
-     */
-    abstract public function getSchemaID(): string;
-
-    /**
-     * Returns the database table schema primary key 
-     * 
-     * @return string
-     */
-    abstract public function getSchema(): string;
-
-
 }

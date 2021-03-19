@@ -10,7 +10,7 @@
 
 declare (strict_types = 1);
 
-namespace MagmaCore\DataSchema;
+namespace MagmaCore\DataSchema\Traits;
 
 trait DataSchemaTrait
 {

@@ -41,14 +41,14 @@ abstract class AbstractTemplate implements TemplateInterface
     {
         /** Create the cache directory if it doesn't exists */
         $templateEnv = $this->templateEnv['template']['template_cache'];
-        $cachePath = TEMPLATES . '/' . $templateEnv['path'];
+        $cachePath = TEMPLATES . 'cache/';
         if (!file_exists($cachePath)) {
             mkdir($cachePath, 0744);
         }
         /* rename the cache to match the name of the template */
-        $fileCache = $cachePath . str_replace(array('/', '.html'), array('_', ''), $file . '.php');
+        $fileCache = $cachePath . str_replace(array('/', ':', '.html'), array('_', '', ''), $file . '.php');
         if (!$templateEnv['enable'] || !file_exists($fileCache) || filemtime($fileCache) < filemtime($file)) {
-            $code = $this->fileInclude($file);
+            $code = $this->fileIncludes($file);
             $code = $this->codeCompiler($code);    
             file_put_contents($fileCache, '<?php class_exists(\'' . __CLASS__ . '\') or exit; ?>' . PHP_EOL . $code);
 
@@ -93,13 +93,14 @@ abstract class AbstractTemplate implements TemplateInterface
      * @param string $file
      * @return void
      */
-    public function fileInclude(string $file)
+    public function fileIncludes(string $file)
     {
         if ($file) {
             $code = file_get_contents($file);
             preg_match_all('/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i', $code, $matches, PREG_SET_ORDER);
             foreach ($matches as $value) {
-                $code = str_replace($value[0], $this->fileInclude($value[2]), $code);
+                /* Pass the template directory to the method so the file can be found */
+                $code = str_replace($value[0], $this->fileIncludes(TEMPLATES . $value[2]), $code);
             }
             $code = preg_replace('/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i', '', $code);
             return $code;

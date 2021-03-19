@@ -12,24 +12,26 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Error\Error;
+use MagmaCore\Ash\Template;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Datatable\Datatable;
+//use MagmaCore\Session\SessionFactory;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\Flash\Flash;
-//use MagmaCore\Session\SessionFactory;
+//use MagmaCore\Cookie\CookieFactory;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
-//use MagmaCore\Cookie\CookieFactory;
 use MagmaCore\Collection\Collection;
 use MagmaCore\Middleware\Middleware;
+//use MagmaCore\Translation\Translation;
 use MagmaCore\FormBuilder\FormBuilder;
 use MagmaCore\Session\Flash\FlashType;
-//use MagmaCore\Translation\Translation;
 use MagmaCore\EventDispatcher\EventDispatcher;
 use MagmaCore\Base\Exception\BaseLogicException;
-use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
+use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
 
 class BaseController extends AbstractBaseController
 {
@@ -69,7 +71,7 @@ class BaseController extends AbstractBaseController
                 'cookie' => '',
                 'tableGrid' => Datatable::class,
                 'flatDb' => FileStorage::class,
-                'collection' => Collection::class
+                'collection' => Collection::class,
             ]
         );
 
@@ -175,6 +177,16 @@ class BaseController extends AbstractBaseController
             throw new BaseLogicException('You can not use the render method if the Twig Bundle is not available.');
         }
         $response = (new ResponseHandler($this->twig->twigRender($template, $context)))->handler();
+        if ($response) {
+            return $response;
+        }
+    }
+
+    public function view(string $template, array $context = [])
+    {
+        $response = (new ResponseHandler(
+            (new Template(Yaml::file('template')))->view($template, $context)
+        ))->handler();
         if ($response) {
             return $response;
         }

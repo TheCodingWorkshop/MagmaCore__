@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataSchema;
 
-use MagmaCore\DataSchema\DataSchemaTrait;
+use MagmaCore\DataSchema\Traits\DataSchemaTrait;
 use MagmaCore\DataSchema\AbstractDataSchema;
 use MagmaCore\DataSchema\DataSchemaBlueprint;
 use MagmaCore\DataSchema\Exception\DataSchemaUnexpectedValueException;
@@ -20,28 +20,32 @@ use MagmaCore\DataSchema\Exception\DataSchemaUnexpectedValueException;
 class DataSchema extends AbstractDataSchema
 {
 
+    /** @var traits */
     use DataSchemaTrait;
 
     /** @var array - contains an array of schema type objects */
     protected array $schemaObject = [];
+    /** @var string */
     protected string $element = '';
+    /** @var string */
     protected string $primaryKey;
+    /** @var string */
     protected mixed $uniqueKey = null;
+    /** @var string */
     protected string $tableSchema = '';
 
     /**
-     * Undocumented function
+     * Main class constructor
      *
      * @param DataSchemaBlueprint $blueprint
      * @return void
      */
     public function __construct()
     {
-    }   
+    }
 
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @param array $overridingSchema
      * @return static
      */
@@ -63,8 +67,7 @@ class DataSchema extends AbstractDataSchema
     }
 
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @param object $dataModel
      * @return static
      */
@@ -75,8 +78,7 @@ class DataSchema extends AbstractDataSchema
     }
 
     /**
-     * Undocumented function
-     *
+     * @inheritdoc
      * @param mixed $args
      * @return static
      */
@@ -84,7 +86,7 @@ class DataSchema extends AbstractDataSchema
     {
         if (is_array($args)) {
             $args = (array)$args;
-            foreach ($args as $schemaObjectType => $schemaObjectOptions) {    
+            foreach ($args as $schemaObjectType => $schemaObjectOptions) {
                 $newSchemaObject = new $schemaObjectType($schemaObjectOptions);
                 if (!$newSchemaObject instanceof DataSchemaTypeInterface) {
                     throw new DataSchemaUnexpectedValueException('Invalid dataSchema type supplied. It does not implement the DataSchemaTypeInterface.');
@@ -95,22 +97,25 @@ class DataSchema extends AbstractDataSchema
         }
     }
 
-
-    public function build(Callable $callback): string
+    /**
+     * @inheritdoc
+     * @param Callable $callback
+     * @return string
+     */
+    public function build(callable $callback): string
     {
         if (is_array($this->schemaObject) && count($this->schemaObject) > 0) {
-            $this->element .= "CREATE TABLE IF NOT EXISTS `{$this->dataModel->getSchema()}`.`{$_ENV['DB_NAME']}` (\n";
-                foreach ($this->schemaObject as $schema) {
-                    $this->element .= $schema->render();
-                }
-                if (is_callable($callback)) {
-                    $this->element .= call_user_func_array($callback, [$this]);
-                }
-            $this->element .= ")\n";
-
-            
+            $this->element .= "CREATE TABLE IF NOT EXISTS `{$_ENV['DB_NAME']}`.`{$this->dataModel->getSchema()}` (\n";
+            foreach ($this->schemaObject as $schema) {
+                $this->element .= $schema->render();
+            }
+            if (is_callable($callback)) {
+                $this->element .= call_user_func_array($callback, [$this]);
+            }
+            $this->element .= ')';
+            $this->element .= $this->getSchemaAttr();
+            $this->element .= "\n";
         }
         return $this->element;
     }
-
 }
