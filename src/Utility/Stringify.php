@@ -15,7 +15,7 @@ namespace MagmaCore\Utility;
 class Stringify
 {
 
-    private function translateString(string $string)
+    private static function translateString(string $string)
     {
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $string);
         if ($text) {
@@ -27,11 +27,11 @@ class Stringify
      * @param $text
      * @return string|string[]
      */
-    public function slugify($text)
+    public static function slugify($text)
     {
         $text = preg_replace('~[^\\pL\d]+~u', '-', $text); // replace non letter or digits by -
         $text = trim($text, '-');
-        $text = $this->translateString($text); // transliterate
+        $text = self::translateString($text); // transliterate
         $text = strtolower($text);
         $text = preg_replace('~[^-\w]+~', '', $text); // remove unwanted characterss
         if (empty($text)) {
@@ -48,7 +48,7 @@ class Stringify
      * @return string
      * @since 1.0.0
      */
-    function justify($string, $atts = '')
+    public static function justify($string, $atts = '')
     {
         if (empty($string))
             return;
@@ -70,7 +70,7 @@ class Stringify
      * @uses 		strlen & substr
      * @param 		$string
      */
-    public function pluralize($string)
+    public static function pluralize($string)
     {
 
         $last = $string[strlen($string) - 1];
@@ -89,11 +89,11 @@ class Stringify
      * @param bool $full
      * @return bool|string
      */
-    public function capitalize($string, $full = false)
+    public static function capitalize($string, $full = false)
     {
         if (!empty($string)) {
             // transliterate
-            $text = $this->translateString($string);
+            $text = self::translateString($string);
             $text = $full ? strtoupper($text) : ucwords($text);
             //$text = preg_replace('~[^-\w]+~', '', $text);
             if (empty($text)) {
@@ -105,14 +105,14 @@ class Stringify
         return false;
     }
 
-    public function studlyCaps(string $string) : string
+    public static function studlyCaps(string $string) : string
     {
         return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $string)));
     }
 
-    public function camelCase(string $string) : string
+    public static function camelCase(string $string) : string
     {
-        return lcfirst($this->studlyCaps($string));
+        return lcfirst(self::studlyCaps($string));
     }
 
     /**
@@ -121,7 +121,7 @@ class Stringify
      * @param string $str - the string to convert
      * @return string
      */
-    public function slugToUrl($str)
+    public static function slugToUrl($str)
     {
         if (empty($str)) {
             return false;

@@ -13,20 +13,18 @@ namespace MagmaCore\Base;
 
 use MagmaCore\Error\Error;
 use MagmaCore\Ash\Template;
+use MagmaCore\Ash\TemplateExtension;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Datatable\Datatable;
-//use MagmaCore\Session\SessionFactory;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\Flash\Flash;
-//use MagmaCore\Cookie\CookieFactory;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Collection\Collection;
 use MagmaCore\Middleware\Middleware;
-//use MagmaCore\Translation\Translation;
 use MagmaCore\FormBuilder\FormBuilder;
 use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\EventDispatcher\EventDispatcher;
@@ -195,7 +193,8 @@ class BaseController extends AbstractBaseController
         $templateData = array_merge(
             ['app' => Yaml::file('app')['settings']], 
             ['user' => Authorized::grantedUser()], 
-            ['obj' => $this]
+            ['obj' => $this],
+            ['func' => new TemplateExtension()]
         );
         $response = (new ResponseHandler(
             (new Template(Yaml::file('template')))->view($template, array_merge($context, $templateData))

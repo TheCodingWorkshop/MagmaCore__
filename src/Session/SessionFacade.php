@@ -15,7 +15,6 @@ use MagmaCore\Session\Exception\SessionInvalidArgumentException;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Session\SessionEnvironment;
 use MagmaCore\Session\SessionFactory;
-use MagmaCore\Session\Singleton;
 
 final class SessionFacade
 {

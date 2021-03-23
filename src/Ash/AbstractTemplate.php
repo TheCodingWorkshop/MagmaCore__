@@ -79,6 +79,7 @@ abstract class AbstractTemplate implements TemplateInterface
         if ($code) {
             $code = $this->blockCompiler($code);
             $code = $this->yieldCompiler($code);
+            $code = $this->functionEchosCompiler($code);
             $code = $this->escapedEchosCompiler($code);
             $code = $this->echosCompiler($code);
             $code = $this->phpCompiler($code);
@@ -128,6 +129,18 @@ abstract class AbstractTemplate implements TemplateInterface
     {
         return preg_replace('~\{{\s*(.+?)\s*\}}~is', '<?php echo $1 ?>', $code);
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param mixed $code
+     * @return void
+     */
+    public function functionEchosCompiler($code)
+    {
+        return preg_replace('~\{@ \s*(.+?)\s*\ @}~is', '<?php echo $func->$1 ?>', $code);
+    }
+
 
     /**
      * Undocumented function
