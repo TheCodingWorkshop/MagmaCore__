@@ -182,29 +182,6 @@ class BaseController extends AbstractBaseController
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $template
-     * @param array $context
-     * @return void
-     */
-    public function view(string $template, array $context = [])
-    {
-        $templateData = array_merge(
-            ['app' => Yaml::file('app')['settings']], 
-            ['user' => Authorized::grantedUser()], 
-            ['obj' => $this],
-            ['func' => new TemplateExtension()]
-        );
-        $response = (new ResponseHandler(
-            (new Template(Yaml::file('template')))->view($template, array_merge($context, $templateData))
-        ))->handler();
-        if ($response) {
-            return $response;
-        }
-    }
-
-    /**
      * @inheritdoc
      *
      * @param string $url
