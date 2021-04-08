@@ -20,6 +20,7 @@ interface MigrationInterface
     public function getMigrations(array $conditions = []): array|null;
     public function createMigrationFromSchema();
     public function locateMigrationFiles(): array;
-    public function migrate(string|null $position = null): void;
+    public function migrate(string|null $direction = 'up'): void;
+    //public function migrateDown(): void;
 
 }

@@ -15,8 +15,8 @@ namespace MagmaCore\Migration;
 interface MigrateInterface
 {
 
-    // public function up(): string;
-    // public function down(): string;
+    public function up(): string;
+    public function down(): string;
     // public function changed(): string;
 
 }
