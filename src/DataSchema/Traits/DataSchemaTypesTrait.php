@@ -64,7 +64,7 @@ trait DataSchemaTypesTrait
                 }
                 break;
             case 'attributes':
-                if (!in_array($value, ['binary', 'unsigned', 'unsigned zerofill', 'on update CURRENT_TIMESTAMP'])) {
+                if (!in_array($value, ['', 'binary', 'unsigned', 'unsigned zerofill', 'on update CURRENT_TIMESTAMP'])) {
                     throw new DataSchemaInvalidArgumentException('');
                 }
                 break;
@@ -111,6 +111,8 @@ trait DataSchemaTypesTrait
         if (isset($default)) {
             switch ($default) {
                 case 'none':
+                    return '';
+                    break;
                 case 'null':
                     return ' DEFAULT NULL';
                     break;

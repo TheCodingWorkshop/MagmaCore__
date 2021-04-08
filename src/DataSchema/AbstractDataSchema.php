@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\DataSchema;
 
 use MagmaCore\DataSchema\DataSchemaInterface;
+use MagmaCore\DataSchema\Exception\DataSchemaInvalidArgumentException;
 use MagmaCore\DataObjectSchema\Exception\DataObjectSchemaInvalidArgumentException;
 
 abstract class AbstractDataSchema implements DataSchemaInterface
@@ -44,7 +45,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
     protected function isEmptyThrowException($key)
     {
         if (empty($key)) {
-            throw new DataObjectSchemaInvalidArgumentException('Invalid or empty schema. Ensure the schema is not empty and is valid.');
+            throw new DataSchemaInvalidArgumentException('Invalid or empty schema. Ensure the schema is not empty and is valid.');
         }
     }
 
@@ -62,22 +63,22 @@ abstract class AbstractDataSchema implements DataSchemaInterface
         switch ($key) {
             case 'collate' :
                 if (!in_array($value, ['utf8mb4_unicode_ci'])) {
-                    throw new DataObjectSchemaInvalidArgumentException('Invalid collate within schema');
+                    throw new DataSchemaInvalidArgumentException('Invalid collate within schema');
                 }
                 break;
             case 'engine' :
                 if (!in_array($value, ['innoDB', 'MyISAM', 'XtraDB', 'Falcon', 'TokuDB', 'Aria'])) {
-                    throw new DataObjectSchemaInvalidArgumentException('Invalid engine within schema');
+                    throw new DataSchemaInvalidArgumentException('Invalid engine within schema');
                 }
                 break;
             case 'charset' :
                 if (!in_array($value, ['utf8mb4'])) {
-                    throw new DataObjectSchemaInvalidArgumentException('Invalid charset within schema');
+                    throw new DataSchemaInvalidArgumentException('Invalid charset within schema');
                 }
                 break;
             case 'row_format' :
                 if (!in_array($value, ['dynamic', 'compact', 'redundant', 'compressed'])) {
-                    throw new DataObjectSchemaInvalidArgumentException('Invalid row format within schema');
+                    throw new DataSchemaInvalidArgumentException('Invalid row format within schema');
                 }
                 break;
         }

@@ -49,14 +49,30 @@ trait DataSchemaTrait
     public function setConstraintKeys(callable $callback): static
     {
         if (is_callable($callback)) {
-            call_user_func_array(
-                $callback,
-                []
-            );
+            call_user_func_array($callback,[]);
+    
         }
         return $this;
 
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $identifier
+     * @param Callable $callback
+     * @return static
+     */
+    public function setMultipleConstraintKeys(callable $callback): static
+    {
+        if (is_callable($callback)) {
+            call_user_func_array($callback,[]);
+    
+        }
+        return $this;
+
+    }
+
 
     /**
      * Undocumented function
@@ -72,10 +88,11 @@ trait DataSchemaTrait
         if (is_array($this->uniqueKey) && count($this->uniqueKey) > 0) {
             $uniqueKey = (array) $this->uniqueKey;
             foreach ($uniqueKey as $unique) {
-                $key .= "UNIQUE KEY `{$unique}` (`{$unique}`)" . (isset($this->foreignKey) ? ',' : '');
+                $key .= "UNIQUE KEY `{$unique}` (`{$unique}`)" . ",";
             }
+            $key = substr_replace($key, '', -1);
         } else {
-            $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`)" .(isset($this->foreignKey) ? ',' : '');
+            $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`), ";
         }
 
         $key .= $this->add();
@@ -86,10 +103,10 @@ trait DataSchemaTrait
     /**
      * Undocumented function
      *
-     * @param string $foreignKey
+     * @param mixed $foreignKey
      * @return static
      */
-    public function foreignKey(string $foreignKey): static
+    public function foreignKey(mixed $foreignKey): static
     {
         $this->foreignKey = $foreignKey;
         return $this;
@@ -98,10 +115,10 @@ trait DataSchemaTrait
     /**
      * Undocumented function
      *
-     * @param string $on
+     * @param mixed $on
      * @return static
      */
-    public function on(string $on): static
+    public function on(mixed $on): static
     {
         $this->on = $on;
         return $this;
@@ -110,10 +127,10 @@ trait DataSchemaTrait
     /**
      * Undocumented function
      *
-     * @param string $reference
+     * @param mixed $reference
      * @return static
      */
-    public function reference(string $reference): static
+    public function reference(mixed $reference): static
     {
         $this->reference = $reference;
         return $this;

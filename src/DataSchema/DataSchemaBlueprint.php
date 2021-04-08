@@ -12,9 +12,10 @@ declare (strict_types = 1);
 
 namespace MagmaCore\DataSchema;
 
-use MagmaCore\DataSchema\DataSchemaBlueprintInterface;
-use MagmaCore\DataSchema\Types\NumericType;
 use MagmaCore\DataSchema\Types\StringType;
+use MagmaCore\DataSchema\Types\NumericType;
+use MagmaCore\DataSchema\Types\DatetimeType;
+use MagmaCore\DataSchema\DataSchemaBlueprintInterface;
 
 class DataSchemaBlueprint implements DataSchemaBlueprintInterface
 {
@@ -41,10 +42,10 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
      * @param mixed $default
      * @return array
      */
-    public function varchar(string $name, int $length = 196, bool $null = true, mixed $default = null): array
+    public function varchar(string $name, int $length = 196, bool $null = false, mixed $default = null): array
     {
         return [
-            StringType::class => ['name' => $name, 'type' => 'varchar', 'length' => $length, 'null', $null, 'default' => $default],
+            StringType::class => ['name' => $name, 'type' => 'varchar', 'length' => $length, 'null' => $null, 'default' => $default],
         ];
     }
 
@@ -64,6 +65,23 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
     {
         return [
             NumericType::class => ['name' => $name, 'type' => 'int', 'length' => $length, 'null' => $null, 'default' => $default, 'attributes' => $attributes, 'auto_increment' => $autoIncrement],
+        ];
+
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param boolean $null
+     * @param string $default
+     * @param string $attributes
+     * @return array
+     */
+    public function datetime(string $name, bool $null = false, string $default = 'ct', string $attributes = ''): array
+    {
+        return [
+            DatetimeType::class => ['type' => 'datetime', 'name' => $name, 'null' => $null, 'default' => $default, 'attributes' => $attributes]        
         ];
 
     }
