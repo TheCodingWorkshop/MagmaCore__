@@ -72,10 +72,10 @@ trait DataSchemaTrait
         if (is_array($this->uniqueKey) && count($this->uniqueKey) > 0) {
             $uniqueKey = (array) $this->uniqueKey;
             foreach ($uniqueKey as $unique) {
-                $key .= "UNIQUE KEY `{$unique}` (`{$unique}`),";
+                $key .= "UNIQUE KEY `{$unique}` (`{$unique}`)" . (isset($this->foreignKey) ? ',' : '');
             }
         } else {
-            $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`),";
+            $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`)" .(isset($this->foreignKey) ? ',' : '');
         }
 
         $key .= $this->add();
@@ -146,15 +146,15 @@ trait DataSchemaTrait
     public function add(): string
     {
         $out = '';
-        if ($this->foreignKey) {
+        if (isset($this->foreignKey)) {
             $out .= " FOREIGN KEY (`{$this->foreignKey}`)";
         }
 
-        if ($this->on) {
+        if (isset($this->on)) {
             $out .= " REFERENCES `{$this->on}`";
         }
 
-        if ($this->reference) {
+        if (isset($this->reference)) {
             $out .= "(`{$this->reference}`)\n";
         }
 

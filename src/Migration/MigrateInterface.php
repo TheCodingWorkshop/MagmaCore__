@@ -7,11 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\DataObjectSchema\Exception;
+namespace MagmaCore\Migration;
 
-use UnexpectedValueException;
+interface MigrateInterface
+{
 
-class DataObjectSchemaUnexpectedValueException extends UnexpectedValueException
-{ }
+    // public function up(): string;
+    // public function down(): string;
+    // public function changed(): string;
+
+}

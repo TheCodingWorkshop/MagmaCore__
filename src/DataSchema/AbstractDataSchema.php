@@ -92,7 +92,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
      */
     public function getSchemaAttr(): string
     {
-        return "ENGINE={$this->schemaAttr['engine']} DEFAULT_CHARSET={$this->schemaAttr['charset']} COLLATE={$this->schemaAttr['collate']} ROW_FORMAT=" . strtoupper($this->schemaAttr['row_format']);
+        return "ENGINE={$this->schemaAttr['engine']} DEFAULT CHARSET={$this->schemaAttr['charset']} COLLATE={$this->schemaAttr['collate']} ROW_FORMAT=" . strtoupper($this->schemaAttr['row_format']);
     }
 
 

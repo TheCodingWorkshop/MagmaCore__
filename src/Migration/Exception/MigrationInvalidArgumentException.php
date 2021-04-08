@@ -7,17 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\DataObjectSchema;
+namespace MagmaCore\Migration\Exception;
 
-interface DataObjectSchemaTypeInterface
-{ 
-    /**
-     * Build the strings together which builds up each database row
-     * 
-     * @return string
-     */
-    public function build() : string;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
+class MigrationInvalidArgumentException extends BaseInvalidArgumentException
+{
+    
 }

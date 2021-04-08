@@ -268,8 +268,9 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         array $row = null,
         ?string $headerIcon = null,
         \Closure $callback = null,
+        string $info = null
     ): string {
-        return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row, $headerIcon, $callback);
+        return (new SubheaderExtension())->subHeader($searchFilter, $controller, $totalRecords, $actions, $actionVertical, $row, $headerIcon, $callback, $info);
     }
 
     /**

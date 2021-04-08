@@ -60,18 +60,22 @@ class IconNavExtension
                 } else {
                     $path = $this->determinePath($_icon, $key, null, $controller);
                 }
+                $newIcon = (isset($icon)) ? $icon : $key;
+                $newRatio = (isset($ratio) ? $ratio : '21');
 
+                $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : 'Unknown');
+                
                 $html .=  "\n" . sprintf(
-                    '<li><a href="%s" uk-icon="%s%s"%s%s%s></a>',
-
+                    '<li><a href="%s"%s%s%s>%s</a>',
+ 
                     ($path ? $path : $toggleID),
-                    (isset($icon) ? 'icon: ' . $icon : 'icon: ' . $key),
-                    (isset($ratio) ? ';ratio: ' . $ratio : ' ;ratio: 1'),
                     (isset($tooltip) ? ' uk-tooltip="' . $tooltip . '"' : ' uk-tooptip="' . $key . '"'),
 
                     ($toggle ? ' uk-toggle' . ($toggleTagrget != '' ? '="target:' . $toggleTagrget . '; animation: uk-animation-slide-bottom-small uk-animation-fade; queued: true"' : '') . '' : ''),
 
-                    (isset($class) ? ' class="' . $class . '"' : '')
+                    (isset($class) ? ' class="' . $class . '"' : ''),
+                    $iconMarkup
+
                 );
 
                 /**

@@ -14,9 +14,6 @@ namespace MagmaCore\DataObjectLayer\ClientRepository;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
-use MagmaCore\DataObjectLayer\DataLayerEnvironment;
-use MagmaCore\DataObjectLayer\DataLayerConfiguration;
-use MagmaCore\DataObjectLayer\DataLayerFactory;
 
 class ClientRepositoryFactory
 {

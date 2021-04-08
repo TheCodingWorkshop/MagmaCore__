@@ -42,7 +42,8 @@ class SubheaderExtension
         array $row = null,
         Object $twigExt = null,
         ?string $headerIcon = null,
-        Closure $callback = null
+        Closure $callback = null,
+        string $info = null
     ): string { //
         $html = '';
         $html .= '<nav uk-navbar-container" uk-navbar>';
@@ -58,9 +59,9 @@ class SubheaderExtension
             <h1><span uk-icon="icon:' . strtolower($headerIcon) . '; ratio:2.5">
             </span> ' . (new Stringify())->pluralize(ucwords($controller)) . '</h1>';
         }
-        $html .= '<p>Welcome back, Èrik Campobadal. You have 15 new notifications</p>';
+        $html .= '<p>' . ($info !==null ? $info : '') . '</p>';
         $html .= '<ul class="uk-breadcrumb">
-                            <li><a href="index.html">Home</a></li>
+                            <li><a href="/">Home</a></li>
                             <li><span href="">Dashboard</span></li>
                         </ul>';
 
@@ -71,7 +72,7 @@ class SubheaderExtension
         $html .= '<div class="uk-navbar-right">';
         if (is_array($actions) && count($actions) > 0) {
             if (is_null($row)) {
-                $html .= (new IconNavExtension())->iconNav($actions, $row, $twigExt, $controller, true);
+                $html .= (new IconNavExtension())->iconNav($actions, $row, $twigExt, $controller, false);
             } else {
                 // send a warning
             }

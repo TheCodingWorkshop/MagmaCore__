@@ -214,6 +214,12 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
             return $this->statement->fetchColumn();
     }
 
+    public function columns()
+    {
+        if ($this->statement)
+            return $this->statement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     /**
      * @inheritDoc
      * @return integer
@@ -258,6 +264,11 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
             $this->revert();
             throw $pdoex;
         }
+    }
+
+    public function exec(string $statement)
+    {
+        $this->dbh->open()->exec($statement);
     }
 
 }

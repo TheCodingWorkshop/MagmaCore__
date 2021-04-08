@@ -48,7 +48,7 @@ class DataLayerClientFacade
     {
         $factory = new ClientRepositoryFactory($this->clientIdentifier, $this->tableSchema, $this->tableSchemaID);
         if ($factory) {
-            $client = $factory->create(\MagmaDataLayer\ClientRepository\ClientRepository::class);
+            $client = $factory->create(\MagmaCore\DataObjectLayer\ClientRepository\ClientRepository::class);
             if ($client) {
                 return $client;
             }

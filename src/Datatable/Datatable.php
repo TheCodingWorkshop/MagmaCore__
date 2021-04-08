@@ -87,7 +87,7 @@ class Datatable extends AbstractDatatable
                             $this->element .= '<tr>' . "\n";
                                 foreach ($this->dataColumns as $column) {
                                     if (isset($column['show_column']) && $column['show_column'] != false) {
-                                        $this->element .= '<td class="' . $column['class'] . '">';
+                                        $this->element .= '<td class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '' ) . ' ' . $column['class'] . '">';
                                             if (is_callable($column['formatter'])) {
                                                 $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                                             } else {

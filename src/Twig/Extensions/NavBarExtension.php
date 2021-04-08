@@ -29,7 +29,7 @@ class NavBarExtension
                     if (isset($item["children"]) && !empty($item["children"])) {
                         $html .= '<a href="' . $item["path"] . '">';
                         if (isset($item["icon"]) && $item["icon"] != "") {
-                            $html .= '<span class="uk-margin-small-right" uk-icon="icon:' . (isset($item["icon"]) ? $item["icon"] : "") . '"></span>';
+                            $html .= '<span class="uk-margin-small-right ' . (isset($item["icon"]) ? $item["icon"] : "") . '"></span>';
                         }
                         $html .= $item["title"];
                         $html .= '</a>';
@@ -45,7 +45,7 @@ class NavBarExtension
                     } else {
                         $html .= '<a href="' . (isset($item["path"]) ? $item["path"] : "") . '">';
                         if (isset($item["icon"]) && $item["icon"] != "") {
-                            $html .= '<span class="uk-margin-small-right" uk-icon="icon:' . (isset($item["icon"]) ? $item["icon"] : "") . '"></span>';
+                            $html .= '<span class="uk-margin-small-right ' . (isset($item["icon"]) ? $item["icon"] : "") . '"></span>';
                         }
                         $html .= (isset($item["title"]) ? $item["title"] : "");
                         $html .= '</a>';

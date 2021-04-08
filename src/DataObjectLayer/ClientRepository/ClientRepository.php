@@ -33,6 +33,11 @@ class ClientRepository implements ClientRepositoryInterface
         $this->em = $em;
     }
 
+    public function getClientCrud(): object
+    {
+        return $this->em->getCrud();
+    }
+
     /**
      * @inheritdoc
      *

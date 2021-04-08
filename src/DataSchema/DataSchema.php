@@ -118,4 +118,9 @@ class DataSchema extends AbstractDataSchema
         }
         return $this->element;
     }
+
+    public function drop(): string
+    {
+        return "DROP TABLE " . $this->dataModel->getSchema();
+    }
 }

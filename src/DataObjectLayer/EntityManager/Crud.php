@@ -218,13 +218,16 @@ class Crud implements CrudInterface
         $query = $this->queryBuilder->buildQuery($args)->rawQuery();
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         if ($this->dataMapper->numRows()) {
-            if (!in_array($resultType, ['fetch', 'fetch_all', 'column'])) {
+            if (!in_array($resultType, ['fetch', 'fetch_all', 'column', 'columns'])) {
                 throw new DataLayerInvalidArgumentException('Invalid 3rd argument. Your options are "fetch, fetch_all or column"');
             }
             switch ($resultType) {
                 case 'column':
                     $data = $this->dataMapper->column();
                     break;
+                case 'columns':
+                    $data = $this->dataMapper->columns();
+                    break;    
                 case 'fetch':
                     $data = $this->dataMapper->result();
                     break;
