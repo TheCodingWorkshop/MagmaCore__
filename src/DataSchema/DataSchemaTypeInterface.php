@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataSchema;
 
-use MagmaCore\DataSchema\DataSchema;
-
 interface DataSchemaTypeInterface
 {
 

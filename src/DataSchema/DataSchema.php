@@ -32,6 +32,8 @@ class DataSchema extends AbstractDataSchema
     /** @var string */
     protected mixed $uniqueKey = null;
     /** @var string */
+    protected mixed $ukey = null;
+    /** @var string */
     protected string $tableSchema = '';
 
     /**
@@ -104,17 +106,22 @@ class DataSchema extends AbstractDataSchema
      */
     public function build(callable $callback): string
     {
+        $bt4 = "\t\t\t\t";
+        $bt3 = "\t\t\t";
+        $eol = PHP_EOL;
+
         if (is_array($this->schemaObject) && count($this->schemaObject) > 0) {
-            $this->element .= "CREATE TABLE IF NOT EXISTS `{$_ENV['DB_NAME']}`.`{$this->dataModel->getSchema()}` (\n";
+            $this->element .= "{$bt3}CREATE TABLE IF NOT EXISTS `{$_ENV['DB_NAME']}`.`{$this->dataModel->getSchema()}`" . $eol;
+            $this->element .= "{$bt3}(" . $eol;
             foreach ($this->schemaObject as $schema) {
-                $this->element .= $schema->render();
+                $this->element .= $bt4 . $schema->render() . $eol;
             }
             if (is_callable($callback)) {
-                $this->element .= call_user_func_array($callback, [$this]);
+                $this->element .= $bt4 . call_user_func_array($callback, [$this]) . $eol;
             }
-            $this->element .= ')';
-            $this->element .= $this->getSchemaAttr();
-            $this->element .= "\n";
+            $this->element .= $bt3 . ')' . $eol;
+            $this->element .= $bt3 . $this->getSchemaAttr() . $eol;
+            $this->element .= $eol;
         }
         return $this->element;
     }

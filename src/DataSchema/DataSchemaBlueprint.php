@@ -34,6 +34,32 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
     }
 
     /**
+     * Automatically generated the auto increment id column for each table
+     * if no default name is set this method will assume your primary key
+     * field will be called generic `id`.
+     *
+     * @param string|null $name
+     * @param integer $length
+     * @return array
+     */
+    public function autoID(string $name = 'id', int $length = 10): array
+    {
+        $this->setPrimaryKey($name);
+        return $this->int($name, $length, false, 'unsigned', 'none', true);
+    }
+
+    /**
+     * Return the auto generated primary key field which allows us to use 
+     * else where within the class
+     *
+     * @return string
+     */
+    public function getPrimaryKey(): string
+    {
+        return $this->primaryKey;
+    }
+
+    /**
      * create an varchar based row. with optiona length/value assignment
      *
      * @param string $name
@@ -46,6 +72,51 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
     {
         return [
             StringType::class => ['name' => $name, 'type' => 'varchar', 'length' => $length, 'null' => $null, 'default' => $default],
+        ];
+    }
+
+    /**
+     * create an text based row.
+     *
+     * @param string $name
+     * @param boolean $null
+     * @param mixed $default
+     * @return array
+     */
+    public function text(string $name, bool $null = false, mixed $default = null): array
+    {
+        return [
+            StringType::class => ['name' => $name, 'type' => 'text', 'null' => $null, 'default' => $default],
+        ];
+    }
+
+    /**
+     * create an longtext based row.
+     *
+     * @param string $name
+     * @param boolean $null
+     * @param mixed $default
+     * @return array
+     */
+    public function longText(string $name, bool $null = false, mixed $default = null): array
+    {
+        return [
+            StringType::class => ['name' => $name, 'type' => 'longtext', 'null' => $null, 'default' => $default],
+        ];
+    }
+
+    /**
+     * create an tinytext based row.
+     *
+     * @param string $name
+     * @param boolean $null
+     * @param mixed $default
+     * @return array
+     */
+    public function tinyText(string $name, bool $null = false, mixed $default = null): array
+    {
+        return [
+            StringType::class => ['name' => $name, 'type' => 'tinytext', 'null' => $null, 'default' => $default],
         ];
     }
 
@@ -86,30 +157,5 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
 
     }
 
-    /**
-     * Automatically generated the auto increment id column for each table
-     * if no default name is set this method will assume your primary key
-     * field will be called generic `id`.
-     *
-     * @param string|null $name
-     * @param integer $length
-     * @return array
-     */
-    public function autoID(string $name = 'id', int $length = 10): array
-    {
-        $this->setPrimaryKey($name);
-        return $this->int($name, $length, false, 'unsigned', 'none', true);
-    }
-
-    /**
-     * Return the auto generated primary key field which allows us to use 
-     * else where within the class
-     *
-     * @return string
-     */
-    public function getPrimaryKey(): string
-    {
-        return $this->primaryKey;
-    }
 
 }

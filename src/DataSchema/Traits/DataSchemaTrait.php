@@ -12,6 +12,8 @@ declare (strict_types = 1);
 
 namespace MagmaCore\DataSchema\Traits;
 
+use MagmaCore\Base\BaseApplication;
+
 trait DataSchemaTrait
 {
 
@@ -39,21 +41,10 @@ trait DataSchemaTrait
         return $this;
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param string $identifier
-     * @param Callable $callback
-     * @return static
-     */
-    public function setConstraintKeys(callable $callback): static
+    public function setKey(mixed $key): static
     {
-        if (is_callable($callback)) {
-            call_user_func_array($callback,[]);
-    
-        }
+        $this->ukey = $key;
         return $this;
-
     }
 
     /**
@@ -63,16 +54,18 @@ trait DataSchemaTrait
      * @param Callable $callback
      * @return static
      */
-    public function setMultipleConstraintKeys(callable $callback): static
+    public function setConstraints(Callable $callback)
     {
-        if (is_callable($callback)) {
-            call_user_func_array($callback,[]);
-    
+        if (!is_callable($callback)) {
+            throw new \Exception();
         }
-        return $this;
+
+        $out = $this->addKeys();
+        $out .= $callback($this);
+
+        return $out;
 
     }
-
 
     /**
      * Undocumented function
@@ -82,21 +75,35 @@ trait DataSchemaTrait
     public function addKeys()
     {
         $key = '';
-        if (!empty($this->primaryKey)) {
-            $key .= "PRIMARY KEY (`{$this->primaryKey}`),";
+        if (isset($this->primaryKey)) {
+            if (!empty($this->primaryKey)) {
+                $key .= "PRIMARY KEY (`{$this->primaryKey}`)," . PHP_EOL;
+            }    
         }
-        if (is_array($this->uniqueKey) && count($this->uniqueKey) > 0) {
-            $uniqueKey = (array) $this->uniqueKey;
-            foreach ($uniqueKey as $unique) {
-                $key .= "UNIQUE KEY `{$unique}` (`{$unique}`)" . ",";
+        if (isset($this->uniqueKey)) {
+            if (is_array($this->uniqueKey) && count($this->uniqueKey) > 0) {
+                $uniqueKey = (array) $this->uniqueKey;
+                foreach ($uniqueKey as $unique) {
+                    $key .= "UNIQUE KEY `{$unique}` (`{$unique}`)" . "," . PHP_EOL;
+                }
+                $key = substr_replace($key, '', -3);
+            } else {
+                $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`), ";
             }
-            $key = substr_replace($key, '', -1);
-        } else {
-            $key .= "UNIQUE KEY `{$this->uniqueKey}` (`{$this->uniqueKey}`), ";
+    
         }
-
-        $key .= $this->add();
-
+        if (isset($this->ukey)) {
+            if (is_array($this->ukey) && count($this->ukey) > 0) {
+                $ukey = (array) $this->ukey;
+                foreach ($ukey as $_ukey) {
+                    $key .= "KEY `{$_ukey}` (`{$_ukey}`)" . "," . PHP_EOL;
+                }
+                $key = substr_replace($key, '', -3);
+            } else {
+                $key .= "KEY `{$this->ukey}` (`{$this->ukey}`), ";
+            }
+    
+        }
         return $key;
     }
 
@@ -155,6 +162,22 @@ trait DataSchemaTrait
         return $this;
     }
 
+    public function addModel(string $model): static
+    {
+        if (!empty($model)) {
+            $model = BaseApplication::diGet($model);
+            if ($model) {
+                $this->model = $model;
+            }
+        }
+        return $this;
+    }
+
+    public function getModel()
+    {
+        return $this->model;
+    }
+
     /**
      * Undocumented function
      *
@@ -163,20 +186,24 @@ trait DataSchemaTrait
     public function add(): string
     {
         $out = '';
+        //if (isset($this->uniqueKey)) {
+             $out .= ',';
+        // } 
         if (isset($this->foreignKey)) {
             $out .= " FOREIGN KEY (`{$this->foreignKey}`)";
         }
-
         if (isset($this->on)) {
             $out .= " REFERENCES `{$this->on}`";
         }
-
         if (isset($this->reference)) {
-            $out .= "(`{$this->reference}`)\n";
+            $out .= " (`{$this->reference}`)";
         }
 
-        $out .= (isset($this->deleteCascade) && $this->deleteCascade === true) ? ' ON DELETE CASCADE' : '';
+        $out .= (isset($this->deleteCascade) && $this->deleteCascade === true) ? 'ON DELETE CASCADE' : '';
         $out .= (isset($this->updateCascade) && $this->updateCascade === true) ? ' ON UPDATE CASCADE' : '';
+        //$out .= ',';
+        //$out = substr($out, 0, -3);
+        //$out .= PHP_EOL;
 
         return $out;
 

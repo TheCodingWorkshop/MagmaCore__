@@ -21,6 +21,5 @@ interface MigrationInterface
     public function createMigrationFromSchema();
     public function locateMigrationFiles(): array;
     public function migrate(string|null $direction = 'up'): void;
-    //public function migrateDown(): void;
 
 }

@@ -184,9 +184,6 @@ abstract class AbstractMigration implements MigrationInterface
                 if (!$newMigrateObject instanceof MigrateInterface) {
                     throw new MigrationInvalidArgumentException($newClass . ' is not a valid Migration object. You will need to implement the MigrateInterface');
                 }
-                // $reflect = new \ReflectionClass($newMigrateObject);
-                // var_dump($reflect->getDocComment());
-                // die;
                 $this->migrateLog(self::START_MIGRATION);
                 $this->executeMigrationCommand(
                     $newMigrateObject, 
