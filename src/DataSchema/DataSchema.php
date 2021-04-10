@@ -104,7 +104,7 @@ class DataSchema extends AbstractDataSchema
      * @param Callable $callback
      * @return string
      */
-    public function build(callable $callback): string
+    public function build(callable $callback = null): string
     {
         $bt4 = "\t\t\t\t";
         $bt3 = "\t\t\t";
@@ -116,7 +116,7 @@ class DataSchema extends AbstractDataSchema
             foreach ($this->schemaObject as $schema) {
                 $this->element .= $bt4 . $schema->render() . $eol;
             }
-            if (is_callable($callback)) {
+            if (is_callable($callback) && $callback !==null) {
                 $this->element .= $bt4 . call_user_func_array($callback, [$this]) . $eol;
             }
             $this->element .= $bt3 . ')' . $eol;
@@ -129,5 +129,96 @@ class DataSchema extends AbstractDataSchema
     public function drop(): string
     {
         return "DROP TABLE " . $this->dataModel->getSchema();
+    }
+
+    /**
+     * The alter statement is used to add, drop or modify an existing database
+     * table. It can also be used drop and add constraints on an existing
+     * table as well
+     *
+     * @param Callable $callback
+     * @return string
+     */
+    public function alter(string $type, Callable $callback): string
+    {
+        if (!is_callable($callback)) {
+            /* do something */
+        }
+        if (!in_array($type, ['add', 'drop', 'modify'])) {
+            /* throw exception */
+        }
+        $element = "\t\t\t" . 'ALTER TABLE ' . "`{$this->dataModel->getSchema()}`" . PHP_EOL;
+        switch ($type) {
+            case 'modify' :
+                $element .= "\t\tMODIFY COLUMN " . $callback($this);
+                $element = substr_replace($element, '', -3);
+                break;
+            case 'change' :
+                $element .= "\t\tCHANGE COLUMN " . $callback($this);
+                $element = substr_replace($element, '', -3);
+                break;    
+            case 'add' :
+                $element .= "\t\t\tADD COLUMN" . $callback($this);
+                $element = substr_replace($element, '', -3);
+                break;
+            case 'drop' :
+                $element .= "\t\t\tDROP COLUMN " . $callback($this);
+                break;
+        }
+        $element .= ';';
+        $element .= PHP_EOL;
+        return $element;
+    }
+
+    /**
+     * Add a column to an existing database table
+     *
+     * @return string
+     */
+    public function addColumn(): string
+    {
+        foreach ($this->schemaObject as $schema) {
+            return $schema->render() . PHP_EOL;
+        }
+
+    }
+
+    /**
+     * Drop a column from an existing database table
+     *
+     * @param string $columnName
+     * @return string
+     */
+    public function dropColumn(string $columnName): string
+    {
+        $this->dropColumn = $columnName;
+        return $this->dropColumn;
+    }
+
+    /**
+     * Modify an existing column datatype or column constraints
+     *
+     * @return void
+     */
+    public function modifyColumn()
+    {
+        return $this->addColumn();
+    }
+
+    /**
+     * Change the name of an existing database table column We can also change
+     * the datatype and constraints
+     *
+     * @param string $oldColumnName
+     * @return string
+     */
+    public function changeColumn(string $oldColumnName): string
+    {
+        return "`{$oldColumnName}`" . ' ' . $this->addColumn();
+    }
+
+    public function destroy()
+    {
+        return "\t\tDROP TABLE " . $this->dataModel->getSchema() . PHP_EOL;
     }
 }

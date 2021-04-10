@@ -18,9 +18,8 @@ use MagmaCore\Migration\MigrateInterface;
 use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Migration\Exception\MigrationInvalidArgumentException;
-use ReflectionClass;
 
-abstract class AbstractMigration implements MigrationInterface
+abstract class AbstractMigration implements MigrationInterface, MigrationChangeInterface
 {
 
     /** @var MigrationTrait */
@@ -38,12 +37,8 @@ abstract class AbstractMigration implements MigrationInterface
     protected string $schemaPath = 'App/Schema/';
 
     protected const NEED_MIGRATION = 'You\'ve not created any migration files yet!';
-    protected const CREATE_MIGRATION = 'Creating migraton file...';
-    protected const END_CREATE_MIGRATION = 'file created successfully.';
-    protected const START_MIGRATION = 'Starting migration...';
-    protected const END_MIGRATION = 'Migration completed successfully.';
-
-    protected const MIGRATE_UP = 'up';
+    protected const CREATE_MIGRATION = 'Generating mirgation for...';
+    protected const END_MIGRATION = ' ... OK';
 
     /**
      * Main class constructor
@@ -54,12 +49,12 @@ abstract class AbstractMigration implements MigrationInterface
      */
     public function __construct(object $dataRepository, string|null $dataSchema = null)
     {
-        if ($dataSchema !==null) {
+        if ($dataSchema !== null) {
             $newSchema = BaseApplication::diGet($dataSchema);
             if (!$newSchema instanceof DataSchemaBuilderInterface) {
                 throw new BaseInvalidArgumentException($dataSchema . ' is not a valid DataSchema object as it does not implement the DataSchemaBuilderInterface');
             }
-            $this->dataSchema = $newSchema;    
+            $this->dataSchema = $newSchema;
         }
         $this->dataRepository = $dataRepository;
     }
@@ -89,6 +84,38 @@ abstract class AbstractMigration implements MigrationInterface
     abstract public function getMigrations(array $conditions = []): array|null;
 
     /**
+     * Returns difference between the Schema and migrated files and return an
+     * array of the difference. If array returns empty this means there no 
+     * difference between the files within the Schema and migration directory.
+     * Ie Schema files class namespace is hash to match the generated migration
+     * file class name
+     *
+     * @return array
+     */
+    public function fileDiff(): array
+    {
+        $schemas = $this->scan($this->schemaPath);
+        $migrations = $this->scan($this->migrationFiles);
+        $hashSchema = array_map(function ($value) {
+            $filename = $this->getFileName($value);
+            if (class_exists($className = '\App\Schema\\' . $filename)) {
+                $object = BaseApplication::diGet($className);
+                $namespace = get_class($object);
+                $hashValue = hash('sha256', $namespace);
+                return 'm' . $hashValue;
+            }
+        }, $schemas);
+        return array_diff(
+            $this->filterUnwantedElements($hashSchema),
+            $this->filterUnwantedElements(
+                str_replace('.php', '', $migrations)
+            )
+
+
+        );
+    }
+
+    /**
      * Create the migration files and placed them within the App/Migrations
      * directory
      *
@@ -111,26 +138,42 @@ abstract class AbstractMigration implements MigrationInterface
                     }
                     $schemaContent = $object->createSchema();
                     if (!empty($schemaContent)) {
-                        $calledClass = get_class($object);
-                        $hashClassName = hash('sha256', $calledClass);
-                        $hashClassName = 'm' . $hashClassName;
-                        $this->migrateLog(self::CREATE_MIGRATION);
+
+                        if (empty($this->fileDiff())) {
+                            /** @todo ensure message only displays if theres nothing to generate */
+                            $this->migrateLog('There is no new schema to generate.');
+                            exit;
+                        }
+                        $hashClassNames = $this->fileDiff();
+                        $this->counter = $hashClassNames;
+                        foreach ($hashClassNames as $hashClass) {
+                            $hashClassName = $hashClass;
+                        }
+
+                        $this->migrateLog(
+                            self::CREATE_MIGRATION . " {$className} [#" . count($this->counter) . "]" . self::END_MIGRATION
+                        );
+                       // $this->migrateLog($className . " [#" . count($this->counter) . "]");
                         file_put_contents(
                             ROOT_PATH . '/' . $this->migrationFiles . $hashClassName . '.php',
-                            trim($this->writeClass(
-                                $hashClassName, 
-                                $newClassName,
-                                $schemaContent, 
-                                $direction
+                            trim(
+                                $this->writeClass(
+                                    $hashClassName,
+                                    $newClassName,
+                                    $schemaContent,
+                                    $direction
                                 )
                             ),
                             LOCK_EX
                         );
-                        $this->migrateLog(self::END_CREATE_MIGRATION);
                     }
                 }
             }
         }
+    }
+
+    public function migrationChange()
+    {
     }
 
     /**
@@ -152,13 +195,13 @@ abstract class AbstractMigration implements MigrationInterface
      *
      * @return array
      */
-    public function migrationDifferences(): array
+    public function migrationDifferences(array $array1 = [], array $array2 = []): array
     {
         /* We can only compute the difference if the files are the same So we need to remove the file extension return from the $this->locateMigrationFiles() */
-        $files = array_map(fn($f): string => $this->getFileName($f), $this->locateMigrationFiles());
+        $files = array_map(fn ($f): string => $this->getFileName($f), $this->locateMigrationFiles());
         return array_diff(
-            $files,
-            ($this->getMigrations() !==null) ? $this->getMigrations() : []
+            !empty($array1) ? $array1 : $files,
+            !empty($array2) ? $array2 : (($this->getMigrations() !== null) ? $this->getMigrations() : [])
         );
     }
 
@@ -173,25 +216,32 @@ abstract class AbstractMigration implements MigrationInterface
     {
         $this->createMigrationTable();
         $migrations = $this->filterUnwantedElements($this->migrationDifferences());
+
+        if (empty($migrations)) {
+            $this->migrateLog('No migrations to apply.');
+            exit;
+        }
+
         foreach ($migrations as $migrate) {
             if ($migrate === '.' || $migrate === '..') {
-               continue;
+                continue;
             }
-            $this->migrateClass = $this->getFileName($migrate);    
+            $this->migrateClass = $this->getFileName($migrate);
             $this->migrations[] = $this->migrateClass;
             if (class_exists($newClass = '\App\Migrations\\' . $this->migrateClass)) {
                 $newMigrateObject = BaseApplication::diGet($newClass);
                 if (!$newMigrateObject instanceof MigrateInterface) {
                     throw new MigrationInvalidArgumentException($newClass . ' is not a valid Migration object. You will need to implement the MigrateInterface');
                 }
-                $this->migrateLog(self::START_MIGRATION);
+
+                $this->logBefore($direction);
                 $this->executeMigrationCommand(
-                    $newMigrateObject, 
+                    $newMigrateObject,
                     $direction
                 );
-                $this->migrateLog(self::END_MIGRATION);
+                $this->migrateLog('Migrated ' . (count($this->migrations) > 0 ? count($this->migrations) : 0) . ' tables');
+                $this->logAfter();
             }
-    
         }
         $this->executeMigration();
     }
@@ -205,7 +255,6 @@ abstract class AbstractMigration implements MigrationInterface
      */
     private function executeMigrationCommand(MigrateInterface $migrateObject, string $direction)
     {
-
         $this->dataRepository
             ->getClientRepository()
             ->getClientCrud()
@@ -213,7 +262,6 @@ abstract class AbstractMigration implements MigrationInterface
             ->exec(
                 $migrateObject->$direction()
             );
-        
     }
 
     /**
@@ -231,5 +279,4 @@ abstract class AbstractMigration implements MigrationInterface
             array_map(fn ($m) => $this->saveMigration(['migration_name' => $m]), $this->migrations)
         );
     }
-
 }

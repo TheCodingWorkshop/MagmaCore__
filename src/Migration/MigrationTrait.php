@@ -64,13 +64,30 @@ trait MigrationTrait
                     $func .= PHP_EOL;
                     $func .= PHP_EOL;
                     $func .= $this->method(null, $originalClassName, 'down');
+                    $func .= PHP_EOL;
+                    $func .= PHP_EOL;
+                    $func .= $this->method(null, $originalClassName, 'change');
                     break;
                 case 'down' :
                     $func .= $this->method(null, $originalClassName);
                     $func .= PHP_EOL;
                     $func .= PHP_EOL;
                     $func .= $this->method($schemaContent, $originalClassName, 'down');
+                    $func .= PHP_EOL;
+                    $func .= PHP_EOL;
+                    $func .= $this->method(null, $originalClassName, 'change');
                     break;
+                case 'change' :
+                    $func .= $this->method(null, $originalClassName);
+                    $func .= PHP_EOL;
+                    $func .= PHP_EOL;
+                    $func .= $this->method(null, $originalClassName, 'down');
+                    $func .= PHP_EOL;
+                    $func .= PHP_EOL;
+                    $func .= $this->method($schemaContent, $originalClassName, 'change');
+
+                    break;
+    
             }
         }
         $func .= $this->fileEnd();
@@ -107,6 +124,42 @@ trait MigrationTrait
         echo "[" . date("Y-m-d H:i:s") . "] - " . $string . PHP_EOL;
     }
 
+    public function logBefore(string $direction)
+    {
+        $msg ='';
+        if ($direction) {
+            $this->direction = $direction;
+            switch($direction) {
+                case 'up';
+                    $msg = 'Starting migration....';
+                    break;
+                case 'down';
+                    $msg = 'Dropping table...';
+                    break;
+                case 'change';
+                    $msg = 'Making changes...';
+                    break;
+
+            }
+            echo $this->migrateLog($msg);
+        }
+    }
+
+    public function logAfter()
+    {
+        $msg ='';
+            switch($this->direction) {
+                case 'up';
+                case 'down';
+                case 'change';
+                    $msg = 'OK...';
+                    break;
+
+            }
+            echo $this->migrateLog($msg);
+    }
+
+
     /**
      * Get the name of a file pass as the argument parameter. Without the 
      * file extension.
@@ -141,20 +194,30 @@ trait MigrationTrait
      */
     private function resolveMigrationClass(string $className): string
     {
-        if (str_contains($className, 'Drop')) {
+        foreach (['Drop', 'Change', 'Modify', 'Add'] as $fs) {
+            if (str_contains($className, $fs)) {
+                return 'change';
+            }    
+        }
+        if (str_contains($className, 'Destroy')) {
             return 'down';
         }
-        if (str_contains($className, 'Change')) {
-            return 'change';
-        }
-        
+
         return 'up';
     }
 
     
     public function filterUnwantedElements(array $files)
     {
-        return array_values(array_filter($files, fn($value) => !is_null($value) && $value !=='' && $value !=='.'));
+        return array_values(array_filter($files, fn($value) => !is_null($value) && $value !=='' && $value !=='.' && $value !=='..'));
+    }
+
+    public function isFile($file)
+    {
+        if ($file === '.' || $file === '..') {
+          return;
+        }
+
     }
 
 
