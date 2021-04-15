@@ -20,6 +20,7 @@ class JsonType extends DataSchemaBaseType implements DataSchemaTypeInterface
 
     /** @var array - Json schema types */
     protected array $types = [
+        'json'
     ];
 
     /**

@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Migration;
 
-interface MigrationChangeInterface
+interface MigrateChangeInterface
 {
 
-    public function migrationChange();
+    public function change(): string;
 
 }

@@ -10,12 +10,14 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Migration;
+namespace MagmaCore\MassData;
 
-interface MigrateInterface
+class MassData implements MassDataInterface
 {
 
-    public function up(): string;
-    public function down(): string;
+    public function add()
+    {
+        
+    }
 
 }

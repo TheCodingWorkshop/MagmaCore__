@@ -55,7 +55,9 @@ class NewAction implements DomainActionLogicInterface
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
                 $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
                 $formData = $controller->formBuilder->getData(); /* submitted data */
-                $entityCollection = $controller->entity->wash($formData)->rinse()->dry(); //* data sanitization */
+                /* data sanitization */
+                $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();  
+
                 $action = $controller->repository
                     ->getRepo()
                     ->validateRepository($entityCollection, $entityObject)

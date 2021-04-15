@@ -21,7 +21,7 @@ abstract class AbstractTemplate implements TemplateInterface
     protected array $templateEnv;
 
     /**
-     * Undocumented function
+     * Main class constructor
      *
      * @param array $templateEnvironment
      * @return void
@@ -72,17 +72,14 @@ abstract class AbstractTemplate implements TemplateInterface
      * Undocumented function
      *
      * @param mixed $code
-     * @return void
+     * @return mixed
      */
-    public function codeCompiler(mixed $code)
+    public function codeCompiler(mixed $code): mixed
     {
         if ($code) {
             $code = $this->blockCompiler($code);
             $code = $this->yieldCompiler($code);
-            $code = $this->functionEchosCompiler($code);
-            $code = $this->escapedEchosCompiler($code);
-            $code = $this->echosCompiler($code);
-            $code = $this->phpCompiler($code);
+            $code = $this->compiler($code);
             return $code;
         }
         return false;
@@ -112,45 +109,38 @@ abstract class AbstractTemplate implements TemplateInterface
      * Undocumented function
      *
      * @param mixed $code
-     * @return void
+     * @return mixed
      */
-    public function phpCompiler($code)
+    public function compiler(mixed $code): mixed
     {
-        return preg_replace('~\{%\s*(.+?)\s*\%}~is', '<?php $1 ?>', $code);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param mixed $code
-     * @return void
-     */
-    public function echosCompiler($code)
-    {
-        return preg_replace('~\{{\s*(.+?)\s*\}}~is', '<?php echo $1 ?>', $code);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param mixed $code
-     * @return void
-     */
-    public function functionEchosCompiler($code)
-    {
-        return preg_replace('~\{@ \s*(.+?)\s*\ @}~is', '<?php echo $func->$1 ?>', $code);
-    }
-
-
-    /**
-     * Undocumented function
-     *
-     * @param mixed $code
-     * @return void
-     */
-    public function escapedEchosCompiler($code)
-    {
-        return preg_replace('~\{{{\s*(.+?)\s*\}}}~is', '<?php echo htmlentities($1, ENT_QUOTES, \'UTF-8\') ?>', $code);
+        $compile = [
+            'php' => '~\{%\s*(.+?)\s*\%}~is', /* {% PHP functions %} */
+            'echos' => '~\{{\s*(.+?)\s*\}}~is', /* echo {{ $test }} */
+            'htmlentities' => '\{{{\s*(.+?)\s*\}}}~is', /* htmlentities {{{ $test }}} */
+            'func' => '~\{@ \s*(.+?)\s*\ @}~is'
+        ];
+        if ($compile) {
+            $comp = [];
+            foreach ($compile as $key => $value) {
+                switch ($key) {
+                    case 'func' :
+                        $comp = [$value, '$func->$1'];
+                        break;
+                    case 'htmlentities' :
+                        $comp = [$value, 'echo htmlentities($1, ENT_QUOTES, \'UTF-8\')'];
+                        break;
+                    case 'echo' :
+                        $comp = [$value, 'echo $1'];
+                        break;
+                    case 'php' :
+                    default :
+                        $comp = [$value, '$1'];
+                        break;
+                }
+                list($expression, $replacement) = $comp;
+                return preg_replace($expression, $replacement, $code);
+            }
+        }
     }
 
     /**

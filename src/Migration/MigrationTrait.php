@@ -12,110 +12,57 @@ declare(strict_types=1);
 
 namespace MagmaCore\Migration;
 
+use MagmaCore\Migration\Migrate;
+
 trait MigrationTrait
 {
-
-    public function fileStart(string $className, string $originalClassName)
+    
+    public function buildMigrationFile(string $hashClassName, string $schemaContent, string $newClassName, string $table = 'tests'): void
     {
-        $file = '<?php' . PHP_EOL;
-        $file .= '/*' . PHP_EOL;
-        $file .= '* This file is part of the MagmaCore package.' . PHP_EOL;
-        $file .= '*' . PHP_EOL;
-        $file .= '* (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>' . PHP_EOL;
-        $file .= '*' . PHP_EOL;
-        $file .= '* For the full copyright and license information, please view the LICENSE' . PHP_EOL;
-        $file .= '* file that was distributed with this source code.' . PHP_EOL;
-        $file .= '* =====================================================' .PHP_EOL;
-        $file .= '* File generated from ' . $originalClassName . PHP_EOL;
-        $file .= '*/' . PHP_EOL;
-        $file .= PHP_EOL;
-        $file .= 'declare(strict_types=1);' . PHP_EOL;
-        $file .= PHP_EOL;
-        $file .= 'namespace App\Migrations;' . PHP_EOL;
-        $file .= PHP_EOL;
-        $file .= 'use MagmaCore\Migration\MigrateInterface;' . PHP_EOL;
-        $file .= PHP_EOL;
-        $file .= "class {$className} implements MigrateInterface" . PHP_EOL;
-        $file .= '{' . PHP_EOL;
+        $commonPattern = ['{{ className }}', '{{ classGeneratedFrom }}'];
+        $commonReplacement = [$hashClassName, $newClassName];
 
-        return $file;
+        $content = file_get_contents($this->rootPath . 'Build/ExampleMigration.txt');
+        $pattern = array_merge($commonPattern, ['{{ up }}', '{{ down }}']);
+        $replacement = array_merge($commonReplacement, [$schemaContent, $this->downMethod($table)]);
+        $content = str_replace($pattern, $replacement, $content);
+
+        file_put_contents(
+            $this->rootPath . $this->migrationFiles . $hashClassName . '.php',
+            trim($content),
+            LOCK_EX
+        );
+
     }
 
-    public function fileEnd()
+    public function buildMigrationChangeFile(string $hashClassName, string $schemaContent, string $newClassName): void
     {
-        return '}' . PHP_EOL;
+
+        $parts = explode('_', $newClassName);
+        if (isset($parts[1]) && $parts[1] !=='') {
+            $parentClass = $parts[1];
+            $content = $content = file_get_contents($this->rootPath . 'Build/ExampleMigrationChange.txt');
+            $commonPattern = ['{{ className }}', '{{ classGeneratedFrom }}'];
+            $commonReplacement = [$hashClassName, $newClassName];
+            $pattern = array_merge($commonPattern, ['{{ extendClass }}', '{{ change }}']);
+            $replacement = array_merge($commonReplacement, [$parentClass, $schemaContent]);
+            $content = str_replace($pattern, $replacement, $content);
+        file_put_contents(
+            $this->rootPath . $this->migrationFiles . $hashClassName . '.php',
+            trim($content),
+            LOCK_EX
+        );
+    }
+
+    }
+
+    private function downMethod(string $table)
+    {
+        return "Drop table {$table}";
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $className
-     * @param string $schemaContent
-     * @param mixed $direction
-     * @return string
-     */
-    public function writeClass(string $className, string $originalClassName, string $schemaContent, mixed $direction = null): string
-    {
-        $func = $this->fileStart($className, $originalClassName) . PHP_EOL;
-        if ($direction) {
-            switch($direction) {
-                case 'up' :
-                    $func .= $this->method($schemaContent, $originalClassName);
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method(null, $originalClassName, 'down');
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method(null, $originalClassName, 'change');
-                    break;
-                case 'down' :
-                    $func .= $this->method(null, $originalClassName);
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method($schemaContent, $originalClassName, 'down');
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method(null, $originalClassName, 'change');
-                    break;
-                case 'change' :
-                    $func .= $this->method(null, $originalClassName);
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method(null, $originalClassName, 'down');
-                    $func .= PHP_EOL;
-                    $func .= PHP_EOL;
-                    $func .= $this->method($schemaContent, $originalClassName, 'change');
-
-                    break;
-    
-            }
-        }
-        $func .= $this->fileEnd();
-
-        return $func;
-    }
-    
-    
-    public function method($schemaContent, string $originalClassName, string $name = 'up')
-    {
-        $func = "\t" . '/**' . PHP_EOL;
-        $func .= "\t" . '* Migrate the query statement to the database' . PHP_EOL;
-        $func .= "\t" . '*' . PHP_EOL;
-        $func .= "\t" . '* @uses ' . $originalClassName . PHP_EOL;
-        $func .= "\t" . '* @return string' . PHP_EOL;
-        $func .= "\t" . '*/' . PHP_EOL;
-        $func .= "\t" . 'public function ' . $name . '(): string' . PHP_EOL;
-        $func .= "\t" . '{' . PHP_EOL;
-        $func .= "\t\t" . 'return "' . PHP_EOL;
-        $func .= "\t\t\t" . ($schemaContent !==null) ? $schemaContent : '';
-        $func .= "\t\t" . '";' . PHP_EOL;
-        $func .= "\t" . '}' . PHP_EOL;
-        return $func;
-
-    }
-
-    /**
-     * Undocumented function
+     * Terminal logging message with date and time stamp
      *
      * @param string $string
      */
@@ -130,13 +77,13 @@ trait MigrationTrait
         if ($direction) {
             $this->direction = $direction;
             switch($direction) {
-                case 'up';
+                case Migrate::MIGRATE_UP;
                     $msg = 'Starting migration....';
                     break;
-                case 'down';
+                case Migrate::MIGRATE_DOWN;
                     $msg = 'Dropping table...';
                     break;
-                case 'change';
+                case Migrate::MIGRATE_CHANGE;
                     $msg = 'Making changes...';
                     break;
 
@@ -149,9 +96,9 @@ trait MigrationTrait
     {
         $msg ='';
             switch($this->direction) {
-                case 'up';
-                case 'down';
-                case 'change';
+                case Migrate::MIGRATE_UP;
+                case Migrate::MIGRATE_DOWN;
+                case Migrate::MIGRATE_CHANGE;
                     $msg = 'OK...';
                     break;
 
@@ -189,27 +136,39 @@ trait MigrationTrait
      * This helper method is used to determin the direction of which method 
      * gets executed.
      *
+     * @param array $filePrefixArray
      * @param string $className
      * @return string
      */
-    private function resolveMigrationClass(string $className): string
+    private function resolveMigrationClass(array $filePrefixArray, string $className): string
     {
-        foreach (['Drop', 'Change', 'Modify', 'Add'] as $fs) {
+        foreach ($filePrefixArray as $fs) {
             if (str_contains($className, $fs)) {
-                return 'change';
+                return Migrate::MIGRATE_CHANGE;
             }    
         }
         if (str_contains($className, 'Destroy')) {
-            return 'down';
+            return Migrate::MIGRATE_DOWN;
         }
 
-        return 'up';
+        return Migrate::MIGRATE_UP;
     }
 
-    
-    public function filterUnwantedElements(array $files)
+    /**
+     * Filter unwanted elements from an array. The function is wrapped with
+     * array_value which will reset the array index
+     *
+     * @param array $files
+     * @return array
+     */
+    public function filterUnwantedElements(array $files): array
     {
-        return array_values(array_filter($files, fn($value) => !is_null($value) && $value !=='' && $value !=='.' && $value !=='..'));
+        return array_values(
+            array_filter(
+                $files, 
+                fn($value) => !is_null($value) && $value !=='' && $value !=='.' && $value !=='..'
+            )
+        );
     }
 
     public function isFile($file)

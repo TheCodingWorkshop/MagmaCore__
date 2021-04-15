@@ -35,6 +35,11 @@ class DataSchema extends AbstractDataSchema
     protected mixed $ukey = null;
     /** @var string */
     protected string $tableSchema = '';
+    
+    protected const MODIFY = 'modify';
+    protected const ADD = 'add';
+    protected const CHANGE = 'change';
+    protected const DROP = 'drop';
 
     /**
      * Main class constructor
@@ -217,7 +222,12 @@ class DataSchema extends AbstractDataSchema
         return "`{$oldColumnName}`" . ' ' . $this->addColumn();
     }
 
-    public function destroy()
+    /**
+     * Drop the specified table from the database
+     *
+     * @return string
+     */
+    public function destroy(): string
     {
         return "\t\tDROP TABLE " . $this->dataModel->getSchema() . PHP_EOL;
     }

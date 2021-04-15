@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
+use MagmaCore\Base\BaseEntity;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\Base\Exception\BaseException;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
+use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
 
 class BaseModel
 { 
@@ -25,6 +27,12 @@ class BaseModel
     protected string $tableSchemaID;
     /** @var Object */
     protected Object $repository;
+    /** @var BaseEntity */
+    protected BaseEntity $entity;
+    /** @var array $casts */
+    protected array $cast = [];
+
+    protected const ALLOWED_CASTING_TYPES = ['array_json'];
 
     /**
      * Main class constructor
@@ -32,15 +40,65 @@ class BaseModel
      * @param string $tableSchema
      * @param string $tableSchemaID
      */
-    public function __construct(string $tableSchema = null, string $tableSchemaID = null)
+    public function __construct(string $tableSchema = null, string $tableSchemaID = null, string $entity = null)
     {
         if (empty($tableSchema) || empty($tableSchemaID)) {
             throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
+        }
+        if ($entity !==null) {
+            $this->entity  = BaseApplication::diGet($entity);
+            if (!$this->entity instanceof BaseEntity) {
+                throw new BaseInvalidArgumentException('');
+            }
         }
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchemaID;
         $factory = new DataRepositoryFactory('baseModel', $tableSchema, $tableSchemaID);
         $this->repository = $factory->create(DataRepository::class);
+
+    }
+
+    /**
+     * Returns the related model entity object
+     *
+     * @return BaseEntity
+     */
+    public function getEntity(): BaseEntity
+    {
+        return $this->entity;
+    }
+
+    /**
+     * two way casting cast a data type back and fourth
+     *
+     * @return void
+     */
+    public function casting()
+    {
+        if (isset($this->cast)) {
+            if (is_array($this->cast) && count($this->cast) > 0) {
+                foreach ($this->cast as $key => $value) {
+                    if (!in_array($value, self::ALLOWED_CASTING_TYPES)) {
+                        throw new BaseInvalidArgumentException($value . ' casting type is not supported.');
+                    }
+                    $this->resolveCast($key, $value);
+                }
+            }
+        }
+    }
+
+    private function resolveCast(string $key, mixed $value)
+    {
+        if (empty($key)) {
+            throw new BaseException('');
+        }
+        switch ($value) {
+            case 'array_json' :
+                if (isset($this->getEntity()->$key) && $this->getEntity()->$key !=='') {
+                    $this->getEntity()->$key = json_encode($value);
+                }   
+                break;
+        }
     }
 
     /**
@@ -59,7 +117,7 @@ class BaseModel
      */
     public function getSchemaID(): string
     {
-        return $this->tableSchema;
+        return $this->tableSchemaID;
     }
 
     /**
@@ -69,7 +127,7 @@ class BaseModel
      */
     public function getSchema(): string
     {
-        return $this->tableSchemaID;
+        return $this->tableSchema;
     }
 
     /**

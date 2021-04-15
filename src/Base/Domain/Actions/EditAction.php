@@ -59,7 +59,7 @@ class EditAction implements DomainActionLogicInterface
                 if ($controller->formBuilder->csrfValidate()) {
                     $this->enforceRules($rules, $controller);
                     $formData = $controller->formBuilder->getData();
-                    $entityCollection = $controller->entity->wash($formData)->rinse()->dry();
+                    $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
 
                     $action = $controller->repository->getRepo()
                         ->validateRepository(

@@ -21,6 +21,7 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
 {
 
     protected string $primaryKey;
+    protected array $attributes = array();
 
     /**
      * Set the table primary key
@@ -121,6 +122,19 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
     }
 
     /**
+     * Return the json field type
+     *
+     * @param string $name
+     * @return array
+     */
+    public function json(string $name): array
+    {
+        return [
+            JsonType::class => ['name' => $name, 'type' => 'json']
+        ];
+    }
+
+    /**
      * create an integre based row. Length field is set to null, so this is a required
      * argument which must be set within the class which is using this method
      *
@@ -157,5 +171,14 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
 
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
 
 }
