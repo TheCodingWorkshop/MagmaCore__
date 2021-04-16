@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\Inertia\Twig;
+namespace MagmaCore\Inertia;
 
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;

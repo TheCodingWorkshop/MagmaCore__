@@ -57,11 +57,11 @@ class NewAction implements DomainActionLogicInterface
                 $formData = $controller->formBuilder->getData(); /* submitted data */
                 /* data sanitization */
                 $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();  
-
                 $action = $controller->repository
                     ->getRepo()
                     ->validateRepository($entityCollection, $entityObject)
                     ->persistAfterValidation();
+    
                 if ($action) {
                     if ($controller->eventDispatcher) {
                         $controller->eventDispatcher->dispatch(

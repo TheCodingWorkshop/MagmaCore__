@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*
  * This file is part of the MagmaCore package.
  *
@@ -9,26 +9,25 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\Inertia\EventListener;
+namespace MagmaCore\Inertia;
 
-use MagmaCore\Inertia\Service\InertiaInterface;
 use MagmaCore\Http\Event\RequestEvent;
 use MagmaCore\Http\Event\ResponseEvent;
-use MagmaCore\Http\ResponseHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 
-class InertiaListener
+class InertaiListener
 {
 
     protected $inertia;
+    protected $debug;
 
-    public function __construct(InertiaInterface $inertia)
+    public function __construct(InertiaInterface $inertia, bool $debug)
     {
         $this->inertia = $inertia;
+        $this->debuyg = $debug;
     }
 
-    public function onBaseRequest(RequestEvent $event)
+    public function onRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
         if (!$request->headers->get('X-Inertia')) {
@@ -41,15 +40,17 @@ class InertiaListener
         }
     }
 
-    public function onBaseResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event)
     {
         if (!$event->getRequest()->headers->get('X-Inertia')) {
             return;
         }
-        if ($event->getResponse()->isRedirect()
-            && 302 === $event->getResponse()->getStatusCode()
-            && in_array($event->getRequest()->getMethod(), ['PUT', 'PATCH', 'DELETE'])
-        ) {
+
+        if ($this->debug && $event->getRequest()->isXmlHttpRequest()) {
+            $event->getResponse()->headers->set('Magma-Debug-Toolbar-Replace', 1);
+        }
+
+        if ($event->getResponse()->isRedirect() && 302 === $event->getResponse()->getStatusCode() && in_array($event->getRequest()->getMethod(), ['PUT', 'PATCH', 'DELETE'])) {
             $event->getResponse()->setStatusCode(303);
         }
     }

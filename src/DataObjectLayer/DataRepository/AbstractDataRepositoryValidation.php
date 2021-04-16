@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use Closure;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Collection\Collection;
 use MagmaCore\ValidationRule\ValidationRule;
@@ -179,6 +181,47 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
             $result = (new $model())->getRepo()->findObjectBy([$fieldName => $value], ['*']);
             if ($result) {
                 $this->errors['err_duplicate_name'] = str_replace('_', ' ', ucwords($fieldName)) . ' already exists';
+            }
+        }
+
+    }
+
+    public function dovalidation(Collection $entityCollection, Null|Object $dataRepository = null, Closure $callback)
+    {
+        if (null !== $entityCollection) {
+            if (is_object($entityCollection) && $entityCollection->count() > 0) {
+                foreach ($entityCollection as $this->key => $this->value) :
+                    if (isset($this->key) && $this->key != '') :
+                        if (!$callback instanceof Closure) {
+                            throw new BaseInvalidArgumentException('');
+                        }
+                        $callback($this->key, $this->value, $entityCollection, $dataRepository);
+                        // switch ($this->key):
+                        //     case 'password_hash':
+                        //     case 'client_password_hash':
+                        //         if ($this->rules) {
+                        //             $this->rules->addRule("required|unique|email");
+                        //         }
+                        //         break;
+                        //     case 'email':
+                        //         if ($this->rules) {
+                        //             $this->rules->addRule("required|unique|email");
+                        //         }
+                        //         break;
+                        //     case 'firstname':
+                        //     case 'lastname':
+                        //         if ($this->rules) {
+                        //             $this->rules->addRule("required");
+                        //         }
+                        //         break;
+                        //     default:
+                        //         if ($entityCollection === $dataRepository) {
+                        //             $this->errors = Error::display('err_unchange');
+                        //         }
+                        //         break;
+                        // endswitch;
+                    endif;
+                endforeach;
             }
         }
 

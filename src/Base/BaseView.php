@@ -19,7 +19,7 @@ use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Twig\TwigExtension;
-use MagmaCore\Inertia\Twig\InertiaTwigExtension;
+use MagmaCore\Inertia\InertiaTwigExtension;
 
 class BaseView
 { 
