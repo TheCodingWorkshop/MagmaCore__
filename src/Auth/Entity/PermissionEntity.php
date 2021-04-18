@@ -16,9 +16,9 @@ use MagmaCore\Base\BaseEntity;
 class PermissionEntity extends BaseEntity
 {
 
-    public function __construct(array $data)
+    public function __construct()
     {
-        parent::__construct($data);
+        parent::__construct();
     }
 
 }

@@ -71,6 +71,7 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
      */
     public function varchar(string $name, int $length = 196, bool $null = false, mixed $default = null): array
     {
+        $this->varchar[] = $name;
         return [
             StringType::class => ['name' => $name, 'type' => 'varchar', 'length' => $length, 'null' => $null, 'default' => $default],
         ];

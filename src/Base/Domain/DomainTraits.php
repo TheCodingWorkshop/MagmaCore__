@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
+use App\Schema\UserSchema;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Domain\DomainLogicRules;
@@ -225,7 +226,8 @@ trait DomainTraits
             ->create(
                 ($column !== null) ? $column : $this->controller->column,
                 ($repository !== null) ? $repository : $this->tableRepository,
-                $this->args
+                $this->args,
+                $this->controller->entity->getColumns($this->schema)
             )
             ->setAttr($tableParams)
             ->table();

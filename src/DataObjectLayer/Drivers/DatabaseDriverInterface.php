@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*
  * This file is part of the MagmaCore package.
  *
@@ -7,17 +7,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\DataObjectLayer\DatabaseConnection;
+namespace MagmaCore\DataObjectLayer\Drivers;
 
-interface DatabaseConnectionInterface
-{
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
 
-    /** */
-    public function open();
-
-    /** */
-    public function close();
-
-}
+interface DatabaseDriverInterface extends DatabaseConnectionInterface
+{ }

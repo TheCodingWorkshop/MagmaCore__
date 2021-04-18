@@ -11,11 +11,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\DataObjectLayer\DataLayerFactory;
 use MagmaCore\DataObjectLayer\DataLayerEnvironment;
 use MagmaCore\DataObjectLayer\DataLayerConfiguration;
-use MagmaCore\DataObjectLayer\DataLayerFactory;
+use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
+use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 
 class DataRepositoryFactory
 {
@@ -76,11 +77,11 @@ class DataRepositoryFactory
     {
         $dataLayerEnvironment = new DataLayerEnvironment(
             new DataLayerConfiguration(
-            // Load the symfony dotenv library 
             \Symfony\Component\Dotenv\Dotenv::class,
-            // if optional argument is set then we can return an external configurations array
-            ($dataLayerConfiguration !==null) ? $dataLayerConfiguration : NULL
-            )
+            ($dataLayerConfiguration !==null) ? $dataLayerConfiguration : NULL,
+            ),
+            Yaml::file('app')['database']['default_driver'] /* second argument */
+
         );
         $factory = new DataLayerFactory($dataLayerEnvironment, $this->tableSchema, $this->tableSchemaID);
         if ($factory) {

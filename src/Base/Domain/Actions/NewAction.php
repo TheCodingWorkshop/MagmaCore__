@@ -37,13 +37,16 @@ class NewAction implements DomainActionLogicInterface
      * 
      * @param Object $controller - The controller object implementing this object
      * @param string $eventDispatcher - the eventDispatcher for the current object
+     * @param string $objectSchema
      * @param string $method - the name of the method within the current controller object
+     * @param array $additionalContext - additional data which can be passed to the event dispatcher
      * @return void
      */
     public function execute(
         Object $controller,
         string|null $entityObject = null,
         string|null $eventDispatcher = null,
+        string|null $objectSchema = null,
         string $method,
         array $rules = [],
         array $additionalContext = []
@@ -51,6 +54,8 @@ class NewAction implements DomainActionLogicInterface
 
         $this->controller = $controller;
         $this->method = $method;
+        $this->schema = $objectSchema;
+        
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
                 $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */

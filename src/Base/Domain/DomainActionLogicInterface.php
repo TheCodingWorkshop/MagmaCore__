@@ -13,6 +13,7 @@ interface DomainActionLogicInterface
      * @param Object $controller
      * @param string $entityObject
      * @param string $eventDispatcher
+     * @param string|null $objectSchema
      * @param string $method
      * @param string $class
      * @param array $additionalContext
@@ -22,6 +23,7 @@ interface DomainActionLogicInterface
         Object $controller,
         string|null $entityObject = null,
         string|null $eventDispatcher = null,
+        string|null $objectSchema = null,
         string $method,
         array $rules = [],
         array $additionalContext = []

@@ -15,5 +15,10 @@ use MagmaCore\Datatable\DatatableColumnInterface;
 
 abstract class AbstractDatatableColumn implements DatatableColumnInterface
 {
-    abstract public function columns() : array;
+    /**
+     * @inheritdoc
+     * @param array $dbColumns
+     * @return array
+     */
+    abstract public function columns(array $dbColumns = []) : array;
 }

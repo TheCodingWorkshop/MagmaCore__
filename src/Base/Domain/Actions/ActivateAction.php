@@ -37,6 +37,7 @@ class ActivateAction implements DomainActionLogicInterface
      * 
      * @param Object $controller - The controller object implementing this object
      * @param string $eventDispatcher - the eventDispatcher for the current object
+     * @param string $objectSchema
      * @param string $method - the name of the method within the current controller object
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
      * @return void
@@ -45,6 +46,7 @@ class ActivateAction implements DomainActionLogicInterface
         Object $controller,
         string|null $entityObject = null,
         string|null $eventDispatcher = null,
+        string|null $objectSchema = null,
         string $method,
         array $rules = [],
         array $additionalContext = []
@@ -52,6 +54,7 @@ class ActivateAction implements DomainActionLogicInterface
 
         $this->controller = $controller;
         $this->method = $method;
+        $this->schema = $objectSchema;
 
         $token = $controller->thisRouteToken();
         if ($token) {

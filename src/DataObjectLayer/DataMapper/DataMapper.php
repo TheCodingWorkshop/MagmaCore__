@@ -12,21 +12,22 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
-
-use PDOStatement;
-use Throwable;
 use PDO;
+use Throwable;
 use PDOException;
+use PDOStatement;
+
+use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
+use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
+use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
 
 class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {
 
-    /** @var DatabaseConnectionInterface */
-    private DatabaseConnectionInterface $dbh;
+    /** @var DatabaseDriverInterface */
+    private DatabaseDriverInterface $dbh;
 
     /** @var PDOStatement */
     private PDOStatement $statement;
@@ -37,7 +38,7 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      * @param DatabaseConnectionInterface
      * @return void
      */
-    public function __construct(DatabaseConnectionInterface $dbh)
+    public function __construct(DatabaseDriverInterface $dbh)
     {
         $this->dbh = $dbh;
         parent::__construct($this->dbh); /* Pass to DatabaseTransaction class */

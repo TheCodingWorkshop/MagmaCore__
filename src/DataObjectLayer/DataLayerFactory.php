@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnection;
 use MagmaCore\DataObjectLayer\DataMapper\DataMapperFactory;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerFactory;
 use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilderFactory;
@@ -55,7 +54,7 @@ class DataLayerFactory
     {
         /* build the data mapper factory object */
         $dataMapperFactory = new DataMapperFactory();
-        $dataMapper = $dataMapperFactory->create(DatabaseConnection::class, $this->environment);
+        $dataMapper = $dataMapperFactory->create(\MagmaCore\DataObjectLayer\Drivers\DatabaseDriverFactory::class, $this->environment);
         if ($dataMapper) {
             /* build the query builder factory object */
             $queryBuilderFactory = new QueryBuilderFactory();

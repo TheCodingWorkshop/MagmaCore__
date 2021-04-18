@@ -32,13 +32,13 @@ class Datatable extends AbstractDatatable
         parent::__construct();
     }
 
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = []) : self
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = []) : self
     {
         $this->dataColumnObject = new $dataColumnString();
         if (!$this->dataColumnObject instanceof DatatableColumnInterface) {
             throw new DatatableUnexpectedValueException($dataColumnString . ' is not a valid data column object.');
         }
-        $this->dataColumns = $this->dataColumnObject->columns();
+        $this->dataColumns = $this->dataColumnObject->columns($dbColumns);
         $this->sortController = $sortController;
         $this->getRepositoryParts($dataRepository);
         return $this;

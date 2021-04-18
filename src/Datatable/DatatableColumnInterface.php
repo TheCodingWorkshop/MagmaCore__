@@ -14,6 +14,12 @@ namespace MagmaCore\Datatable;
 interface DatatableColumnInterface
 {
 
-    public function columns() : array;
+    /**
+     * Returns an array of database columns that matches the its entity and schema
+     *
+     * @param array $dbColumns
+     * @return array
+     */
+    public function columns(array $dbColumns = []) : array;
 
 }

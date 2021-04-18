@@ -11,26 +11,26 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DatabaseConnection;
 
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransactionInterface;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnection;
-use LogicException;
 use PDOException;
+use LogicException;
+use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
+use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransactionInterface;
 
 class DatabaseTransaction implements DatabaseTransactionInterface
 {
 
-    private DatabaseConnection $db;
+    private DatabaseDriverInterface $db;
     private int $transactionCounter = 0;
 
     /**
      * Main class constructor method which accepts the database connection object
      * which is then pipe to the class property (db)
      *
-     * @param DatabaseConnection $db
+     * @param DatabaseDriverInterface $db
      * @return void
      * @throws LogicException - if there's no database connection object
      */
-    public function __construct(DatabaseConnection $db)
+    public function __construct(DatabaseDriverInterface $db)
     {
         $this->db = $db;
         if (!$this->db) {

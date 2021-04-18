@@ -11,19 +11,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
-use DataObjectLayer\Exception\DataLayerInvalidArgumentException;
+use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
 class DataLayerEnvironment
 {
     
     /** @var Object */
     protected Object $environmentConfiguration;
-
-    /** @var string */
-    protected const VERSION = '1.0.0';
-
-    /** @var string */
-    protected const DEFAULT_DRIVER = 'mysql';
 
     /**
      * Main construct class
@@ -34,7 +28,10 @@ class DataLayerEnvironment
     public function __construct(Object $environmentConfiguration, ?string $defaultDriver = null)
     {
         $this->environmentConfiguration = $environmentConfiguration;
-        $this->currentDriver  = ($defaultDriver !=null) ? $defaultDriver : self::DEFAULT_DRIVER;
+        if (empty($defaultDriver) || is_null($defaultDriver)) {
+            throw new DataLayerInvalidArgumentException('Please specify your default database driver within the app.yml file under the database settings');
+        }
+        $this->currentDriver  = $defaultDriver;
     }
 
     /**
@@ -74,7 +71,7 @@ class DataLayerEnvironment
      */
     public function getDsn() : string
     {
-        return $this->getDatabaseCredentials($this->currentDriver)['dsn'];
+        return $this->getDatabaseCredentials()['dsn'];
     }
 
     /**
@@ -84,7 +81,7 @@ class DataLayerEnvironment
      */
     public function getDbUsername() : string
     {
-        return $this->getDatabaseCredentials($this->currentDriver)['username'];
+        return $this->getDatabaseCredentials()['username'];
     }
 
     /**
@@ -94,7 +91,7 @@ class DataLayerEnvironment
      */
     public function getDbPassword() : string
     {
-        return $this->getDatabaseCredentials($this->currentDriver)['password'];
+        return $this->getDatabaseCredentials()['password'];
     }
 
 

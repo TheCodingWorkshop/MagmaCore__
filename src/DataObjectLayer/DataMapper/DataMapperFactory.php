@@ -7,13 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
-use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerEnvironment;
+use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 
 class DataMapperFactory
 {
@@ -24,26 +25,41 @@ class DataMapperFactory
      * @return void
      */
     public function __construct()
-    { }
+    {
+    }
 
     /**
      * Creates the data mapper object and inject the dependency for this object. We are also
      * creating the DatabaseConnection Object and injecting the environment object. Which will
      * expose the environment methods with the database connection class.
      *
-     * @param string $databaseConnectionString
+     * @param string $databaseDriverFactory
      * @param Object $dataMapperEnvironmentConfiguration
      * @return DataMapperInterface
      * @throws DataLayerUnexpectedValueException
      */
-    public function create(string $databaseConnectionString, DataLayerEnvironment $environment) : DataMapperInterface
+    public function create(string $databaseDriverFactory, DataLayerEnvironment $environment): DataMapperInterface
     {
-        $databaseConnectionObject = new $databaseConnectionString($environment);
-        if (!$databaseConnectionObject instanceof DatabaseConnectionInterface) {
-            throw new DataLayerUnexpectedValueException($databaseConnectionString . ' is not a valid database connection object');
-        }
-        return new DataMapper($databaseConnectionObject);
+        $params = $this->resolvedDatabaseParameters();
+        $dbObject = (new $databaseDriverFactory())->create($environment, $params['class'], $params['driver']);
+        return new DataMapper($dbObject);
     }
 
-
+    /**
+     * Return the application parameters as they were defined within the config
+     * yaml file
+     *
+     * @return array
+     */
+    private function resolvedDatabaseParameters(): array
+    {
+        $database = Yaml::file('app')['database'];
+        if (is_array($database) && count($database) > 0) {
+            foreach ($database['drivers'] as $driver => $class) {
+                if (isset($driver) && $driver === $database['default_driver']) {
+                    return array_merge($class, ['driver' => $driver]);
+                }
+            }
+        }
+    }
 }

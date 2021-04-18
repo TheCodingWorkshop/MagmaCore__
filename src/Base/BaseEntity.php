@@ -27,7 +27,9 @@ class BaseEntity
     /** @var array */
     protected array $dirtyData;
     /** */
-    protected object $dataSchemaObject;
+    protected object|null $dataSchemaObject;
+    /** @var array */
+    protected array $dbColumns = [];
 
     /**
      * BaseEntity constructor.
@@ -41,10 +43,11 @@ class BaseEntity
     }
 
     /**
-     * Undocumented function
+     * Create method which initialize the schema object and return its result
+     * within the set class property.
      *
      * @param string $dataSchema
-     * @return void
+     * @return static
      */
     public function create(string $dataSchema = null): static
     {
@@ -58,13 +61,33 @@ class BaseEntity
         }
     }
 
-    public function getSchemaAtts()
+    /**
+     * Return the schema object database column name as an array. Which can be used
+     * to mapp the columns within the dataColumn object. To construct the datatable
+     *
+     * @param integer $indexPosition
+     * @return array
+     */
+    public function getSchemaColumns(int $indexPosition = 2): array
     {
-        // $reflect = new \ReflectionClass($this->dataSchemaObject);
-        // $property = $reflect->getProperty('blueprint')->setAccessible(true);
-        // //$property->setAccessible(true);
-        // return $this->dataSchemaObject->blueprint->getAttributes();
-        //$property->setAccessible(false);
+        $reflectionClass = new \ReflectionClass($this->dataSchemaObject);
+        $propertyName = $reflectionClass->getProperties()[$indexPosition]->getName();
+        if (str_contains($propertyName, 'Model') === false) {
+            throw new BaseInvalidArgumentException('Invalid property name');
+        }
+        if ($reflectionClass->hasProperty($propertyName)) {
+            $reflectionProperty = new \ReflectionProperty($this->dataSchemaObject, $propertyName);
+            $reflectionProperty->setAccessible(true);
+            $props = $reflectionProperty->getValue($this->dataSchemaObject);
+            $this->dbColumns = $props->getRepo()
+                ->getEm()
+                    ->getCrud()
+                        ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
+            
+            return $this->dbColumns;
+            
+            $reflectionProperty->setAccessible(false);
+        }
     }
 
 
