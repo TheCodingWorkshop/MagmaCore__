@@ -45,6 +45,12 @@ class MysqlDatabaseConnection extends AbstractDatabaseDriver
         }
     }
 
+    /**
+     * Opens a new Mysql database connection
+     *
+     * @return PDO_MYSQL
+     * @throws DataLayerException
+     */
     public function open()
     {
         try {

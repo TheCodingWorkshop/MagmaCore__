@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
@@ -17,9 +18,11 @@ use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
+use MagmaCore\DataObjectLayer\DataRelationship\DataRelationshipInterface;
+use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
 
 class BaseModel
-{ 
+{
 
     /** @var string */
     protected string $tableSchema;
@@ -39,13 +42,15 @@ class BaseModel
      *
      * @param string $tableSchema
      * @param string $tableSchemaID
+     * @param string|null $entity
      */
-    public function __construct(string $tableSchema = null, string $tableSchemaID = null, string $entity = null)
-    {
-        if (empty($tableSchema) || empty($tableSchemaID)) {
-            throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
-        }
-        if ($entity !==null) {
+    public function __construct(
+        string $tableSchema = null,
+        string $tableSchemaID = null,
+        string $entity = null
+    ) {
+        $this->throwException($tableSchema, $tableSchemaID);
+        if ($entity !== null) {
             $this->entity  = BaseApplication::diGet($entity);
             if (!$this->entity instanceof BaseEntity) {
                 throw new BaseInvalidArgumentException('');
@@ -53,9 +58,32 @@ class BaseModel
         }
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchemaID;
+        $this->createRepository($this->tableSchema, $this->tableSchemaID);
+    }
+
+    /**
+     * Create the model repositories
+     *
+     * @param string $tableSchema
+     * @param string $tableSchemaID
+     * @return void
+     */
+    public function createRepository(string $tableSchema, string $tableSchemaID): void
+    {
         $factory = new DataRepositoryFactory('baseModel', $tableSchema, $tableSchemaID);
         $this->repository = $factory->create(DataRepository::class);
+    }
 
+    /**
+     * Throw an exception
+     *
+     * @return void
+     */
+    private function throwException(string $tableSchema, string $tableSchemaID): void
+    {
+        if (empty($tableSchema) || empty($tableSchemaID)) {
+            throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
+        }
     }
 
     /**
@@ -93,10 +121,10 @@ class BaseModel
             throw new BaseException('');
         }
         switch ($value) {
-            case 'array_json' :
-                if (isset($this->getEntity()->$key) && $this->getEntity()->$key !=='') {
+            case 'array_json':
+                if (isset($this->getEntity()->$key) && $this->getEntity()->$key !== '') {
                     $this->getEntity()->$key = json_encode($value);
-                }   
+                }
                 break;
         }
     }
@@ -150,14 +178,26 @@ class BaseModel
         }
         // As we are expecting the object name using dot notations we need to convert it
         if (is_string($objectName)) {
-            $objectName = 'app.' . $objectName;    
+            $objectName = 'app.' . $objectName;
             $objectName = ucwords(str_replace('.', '\\', $objectName));
 
             return BaseApplication::diGet($objectName);
         }
-
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $relationshipType
+     * @return object
+     */
+    public function addRelationship(string $relationshipType): object
+    {
+        $relationship = BaseApplication::diGet($relationshipType);
+        if (!$relationship instanceof DataRelationshipInterface) {
+            throw new DataRelationshipInvalidArgumentException('');
+        }
+        return $relationship;
 
-
+    }
 }

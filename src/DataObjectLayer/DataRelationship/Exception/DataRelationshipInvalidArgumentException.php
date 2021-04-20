@@ -7,18 +7,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\Auth\Entity;
+namespace MagmaCore\DataObjectLayer\DataRelationship\Exception;
 
-use MagmaCore\Base\BaseEntity;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
-class RememberedLoginEntity extends BaseEntity
-{
-
-    public function __construct(array $data)
-    {
-        parent::__construct($data);
-    }
-
-}
+class DataRelationshipInvalidArgumentException extends BaseInvalidArgumentException
+{ }

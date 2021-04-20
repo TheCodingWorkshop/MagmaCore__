@@ -7,18 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\Security\Event;
+namespace MagmaCore\Seeder;
 
-use MagmaCore\Auth\Model\UserModel;
+use MagmaCore\Seeder\SeederInterface;
 
-class AuthentciationFailureEvent extends AuthentciationEvent
-{  
+class Seeder implements SeederInterface
+{
 
-    public function __construct(UserModel $userModel)
+    public function handler()
     {
-        parent::__construct($userModel);
+        
     }
 
 }

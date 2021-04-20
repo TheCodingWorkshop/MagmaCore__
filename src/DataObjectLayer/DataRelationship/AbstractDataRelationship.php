@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRelationship;
 
+use MagmaCore\Base\BaseApplication;
+use MagmaCore\DataObjectLayer\DataRelationship\DataRelationshipInterface;
+
 /**
  * Each record in both tables can relate to none or any number of records 
  * in the other table. These relationships require a third table, 
@@ -21,65 +24,61 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 abstract class AbstractDataRelationship implements DataRelationshipInterface
 {
 
-    protected object $relatableModel;
-    protected string $tableSchemaPrimary;
-    protected string $tableSchemaSecondary;
-    protected mixed $fields;
+    protected object $hasOne;
+    protected object $belongsTo;
+    protected object $objectModel;
 
-    public function __construct(object $relatableModel)
+    /**
+     * Undocumented function
+     *
+     * @param string $hasOne
+     * @return void
+     */
+    public function hasOne(string $hasOne): static
     {
-        $this->relatableModel = $relatableModel;
+        if ($hasOne)
+            $this->hasOne = BaseApplication::diGet($hasOne);
+
+        return $this;
     }
 
-    public function table(): static
+    public function getHasOneSchema(): string
     {
-        $tables = $this->relatableModel->getSchema();
-        $extract = explode('_', $tables);
-        if (is_array($extract) && count($extract) > 1) {
-            if (isset($extract[0]) && isset($extract[1])) {
-                $this->tableSchemaPrimary = Stringify::pluralize($extract[0]);
-                $this->tableSchemaSecondary = Stringify::pluralize($extract[1]);
-                $this->tableResolver($this->tableSchemaPrimary, $this->tableSchemaSecondary);
-            }
-        }
+        return $this->hasOne->getSchema();
     }
 
-    public function set(mixed $fields): static
+    public function getHasOneSchemaID(): string
     {
-        $this->fields = $fields;
-        return new static($this->fields);
+        return $this->hasOne->getSchemaID();
     }
 
-    public function read(): static
+    /**
+     * 
+     *
+     * @param string $tablePivot
+     * @return void
+     */
+    public function tablePivot(object $pivotObject, string $schemaObject): static
     {
-
+        if ($pivotObject)
+            $this->tablePivot = $pivotObject;
+        if ($schemaObject)
+            $this->schemaObject = $schemaObject;
+        return $this;
     }
 
-    public function get(): static
+    public function filterSelection(
+        string $parentModel, 
+        array $selectors, 
+        $defaultSelector = ['*']
+    )
     {
+        $filter = array_map(
+            fn($selector) : string => $parentModel . '.' . $selector, 
+            $selectors
+        );
+        return (empty($filter)) ? $defaultSelector : $filter;
 
     }
-
-    public function delete(): static
-    {
-
-    }
-
-    public function push(): bool
-    {
-        if (count($this->fields) > 0) {
-            $this->relatableModel
-                ->getRepo()
-                    ->getEm()
-                        ->getCrud()
-                            ->create($this->fields)
-        }
-    }
-
-    private function tableResolver(string $tableSchemaPrimary, string $tableSchemaSecondary)
-    {
-
-    }
-
 
 }

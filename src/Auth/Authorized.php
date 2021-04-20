@@ -52,7 +52,8 @@ class Authorized
     public static function login(Object $user, $rememberMe)
     {
         /* Set userID Session here */
-        SessionTrait::registerUserSession($user->id ? $user->id : 0); /* 0 is Gueast */
+        session_regenerate_id(true);
+        SessionTrait::registerUserSession($user->id ? $user->id : 0);
         if ($rememberMe) {
             $rememberLogin = new RememberedLogin();
             list($token, $timestampExpiry) = $rememberLogin->rememberedLogin($user->id);

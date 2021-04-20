@@ -15,5 +15,5 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 interface DataRelationshipInterface
 {
 
-
+    
 }
