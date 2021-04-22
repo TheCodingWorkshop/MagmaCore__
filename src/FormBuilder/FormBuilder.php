@@ -13,7 +13,6 @@ namespace MagmaCore\FormBuilder;
 
 use Throwable;
 use MagmaCore\Error\Error;
-use MagmaCore\Base\BaseRedirect;
 use ParagonIE\AntiCSRF\AntiCSRF;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\SessionTrait;
@@ -34,7 +33,7 @@ class FormBuilder extends AbstractFormBuilder
     protected bool $addCsrf = true;
     protected string $element = '';
     protected Object $error;
-    
+    private array|null $dataRepository;
     /**
      * Main class constructor
      * 
@@ -70,6 +69,29 @@ class FormBuilder extends AbstractFormBuilder
         return $this;
     }
 
+    public function addRepository(array|null $repository = null): static
+    {
+        if ($repository != null) {
+           // $repository = (array) $dataRepository;
+            $this->dataRepository = $repository;
+        }
+        return $this;
+
+    }
+
+    public function getRepo()
+    {
+        return $this->dataRepository;
+    }
+
+    public function hasValue($fieldName)
+    {
+        return (
+            empty($this->dataRepository[$fieldName]) 
+            ? '' : $this->dataRepository[$fieldName]
+        );
+    }
+
     /**
      * This method allows us to chain multiple input types together to build the required
      * form structure
@@ -90,6 +112,18 @@ class FormBuilder extends AbstractFormBuilder
                 return $this;
             }
         }
+    }
+
+    public function addOptions(array $options): static
+    {
+        $this->addOptions = $options;
+        return $this;
+    }
+
+    public function addSettings(array $settings): static
+    {
+        $this->addSettings = $settings;
+        return $this;
     }
 
     /**

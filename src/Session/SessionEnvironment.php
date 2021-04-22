@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Session;
@@ -54,21 +55,21 @@ class SessionEnvironment
      * 
      * @return int
      */
-    public function getLifetime() : int
+    public function getLifetime(): int
     {
         $lifetime = (isset($this->getConfig()['lifetime']) ? filter_var($this->getConfig()['lifetime'], FILTER_VALIDATE_INT) : 120);
         if ($lifetime) {
             return $lifetime;
         }
     }
-    
+
     /**
      * Path on the domain where the cookie will work. Use a single slash ('/') 
      * for all paths on the domain.
      * 
      * @return string
      */
-    public function getPath() : string
+    public function getPath(): string
     {
         $path = (isset($this->getConfig()['path']) ? $this->getConfig()['path'] : '');
         if ($path) {
@@ -82,13 +83,12 @@ class SessionEnvironment
      * 
      * @return string
      */
-    public function getDomain() : ?string
+    public function getDomain(): ?string
     {
         $domain = (isset($this->getConfig()['domain']) ? $this->getConfig()['domain'] : $_SERVER['SERVER_NAME']);
         if ($domain) {
             return $domain;
         }
-
     }
 
     /**
@@ -96,11 +96,10 @@ class SessionEnvironment
      * 
      * @return bool
      */
-    public function isSecure() : bool
+    public function isSecure(): bool
     {
         $isSecure = (isset($this->getConfig()['secure']) ? $this->getConfig()['secure'] : isset($_SERVER['HTTPS']));
         return $isSecure;
-
     }
 
     /**
@@ -109,7 +108,7 @@ class SessionEnvironment
      * 
      * @return null|bool
      */
-    public function isHttpOnly() : ?bool
+    public function isHttpOnly(): ?bool
     {
         $isHttpOnly = (isset($this->getConfig()['httpOnly']) ? $this->getConfig()['httpOnly'] : NULL);
         return $isHttpOnly;
@@ -120,13 +119,13 @@ class SessionEnvironment
      * 
      * @return string
      */
-    public function getSessionName() : string
+    public function getSessionName(): string
     {
         $sessionName = (isset($this->getConfig()['session_name']) ? $this->getConfig()['session_name'] : '');
         if ($sessionName) {
             return $sessionName;
         }
-    }   
+    }
 
     /**
      * PHP sessio runtime configuration strings
@@ -151,11 +150,10 @@ class SessionEnvironment
     {
         foreach ($this->getSessionRuntimeConfigurations() as $runtimeConfig) {
             switch ($runtimeConfig) {
-                case $runtimeConfig :
+                case $runtimeConfig:
                     return $this->getConfig()[str_replace('session.', '', $runtimeConfig)];
                     break;
             }
         }
     }
-
 }

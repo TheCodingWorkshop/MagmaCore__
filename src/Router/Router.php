@@ -14,12 +14,14 @@ namespace MagmaCore\Router;
 
 use Closure;
 use ReflectionMethod;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Router\RouterTrait;
 use MagmaCore\Http\RequestHandler;
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Router\RouterInterface;
 use MagmaCore\Router\Exception\RouterNoRoutesFound;
-use MagmaCore\Router\Exception\RouterBadMethodCallException;
+use MagmaCore\Router\Exception\NoActionFoundException;
 use MagmaCore\Router\Exception\RouterBadFunctionCallException;
 
 class Router implements RouterInterface
@@ -33,7 +35,8 @@ class Router implements RouterInterface
     /** @var array - Parameters from the matched route */
     protected array $params = [];
     /** @var string - Controller Slug */
-    protected string $controllerSlug = "Controller";
+    protected string $controllerSuffix = "Controller";
+    private string $actionSuffix = 'Action';
     /** @var string */
     protected string $namespace = 'App\Controller\\';
 
@@ -59,60 +62,100 @@ class Router implements RouterInterface
     }
 
     /**
+     * Create the controller object name using the parameters defined within
+     * the yaml configuration file. Route parametes are accessible using 
+     * the $this->params property and can fetch any key defined. ie
+     * `controller, action, namespace, id etc..`
+     *
+     * @return string
+     */
+    private function createController(): string
+    {
+        $controllerName = $this->params['controller'] . $this->controllerSuffix;
+        $controllerName  = $this->transformUpperCamelCases($controllerName);
+        $controllerName = $this->getNamespace() . $controllerName;
+        return $controllerName;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return string
+     */
+    public function createAction(): string
+    {
+        $action = $this->params['action'];
+        $action = $this->transformLowerCamelCase($action);
+        return $action;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $url
+     * @return array
+     */
+    private function dispatchWithException(string $url): array
+    {
+        $url = $this->removeQueryStringVariables($url);
+        if (!$this->match($url)) {
+            throw new RouterNoRoutesFound("Route {$url} does not match any valid route.", 404);
+        }
+        if (!class_exists($controller = $this->createController())) {
+            throw new RouterBadFunctionCallException("Class {$controller} does not exists.");
+        }
+
+        return [$controller];
+    }
+
+    /**
      * @inheritDoc
      * @throws RouterException
      */
-    public function dispatch(string $url, $args = null, object|null $request = null)
+    public function dispatch(string $url)
     {
-        $url = $this->removeQueryStringVariables($url);
-        if ($this->match($url)) {
-            $controllerName = $this->params['controller'] . $this->controllerSlug;
-            $controllerName  = $this->transformUpperCamelCases($controllerName);
-            $controllerName = $this->getNamespace() . $controllerName;
-
-            if (class_exists($controllerName)) {
-                $controllerObject = new $controllerName($this->params);
-                $action = $this->params['action'];
-                $action = $this->transformLowerCamelCase($action);
-                if (preg_match('/action$/i', $action) == 0) {
-                    $controllerObject->$action();
-                } else {
-                    throw new RouterBadMethodCallException("Method $action in controller $controllerName cannot be called directly - remove the Action suffix to call this method");;
-                }
+        list($controller) = $this->dispatchWithException($url);
+        $controllerObject = new $controller($this->params);
+        $action = $this->createAction();
+        if (preg_match('/action$/i', $action) == 0) {
+            if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
+            $this->resolveControllerActionDependencies($controllerObject, $action);
             } else {
-                throw new RouterBadFunctionCallException("Class {$controllerName} does not exists.");
+                $controllerObject->$action();
             }
         } else {
-            throw new RouterNoRoutesFound("Route {$url} does not match any valid route.", 404);
+            throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");;
         }
     }
 
     /**
-     * Pass method arguments by name
+     * Undocumented function
      *
-     * @param object $object
-     * @param string $method
-     * @param array $args
+     * @param object $controllerObject
+     * @param string $newAction
      * @return mixed
      */
-    public function resolvedMethods($object, $method, array $args = array())
+    private function resolveControllerActionDependencies(object $controllerObject, string $newAction): mixed
     {
-        $reflection = new ReflectionMethod($object, $method);
-        $reflection->setAccessible(true);
-        $pass = [];
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $pass[] = $args[$param->getName()];
-            } else {
-                if ($param->isDefaultValueAvailable()) {
-                    $pass[] = $param->getDefaultValue();
-                } else {
-                    $pass[] = '';
+        $newAction = $newAction . $this->actionSuffix;
+        $reflectionMethod = new ReflectionMethod($controllerObject, $newAction);
+        $reflectionMethod->setAccessible(true);
+        if ($reflectionMethod) {
+            $dependencies = [];
+            foreach ($reflectionMethod->getParameters() as $param) {
+                $newAction = BaseApplication::diGet(Yaml::file('providers')[$param->getName()]);
+                if (isset($newAction)) {
+                    $dependencies[] = $newAction;
+                } else if ($param->isDefaultValueAvailable()) {
+                    $dependencies[] = $param->getDefaultValue();
                 }
             }
+            return $reflectionMethod->invokeArgs(
+                $controllerObject,
+                $dependencies
+            );
         }
-
-        return $reflection->invokeArgs($object, $pass);
+        $reflectionMethod->setAccessible(false);
     }
 
     /**

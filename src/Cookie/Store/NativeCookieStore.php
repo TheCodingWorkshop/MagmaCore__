@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types=1);
 
@@ -24,7 +32,7 @@ class NativeCookieStore extends AbstractCookieStore
      * @param null|array $attributes
      * @return self
      */
-    public function hasCookie() : bool
+    public function hasCookie(): bool
     {
         return isset($_COOKIE[$this->cookieEnvironment->getCookieName()]);
     }
@@ -34,7 +42,7 @@ class NativeCookieStore extends AbstractCookieStore
      * @param mixed $value
      * @return self
      */
-    public function setCookie($value) : void
+    public function setCookie(mixed $value): void
     {
         setcookie($this->cookieEnvironment->getCookieName(), $value, $this->cookieEnvironment->getExpiration(), $this->cookieEnvironment->getPath(), $this->cookieEnvironment->getDomain(), $this->cookieEnvironment->isSecure(), $this->cookieEnvironment->isHttpOnly());
     }
@@ -43,10 +51,8 @@ class NativeCookieStore extends AbstractCookieStore
      * @inheritdoc
      * @return self
      */
-    public function deleteCookie(?string $cookieName = null) : void
+    public function deleteCookie(string|null $cookieName = null): void
     {
-        setcookie(($cookieName !=null) ? $cookieName : $this->cookieEnvironment->getCookieName(), '', (time() - 3600), $this->cookieEnvironment->getPath(), $this->cookieEnvironment->getDomain(), $this->cookieEnvironment->isSecure(), $this->cookieEnvironment->isHttpOnly());
-
+        setcookie(($cookieName != null) ? $cookieName : $this->cookieEnvironment->getCookieName(), '', (time() - 3600), $this->cookieEnvironment->getPath(), $this->cookieEnvironment->getDomain(), $this->cookieEnvironment->isSecure(), $this->cookieEnvironment->isHttpOnly());
     }
-
 }

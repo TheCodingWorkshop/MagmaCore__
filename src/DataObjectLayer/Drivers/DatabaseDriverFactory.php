@@ -20,7 +20,7 @@ class DatabaseDriverFactory
 {
 
     /**
-     * Create and return the database driver object. PAssing the object environment and 
+     * Create and return the database driver object. Passing the object environment and 
      * default database driver to the database driver constructor method.
      *
      * @param object $environment

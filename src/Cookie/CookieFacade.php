@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
 
-use MagmaCore\Cookie\Exception\CookieInvalidArgumentException;
 use MagmaCore\Cookie\CookieFactory;
 use MagmaCore\Cookie\CookieEnvironment;
 use MagmaCore\Cookie\Store\NativeCookieStore;
@@ -21,13 +20,9 @@ use MagmaCore\Cookie\CookieConfig;
 class CookieFacade
 {
 
-    /** @var array */
-    protected const COOKIE_PARAMS = ['name', 'expires', 'path', 'domain', 'secure', 'httponly'];
-    /** @var string */
-    protected const __MAGMA_COOKIE__ = '__magmacore_cookie__';
     /** @var string - the namespace reference to the cookie store type */
     protected string $store;
-    /** @var Object - the cookie environment object */
+    /** @var object - the cookie environment object */
     protected Object $cookieEnvironment;
 
     /**
@@ -41,28 +36,8 @@ class CookieFacade
     public function __construct(?array $cookieEnvironmentArray = null, ?string $store = null)
     {
         $cookieArray = array_merge((new CookieConfig())->baseConfig(), $cookieEnvironmentArray);
-        //$this->throwExceptionIfCookieParamsInvalid($cookieArray);
         $this->cookieEnvironment = new CookieEnvironment($cookieArray);
         $this->store = ($store != null) ? $store : NativeCookieStore::class;
-    }
-
-    /**
-     * Ensure the cookie params matches the param we defined within this core class
-     * else return invalid exception
-     * 
-     * @param array $cookieEnvironment#
-     * @return bool
-     */
-    private function throwExceptionIfCookieParamsInvalid(?array $cookieEnvironment = null): bool
-    {
-        if ($cookieEnvironment != null && is_array($cookieEnvironment)) {
-            foreach ($cookieEnvironment as $cookieEnv) {
-                if (!in_array($cookieEnv, self::COOKIE_PARAMS)) {
-                    throw new CookieInvalidArgumentException('Invalid cookie parameters');
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -70,7 +45,7 @@ class CookieFacade
      * dependencies ie. the cookie store object and the cookie environment 
      * configuration.
      *
-     * @return Object
+     * @return object
      */
     public function initialize(): Object
     {

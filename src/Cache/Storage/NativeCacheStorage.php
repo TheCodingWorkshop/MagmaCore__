@@ -7,17 +7,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
 
 use MagmaCore\Cache\Exception\CacheException;
-use MagmaCore\ Cache\Storage\AbstractCacheStorage;
+use MagmaCore\Cache\Storage\AbstractCacheStorage;
 use MagmaCore\Cache\Storage\CacheStorageTrait;
 use MagmaCore\Utility\Files;
 
 class NativeCacheStorage extends AbstractCacheStorage
-{ 
+{
 
     use CacheStorageTrait;
 
@@ -44,7 +45,7 @@ class NativeCacheStorage extends AbstractCacheStorage
      *                        cache frontend has been set.
      * @api
      */
-    public function setCache(string $entryIdentifier, string $value, int $ttl = null) : void
+    public function setCache(string $entryIdentifier, string $value, int $ttl = null): void
     {
         $this->isCacheValidated($entryIdentifier);
         $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($entryIdentifier);
@@ -72,7 +73,7 @@ class NativeCacheStorage extends AbstractCacheStorage
     /**
      * @inheritDoc
      */
-    public function hasCache(string $entryIdentifier) : bool
+    public function hasCache(string $entryIdentifier): bool
     {
         $this->isCacheValidated($entryIdentifier, false);
         return file_exists($this->cacheEntryPathAndFilename($entryIdentifier));
@@ -113,6 +114,6 @@ class NativeCacheStorage extends AbstractCacheStorage
      * @inheritDoc
      */
     public function collectGarbage(): void
-    { }
-
+    {
+    }
 }

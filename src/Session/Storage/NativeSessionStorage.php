@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Session\Storage;
@@ -20,7 +21,7 @@ class NativeSessionStorage extends AbstractSessionStorage
     /**
      * Main class constructor
      *
-     * @param Object $sessionEnvironment
+     * @param object $sessionEnvironment
      */
     public function __construct(Object $sessionEnvironment)
     {
@@ -31,10 +32,10 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @inheritdoc
      *
      * @param string $key
-     * @param [type] $value
+     * @param mixed$value
      * @return void
      */
-    public function setSession(string $key, $value) : void
+    public function setSession(string $key, mixed $value): void
     {
         $_SESSION[$key] = $value;
     }
@@ -43,10 +44,10 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @inheritdoc
      *
      * @param string $key
-     * @param [type] $value
+     * @param mixed $value
      * @return void
      */
-    public function setArraySession(string $key, $value) : void
+    public function setArraySession(string $key, mixed $value): void
     {
         $_SESSION[$key][] = $value;
     }
@@ -55,10 +56,10 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @inheritdoc
      *
      * @param string $key
-     * @param [type] $default
+     * @param mixed $default
      * @return void
      */
-    public function getSession(string $key, $default = null)
+    public function getSession(string $key, mixed $default = null)
     {
         if ($this->hasSession($key)) {
             return $_SESSION[$key];
@@ -72,7 +73,7 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @param string $key
      * @return void
      */
-    public function deleteSession(string $key) : void
+    public function deleteSession(string $key): void
     {
         if ($this->hasSession($key)) {
             unset($_SESSION[$key]);
@@ -84,7 +85,7 @@ class NativeSessionStorage extends AbstractSessionStorage
      *
      * @return void
      */
-    public function invalidate() : void
+    public function invalidate(): void
     {
         $_SESSION = array();
         if (ini_get('session.use_cookies')) {
@@ -104,18 +105,17 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @inheritdoc
      *
      * @param string $key
-     * @param [type] $default
+     * @param mixed $default
      * @return void
      */
-    public function flush(string $key, $default = null)
+    public function flush(string $key, mixed $default = null)
     {
         if ($this->hasSession($key)) {
             $value = $_SESSION[$key];
             $this->deleteSession($key);
-            return $value;    
+            return $value;
         }
         return $default;
-
     }
 
     /**
@@ -124,7 +124,7 @@ class NativeSessionStorage extends AbstractSessionStorage
      * @param string $key
      * @return boolean
      */
-    public function hasSession(string $key) : bool
+    public function hasSession(string $key): bool
     {
         return isset($_SESSION[$key]);
     }

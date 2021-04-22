@@ -41,14 +41,19 @@ class Yaml
      */
     public function getYaml(string $yamlFile)
     {
-        foreach (glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') as $file) {
-            $this->isFileExists($file);
-            $parts = parse_url($file);
-            $path = $parts['path'];
-            if (strpos($path, $yamlFile) !== false) {
-                return SymfonyYaml::parseFile($file);
+        if (defined('CONFIG_PATH')) {
+            foreach (glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') as $file) {
+                $this->isFileExists($file);
+                $parts = parse_url($file);
+                $path = $parts['path'];
+                if (strpos($path, $yamlFile) !== false) {
+                    return SymfonyYaml::parseFile($file);
+                }
             }
+    
         }
+
+            
     }
 
     /**

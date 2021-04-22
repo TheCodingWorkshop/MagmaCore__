@@ -12,27 +12,52 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\RouterFactory;
 use MagmaCore\Session\SessionFacade;
+use MagmaCore\Base\Traits\BootstrapTrait;
 use MagmaCore\Container\ContainerFactory;
-use MagmaCore\Session\Exception\SessionException;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 
 abstract class AbstractBaseBootLoader
 {
 
+    use BootstrapTrait;
+
+    /** @var BaseApplication $application */
     protected BaseApplication $application;
 
+    /**
+     * Main class constructor
+     *
+     * @param BaseApplication $application
+     */
     public function __construct(BaseApplication $application)
     {
         $this->application = $application;
     }
 
-    protected function phpVersion()
+    /**
+     * Compare PHP version with the core version ensuring the correct version of 
+     * PHP and MagmaCore framework is being used at all time in sync.
+     *
+     * @return void
+     */
+    protected function phpVersion(): void
     {
-        if (version_compare($phpVersion = PHP_VERSION, $coreVersion = $this->application->getConfig()['app']['app_version'], '<')) {
+        if (version_compare($phpVersion = PHP_VERSION, $coreVersion = $this->app()->getConfig()['app']['app_version'], '<')) {
             die(sprintf('You are runninig PHP %s, but the core framework requires at least PHP %s', $phpVersion, $coreVersion));
         }
+    }
+
+    /**
+     * Returns the bootstrap appplications object
+     *
+     * @return BaseAPplication
+     */
+    public function app(): BaseApplication
+    {
+        return $this->application;
     }
 
     /**
@@ -48,49 +73,43 @@ abstract class AbstractBaseBootLoader
     }
 
     /**
-     * Defined common constants which are commonly used throughout the framework
+     * Load the framework default enviornment configuration. Most configurations
+     * can be done from inside the app.yml file
      *
      * @return void
      */
-    protected function loadConstants(): void
+    protected function loadEnvironment(): void
     {
-        defined('DS') or define('DS', DIRECTORY_SEPARATOR);
-        defined('APP_ROOT') or define('APP_ROOT', $this->application->getPath());
-        defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
-        defined('ASSET_PATH') or define('ASSET_PATH', '/' . PUBLIC_PATH . '/assets');
-        defined('CSS_PATH') or define('CSS_PATH', ASSET_PATH . '/css');
-        defined('JS_PATH') or define('JS_PATH', ASSET_PATH . '/js');
-        defined('IMAGE_PATH') or define('IMAGE_PATH', ASSET_PATH . '/images');
-
-        defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
-        defined('TEMPLATES') or define('TEMPLATES',$_SERVER['DOCUMENT_ROOT'] . 'App/Templates/');
-        defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
-        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
-        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
-        defined('ROOT_URI') or define('ROOT_URI', '');
-        defined('RESOURCES') or define('RESOURCES', ROOT_URI);
-        defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
-        
-        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
-
-    }
-
-    protected function loadEnvironment()
-    {
-        $settings = $this->application->getConfig()['settings'];
+        $settings = $this->app()->getConfig()['settings'];
         ini_set('default_charset', $settings['default_charset']);
+        date_default_timezone_set($settings['default_timezone']);
     }
 
-    protected function loadProviders()
+    /**
+     * Returns an array of the application set providers which will be loaded
+     * by the dependency container. Which uses PHP Reflection class to 
+     * create objects. With a key property which is defined within the yaml 
+     * providers file
+     *
+     * @return array
+     */
+    protected function loadProviders(): array
     {
-        $providers = $this->application->getContainerProviders();
+        return $this->app()->getContainerProviders();
     }
 
-    public static function diGet(string $class)
+    /**
+     * Initialise the pass our classes to be loaded by the framework dependency
+     * container using PHP Reflection
+     *
+     * @param string $dependencies
+     * @return mixed
+     */
+    public static function diGet(string $dependencies): mixed
     {
         $container = (new ContainerFactory())->create();
         if ($container) {
-            return $container->get($class);
+            return $container->get($dependencies);
         }
     }
 
@@ -110,18 +129,21 @@ abstract class AbstractBaseBootLoader
      *
      * @return string
      */
-    protected function getDefaultSessionDriver()
+    protected function getDefaultSessionDriver(): string
     {
-        $session = $this->application->getSessions();
-        if (count($session) > 0) {
-            if (array_key_exists('drivers', $session)) {
-                $sess  = $session['drivers']['default_storage'];
-                if ($sess['default'] === true) {
-                    return $sess['class'];
-                }
-            }
-        }
+        return $this->getDefaultSettings($this->app()->getSessions());
     }
+
+    /**
+     * Get the default session driver defined with the session.yml file
+     *
+     * @return string
+     */
+    protected function getDefaultCacheDriver(): string
+    {
+        return $this->getDefaultSettings($this->app()->getCache());
+    }
+
 
     /**
      * Builds the application session component and returns the configured object. Based
@@ -131,41 +153,57 @@ abstract class AbstractBaseBootLoader
      */
     protected function loadSession(): Object
     {
-        $sessionIdentifier = $this->application->getSessions()['session_name'];
         $session = (new SessionFacade(
-            $this->application->getSessions(),
-            $sessionIdentifier,
-            $this->application->getSessionDriver()
+            $this->app()->getSessions(),
+            $this->app()->getSessions()['session_name'],
+            $this->app()->getSessionDriver()
         ))->setSession();
-        if (!$session) {
-            throw new SessionException('Please enable session within the session.yml configuration in order to use this Sessions.');
-        } else {
-            GlobalManager::set('session_global', $session);
-            return $session;
-        }
+
+        GLobalManager::set('session_global', $session);
+        return $session;
     }
 
-    /**
-     * 
-     */
     protected function loadRoutes()
     {
-        $factory = new RouterFactory($this->application->getRouteHandler());
-        $factory->create($this->application->getRouter());
-        if (count($this->application->getRoutes()) > 0) {
-            return $factory->buildRoutes($this->application->getRoutes());
+        $factory = new RouterFactory($this->app()->getRouteHandler());
+        $factory->create($this->app()->getRouter());
+        if (count($this->app()->getRoutes()) > 0) {
+            return $factory->buildRoutes($this->app()->getRoutes());
         }
     }
 
+    protected function loadErrorHandlers(): void
+    {
+        error_reporting($this->app()->getErrorHandlerLevel());
+        set_error_handler($this->app()->getErrorHandling()['error']);
+        set_exception_handler($this->app()->getErrorHandling()['exception']);
+    }
+
     /**
-     * Undocumented function
+     * Defined common constants which are commonly used throughout the framework
      *
      * @return void
      */
-    protected function loadErrorHandlers()
+    public function load(): void
     {
-        error_reporting($this->application->getErrorHandlerLevel());
-        set_error_handler($this->application->getErrorHandling()['error']);
-        set_exception_handler($this->application->getErrorHandling()['exception']);
+        defined('DS') or define('DS', DIRECTORY_SEPARATOR);
+        defined('APP_ROOT') or define('APP_ROOT', $this->app()->getPath());
+        defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
+        defined('ASSET_PATH') or define('ASSET_PATH', '/' . PUBLIC_PATH . '/assets');
+        defined('CSS_PATH') or define('CSS_PATH', ASSET_PATH . '/css');
+        defined('JS_PATH') or define('JS_PATH', ASSET_PATH . '/js');
+        defined('IMAGE_PATH') or define('IMAGE_PATH', ASSET_PATH . '/images');
+
+        defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
+        defined('TEMPLATES') or define('TEMPLATES', $_SERVER['DOCUMENT_ROOT'] . 'App/Templates/');
+        defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
+        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
+        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
+        defined('ROOT_URI') or define('ROOT_URI', '');
+        defined('RESOURCES') or define('RESOURCES', ROOT_URI);
+        defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
+
+        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
     }
+
 }

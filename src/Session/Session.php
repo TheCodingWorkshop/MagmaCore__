@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Session;
@@ -41,7 +42,7 @@ class Session implements SessionInterface
         if ($this->isSessionKeyValid($sessionIdentifier) === false) {
             throw new SessionInvalidArgumentException($sessionIdentifier . ' is not a valid session name');
         }
-        
+
         $this->sessionIdentifier = $sessionIdentifier;
         $this->storage = $storage;
     }
@@ -59,15 +60,14 @@ class Session implements SessionInterface
      * @return void
      * @throws SessionException
      */
-    public function set(string $key, $value) : void
+    public function set(string $key, $value): void
     {
         $this->ensureSessionKeyIsValid($key);
-        try{
+        try {
             $this->storage->SetSession($key, $value);
-        } catch(Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $throwable);
         }
-
     }
 
     /**
@@ -78,15 +78,14 @@ class Session implements SessionInterface
      * @return void
      * @throws SessionException
      */
-    public function setArray(string $key, $value) : void
+    public function setArray(string $key, $value): void
     {
         $this->ensureSessionKeyIsValid($key);
-        try{
+        try {
             $this->storage->setArraySession($key, $value);
-        }catch(Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $throwable);
         }
-
     }
 
     /**
@@ -97,11 +96,11 @@ class Session implements SessionInterface
      * @return void
      * @throws SessionException
      */
-    public function get(string $key, $default = null) 
+    public function get(string $key, $default = null)
     {
-        try{
+        try {
             return $this->storage->getSession($key, $default);
-        } catch(Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw $throwable;
         }
     }
@@ -113,12 +112,12 @@ class Session implements SessionInterface
      * @return boolean
      * @throws SessionException
      */
-    public function delete(string $key) : bool
+    public function delete(string $key): bool
     {
         $this->ensureSessionKeyIsValid($key);
-        try{
+        try {
             $this->storage->deleteSession($key);
-        }catch(Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw $throwable;
         }
         return true;
@@ -129,7 +128,7 @@ class Session implements SessionInterface
      *
      * @return void
      */
-    public function invalidate() : void
+    public function invalidate(): void
     {
         $this->storage->invalidate();
     }
@@ -145,9 +144,9 @@ class Session implements SessionInterface
     public function flush(string $key, $value = null)
     {
         $this->ensureSessionKeyIsValid($key);
-        try{
+        try {
             return $this->storage->flush($key, $value);
-        }catch(Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw $throwable;
         }
     }
@@ -159,7 +158,7 @@ class Session implements SessionInterface
      * @return boolean
      * @throws SessiopnInvalidArgumentException
      */
-    public function has(string $key) : bool
+    public function has(string $key): bool
     {
         $this->ensureSessionKeyIsValid($key);
         return $this->storage->hasSession($key);
@@ -171,7 +170,7 @@ class Session implements SessionInterface
      * @param string $key
      * @return boolean
      */
-    protected function isSessionKeyValid(string $key) : bool
+    protected function isSessionKeyValid(string $key): bool
     {
         return (preg_match(self::SESSION_PATTERN, $key) === 1);
     }
@@ -182,11 +181,10 @@ class Session implements SessionInterface
      * @param string $key
      * @return void
      */
-    protected function ensureSessionKeyIsvalid(string $key) : void
+    protected function ensureSessionKeyIsvalid(string $key): void
     {
         if ($this->isSessionKeyValid($key) === false) {
             throw new SessionInvalidArgumentException($key . ' is not a valid session key');
         }
     }
-
 }

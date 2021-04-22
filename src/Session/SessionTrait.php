@@ -25,7 +25,7 @@ trait SessionTrait
      *
      * @return bool - true if session is valid or false otherwise
      */
-    public function preventSessionHijack() : bool
+    public function preventSessionHijack(): bool
     {
         if (!isset($_SESSION['IPaddress']) || !isset($_SESSION['userAgent'])) {
             return false;
@@ -47,7 +47,7 @@ trait SessionTrait
      * @since 1.0.0
      * @return bool
      */
-    protected function validateSession() : bool
+    protected function validateSession(): bool
     {
         if (isset($_SESSION['OBSOLETE']) && !isset($_SESSION['EXPIRES'])) {
             return false;
@@ -67,7 +67,7 @@ trait SessionTrait
      */
     public function sessionRegeneration(int $sessionExpiration = 10, bool $deleteOldSession = false)
     {
-        if(isset($_SESSION['OBSOLETE']) && $_SESSION['OBSOLETE'] == true) {
+        if (isset($_SESSION['OBSOLETE']) && $_SESSION['OBSOLETE'] == true) {
             return;
         }
         // Set current session to expire in 10 seconds
@@ -84,7 +84,6 @@ trait SessionTrait
         // Now we unset the obsolete and expiration values for the session we want to keep
         unset($_SESSION['OBSOLETE']);
         unset($_SESSION['EXPIRES']);
-
     }
 
     /**
@@ -117,6 +116,4 @@ trait SessionTrait
     {
         $_SESSION['user_id'] = $userID;
     }
-
-
 }

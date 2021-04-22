@@ -16,23 +16,24 @@ use App\Model\UserModel;
 use MagmaCore\Error\Error;
 use MagmaCore\Utility\Sanitizer;
 use MagmaCore\Utility\Validator;
-use MagmaCore\DataObjectLayer\DataLayerTrait;
 
 class Authenticator
 {
 
-    use DataLayerTrait;
+    /** @var array $errors */
     protected array $errors = [];
+    /** @var bool $action */
     protected bool $action = false;
 
     /**
-     * Authenticate the user by their email and password and only if their account status is active
+     * Authenticate the user by their email and password and only if their account 
+     * status is active
      * 
      * @param string $email
      * @param string $password
-     * @return mixed
+     * @return object
      */
-    public function authenticate(string $email, string $passqwordHash)
+    public function authenticate(string $email, string $passqwordHash): object
     {
         $this->repository = (new UserModel());
         $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
@@ -57,7 +58,7 @@ class Authenticator
      * @param string|null $password
      * @return object
      */
-    public function getValidatedUser(object $object, string|null $email = null, string|null $password = null)
+    public function getValidatedUser(object $object, string|null $email = null, string|null $password = null): object
     {
         $this->object = $object;
         $req = $object->request->handler();
@@ -87,6 +88,13 @@ class Authenticator
         }
     }
 
+    /**
+     * Call the authorized class and initialize the login method passing
+     * the relevant arguments. This helper method is called from the 
+     * loginAction from the core Base domain class
+     *
+     * @return void
+     */
     public function getLogin(): void
     {
         Authorized::login($this->validatedUser, $this->isRememberingLogin());

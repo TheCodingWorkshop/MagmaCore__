@@ -7,11 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache\Exception;
 
-use InvalidArgumentException;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
-class CacheInvalidArgumentException extends InvalidArgumentException
-{ }
+class CacheInvalidArgumentException extends BaseInvalidArgumentException
+{
+}

@@ -7,12 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
 class CacheEnvironmentConfigurations
-{ 
+{
 
     /** @var string */
     protected string $cacheIdentifier;
@@ -30,10 +31,10 @@ class CacheEnvironmentConfigurations
      * @return void
      */
     public function __construct(
-        ?string $cacheIdentifier = null, 
-        string $fileCacheBasePath, 
-        int $maximumPathLength = PHP_MAXPATHLEN)
-    {
+        ?string $cacheIdentifier = null,
+        string $fileCacheBasePath,
+        int $maximumPathLength = PHP_MAXPATHLEN
+    ) {
         $this->cacheIdentifier = $cacheIdentifier;
         $this->fileCacheBasePath = $fileCacheBasePath;
         $this->maximumPathLength = $maximumPathLength;
@@ -45,7 +46,7 @@ class CacheEnvironmentConfigurations
      *
      * @return integer
      */
-    public function getMaximumPathLength() : int
+    public function getMaximumPathLength(): int
     {
         return $this->maximumPathLength;
     }
@@ -55,7 +56,7 @@ class CacheEnvironmentConfigurations
      *
      * @return string
      */
-    public function getFileCacheBasePath() : string
+    public function getFileCacheBasePath(): string
     {
         return $this->fileCacheBasePath;
     }
@@ -65,9 +66,8 @@ class CacheEnvironmentConfigurations
      *
      * @return string
      */
-    public function getCacheIdentifier() : string
+    public function getCacheIdentifier(): string
     {
         return $this->cacheIdentifier;
     }
-
 }

@@ -7,10 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Cache\CacheConfig;
+use MagmaCore\Base\BaseConstants;
+use MagmaCore\Session\SessionConfig;
 use MagmaCore\Base\AbstractBaseBootLoader;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
@@ -29,7 +33,7 @@ class BaseApplication extends AbstractBaseBootLoader
 
     /** @return void */
     public function __construct()
-    { 
+    {
         /* Pass the current object to the parent class */
         parent::__construct($this);
     }
@@ -73,28 +77,33 @@ class BaseApplication extends AbstractBaseBootLoader
      *
      * @return array
      */
-    public function getConfig() : array
+    public function getConfig(): array
     {
         return $this->appConfig;
     }
 
     /**
-     * Set the application session configuration from the session.yml file.
+     * Set the application session configuration from the session.yml file else
+     * load the core session configration class
      *
      * @param array $ymlSession
      * @return self
+     * @throws BaseInvalidArgumentException
      */
-    public function setSession(array $ymlSession, string|null $newSessionDriver = null): self
+    public function setSession(array $ymlSession = [], string|null $newSessionDriver = null): self
     {
-        $this->session = $ymlSession;
-        $this->newSessionDriver = ($newSessionDriver !==null) ? $newSessionDriver : $this->getDefaultSessionDriver();
+        $this->session = (!empty($ymlSession) ? $ymlSession : (new SessionConfig())->baseConfiguration());
+        $this->newSessionDriver = ($newSessionDriver !== null) ? $newSessionDriver : $this->getDefaultSessionDriver();
         return $this;
     }
 
     /**
-     * Returns the application session configuration array
+     * If session yml is set from using the setSession from the application 
+     * bootstrap. Use the user defined session.yml else revert to the core
+     * session configuration.
      *
      * @return array
+     * @throws BaseInvalidArgumentException
      */
     public function getSessions(): array
     {
@@ -102,15 +111,21 @@ class BaseApplication extends AbstractBaseBootLoader
             throw new BaseInvalidArgumentException('You have no session configuration. This is required.');
         }
         return $this->session;
-    }   
+    }
 
     /**
-     * Returns the default session driver
+     * Returns the default session driver from either the core or user defined 
+     * session configuration. Throws an exception if neither configuration
+     * was found
      *
      * @return string
+     * @throws BaseInvalidArgumentException
      */
     public function getSessionDriver(): string
     {
+        if (empty($this->session)) {
+            throw new BaseInvalidArgumentException('You have no session configuration. This is required.');
+        }
         return $this->newSessionDriver;
     }
 
@@ -142,9 +157,11 @@ class BaseApplication extends AbstractBaseBootLoader
      * @param array $ymlSCache
      * @return self
      */
-    public function setCache(array $ymlCache): self
+    public function setCache(array $ymlCache = [], string|null $newCacheDriver = null): self
     {
-        $this->cache = $ymlCache;
+        $this->cache = (!empty($ymlCache) ? $ymlCache : (new CacheConfig())->baseConfiguration());
+        $this->newCacheDriver = ($newCacheDriver !== null) ? $newCacheDriver : $this->getDefaultCacheDriver();
+
         return $this;
     }
 
@@ -157,6 +174,23 @@ class BaseApplication extends AbstractBaseBootLoader
     {
         return $this->cache;
     }
+
+    /**
+     * Returns the default cache driver from either the core or user defined 
+     * cache configuration. Throws an exception if neither configuration
+     * was found
+     *
+     * @return string
+     * @throws BaseInvalidArgumentException
+     */
+    public function getCacheDriver(): string
+    {
+        if (empty($this->cache)) {
+            throw new BaseInvalidArgumentException('You have no cache configuration. This is required.');
+        }
+        return $this->newCacheDriver;
+    }
+
 
     /**
      * Set the application container providers configuration from the session.yml file.
@@ -191,8 +225,8 @@ class BaseApplication extends AbstractBaseBootLoader
     public function setRoutes(array $ymlRoutes, string|null $routeHandler = null, string|null $newRouter = null): self
     {
         $this->routes = $ymlRoutes;
-        $this->routeHandler = ($routeHandler !==null) ? $routeHandler : $this->defaultRouteHandler();
-        $this->newRouter = ($newRouter !==null) ? $newRouter : '';
+        $this->routeHandler = ($routeHandler !== null) ? $routeHandler : $this->defaultRouteHandler();
+        $this->newRouter = ($newRouter !== null) ? $newRouter : '';
         return $this;
     }
 
@@ -203,7 +237,7 @@ class BaseApplication extends AbstractBaseBootLoader
      */
     public function getRoutes(): array
     {
-        if (count($this->routes)< 0) {
+        if (count($this->routes) < 0) {
             throw new BaseInvalidArgumentException('No routes detected within your routes.yml file');
         }
         return $this->routes;
@@ -266,12 +300,11 @@ class BaseApplication extends AbstractBaseBootLoader
 
     public function run(): void
     {
-        $this->loadConstants();
+        BaseConstants::load($this->app());
         $this->phpVersion();
         //$this->loadErrorHandlers();
         $this->loadSession();
         $this->loadEnvironment();
         $this->loadRoutes();
     }
-
 }

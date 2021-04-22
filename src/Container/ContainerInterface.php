@@ -7,12 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Container;
 
+use MagmaCore\Container\NotFoundExceptionInterface;
 use MagmaCore\Container\ContainerExceptionInterface;
-
 
 /** PSR-11 Container */
 interface ContainerInterface
@@ -40,5 +41,5 @@ interface ContainerInterface
      *
      * @return bool
      */
-    public function has(string $id) : bool;
+    public function has(string $id): bool;
 }

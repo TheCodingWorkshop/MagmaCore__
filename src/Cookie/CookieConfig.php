@@ -7,16 +7,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
 
 class CookieConfig
-{   
+{
 
     /** @return void */
     public function __construct()
-    { }
+    {
+    }
 
     /**
      * Main cookie configuration default array settings
@@ -33,8 +35,7 @@ class CookieConfig
             'domain' => 'localhost',
             'secure' => false,
             'httponly' => true
-        
+
         ];
     }
-
 }

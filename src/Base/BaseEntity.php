@@ -39,8 +39,7 @@ class BaseEntity
      * @throws BaseException
      */
     public function __construct()
-    {
-    }
+    {}
 
     /**
      * Create method which initialize the schema object and return its result
@@ -59,6 +58,19 @@ class BaseEntity
             $this->dataSchemaObject = $newSchema;
             return $this;
         }
+    }
+
+    /**
+     * Return an array of database column name matching the object schema
+     * and model
+     * 
+     * @param string $schema
+     * @return array
+     * @throws BaseInvalidArgumentException
+     */
+    public function getColumns(string $schema): array
+    {
+        return $this->create($schema)->getSchemaColumns();
     }
 
     /**

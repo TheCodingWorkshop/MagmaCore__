@@ -22,35 +22,6 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 trait ControllerTrait
 {
-
-
-    /**
-     * Get the reflection action method
-     *
-     * @param [type] $method
-     * @param array $argument
-     * @return void
-     */
-    private function ResolvedControllerMethods($method, array $argument)
-    {
-        $reflectionMethod = new ReflectionMethod($this, $method);
-        $args = [];
-        foreach ($reflectionMethod->getParameters() as $param) {
-            $name = $param->getName();
-            $class = $param->getClass();
-            if ($class === null) {
-                $args[] = $this->routeParams[$name];
-            } else {
-                if ($class->isInstance('')) {
-                    $args[] = '';
-                } else {
-                    throw new \BadMethodCallException("Method {$method} does not exists.");
-                }
-                return call_user_func_array([$this, $method], $argument);
-            }
-        }
-    }
-
     /**
      * Method for allowing child controller class to dependency inject other objects
      * 
@@ -69,11 +40,9 @@ trait ControllerTrait
             $output = '';
             foreach ($args as $arg) {
                 foreach ($arg as $property => $class) {
-                    //if (strpos($class, $arg[$property]) !== false) {
                     if ($class) {
                         $output = ($property === 'dataColumns' || $property === 'column') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
                     }
-                    //}
                 }
             }
             return $output;

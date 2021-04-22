@@ -134,6 +134,17 @@ class ManyToMany extends AbstractDataRelationship
         return new Collection($results);
     }
 
+    /**
+     * Return the raw relationship query.
+     *
+     * @return string
+     */
+    public function getQuery(): string
+    {
+        return $this->query;
+    }
+
+
 
 }
         // $query = "SELECT users.id, users.email, users.firstname, users.lastname, roles.id AS role_id, roles.role_name AS role_name FROM users

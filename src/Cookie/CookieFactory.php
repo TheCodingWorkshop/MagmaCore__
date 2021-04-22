@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
@@ -21,7 +22,8 @@ class CookieFactory
 
     /** @return void */
     public function __construct()
-    { }
+    {
+    }
 
     /**
      * Cookie factory which create the cookie object and instantiate the choosen
@@ -33,7 +35,7 @@ class CookieFactory
      * @return CookieInterface
      * @throws CookieUnexpectedValueException
      */
-    public function create(?string $cookieStore = null, CookieEnvironment $cookieEnvironment) : CookieInterface
+    public function create(?string $cookieStore = null, CookieEnvironment $cookieEnvironment): CookieInterface
     {
         $cookieStoreObject = new $cookieStore($cookieEnvironment);
         if (!$cookieStoreObject instanceof CookieStoreInterface) {
@@ -42,5 +44,4 @@ class CookieFactory
 
         return new Cookie($cookieStoreObject);
     }
-
 }

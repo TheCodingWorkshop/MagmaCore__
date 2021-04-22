@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace MagmaCore\Auth\Roles;
 
 use MagmaCore\Auth\Roles\RolesInterface;
-use MagmaCore\Auth\Model\RolePermissionModel;
-use MagmaCore\Auth\Model\UserRoleModel;
+use App\Model\RolePermissionModel;
+use App\Model\UserRoleModel;
 
 class Roles implements RolesInterface
 {

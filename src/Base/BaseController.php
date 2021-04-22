@@ -11,26 +11,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Error\Error;
-use MagmaCore\Ash\Template;
-use MagmaCore\Ash\TemplateExtension;
-use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\BaseRedirect;
-use MagmaCore\Datatable\Datatable;
-use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\Flash\Flash;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
-use MagmaCore\Collection\Collection;
 use MagmaCore\Middleware\Middleware;
-use MagmaCore\FormBuilder\FormBuilder;
 use MagmaCore\Session\Flash\FlashType;
-use MagmaCore\EventDispatcher\EventDispatcher;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
-use MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage;
 
 class BaseController extends AbstractBaseController
 {
@@ -58,21 +48,7 @@ class BaseController extends AbstractBaseController
         $this->routeParams = $routeParams;
         $this->twig = new BaseView();
 
-        $this->diContainer(
-            [
-                'request' => RequestHandler::class,
-                'response' => ResponseHandler::class,
-                'formBuilder' => FormBuilder::class,
-                'eventDispatcher' => EventDispatcher::class,
-                'error' => Error::class,
-                'session' => '',
-                'cache' => '',
-                'cookie' => '',
-                'tableGrid' => Datatable::class,
-                'flatDb' => FileStorage::class,
-                'collection' => Collection::class,
-            ]
-        );
+        $this->diContainer(Yaml::file('providers'));
 
         $this->registerSubscribedServices();
     }

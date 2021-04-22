@@ -143,7 +143,10 @@ abstract class AbstractMigration implements MigrationInterface
                     foreach ($hashClassNames as $hashClass) {
                         $hashClassName = $hashClass;
                     }
-            
+                    /**
+                     * @todo - create migration based on folder structure with anything
+                     * in pivot directory to be loaded after main directory migration
+                     */
                     $this->migrateLog(
                         Migrate::CREATE_MIGRATION . " {$className} [#" . count($this->counter) . "]" . Migrate::END_MIGRATION
                     );

@@ -22,7 +22,7 @@ trait MigrationTrait
         $commonPattern = ['{{ className }}', '{{ classGeneratedFrom }}'];
         $commonReplacement = [$hashClassName, $newClassName];
 
-        $content = file_get_contents($this->rootPath . 'Build/ExampleMigration.txt');
+        $content = file_get_contents($this->rootPath . 'Stubs/ExampleMigration.stub');
         $pattern = array_merge($commonPattern, ['{{ up }}', '{{ down }}']);
         $replacement = array_merge($commonReplacement, [$schemaContent, $this->downMethod($table)]);
         $content = str_replace($pattern, $replacement, $content);
@@ -41,7 +41,7 @@ trait MigrationTrait
         $parts = explode('_', $newClassName);
         if (isset($parts[1]) && $parts[1] !=='') {
             $parentClass = $parts[1];
-            $content = $content = file_get_contents($this->rootPath . 'Build/ExampleMigrationChange.txt');
+            $content = $content = file_get_contents($this->rootPath . 'Stubs/ExampleMigrationChange.stub');
             $commonPattern = ['{{ className }}', '{{ classGeneratedFrom }}'];
             $commonReplacement = [$hashClassName, $newClassName];
             $pattern = array_merge($commonPattern, ['{{ extendClass }}', '{{ change }}']);

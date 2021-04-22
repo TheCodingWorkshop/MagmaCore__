@@ -7,16 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
 use MagmaCore\Cache\Exception\CacheInvalidArgumentException;
-use MagmaCore\Cache\Exception\CacheException;
 use MagmaCore\Cache\CacheInterface;
 
-Abstract class AbstractCache implements CacheInterface
-{ 
+abstract class AbstractCache implements CacheInterface
+{
 
     /** @var string regular exppression - ensure cache name is of correct values */
     const PATTERN_ENTRYIDENTIFIER = '/^[a-zA-Z0-9_\.]{1,64}$/';
@@ -39,12 +39,11 @@ Abstract class AbstractCache implements CacheInterface
     public function __construct(?string $cacheIdentifier = null, ?Object $storage = null, array $options = [])
     {
         $this->$cacheIdentifier = $cacheIdentifier;
-        if (!empty($storage) && $storage !=null) {
+        if (!empty($storage) && $storage != null) {
             $this->storage = $storage;
         }
         if ($options)
             $this->options = $options;
-
     }
 
     /**
@@ -74,6 +73,4 @@ Abstract class AbstractCache implements CacheInterface
             throw new CacheInvalidArgumentException('"' . $key . '" is not a valid cache key.', 0);
         }
     }
-
-
 }

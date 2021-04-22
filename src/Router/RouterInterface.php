@@ -30,10 +30,9 @@ interface RouterInterface
      * action method
      *
      * @param string $url The route URL
-     * @param mixed $args
      * @return void
      */
-    public function dispatch(string $url, $args = null, object|null $request = null);
+    public function dispatch(string $url);
 
     /**
      * Get the currently matched parameters

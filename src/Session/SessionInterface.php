@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Session;
@@ -22,7 +23,7 @@ interface SessionInterface
      * @return void
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function set(string $key, $value) : void;
+    public function set(string $key, $value): void;
 
     /**
      * Sets the specific value to a specific array key of the session
@@ -32,7 +33,7 @@ interface SessionInterface
      * @return void
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function setArray(string $key, $value) : void;
+    public function setArray(string $key, $value): void;
 
     /**
      * gets/returns the value of a specific key of the session
@@ -51,14 +52,14 @@ interface SessionInterface
      * @return bool
      * @throws SessionInvalidArgumentException
      */
-    public function delete(string $key) : bool;
+    public function delete(string $key): bool;
 
     /**
      * Destroy the session. Along with session cookies
      *
      * @return void
      */
-    public function invalidate() : void;
+    public function invalidate(): void;
 
     /**
      * Returns the requested value and remove it from the session
@@ -76,7 +77,5 @@ interface SessionInterface
      * @return bool
      * @throws SessionInvalidArgumentException  MUST be thrown if the $key string is not a legal value.
      */
-    public function has(string $key) : bool;
-
-
+    public function has(string $key): bool;
 }

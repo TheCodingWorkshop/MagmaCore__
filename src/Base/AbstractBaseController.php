@@ -7,16 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
 use MagmaCore\Base\Traits\ControllerTrait;
-use MagmaCore\Cache\CacheInterface;
-use MagmaCore\Router\RouterInterface;
-use MagmaCore\Session\SessionInterface;
 use MagmaCore\Container\ContainerInterface;
-use MagmaCore\Session\Flash\FlashInterface;
 use MagmaCore\EventDispatcher\ListenerProviderInterface;
 use MagmaCore\Service\Contracts\ServiceSubscriberInterface;
 
@@ -48,10 +45,9 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
         return $previous;
     }
 
-    public static function getSubscribedServices() : array
+    public static function getSubscribedServices(): array
     {
-        return [
-        ];
+        return [];
     }
 
     /**
@@ -63,29 +59,24 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function getListenersForEvent(object $event): iterable
     {
-        return [
-
-        ];
-    }   
-
+        return [];
+    }
 
     /**
      * Return the current controller name as a string
      * @return string
      */
-    public function thisRouteController() : string
+    public function thisRouteController(): string
     {
-         //return strtolower($this->routeParams['controller']);
-         return isset($this->routeParams['controller']) ? strtolower($this->routeParams['controller']) : '';
+        return isset($this->routeParams['controller']) ? strtolower($this->routeParams['controller']) : '';
     }
 
     /**
      * Return the current controller action as a string
      * @return string
      */
-    public function thisRouteAction() : string
+    public function thisRouteAction(): string
     {
-        //return strtolower($this->routeParams['action']);
         return isset($this->routeParams['action']) ? strtolower($this->routeParams['action']) : '';
     }
 
@@ -93,7 +84,7 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      * Return the current controller namespade as a string
      * @return string
      */
-    public function thisRouteNamespace() : string
+    public function thisRouteNamespace(): string
     {
         return isset($this->routeParams['namespace']) ? strtolower($this->routeParams['namespace']) : '';
     }
@@ -102,19 +93,18 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      * Return the current controller token as a string
      * @return string
      */
-    public function thisRouteToken() : string|null
+    public function thisRouteToken(): string|null
     {
         $token = isset($this->routeParams['token']) ? $this->routeParams['token'] : null;
         $token = (string)$token;
         return $token;
-
     }
 
     /**
      * Return the current controller route ID if set as a int
      * @return int|false
      */
-    public function thisRouteID() : int|false
+    public function thisRouteID(): int|false
     {
 
         $ID = isset($this->routeParams['id']) ? $this->routeParams['id'] : false;
@@ -126,6 +116,4 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
     {
         return (array)$data;
     }
-
-
 }

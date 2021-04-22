@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
@@ -45,7 +46,7 @@ class CookieEnvironment
      * 
      * @return array
      */
-    public function getConfig() : array
+    public function getConfig(): array
     {
         return $this->cookieConfig;
     }
@@ -60,14 +61,14 @@ class CookieEnvironment
      * 
      * @return int
      */
-    public function getExpiration() : int
+    public function getExpiration(): int
     {
         $expires = (isset($this->getConfig()['expires']) ? filter_var($this->getConfig()['expires'], FILTER_VALIDATE_INT) : 0);
         if ($expires) {
             return $expires;
         }
     }
-    
+
     /**
      * The path on the server in which the cookie will be available on. If set to '/', 
      * the cookie will be available within the entire domain. If set to '/foo/', 
@@ -77,7 +78,7 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getPath() : string
+    public function getPath(): string
     {
         $path = (isset($this->getConfig()['path']) ? filter_var($this->getConfig()['path'], FILTER_SANITIZE_STRING) : '/');
         if ($path) {
@@ -94,13 +95,12 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getDomain() : string
+    public function getDomain(): string
     {
         $domain = (isset($this->getConfig()['domain']) ? $this->getConfig()['domain'] : isset($_SERVER['SERVER_NAME']));
         if ($domain) {
             return $domain;
         }
-
     }
 
     /**
@@ -111,13 +111,12 @@ class CookieEnvironment
      * 
      * @return bool
      */
-    public function isSecure() : bool
+    public function isSecure(): bool
     {
         $isSecure = (isset($this->getConfig()['secure']) ? $this->getConfig()['secure'] : isset($_SERVER['HTTPS']));
         if (is_bool($isSecure)) {
             return $isSecure;
         }
-
     }
 
     /**
@@ -129,13 +128,12 @@ class CookieEnvironment
      * 
      * @return null|bool
      */
-    public function isHttpOnly() : bool
+    public function isHttpOnly(): bool
     {
         $isHttpOnly = (isset($this->getConfig()['httpOnly']) ? $this->getConfig()['httpOnly'] : true);
         if (is_bool($isHttpOnly)) {
             return $isHttpOnly;
         }
-
     }
 
     /**
@@ -143,12 +141,11 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getCookieName() : string
+    public function getCookieName(): string
     {
         $cookieName = (isset($this->getConfig()['name']) ? $this->getConfig()['name'] : '');
         if ($cookieName) {
             return $cookieName;
         }
-    }   
-
+    }
 }

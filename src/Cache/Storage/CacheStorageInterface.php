@@ -7,12 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
 
 interface CacheStorageInterface
-{ 
+{
 
     /**
      * Saves data in the cache.
@@ -34,7 +35,7 @@ interface CacheStorageInterface
      *               cache entry could not be loaded
      * @api
      */
-    public function getCache(string $key);
+    public function getCache(string $key): mixed;
 
     /**
      * Checks if a cache entry with the specified identifier exists.
@@ -71,5 +72,4 @@ interface CacheStorageInterface
      * @api
      */
     public function collectGarbage(): void;
-
 }

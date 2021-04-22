@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache;
@@ -14,11 +15,12 @@ namespace MagmaCore\Cache;
 use MagmaCore\Cache\CacheFactory;
 
 class CacheFacade
-{ 
+{
 
     /** @return void */
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Undocumented function
@@ -29,12 +31,10 @@ class CacheFacade
      * @return void
      */
     public function create(
-        ?string $cacheIdentifier = null, 
-        ?string $storage = null, 
+        ?string $cacheIdentifier = null,
+        ?string $storage = null,
         array $options = []
-    )
-    {
+    ) {
         return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
     }
-
 }

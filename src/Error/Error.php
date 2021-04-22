@@ -65,7 +65,7 @@ class Error implements ErrorInterface
                 if (is_string($code)) {
                     $this->errorCode = $code;
                     $this->object->flashMessage($error, $this->object->flashWarning());
-                    $this->object->redirect(($redirectPath !==null) ? $redirectPath : $this->object->onSelf());
+                    $this->object->redirect(($redirectPath !== null) ? $redirectPath : $this->object->onSelf());
                 }
             }
         }
@@ -139,7 +139,7 @@ class Error implements ErrorInterface
      * @param string $code
      * @return array
      */
-    public static function display(string $code) : array
+    public static function display(string $code): array
     {
         $error = Yaml::file('error')[$code];
         if ($error) {

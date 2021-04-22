@@ -7,13 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Container;
 
 use MagmaCore\Container\Exception\DependencyIsNotInstantiableException;
 use MagmaCore\Container\Exception\DependencyHasNoDefaultValueException;
-use MagmaCore\Container\Exception\ContainerInvalidArgumentException;
 use MagmaCore\Container\Exception\ContainerException;
 use MagmaCore\Container\ContainerExceptionInterface;
 use MagmaCore\Container\ContainerInterface;
@@ -22,8 +22,8 @@ use ReflectionClass;
 use Closure;
 
 /** PSR-11 Container */
-class Container implements  ContainerInterface, SettableInterface
-{ 
+class Container implements ContainerInterface, SettableInterface
+{
 
     /** @var array */
     protected array $instance = [];
@@ -42,7 +42,7 @@ class Container implements  ContainerInterface, SettableInterface
      * @param Closure $concrete
      * @return void
      */
-    public function set(string $id, Closure $concrete = null) : void
+    public function set(string $id, Closure $concrete = null): void
     {
         if ($concrete === null) {
             $concrete = $id;
@@ -60,7 +60,7 @@ class Container implements  ContainerInterface, SettableInterface
     public function get(string $id)
     {
         if (!$this->has($id)) {
-           $this->set($id);
+            $this->set($id);
         }
         $concrete = $this->instance[$id];
         return $this->resolved($concrete);
@@ -71,10 +71,10 @@ class Container implements  ContainerInterface, SettableInterface
      * @param string $id Identifier of the entry to look for.
      * @return bool
      */
-    public function has(string $id) : bool
+    public function has(string $id): bool
     {
         return isset($this->instance[$id]);
-    }   
+    }
 
     /**
      * Resolves a single dependency
@@ -87,28 +87,28 @@ class Container implements  ContainerInterface, SettableInterface
      */
     protected function resolved($concrete)
     {
-       if ($concrete instanceof Closure) {
-           return $concrete($this);
-       }
+        if ($concrete instanceof Closure) {
+            return $concrete($this);
+        }
 
-       $reflection = new ReflectionClass($concrete);
-       /* Check to see whether the class is instantiable */
-       if (!$reflection->isInstantiable()) {
-           throw new DependencyIsNotInstantiableException("Class {$concrete} is not instantiable.");
-       }
+        $reflection = new ReflectionClass($concrete);
+        /* Check to see whether the class is instantiable */
+        if (!$reflection->isInstantiable()) {
+            throw new DependencyIsNotInstantiableException("Class {$concrete} is not instantiable.");
+        }
 
-       /* Get the class constructor */
-       $constructor = $reflection->getConstructor();
-       if (is_null($constructor)) {
-           /* Return the new instance */
-           return $reflection->newInstance();
-       }
+        /* Get the class constructor */
+        $constructor = $reflection->getConstructor();
+        if (is_null($constructor)) {
+            /* Return the new instance */
+            return $reflection->newInstance();
+        }
 
-       /* Get the constructor parameters */
-       $parameters = $constructor->getParameters();
-       $dependencies = $this->getDependencies($parameters, $reflection);
-       /* Get the new instance with dependency resolved */
-       return $reflection->newInstanceArgs((array)$dependencies);
+        /* Get the constructor parameters */
+        $parameters = $constructor->getParameters();
+        $dependencies = $this->getDependencies($parameters, $reflection);
+        /* Get the new instance with dependency resolved */
+        return $reflection->newInstanceArgs((array)$dependencies);
     }
 
     /**
@@ -144,11 +144,11 @@ class Container implements  ContainerInterface, SettableInterface
      * @param array $services
      * @return self
      */
-    public function SetServices(array $services = []) : self
+    public function SetServices(array $services = []): self
     {
         if ($services)
             $this->services = $services;
-        
+
         return $this;
     }
 
@@ -156,7 +156,7 @@ class Container implements  ContainerInterface, SettableInterface
      * @inheritdoc
      * @return array
      */
-    public function getServices() : array
+    public function getServices(): array
     {
         return $this->services;
     }
@@ -166,10 +166,9 @@ class Container implements  ContainerInterface, SettableInterface
      * @param array $args
      * @return self
      */
-    public function unregister(array $args = []) : self
+    public function unregister(array $args = []): self
     {
         $this->unregister = $args;
         return $this;
     }
-
 }

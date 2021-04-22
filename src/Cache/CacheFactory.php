@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache;
@@ -18,18 +19,19 @@ use MagmaCore\Cache\CacheEnvironmentConfigurations;
 use MagmaCore\Cache\Cache;
 
 class CacheFactory
-{ 
+{
 
-    /** @var Object */
+    /** @var object */
     protected Object $envConfigurations;
 
     /**
      * Main factory constructor method
      *
-     * @param Object $envConfigurations
+     * @param object $envConfigurations
      */
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Factory create method which create the cache object and instantiate the storage option
@@ -43,21 +45,20 @@ class CacheFactory
      * @return CacheInterface
      */
     public function create(
-        ?string $cacheIdentifier = null, 
-        ?string $storage = null, 
+        ?string $cacheIdentifier = null,
+        ?string $storage = null,
         array $options = []
-    ) : CacheInterface
-    {
+    ): CacheInterface {
         $this->envConfigurations = new CacheEnvironmentConfigurations($cacheIdentifier, __DIR__);
         $storageObject = new $storage($this->envConfigurations, $options);
         if (!$storageObject instanceof CacheStorageInterface) {
             throw new cacheInvalidArgumentException(
-                '"' . $storage . '" is not a valid cache storage object.', 0
+                '"' . $storage . '" is not a valid cache storage object.',
+                0
             );
         }
-        $defaultStorage = ($storageObject !=null) ? $storageObject : new NativeCacheStorage($this->envConfigurations, $options);
-        
+        $defaultStorage = ($storageObject != null) ? $storageObject : new NativeCacheStorage($this->envConfigurations, $options);
+
         return new Cache($cacheIdentifier, $defaultStorage, $options);
     }
-
 }

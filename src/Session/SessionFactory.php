@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Session;
@@ -21,7 +22,8 @@ class SessionFactory
 
     /** @return void */
     public function __construct()
-    { }
+    {
+    }
 
     /**
      * Session factory which create the session object and instantiate the choosen
@@ -35,11 +37,10 @@ class SessionFactory
      * @throws BaseUnexpectedValueException
      */
     public function create(
-        string $sessionIdentifier, 
-        string $storage, 
+        string $sessionIdentifier,
+        string $storage,
         SessionEnvironment $sessionEnvironment
-    ) : SessionInterface
-    {
+    ): SessionInterface {
         $storageObject = new $storage($sessionEnvironment);
         if (!$storageObject instanceof SessionStorageInterface) {
             throw new SessionUnexpectedValueException(
@@ -49,5 +50,4 @@ class SessionFactory
 
         return new Session($sessionIdentifier, $storageObject);
     }
-
 }

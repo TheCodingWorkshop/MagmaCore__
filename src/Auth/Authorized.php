@@ -43,20 +43,20 @@ class Authorized
     /**
      * Login the user
      *
-     * @param object $user The user model
+     * @param object $userModel Get the data from the user model from security controller
      * @param boolean $rememberMe Remember the login if true
      * @return void
      * @throws GlobalManagerException
      * @throws Exception
      */
-    public static function login(Object $user, $rememberMe)
+    public static function login(Object $userModel, $rememberMe)
     {
         /* Set userID Session here */
         session_regenerate_id(true);
-        SessionTrait::registerUserSession($user->id ? $user->id : 0);
+        SessionTrait::registerUserSession($userModel->id ? $userModel->id : 0);
         if ($rememberMe) {
             $rememberLogin = new RememberedLogin();
-            list($token, $timestampExpiry) = $rememberLogin->rememberedLogin($user->id);
+            list($token, $timestampExpiry) = $rememberLogin->rememberedLogin($userModel->id);
             if ($token !=null) {
                 $cookie = (new CookieFacade(['name' => self::TOKEN_COOKIE_NAME, 'expires' => $timestampExpiry]))->initialize();
                 $cookie->set($token);
@@ -70,15 +70,17 @@ class Authorized
      * @return int
      * @throws GlobalManagerException
      */
-    protected static function getCurrentSessionID()
+    protected static function getCurrentSessionID(): int
     {
         return intval(SessionTrait::sessionFromGlobal()->get('user_id'));
     }
 
     /**
-     * Undocumented function
+     * Register the current logged in user to the Session so there info can 
+     * be accessible globally.
      *
-     * @return void
+     * @return object|null
+     * @throws BaseUnexpectedValueException
      */
     public static function grantedUser()
     {
@@ -160,7 +162,7 @@ class Authorized
      * @throws GlobalManagerException
      * @throws Throwable
      */
-    protected static function loginFromRemembermeCookie() : Null|Object
+    protected static function loginFromRemembermeCookie() : object|null
     {
         $cookie = $_COOKIE[self::TOKEN_COOKIE_NAME] ?? false;
         if ($cookie) {

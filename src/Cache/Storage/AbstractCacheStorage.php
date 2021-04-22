@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
@@ -17,8 +18,8 @@ use MagmaCore\Cache\Storage\IterableStorageInterface;
 use MagmaCore\Cache\Storage\CacheStorageTrait;
 use DirectoryIterator;
 
-Abstract class AbstractCacheStorage implements IterableStorageInterface
-{ 
+abstract class AbstractCacheStorage implements IterableStorageInterface
+{
 
     use CacheStorageTrait;
 
@@ -77,7 +78,7 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
      * @param string $cacheDirectory
      * @return void Full path of the cache directory
      */
-    public function setCacheDirectory(string $cacheDirectory) : void
+    public function setCacheDirectory(string $cacheDirectory): void
     {
         $this->cacheDirectory = rtrim($cacheDirectory, '/') . '/';
     }
@@ -86,7 +87,7 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
      * Returns the directory where the cache files are stored
      * @return string Full path of the cache directory
      */
-    public function getCacheDirectory() : string
+    public function getCacheDirectory(): string
     {
         return $this->cacheDirectory;
     }
@@ -112,10 +113,9 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
      * @param string $entryIdentifier
      * @return string
      */
-    protected function cacheEntryPathAndFilename($entryIdentifier) : string
+    protected function cacheEntryPathAndFilename($entryIdentifier): string
     {
         return $this->cacheDirectory . $entryIdentifier . $this->cacheEntryFileExtension;
-
     }
 
     /**
@@ -148,7 +148,7 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
      * @return void
      * @throws CacheInvalidArgumentException
      */
-    protected function isCacheValidated(string $entryIdentifier, bool $all = true) : void
+    protected function isCacheValidated(string $entryIdentifier, bool $all = true): void
     {
         if ($entryIdentifier !== basename($entryIdentifier)) {
             throw new CacheInvalidArgumentException('The specified cache identifier must not contain a path segment.', 1334756960);
@@ -158,7 +158,6 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
                 throw new CacheInvalidArgumentException('The specified cache identifier must not be empty.', 1334756961);
             }
         }
-
     }
 
     /**
@@ -253,6 +252,4 @@ Abstract class AbstractCacheStorage implements IterableStorageInterface
             $this->cacheFilesIterator->next();
         }
     }
-
-
 }

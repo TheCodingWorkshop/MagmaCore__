@@ -1,8 +1,18 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types=1);
 
 namespace MagmaCore\Session\GlobalManager;
+
+use MagmaCore\Session\GlobalManager\GlobalManagerException;
 
 interface GlobalManagerInterface
 {
@@ -15,7 +25,7 @@ interface GlobalManagerInterface
      * @return void
      * @throws GlobalManagerException
      */
-    public static function set(string $name, $context) : void;
+    public static function set(string $name, $context): void;
 
     /**
      * Get the value/context of the set global variable
@@ -25,5 +35,4 @@ interface GlobalManagerInterface
      * @throws GlobalManagerException
      */
     public static function get(string $name);
-
 }

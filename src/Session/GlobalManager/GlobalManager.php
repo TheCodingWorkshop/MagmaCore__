@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types=1);
 
@@ -18,9 +26,9 @@ class GlobalManager implements GlobalManagerInterface
      * @return void
      * @throws GlobalManagerException
      */
-    public static function set(string $name, $context) : void
+    public static function set(string $name, $context): void
     {
-        if ($name !=='') {
+        if ($name !== '') {
             $GLOBALS[$name] = $context;
         }
     }
@@ -37,7 +45,7 @@ class GlobalManager implements GlobalManagerInterface
         self::isGlobalValid($name);
         try {
             return $GLOBALS[$name];
-        } catch(GlobalManagerException $ex) {
+        } catch (GlobalManagerException $ex) {
             throw $ex;
         }
     }
@@ -48,11 +56,10 @@ class GlobalManager implements GlobalManagerInterface
      * @param string $name
      * @return void
      */
-    protected static function isGlobalValid(string $name) : void
+    protected static function isGlobalValid(string $name): void
     {
         if (!isset($GLOBALS[$name]) || empty($name)) {
             throw new GlobalManagerException("Invalid global. Please ensure you've set the global state for {$name}");
         }
     }
-
 }

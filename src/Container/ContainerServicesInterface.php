@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Container;
@@ -21,14 +22,14 @@ interface ContainerServicesInterface
      * @param array $services
      * @return self
      */
-    public function setServices(array $services = []) : self;
+    public function setServices(array $services = []): self;
 
     /**
      * Get class service or services
      *
      * @return array
      */
-    public function getServices() : array;
+    public function getServices(): array;
 
     /**
      * Unregister a service from being instantiable
@@ -36,7 +37,7 @@ interface ContainerServicesInterface
      * @param array $args - optional argument
      * @return void;
      */
-    public function unregister(array $args = []) : self;
+    public function unregister(array $args = []): self;
 
     /**
      * Register service or services with autowiring
@@ -44,5 +45,4 @@ interface ContainerServicesInterface
      * @return void
      */
     public function register();
-
 }

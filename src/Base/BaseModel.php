@@ -15,6 +15,7 @@ namespace MagmaCore\Base;
 use MagmaCore\Base\BaseEntity;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Exception\BaseException;
+use MagmaCore\Base\Traits\ModelCastingTrait;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
@@ -23,6 +24,7 @@ use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalid
 
 class BaseModel
 {
+    use ModelCastingTrait;
 
     /** @var string */
     protected string $tableSchema;
@@ -58,6 +60,7 @@ class BaseModel
         }
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchemaID;
+        $this->casting(self::ALLOWED_CASTING_TYPES);
         $this->createRepository($this->tableSchema, $this->tableSchemaID);
     }
 
@@ -83,49 +86,6 @@ class BaseModel
     {
         if (empty($tableSchema) || empty($tableSchemaID)) {
             throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
-        }
-    }
-
-    /**
-     * Returns the related model entity object
-     *
-     * @return BaseEntity
-     */
-    public function getEntity(): BaseEntity
-    {
-        return $this->entity;
-    }
-
-    /**
-     * two way casting cast a data type back and fourth
-     *
-     * @return void
-     */
-    public function casting()
-    {
-        if (isset($this->cast)) {
-            if (is_array($this->cast) && count($this->cast) > 0) {
-                foreach ($this->cast as $key => $value) {
-                    if (!in_array($value, self::ALLOWED_CASTING_TYPES)) {
-                        throw new BaseInvalidArgumentException($value . ' casting type is not supported.');
-                    }
-                    $this->resolveCast($key, $value);
-                }
-            }
-        }
-    }
-
-    private function resolveCast(string $key, mixed $value)
-    {
-        if (empty($key)) {
-            throw new BaseException('');
-        }
-        switch ($value) {
-            case 'array_json':
-                if (isset($this->getEntity()->$key) && $this->getEntity()->$key !== '') {
-                    $this->getEntity()->$key = json_encode($value);
-                }
-                break;
         }
     }
 
@@ -159,6 +119,16 @@ class BaseModel
     }
 
     /**
+     * Returns the related model entity object
+     *
+     * @return BaseEntity
+     */
+    public function getEntity(): BaseEntity
+    {
+        return $this->entity;
+    }
+
+    /**
      * Return the name object from within the app namespace. i,e validate.user
      * will instantiate the App\Validate\UserValidate Object. We only call the object
      * on the fly and use it when we want.
@@ -186,7 +156,7 @@ class BaseModel
     }
 
     /**
-     * Undocumented function
+     * Allow an association between two tables.
      *
      * @param string $relationshipType
      * @return object

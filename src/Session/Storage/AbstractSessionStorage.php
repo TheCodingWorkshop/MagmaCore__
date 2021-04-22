@@ -48,7 +48,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * @param string $sessionName
      * @return void
      */
-    public function setSessionName(string $sessionName) : void
+    public function setSessionName(string $sessionName): void
     {
         session_name($sessionName);
     }
@@ -58,7 +58,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * @return string
      */
-    public function getSessionName() : string
+    public function getSessionName(): string
     {
         return session_name();
     }
@@ -69,7 +69,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * @param $sessionID
      * @return void
      */
-    public function setSessionID(string $sessionID) : void
+    public function setSessionID(string $sessionID): void
     {
         session_id($sessionID);
     }
@@ -83,13 +83,13 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     {
         return session_id();
     }
-    
+
     /**
      * Override PHP default session runtime configurations
      * 
      * @return void
      */
-    public function iniSet() : void
+    public function iniSet(): void
     {
         foreach ($this->sessionEnvironment->getSessionRuntimeConfigurations() as $option) {
             if ($option) {
@@ -107,7 +107,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      */
     public function isSessionStarted()
     {
-        return php_sapi_name() !== 'cli' ? $this->getSessionID() !=='' : false;
+        return php_sapi_name() !== 'cli' ? $this->getSessionID() !== '' : false;
     }
 
     /**
@@ -127,7 +127,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * 
      * @return void
      */
-    public function start() : void                                                               
+    public function start(): void
     {
         $this->setSessionName($this->sessionEnvironment->getSessionName());
         session_set_cookie_params($this->sessionEnvironment->getLifetime(), $this->sessionEnvironment->getPath(), $this->sessionEnvironment->getDomain(), $this->sessionEnvironment->isSecure(), $this->sessionEnvironment->isHttpOnly());
@@ -138,7 +138,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
                 $_SESSION = array();
                 $_SESSION['IPaddress'] = $_SERVER['REMOTE_ADDR'];
                 $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-            } elseif (rand(1, 100) <= 5) {// Give a 5% chance of the session id changing on any request
+            } elseif (rand(1, 100) <= 5) { // Give a 5% chance of the session id changing on any request
                 $this->sessionRegeneration();
             }
         } else {
@@ -147,5 +147,4 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
             $this->startSession(); // restart session
         }
     }
-
 }
