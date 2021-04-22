@@ -10,16 +10,9 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Filler;
+namespace MagmaCore\Fillable\Exception;
 
-use MagmaCore\Filler\FillerInterface;
+use MagmaCore\Base\Exception\BaseNoValueException;
 
-class Filler implements FillerInterface
-{
-
-    public function handler()
-    {
-        
-    }
-
-}
+class FillableNoValueException extends BaseNoValueException
+{ }

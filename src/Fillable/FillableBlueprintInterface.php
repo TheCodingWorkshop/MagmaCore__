@@ -10,11 +10,11 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Filler;
+namespace MagmaCore\Fillable;
 
-interface FillerInterface
+interface FillableBlueprintInterface
 {
 
-    public function handler();
+    public function faker(): object;
 
 }
