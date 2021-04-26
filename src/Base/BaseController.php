@@ -30,8 +30,10 @@ class BaseController extends AbstractBaseController
 
     /** @var array */
     protected array $routeParams;
-    /** @var Object */
+    /** @var object */
     protected Object $twig;
+    /** @var */
+    protected object $template;
     /** @var array */
     protected array $callBeforeMiddlewares = [];
     /** @var array */

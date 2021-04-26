@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Fillable\Exception;
+namespace MagmaCore\Plugin\Exception;
 
-use MagmaCore\Base\Exception\BaseNoValueException;
+use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 
-class FillableNoValueException extends BaseNoValueException
-{
-}
+class PluginUnexpectedValueException extends BaseUnexpectedValueException
+{}
+

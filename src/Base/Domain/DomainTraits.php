@@ -227,7 +227,13 @@ trait DomainTraits
                 ($column !== null) ? $column : $this->controller->column,
                 ($repository !== null) ? $repository : $this->tableRepository,
                 $this->args,
-                $this->controller->entity->getColumns($this->schema)
+                /** 
+                 * getColumns() is a method located within the BaseModel class 
+                 * and it simple returns an array of columns for the model db table
+                 * its takes 1 argument which is schema that built the model. See
+                 * the relevant schema located in the App/Schema directory
+                 * */
+                $this->controller->repository->getColumns($this->schema)
             )
             ->setAttr($tableParams)
             ->table();

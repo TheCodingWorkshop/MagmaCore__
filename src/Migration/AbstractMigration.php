@@ -33,7 +33,7 @@ abstract class AbstractMigration implements MigrationInterface
     /** @var array */
     protected array $migrations = [];
     /** @var string */
-    protected string $migrationFiles = 'App/Migrations/';
+    protected string $migrationFiles = 'App/Database/Migrations/';
     /** @var string */
     protected string $schemaPath = 'App/Schema/';
     /** @var string */

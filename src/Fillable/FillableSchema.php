@@ -15,18 +15,26 @@ namespace MagmaCore\Fillable;
 use Closure;
 use MagmaCore\Fillable\Faker\Faker;
 use MagmaCore\Fillable\Exception\FillableNoValueException;
+use MagmaCore\Fillable\Exception\FillableOutOfRangeException;
 
 class FillableSchema
 {
 
     /** @var array $bindValues */
     private array $bindValues = [];
+    /** @var array $bindKeys */
     private array $bindKeys = [];
-    private int|null $record = 0;
-
+    /** @var Faker $faker - th $faker object */
+    private Faker $faker;
     /** @var object $model - the model which to be fill */
     private object $model;
 
+    /**
+     * Main constructor class
+     *
+     * @param Faker $faker
+     * @return void
+     */
     public function __construct(Faker $faker)
     {
         $this->faker = $faker;
@@ -46,17 +54,19 @@ class FillableSchema
         return $this;
     }
 
-    public function rows(int $record = 0): static
+    public function create(int $rows = 20, Closure $callback)
     {
-        if ($record)
-            $this->record = $record;
-        return $this;
+        set_time_limit(31);
+        $i = 1;
+        do {
+            $callback($this);
+            sleep(1);
+            $i++;
+        } while ($i <= $rows);
     }
 
     /**
-     * Collect the value from the fill method and store it within an class array
-     * property. This will allow us to collect all the value ready for binding
-     * to the database table column name
+     * The value to pass for the fillable column
      *
      * @param mixed $value
      * @return static
@@ -69,7 +79,22 @@ class FillableSchema
     }
 
     /**
-     * Undocumented function
+     * Bind the fillable propertie to the corresponding column name. We can then 
+     * build the query to run this fillable
+     *
+     * @param Closure $callback
+     * @return mixed
+     */
+    public function bind(Closure $callback): mixed
+    {
+        if ($callback) {
+            return $callback($this);
+        }
+    }
+
+    /**
+     * Return an array of the binding columns. Which will bind the values define
+     * within the fill method
      *
      * @param array $bindKeys
      * @return static
@@ -81,40 +106,80 @@ class FillableSchema
         return $this;
     }
 
-    public function push()
+
+    /**
+     * Undocumented function
+     *
+     * @return boolean
+     */
+    public function push(): bool
+    {
+        $this->throwException();
+        try {
+            $i = 0;
+            set_time_limit(31);
+            $i = 1;
+            do {
+
+                $combine = array_combine($this->bindKeys, $this->bindValues);
+                $save = $this->model->getRepo()->getEm()->getCrud()->create($combine);
+                sleep(1);
+                $i++;
+                return $save;
+            } while ($i <= 20);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     * Returns the the model object for the current fillables
+     *
+     * @return object
+     */
+    public function getModel(): object
+    {
+        return $this->model;
+    }
+
+    /**
+     * Returns the faker object
+     *
+     * @return Faker
+     */
+    public function faker(): Faker
+    {
+        return $this->faker;
+    }
+
+    /**
+     * Returns the integre length of an array
+     *
+     * @param array $array
+     * @return integer
+     */
+    private function count(array $array): int
+    {
+        return isset($array) ? count($array) : 0;
+    }
+
+    /**
+     * Throw an exception if the $bindKeys and $bindValues properties are empty
+     * by default the chain can operate without the rows() method as the 
+     * class will always generate a single result. If the rows() method is added
+     * to the chain then the rows() argument must be greater than 1
+     *
+     * @return void
+     */
+    private function throwException(): void
     {
         if (empty($this->bindValues) || empty($this->bindKeys)) {
             throw new FillableNoValueException('No values added to either of the properties');
         }
-        if (isset($this->record) && $this->record < 0) {
-            throw new FillableNoValueException('If you added the (rows()) method to the chain. Then you must specify a value greater than zero (0)');
-            unset($this->record);
-        }
-        $combine = array_combine($this->bindKeys, $this->bindValues);
-        if ($this->record > 1) {
-            for ($i = 0; $i < $this->record; $i++) {
-                $this->model
-                    ->getRepo()
-                    ->getEm()
-                    ->getCrud()
-                    ->create($combine);
+        if ($keys = $this->count($this->bindKeys) && $values = $this->count($this->bindValues)) {
+            if ($keys < $values) {
+                throw new FillableOutOfRangeException('Your keys and values are out of range.');
             }
-            die;
-        }
-    }
-
-
-    /**
-     * Bind the fillable propertie to the corresponding column name. We can then 
-     * build the query to run this fillable
-     *
-     * @param Closure $callback
-     * @return mixed
-     */
-    public function bind(Closure $callback): mixed
-    {
-        if ($callback) {
-            return $callback($this);
         }
     }
 }

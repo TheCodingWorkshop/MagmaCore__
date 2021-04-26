@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Fillable\Exception;
 
-use MagmaCore\Base\Exception\BaseNoValueException;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
-class FillableNoValueException extends BaseNoValueException
+class FillableInvalidArgumentException extends BaseInvalidArgumentException
 {
 }

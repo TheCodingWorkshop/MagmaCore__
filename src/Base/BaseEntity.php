@@ -13,11 +13,8 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Utility\Sanitizer;
-use MagmaCore\Base\BaseApplication;
 use MagmaCore\Collection\Collection;
 use MagmaCore\Base\Exception\BaseException;
-use MagmaCore\DataSchema\DataSchemaBuilderInterface;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 class BaseEntity
 {
@@ -28,8 +25,6 @@ class BaseEntity
     protected array $dirtyData;
     /** */
     protected object|null $dataSchemaObject;
-    /** @var array */
-    protected array $dbColumns = [];
 
     /**
      * BaseEntity constructor.
@@ -40,68 +35,6 @@ class BaseEntity
      */
     public function __construct()
     {}
-
-    /**
-     * Create method which initialize the schema object and return its result
-     * within the set class property.
-     *
-     * @param string $dataSchema
-     * @return static
-     */
-    public function create(string $dataSchema = null): static
-    {
-        if ($dataSchema !==null) {
-            $newSchema = BaseApplication::diGet($dataSchema);
-            if (!$newSchema instanceof DataSchemaBuilderInterface) {
-                throw new BaseInvalidArgumentException('');
-            }
-            $this->dataSchemaObject = $newSchema;
-            return $this;
-        }
-    }
-
-    /**
-     * Return an array of database column name matching the object schema
-     * and model
-     * 
-     * @param string $schema
-     * @return array
-     * @throws BaseInvalidArgumentException
-     */
-    public function getColumns(string $schema): array
-    {
-        return $this->create($schema)->getSchemaColumns();
-    }
-
-    /**
-     * Return the schema object database column name as an array. Which can be used
-     * to mapp the columns within the dataColumn object. To construct the datatable
-     *
-     * @param integer $indexPosition
-     * @return array
-     */
-    public function getSchemaColumns(int $indexPosition = 2): array
-    {
-        $reflectionClass = new \ReflectionClass($this->dataSchemaObject);
-        $propertyName = $reflectionClass->getProperties()[$indexPosition]->getName();
-        if (str_contains($propertyName, 'Model') === false) {
-            throw new BaseInvalidArgumentException('Invalid property name');
-        }
-        if ($reflectionClass->hasProperty($propertyName)) {
-            $reflectionProperty = new \ReflectionProperty($this->dataSchemaObject, $propertyName);
-            $reflectionProperty->setAccessible(true);
-            $props = $reflectionProperty->getValue($this->dataSchemaObject);
-            $this->dbColumns = $props->getRepo()
-                ->getEm()
-                    ->getCrud()
-                        ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
-            
-            return $this->dbColumns;
-            
-            $reflectionProperty->setAccessible(false);
-        }
-    }
-
 
     /**
      * Accept raw unthreated data and prepare for sanitization

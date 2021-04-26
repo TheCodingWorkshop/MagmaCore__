@@ -12,10 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use ReflectionClass;
+use ReflectionProperty;
 use MagmaCore\Base\BaseEntity;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Base\Traits\ModelCastingTrait;
+use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
@@ -36,7 +38,11 @@ class BaseModel
     protected BaseEntity $entity;
     /** @var array $casts */
     protected array $cast = [];
-
+    /** @var array */
+    protected array $dbColumns = [];
+    /** @var array $fillable - returns a array of columns which cannot be null */
+    protected array $fillable = [];
+    /** @var array */
     protected const ALLOWED_CASTING_TYPES = ['array_json'];
 
     /**
@@ -170,4 +176,74 @@ class BaseModel
         return $relationship;
 
     }
+
+    /**
+     * Create method which initialize the schema object and return its result
+     * within the set class property.
+     *
+     * @param string $dataSchema
+     * @return static
+     */
+    public function create(string $dataSchema = null): static
+    {
+        if ($dataSchema !==null) {
+            $newSchema = BaseApplication::diGet($dataSchema);
+            if (!$newSchema instanceof DataSchemaBuilderInterface) {
+                throw new BaseInvalidArgumentException('');
+            }
+            $this->dataSchemaObject = $newSchema;
+            return $this;
+        }
+    }
+
+    /**
+     * Return an array of database column name matching the object schema
+     * and model
+     * 
+     * @param string $schema
+     * @return array
+     * @throws BaseInvalidArgumentException
+     */
+    public function getColumns(string $schema): array
+    {
+        return $this->create($schema)->getSchemaColumns();
+    }
+
+    public function getFillables(string $model): array
+    {
+        if (!$this->fillable) {
+            throw new BaseInvalidArgumentException('No fillable array set for your entity class ' . $model);
+        }
+        return $this->fillable;
+    }
+
+    /**
+     * Return the schema object database column name as an array. Which can be used
+     * to mapp the columns within the dataColumn object. To construct the datatable
+     *
+     * @param integer $indexPosition
+     * @return array
+     */
+    public function getSchemaColumns(int $indexPosition = 2): array
+    {
+        $reflectionClass = new ReflectionClass($this->dataSchemaObject);
+        $propertyName = $reflectionClass->getProperties()[$indexPosition]->getName();
+        if (str_contains($propertyName, 'Model') === false) {
+            throw new BaseInvalidArgumentException('Invalid property name');
+        }
+        if ($reflectionClass->hasProperty($propertyName)) {
+            $reflectionProperty = new ReflectionProperty($this->dataSchemaObject, $propertyName);
+            $reflectionProperty->setAccessible(true);
+            $props = $reflectionProperty->getValue($this->dataSchemaObject);
+            $this->dbColumns = $props->getRepo()
+                ->getEm()
+                    ->getCrud()
+                        ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
+            
+            return $this->dbColumns;
+            
+            $reflectionProperty->setAccessible(false);
+        }
+    }
+
 }

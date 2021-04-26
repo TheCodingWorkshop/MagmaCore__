@@ -10,10 +10,17 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Fillable\Exception;
+namespace MagmaCore\Plugin;
 
-use MagmaCore\Base\Exception\BaseNoValueException;
-
-class FillableNoValueException extends BaseNoValueException
+interface PluginBuilderInterface
 {
+
+    /**
+     * Execute the plugin
+     *
+     * @return string
+     */
+    public function pluginProcessor(): mixed;
+
+
 }

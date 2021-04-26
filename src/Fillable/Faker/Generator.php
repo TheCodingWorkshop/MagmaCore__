@@ -134,7 +134,46 @@ class Generator
         '@googlemail.co.uk',
         '@fakermail.au',
         '@fakermail.co.uk',
-        '@fakermail.ja'
+        '@fakermail.ja',
+    ];
+
+    public const DELIMITER = [
+        '-',
+        '_',
+        '.',
+        '',
+    ];
+
+    public const STATUS = [
+        'active',
+        'pending',
+        'lock',
+        'suspended',
+    ];
+
+    public const PHONE_NUMBER = [
+        '0812', 
+        '0800',
+        '0845',
+        '0813', 
+        '0814', 
+        '0815', 
+        '0816', 
+        '0817', 
+        '0818', 
+        '0819', 
+        '0909', 
+        '0908',
+        '0333',
+        '0345',
+        '0201',
+        '0208',
+        '0209',
+        '0109',
+        '0164',
+        '0165',
+        '0169',
+        '0400'
     ];
 
 }
