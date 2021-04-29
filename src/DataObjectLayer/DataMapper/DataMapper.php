@@ -17,6 +17,7 @@ use Throwable;
 use PDOException;
 use PDOStatement;
 
+use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
@@ -252,24 +253,38 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      * 
      * @param string $query
      * @param array $parameters
-     * @return mixed
+     * @return void
      * @throws Throwable
      */
-    public function persist(string $sqlQuery, array $parameters)
+    public function persist(string $sqlQuery, array $parameters): void
     {
+        $this->start();
         try {
-            $this->start();
             $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
             $this->commit();
-        } catch (PDOException $pdoex) {
-            $this->revert();
-            throw $pdoex;
+        } catch (DataLayerException $e) {
+           $this->revert();
+           throw new DataLayerException($e->getMessage());
         }
     }
 
-    public function exec(string $statement)
+    /**
+     * Quickly execute commands through command line.
+     *
+     * @param string $statement
+     * @return void
+     */
+    public function exec(string $statement): void
     {
-        $this->dbh->open()->exec($statement);
+        $this->start();
+        try {
+            $this->dbh->open()->exec($statement);
+            $this->commit();
+        } catch (DataLayerException $e) {
+           $this->revert();
+           throw new DataLayerException($e->getMessage());
+        }
+        
     }
 
 }

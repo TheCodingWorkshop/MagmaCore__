@@ -10,17 +10,10 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Plugin;
+namespace MagmaCore\StringCollection;
 
-interface PluginBuilderInterface
+use MagmaCore\Base\Exception\BaseException;
+
+class StringCollectionException extends BaseException
 {
-
-    /**
-     * Execute the plugin
-     *
-     * @return string
-     */
-    public function pluginProcessor();
-
-
 }

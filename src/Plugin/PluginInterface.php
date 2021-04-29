@@ -20,9 +20,10 @@ interface PluginInterface
      * plugins.
      *
      * @param string $plugin
+     * @param array $options
      * @return void
      */
-    public function register(string $plugin): void;
+    public function register(string $plugin, array $options = []): void;
 
     /**
      * Unregister a single registered or default plugin
@@ -53,6 +54,20 @@ interface PluginInterface
      * @return array
      */
     public function getPlugins(): array;
+
+    /**
+     * Return an array of the plugin meta data
+     *
+     * @return array
+     */
+    public function getOptions(): array;
+
+    /**
+     * Returns the string unique name of the plugin
+     *
+     * @return string
+     */
+    public function getUniqueName(): string;
 
     /**
      * Return an array of all plugins default and registered plugins

@@ -16,34 +16,13 @@ interface PluginManagerInterface
 {
 
     /**
-     * Register the name of the plugin
-     *
-     * @return string
+     * Name: Hello Dolly;
+     * URI: www.wordpress.org/plugins/hello-dolly/;
+     * Description: This is not just a plugin it symbolizes the hope and enthusiasm of an entire; 
+     * Author: Matt Mullenweg;
+     * Homepage: www.ma.tt/;
+     * Version: 1.0.0
      */
-    public function pluginName(): string;
-
-    /**
-     * Add a meta description which briefly describes the purpose of the plugin
-     *
-     * @return string
-     */
-    public function plugDescription(): string;
-
-    /**
-     * Declare the current stabler version of the plugin
-     *
-     * @return integer
-     */
-    public function pluginVersion(): int;
-
-    /**
-     * Returns an array of author meta data. ie authors name, email address and 
-     * Ensure the array is define in the correct order
-     * ['name', 'email', 'etc']
-     *
-     * @return array
-     */
-    public function pluginAuthor(): array;
-
+    public function pluginDeploy();
 
 }

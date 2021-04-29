@@ -77,25 +77,16 @@ class ClientRepository implements ClientRepositoryInterface
         }
     }
 
-
-
     /**
      * @inheritdoc
      *
      * @param array $conditions
      * @return array
      */
-    public function get(array $conditions = []): array
+    public function get(array $selectors = [], array $conditions = []): array
     {
         try {
-            if (count($conditions) > 0) {
-                return $this->em->getCrud()->read(
-                    (isset($conditions['selectors']) ? $conditions['selectors'] : []),
-                    (isset($conditions['condition']) ? $conditions['condition'] : []),
-                );
-            } else {
-                return $this->em->getCrud()->read();
-            }
+            return $this->em->getCrud()->read($selectors, $conditions);
         } catch (Throwable $throw) {
             throw $throw;
         }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * This file is part of the MagmaCore package.
  *
@@ -7,12 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DatabaseConnection;
 
 use PDOException;
 use LogicException;
+use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransactionInterface;
 
@@ -43,13 +45,17 @@ class DatabaseTransaction implements DatabaseTransactionInterface
      * @return bool true on success or false on failure
      * @throws PDOException - if a transaction as already started or the driver does not support transaction
      */
-    public function start() : bool
+    public function start(): bool
     {
-        if ($this->db) {
-            if (!$this->transactionCounter++) {
+        try {
+            if ($this->db) {
+                if (!$this->transactionCounter++) {
+                    return $this->db->open()->beginTransaction();
+                }
                 return $this->db->open()->beginTransaction();
             }
-            return $this->db->open()->beginTransaction();
+        } catch (DataLayerException $e) {
+            throw new DataLayerException($e->getMessage());
         }
     }
 
@@ -58,13 +64,17 @@ class DatabaseTransaction implements DatabaseTransactionInterface
      * @return bool true on success or false on failure
      * @throws PDOException - If theres no active transaction
      */
-    public function commit () : bool
+    public function commit(): bool
     {
-        if ($this->db) {
-            if (!$this->transactionCounter) {
-                return $this->db->open()->commit();
+        try {
+            if ($this->db) {
+                if (!$this->transactionCounter) {
+                    return $this->db->open()->commit();
+                }
+                return $this->transactionCounter >= 0;
             }
-            return $this->transactionCounter >= 0;
+        } catch (DataLayerException $e) {
+            throw new DataLayerException($e->getMessage());
         }
     }
 
@@ -73,16 +83,19 @@ class DatabaseTransaction implements DatabaseTransactionInterface
      * @return bool true on success or false on failure
      * @throws PDOException - If theres no active transaction
      */
-    public function revert() : bool
+    public function revert(): bool
     {
-        if ($this->db) {
-            if ($this->transactionCounter >= 0) {
+        try {
+            if ($this->db) {
+                if ($this->transactionCounter >= 0) {
+                    $this->transactionCounter = 0;
+                    return $this->db->open()->rollBack();
+                }
                 $this->transactionCounter = 0;
-                return $this->db->open()->rollBack();
+                return false;
             }
-            $this->transactionCounter = 0;
-            return false;
+        } catch (DataLayerException $e) {
+            throw new DataLayerException($e->getMessage());
         }
     }
-
 }

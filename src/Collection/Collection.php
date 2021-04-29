@@ -378,4 +378,21 @@ class Collection implements CollectionInterface
     {
         return $this->size();
     }
+
+    public function flat($array) { 
+        if (!is_array($array)) { 
+          return FALSE; 
+        } 
+        $result = array(); 
+        foreach ($array as $key => $value) { 
+          if (is_array($value)) { 
+            $result = array_merge($result, $this->flat($value)); 
+          } 
+          else { 
+            $result[$key] = $value; 
+          } 
+        } 
+        return $result; 
+      } 
+
 }

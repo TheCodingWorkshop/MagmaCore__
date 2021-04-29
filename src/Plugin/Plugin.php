@@ -22,13 +22,11 @@ class Plugin implements PluginInterface
 
     /** @var array $defaultPlugins - contains all framework default plugins */
     private array $defaultPlugins = [];
-
-    public function __construct(private array $plugin = [])
-    {
-    }
+    private array $plugin = [];
+    private array $options = [];
 
     /**
-     * Undocumented function
+     * Handle exception nicely if trying to call an invalid method on the object
      *
      * @param string $method
      * @param mixed $args
@@ -46,9 +44,12 @@ class Plugin implements PluginInterface
      * @param string $plugin
      * @return void
      */
-    public function register(string $plugin): void
+    public function register(string $plugin, array $options = []): void
     {
         $this->plugin[$plugin] = $this->resolvePluginRegistration($plugin);
+        if ($options) {
+            $this->options = $options;
+        }
     }
 
     /**
@@ -95,6 +96,26 @@ class Plugin implements PluginInterface
     public function getPlugins(): array
     {
         return $this->plugin;
+    }
+
+    /**
+     * Return an array of the plugin meta data
+     *
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Returns the string unique name of the plugin
+     *
+     * @return string
+     */
+    public function getUniqueName(): string
+    {
+        return $this->getOptions()['Name'];
     }
 
     /**
@@ -147,7 +168,8 @@ class Plugin implements PluginInterface
     public function countPlugins(): int
     {
         $combine = array_merge($this->countDefaultPlugins(), $this->countRegisteredPlugins());
-        return isset($combine) ? count($combine) : 0;
+        //return isset($combine) ? count($combine) : 0;
+        return 0;
     }
 
     /**
@@ -161,7 +183,7 @@ class Plugin implements PluginInterface
         if ($pluginName) {
             $newPluginObject = BaseApplication::diGet($pluginName);
             if (!$newPluginObject instanceof PluginManagerInterface) {
-                throw new PluginInvalidArgumentException('');
+                throw new PluginInvalidArgumentException('Your plugin is invalid as it does not implements the correct interface [PluginManagerInterface]');
             }
             return $newPluginObject;
         }
