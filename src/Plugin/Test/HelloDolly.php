@@ -21,10 +21,10 @@ class HelloDolly implements PluginManagerInterface
 
     /**
      * Name: HelloDolly;
-     * URI: www.wordpress.org/plugins/hello-dolly/;
-     * Description: This is not just a plugin it symbolizes the hope and enthusiasm of an entire; 
-     * Author: Matt Mullenweg;
-     * Homepage: www.ma.tt/;
+     * URI: www.lava-studio.co.uk/plugins/hello-dolly/;
+     * Description: This is a generic plugin description;
+     * Author: Ricardo Miller;
+     * Homepage: www.lava-studio.co.uk/;
      * Version: 1.0.0
      */
     public function pluginDeploy()
