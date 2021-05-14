@@ -7,85 +7,50 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
-use Twig\Extension\DebugExtension;
-use Twig\Loader\FilesystemLoader;
 use MagmaCore\Utility\Yaml;
-use MagmaCore\Twig\TwigExtension;
-use MagmaCore\Inertia\InertiaTwigExtension;
+use MagmaCore\Ash\Error\LoaderError;
+use MagmaCore\Ash\TemplateEnvironment;
+use MagmaCore\Ash\Exception\FileNotFoundException;
 
 class BaseView
-{ 
+{
 
     /**
-     * Render a view template using Twig
-     *
-     * @param string $template The template file
-     * @param array $args Associative array of data to display in the view (optional)
-     *
-     * @return void
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     */
-    public function twigRender($template, $args = [])
-    {
-        echo $this->getTemplate($template, $args);
-    }
-
-    /**
-     * Get the contents of a view template using Twig
-     *
-     * @param string $template The template file
-     * @param array $args Associative array of data to display in the view (optional)
-     *
-     * @return string
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
-     * @throws Exception
-     */
-    public function getTemplate(string $template, array $args = [])
-    {
-        static $twig = null;
-        if ($twig === null) {
-            $loader = new FilesystemLoader('templates', TEMPLATE_PATH);
-            $twig = new Environment($loader, [Yaml::file('twig')]);
-
-            $twig->addExtension(new DebugExtension());
-            $twig->addExtension(new TwigExtension());
-            $twig->addExtension(new InertiaTwigExtension());
-        }
-
-        return $twig->render($template, $args);
-    }
-
-    /**
-     * Undocumented function
+     * Render a view template using the framework native template engine
      *
      * @param string $template
-     * @param array $args
-     * @param string $directory
+     * @param array $context
      * @return void
+     * @throws LoaderError
+     * @throws FileNotFoundException
      */
-    public function  getErrorResource(string $template, array $args = []) 
+    public function ashRender(string $template, array $context = [])
     {
-        static $twig = null;
-        if ($twig === null) {
-            $loader = new FilesystemLoader(ERROR_RESOURCE);
-            $twig = new Environment($loader);
-            $twig->addExtension(new DebugExtension());
-        }
-
-        return $twig->render($template, $args);
+        echo $this->templateRender($template, $context);
     }
 
+    /**
+     * Get the contents of a view template using the native framework template
+     * engine.
+     *
+     * @param string $template
+     * @param array $context
+     * @return mixed
+     * @throws LoaderError
+     */
+    public function templateRender(string $template, array $context = [])
+    {
+        static $ash = null;
+        if ($ash === null) {
+            $ash = new TemplateEnvironment(Yaml::file('template'), 'templates', TEMPLATE_PATH);
+        }
+
+        return $ash->view($template, $context);
+    }
 
 }

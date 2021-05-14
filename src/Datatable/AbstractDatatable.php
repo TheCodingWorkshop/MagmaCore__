@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
-use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 use MagmaCore\Datatable\DatatableInterface;
+use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
 abstract class AbstractDatatable implements DatatableInterface
 {
@@ -20,7 +20,7 @@ abstract class AbstractDatatable implements DatatableInterface
     protected const TABLE_PROPERTIES = [
         'status' => '',
         'orderby' => '',
-        'table_class' => ['uk-table uk-table-middle uk-table-hover uk-table-striped uk-table-responsive uk-table-condensed'],
+        'table_class' => [],
         'table_id' => 'datatable',
         'show_table_thead' => true,
         'show_table_tfoot' => false,

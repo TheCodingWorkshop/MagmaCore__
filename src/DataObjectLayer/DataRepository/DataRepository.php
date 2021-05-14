@@ -383,4 +383,9 @@ class DataRepository implements DataRepositoryInterface
             exit;
         }
     }
+
+    public function count(array $conditions = [], ?string $field = 'id')
+    {
+        return $this->em->getCrud()->countRecords($conditions, $field);
+    }
 }

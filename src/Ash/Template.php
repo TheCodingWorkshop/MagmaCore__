@@ -17,33 +17,33 @@ use MagmaCore\Ash\AbstractTemplate;
 class Template extends AbstractTemplate
 {
 
-    /** @var array */
-    protected array $templateEnvironment;
+    /** @var TemplateEnvironment */
+    protected TemplateEnvironment $templateEnvironment;
 
     /**
-     * Undocumented function
+     * Main class constructor
      *
      * @param array $templateEnvironment
      * @return void
      */
-    public function __construct(array $templateEnvironment)
+    public function __construct(TemplateEnvironment $templateEnvironment)
     {
+        $this->templateEnvironment = $templateEnvironment;
         parent::__construct($templateEnvironment);
     }
 
     /**
-     * Undocumented function
+     * Display the template
      *
      * @param string $file
      * @param array $context
-     * @return void
+     * @return Response
      */
     public function view(string $file, array $context = [])
     {
         $fileCache = $this->cache(TEMPLATES . $file);
-        extract($context, EXTR_SKIP);
+        extract(array_merge($context, $context), EXTR_SKIP);
         require $fileCache;
     }
-
 
 }

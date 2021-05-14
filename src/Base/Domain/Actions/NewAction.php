@@ -27,6 +27,8 @@ class NewAction implements DomainActionLogicInterface
 
     use DomainTraits;
 
+    /** @var bool */
+    protected bool $isRestFul = false;
     /** @return void - not currently being used */
     public function __construct()
     {
@@ -55,18 +57,18 @@ class NewAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        
+
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
                 $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
-                $formData = $controller->formBuilder->getData(); /* submitted data */
+                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
                 /* data sanitization */
-                $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();  
+                $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
                 $action = $controller->repository
                     ->getRepo()
                     ->validateRepository($entityCollection, $entityObject)
                     ->persistAfterValidation();
-    
+
                 if ($action) {
                     if ($controller->eventDispatcher) {
                         $controller->eventDispatcher->dispatch(
@@ -82,6 +84,7 @@ class NewAction implements DomainActionLogicInterface
                         );
                     }
                 }
+                $this->domainAction = $action;
             }
         endif;
         return $this;

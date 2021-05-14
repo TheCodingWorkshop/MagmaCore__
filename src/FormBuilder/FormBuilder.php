@@ -18,6 +18,7 @@ use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\FormBuilder\FormBuilderTrait;
 use MagmaCore\FormBuilder\AbstractFormBuilder;
+use MagmaCore\FormBuilder\Traits\FormalizerTrait;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
 
@@ -25,6 +26,7 @@ class FormBuilder extends AbstractFormBuilder
 {
 
     use FormBuilderTrait;
+    use FormalizerTrait;
     use SessionTrait;
 
     protected array $inputObject = [];
@@ -33,7 +35,7 @@ class FormBuilder extends AbstractFormBuilder
     protected bool $addCsrf = true;
     protected string $element = '';
     protected Object $error;
-    private array|null $dataRepository;
+    private object|null $dataRepository = null;
     /**
      * Main class constructor
      * 
@@ -69,29 +71,6 @@ class FormBuilder extends AbstractFormBuilder
         return $this;
     }
 
-    public function addRepository(array|null $repository = null): static
-    {
-        if ($repository != null) {
-           // $repository = (array) $dataRepository;
-            $this->dataRepository = $repository;
-        }
-        return $this;
-
-    }
-
-    public function getRepo()
-    {
-        return $this->dataRepository;
-    }
-
-    public function hasValue($fieldName)
-    {
-        return (
-            empty($this->dataRepository[$fieldName]) 
-            ? '' : $this->dataRepository[$fieldName]
-        );
-    }
-
     /**
      * This method allows us to chain multiple input types together to build the required
      * form structure
@@ -112,18 +91,6 @@ class FormBuilder extends AbstractFormBuilder
                 return $this;
             }
         }
-    }
-
-    public function addOptions(array $options): static
-    {
-        $this->addOptions = $options;
-        return $this;
-    }
-
-    public function addSettings(array $settings): static
-    {
-        $this->addSettings = $settings;
-        return $this;
     }
 
     /**
@@ -152,7 +119,11 @@ class FormBuilder extends AbstractFormBuilder
             if ($this->addCsrf) {
                 $this->element .= $this->csrfForm($this->formAttr['action']);
             }
-        $this->element .= '</form>';
+            $this->element .= PHP_EOL;
+
+        $this->element .= (isset($this->formAttr['leave_form_open']) && $this->formAttr['leave_form_open'] === true ? '' : '</form>');
+
+        $this->element .= PHP_EOL;
         if (isset($this->element) && !empty($this->element)) {
             return $this->element;
         }

@@ -71,7 +71,10 @@ class LoginAction implements DomainActionLogicInterface
                                 $controller->eventDispatcher->dispatch(
                                     new $eventDispatcher(
                                         $method,
-                                        array(),
+                                        array(
+                                            $controller->authenticator->getAuthUser(),
+                                            $additionalContext ? $additionalContext : []
+                                        ),
                                         $controller
                                     ),
                                     $eventDispatcher::NAME

@@ -40,6 +40,7 @@ class Error implements ErrorInterface
      * Add a error to the error array
      *
      * @param array|string $error
+     * @param object $object
      * @param array $errorParams
      * @return void
      */

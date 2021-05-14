@@ -121,21 +121,21 @@ class Container implements ContainerInterface, SettableInterface
     protected function getDependencies($parameters, ReflectionClass $reflection)
     {
         $dependencies = [];
-        foreach ($parameters as $parameter) { /* Get the type hinted class */
+        foreach ($parameters as $parameter) {
             $dependency = $parameter->getClass();
-            if ($dependency === null) { /* Check is a default value for parameters is available */
-                if ($parameter->isDefaultValueAvailable()) { /* Get the parameter default value */
+            if (is_null($dependency)) {
+                if ($parameter->isDefaultValueAvailable()) {
                     $dependencies[] = $parameter->getDefaultValue();
                 } else {
-                    throw new DependencyHasNoDefaultValueException("Sorry cannot resolve class dependency {$parameter->name}");
+                    throw new DependencyHasNoDefaultValueException('Sorry cannot resolve class dependency ' . $parameter->name);
                 }
-            } elseif (!$reflection->isUserDefined()) { /* needs testing might take out */
+            } elseif (!$reflection->isUserDefined()) {
                 $this->set($dependency->name);
             } else {
-                /* Get dependencies resolved */
                 $dependencies[] = $this->get($dependency->name);
             }
         }
+
         return $dependencies;
     }
 

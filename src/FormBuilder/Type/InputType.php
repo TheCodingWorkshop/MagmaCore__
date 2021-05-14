@@ -11,10 +11,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Type;
 
-use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-use MagmaCore\FormBuilder\FormExtensionTypeInterface;
-use MagmaCore\FormBuilder\FormBuilderTypeInterface;
+use MagmaCore\Utility\Stringify;
 use MagmaCore\FormBuilder\FormBuilderTrait;
+use MagmaCore\FormBuilder\FormBuilderTypeInterface;
+use MagmaCore\FormBuilder\FormExtensionTypeInterface;
+use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 
 
 class InputType implements FormBuilderTypeInterface
@@ -27,7 +28,7 @@ class InputType implements FormBuilderTypeInterface
      /** @var array - returns the combined attr options from extensions and constructor fields */
     protected array $attr = [];
     /** @var array - return an array of form fields attributes */
-    protected array $fields = [];
+    protected mixed $fields;
     /** @var array returns an array of form settings */
     protected array $settings = [];
     /** @var mixed */
@@ -44,14 +45,14 @@ class InputType implements FormBuilderTypeInterface
      */
     public function __construct(array $fields, $options = null, array $settings = [])
     {
-        $this->fields = $fields;
+        $this->fields = $this->filterArray($fields);
         $this->options = ($options !=null) ? $options : null;
         $this->settings = $settings;
         if (is_array($this->baseOptions)) {
             $this->baseOptions = $this->getBaseOptions();
         }
     }
-
+    
     /**
      * Returns an array of base options.
      *
@@ -62,7 +63,7 @@ class InputType implements FormBuilderTypeInterface
         return [
             'type' => $this->type, 
             'name' => '', 
-            'id' => $this->fields['name'], 
+            'id' => (isset($this->fields['name']) ? $this->fields['name'] : ''), 
             'class' => ['uk-input'],
             'checked' => false, 
             'required' => false, 
@@ -115,7 +116,6 @@ class InputType implements FormBuilderTypeInterface
         if (empty($this->type)) {
             throw new FormBuilderInvalidArgumentException('Sorry please set the ' . $this->type . ' property in your extension class.');
         }
-
         if (!$this->buildExtensionObject()) {
             $defaultWithExtensionOptions = (!empty($extensionOptions) ? array_merge($this->getBaseOptions(), $extensionOptions) : $this->getBaseOptions());
             if ($this->fields) { /* field options set from the constructor */
@@ -191,6 +191,16 @@ class InputType implements FormBuilderTypeInterface
                 break;
             case 'checkbox' :
                 return sprintf("\n<input %s>&nbsp;%s\n", $this->filtering(), ($this->settings['checkbox_label'] !='' ? $this->settings['checkbox_label'] : ''));
+                break;
+            case 'multiple_checkbox' :
+                if (
+                    isset($this->options) && 
+                    is_array($this->options) && 
+                    count($this->options) > 0) {
+                        foreach ($this->options['choices'] as $key => $option) {    
+                           return '<input type="checkbox" class="uk-checkbox" name="visibility[]" id="' . $key . '" value="' . $key . '">&nbsp;' . Stringify::capitalize($key);
+                        }   
+                }
                 break;
             default :
                 return sprintf("\n<input %s>\n", $this->filtering());

@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
-use ReflectionMethod;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
@@ -47,6 +48,11 @@ trait ControllerTrait
             }
             return $output;
         }
+    }
+
+    public function addDefinitions(?array $args = null)
+    {
+        return $this->diContainer($args);
     }
 
     /**
@@ -144,6 +150,107 @@ trait ControllerTrait
                 }
             }
         }
+        return false;
+    }
+
+    public function getColumnParts(string $columnString, string $part = 'sortable')
+    {
+        $columns = BaseApplication::diGet($columnString);
+        if ($columns) {
+            return array_filter(
+                $columns->columns(),
+                fn ($column) => isset($column[$part]) && $column[$part] === true ? $column['dt_row'] : []
+            );
+        }
+    }
+
+    /**
+     * Return an array of sortable columns from a *Column class. Only the sortable 
+     * columns which is set to true will be returned
+     *
+     * @param string $columnString
+     * @return array
+     */
+    public function getSortableColumns(string $columnString): array
+    {
+        $sortables = $this->getColumnParts($columnString);
+        return array_map(fn ($col) => $col['db_row'], $sortables);
+    }
+
+    /**
+     * Return an array of visible columns from a *Column class. Only the show  
+     * columns which is set to true will be returned
+     *
+     * @param string $columnString
+     * @return array
+     */
+    public function getVisibleColumns(string $columnString)
+    {
+        $visibleColumns = $this->getColumnParts($columnString, 'show_column');
+        return array_map(fn ($col) => $col['db_row'], $visibleColumns);
+    }
+
+    /**
+     * Return an array of searchable columns from a *Column class. Only the searchable 
+     * columns which is set to true will be returned
+     *
+     * @param string $columnString
+     * @return array
+     */
+    public function getSearchableColumns(string $columnString)
+    {
+        $sortables = $this->getColumnParts($columnString, 'searchable');
+        return array_map(fn ($col) => $col['db_row'], $sortables);
+    }
+
+    /**
+     * Initialize each participating controller with controller settings data 
+     * which is stored and retrive from the database. All controller have options
+     * which can adjust the current listing pages ie. change how much data is return
+     * within the data table. or change the search term or even enable advance 
+     * pagination.
+     *
+     * @param string|null $controller - the participating controller object
+     * @param string $columns - the matching *Column class as a qualified namespace
+     * @return boolean
+     */
+    public function initializeControllerSettings(?string $controller = null, string $columnString): bool
+    {
+        if (is_array($controllers = Yaml::file('controller'))) {
+            foreach ($controllers as $key => $setting) {
+                if (!in_array($controller, array_keys($controllers))) {
+                    throw new BaseException('Cannot initialize settings for ' . Stringify::capitalize($key) . 'Controller. Please ensure your controller.yml is referencing specific the controller name. As the array key without the controller suffix');
+                }
+
+                $find = $this->controllerSettingsModel
+                    ->getRepo()
+                    ->findObjectBy(['controller_name' => $controller]);
+
+                if ($find !== null && $controller === $find->controller_name) {
+                    return false;
+                }
+                $controllerSettings = [
+                    'controller_name' => $key,
+                    'records_per_page' => $setting['records_per_page'],
+                    'visibility' => serialize($this->getVisibleColumns($columnString)),
+                    'sortable' => serialize($this->getSortableColumns($columnString)),
+                    'searchable' => NULL,
+                    'query_values' => serialize($setting['status_choices']),
+                    'query' => $setting['query'],
+                    'filter' => serialize($setting['filter_by']),
+                    'alias' => $setting['filter_alias']
+                ];
+                $action = $this->controllerSettingsModel
+                    ->getRepo()
+                    ->getEm()
+                    ->getCrud()
+                    ->create($controllerSettings);
+                if ($action) {
+                    return $action;
+                }
+            }
+        }
+
         return false;
     }
 }

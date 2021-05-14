@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false" bootstrap="./vendor/autoload.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" verbose="true">
+ <testsuite name="Unit">
+  <directory suffix="Test.php">./tests/Unit/</directory>
+ </testsuite>
+ <filter>
+  <whitelist processUncoveredFilesFromWhitelist="true">
+   <directory suffix=".php">./src</directory>
+  </whitelist>
+ </filter>
+</phpunit>

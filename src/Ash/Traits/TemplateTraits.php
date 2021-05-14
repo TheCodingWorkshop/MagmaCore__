@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Traits;
 
+use MatthiasMullie\Minify;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Ash\Exception\FileNotFoundException;
 
 trait TemplateTraits
@@ -26,14 +28,25 @@ trait TemplateTraits
      * @return string
      * @throws FileNotFoundException
      */
-    public function addjs($js)
+    public function addjs(mixed $js = null, string $location = 'footer')
     {
         $this->js = $js;
-        if (is_array($this->js) && count($this->js) > 0) {
-            foreach ($this->js as $file) {
-                $jsFile = $this->resolvePath($file);
-                if ($jsFile) {
-                    echo '<script src="' . $jsFile . '"></script>' . "\n";
+        $jsYmls = Yaml::file('assets')['scripts'];
+        $allJs = array_merge($jsYmls, isset($this->js) ? $this->js : []);
+        if (is_array($allJs) && count($allJs) > 0) {
+            foreach ($allJs as $file) {
+                if (isset($file['enable']) && $file['enable'] === true) {
+                    if (isset($file['location']) && $file['location'] === $location) {
+                        if (isset($file['cdn']) && $file['cdn'] === true) {
+                            $jsFile = isset($file['src']) ? $file['src'] : '';
+                        } else {
+                            $jsFile = $this->resolvePath($file['src']);
+                        }
+                        if ($jsFile) {
+                            //$minifier = new Minify\CSS($jsFile);
+                            echo '<script src="' . $jsFile . '"></script>' . "\n";
+                        }
+                    }
                 }
             }
         }
@@ -48,14 +61,24 @@ trait TemplateTraits
      * @return string
      * @throws FileNotFoundException
      */
-    public function addcss($css)
+    public function addcss(mixed $css = null)
     {
         $this->css = $css;
-        if (is_array($this->css) && count($this->css) > 0) {
-            foreach ($this->css as $file) {
-                $cssFile = $this->resolvePath($file, 'css');
-                if ($cssFile) {
-                    echo '<link rel="stylesheet" href="' . $cssFile . '">' . "\n";
+        $cssYmls = Yaml::file('assets')['stylesheets'];
+        $allCss = array_merge($cssYmls, isset($this->css) ? $this->css : []);
+        if (is_array($allCss) && count($allCss) > 0) {
+
+            foreach ($allCss as $file) {
+                if (isset($file['enable']) && $file['enable'] === true) {
+                    if (isset($file['cdn']) && $file['cdn'] === true) {
+                        $cssFile = isset($file['href']) ? $file['href'] : '';
+                    } else {
+                        $cssFile = $this->resolvePath($file['href']);
+                    }
+
+                    if ($cssFile) {
+                        echo '<link rel="stylesheet" href="' . $cssFile . '">' . "\n";
+                    }
                 }
             }
         }
@@ -69,24 +92,11 @@ trait TemplateTraits
      * @param string $type - defaults to a javascript file can be change within other methods
      * @return void
      */
-    private function resolvePath(string $file, string $type = 'js'): string
+    private function resolvePath(string $file): string
     {
-        $pathFile = $this->assignedPath($type) . "/{$file}.{$type}";
-        if (!file_exists(APP_ROOT . $pathFile)) {
-            throw new FileNotFoundException("{$file} was not found within the specified directory. Please ensure your file exists."); 
+        if (!file_exists(APP_ROOT . $file)) {
+            throw new FileNotFoundException("{$file} was not found within the specified directory. Please ensure your file exists.");
         }
-        return $pathFile;
+        return $file;
     }
-
-    /**
-     * Returns returns the relative path to the script static files
-     *
-     * @param string $path
-     * @return string
-     */
-    private function assignedPath(string $path = 'js'): string
-    {
-        return ASSET_PATH . '/' . $path;
-    }
-
 }

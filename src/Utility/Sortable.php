@@ -44,8 +44,9 @@ class Sortable
 
     public function getColumn() : string
     {
+        $cols = array_values(array_filter($this->columns, fn($col) => $col));
         if (is_array($this->columns)) {
-            $this->column = isset($_GET['column']) && in_array($_GET['column'], $this->columns) ? $_GET['column'] : $this->columns[0];
+            $this->column = isset($_GET['column']) && in_array($_GET['column'], $this->columns) ? $_GET['column'] : $cols[0];
             if ($this->column) {
                 return $this->column;
             }

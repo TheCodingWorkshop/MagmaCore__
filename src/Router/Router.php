@@ -15,6 +15,7 @@ namespace MagmaCore\Router;
 use Closure;
 use ReflectionMethod;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\Stringify;
 use MagmaCore\Router\RouterTrait;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\RouterInterface;
@@ -70,7 +71,7 @@ class Router implements RouterInterface
     private function createController(): string
     {
         $controllerName = $this->params['controller'] . $this->controllerSuffix;
-        $controllerName  = $this->transformUpperCamelCases($controllerName);
+        $controllerName = Stringify::studlyCaps($controllerName);
         $controllerName = $this->getNamespace() . $controllerName;
         return $controllerName;
     }
@@ -83,7 +84,7 @@ class Router implements RouterInterface
     public function createAction(): string
     {
         $action = $this->params['action'];
-        $action = $this->transformLowerCamelCase($action);
+        $action = Stringify::camelCase($action);
         return $action;
     }
 

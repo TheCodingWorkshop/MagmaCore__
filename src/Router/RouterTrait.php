@@ -14,28 +14,4 @@ namespace MagmaCore\Router;
 trait RouterTrait
 {
 
-    /**
-     * Convert the string with hyphens to StudlyCaps,
-     * e.g. post-authors => PostAuthors
-     *
-     * @param string $string The string to convert
-     * @return string
-     */
-    protected function transformUpperCamelCases($string)
-    {
-        return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
-    }
-
-    /**
-     * Convert the string with hyphens to camelCase,
-     * e.g. add-new => addNew
-     *
-     * @param string $string The string to convert
-     * @return string
-     */
-    protected function transformLowerCamelCase($string)
-    {
-        return lcfirst($this->transformUpperCamelCases($string));
-    }
-
 }

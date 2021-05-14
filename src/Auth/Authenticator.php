@@ -31,9 +31,9 @@ class Authenticator
      * 
      * @param string $email
      * @param string $password
-     * @return object
+     * @return object|null
      */
-    public function authenticate(string $email, string $passqwordHash): object
+    public function authenticate(string $email, string $passqwordHash): ?object
     {
         $this->repository = (new UserModel());
         $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
@@ -43,10 +43,15 @@ class Authenticator
                 $this->action = true;
                 if (password_verify($passqwordHash, $this->user->password_hash)) {
                     $this->action = true;
+                    if ($this->user->user_failed_logins !==0) {
+                        $this->forceReset();
+                    }
                     return $this->user;
                 }
             }
         }
+        return null;
+        
     }
 
     /**
@@ -75,6 +80,11 @@ class Authenticator
         return $this->validatedUser;
     }
 
+    public function getAuthUser(): array
+    {
+        return (array)$this->validatedUser;
+    }
+
     /**
      * Get the remember_me value from the request if the checkbox was checked
      *
@@ -98,6 +108,29 @@ class Authenticator
     public function getLogin(): void
     {
         Authorized::login($this->validatedUser, $this->isRememberingLogin());
+    }
+
+    public function forceDetected(string $email)
+    {
+        $this->repository->getRepo()
+            ->getEm()
+            ->getCrud()
+            ->rawQuery(
+                'UPDATE `users` SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login WHERE email = :email',
+                ['user_last_failed_login' => time(), 'email' => $email]
+            );
+    }
+
+    public function forceReset()
+    {
+        // reset the failed login counter for that user
+        $this->repository->getRepo()
+            ->getEm()
+            ->getCrud()
+            ->rawQuery(
+                'UPDATE `users` SET user_failed_logins = 0, user_last_failed_login = NULL WHERE id = :id AND user_failed_logins !=0',
+                ['id' => $this->user->id]
+            );
     }
 
 
@@ -130,8 +163,12 @@ class Authenticator
                         if (empty($value)) {
                             $this->errors = Error::display('err_password_require');
                         }
-                        $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash']);
-                        if (!password_verify($value, $user->password_hash)) {
+                        $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash', 'user_failed_logins', 'user_last_failed_login']);
+
+                        if (($user->user_failed_logins >= 3) && ($user->user_last_failed_login > (time() - 30))) {
+                            $this->errors = Error::display('err_password_force');
+                        } else if (!password_verify($value, $user->password_hash)) {
+                            $this->forceDetected($this->email);
                             $this->errors = Error::display('err_invalid_credentials');
                         }
                         break;

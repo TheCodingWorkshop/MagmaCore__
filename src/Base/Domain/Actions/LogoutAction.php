@@ -66,8 +66,11 @@ class LogoutAction implements DomainActionLogicInterface
                         $controller->eventDispatcher->dispatch(
                             new $eventDispatcher(
                                 $method,
-                                array(),
-                                $controller
+                                array(
+                                    $controller->authenticator->getAuthUser(),
+                                    $additionalContext ? $additionalContext : []
+                                ),
+                        $controller
                             ),
                             $eventDispatcher::NAME
                         );

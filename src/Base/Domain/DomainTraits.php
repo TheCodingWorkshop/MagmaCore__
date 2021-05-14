@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use App\Schema\UserSchema;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Domain\DomainLogicRules;
@@ -86,7 +85,7 @@ trait DomainTraits
      */
     public function getFileExt(int $indexPos): string
     {
-        return Yaml::file('twig')['template_ext'][$indexPos];
+        return Yaml::file('template')['template']['template_ext'][$indexPos];
     }
 
     /**
@@ -132,7 +131,7 @@ trait DomainTraits
      * @param int $extension - the file extension defaults to 2 (.html.twig)
      * @return self
      */
-    public function render(string|null $filename = null, int $extension = 2): self
+    public function render(string|null $filename = null, int $extension = 0): self
     {
         if ($filename !== null) {
             $this->fileToRender = $filename;
@@ -214,12 +213,8 @@ trait DomainTraits
      * @param array $tableData
      * @return self
      */
-    public function table(
-        array $tableParams = [],
-        Object|null $column = null,
-        Object|null $repository = null,
-        array $tableData = []
-    ): self {
+    public function table(array $tableParams = [], object|null $column = null, object|null $repository = null, array $tableData = []): self
+    {
 
         /* Create the table object and pass the dataColumn and repository object */
         $table = $this->tableData
@@ -233,7 +228,8 @@ trait DomainTraits
                  * its takes 1 argument which is schema that built the model. See
                  * the relevant schema located in the App/Schema directory
                  * */
-                $this->controller->repository->getColumns($this->schema)
+                $this->controller->repository->getColumns($this->schema),
+                $this->controller
             )
             ->setAttr($tableParams)
             ->table();
@@ -245,6 +241,7 @@ trait DomainTraits
                 'table' => $table,
                 'pagination' => $this->controller->tableGrid->pagination(),
                 'columns' => $this->controller->tableGrid->getColumns(),
+                'dataColumns' => $this->controller->tableGrid->getDataColumns(),
                 'total_records' => $this->controller->tableGrid->totalRecords(),
                 'search_query' => $this->controller->request->handler()->query->getAlnum($this->args['filter_alias'])
             ];
@@ -276,7 +273,7 @@ trait DomainTraits
      *
      * @return void
      */
-    public function end(): void
+    public function end(string|null $type = null): void
     {
         $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
         $this->controller->render($this->fileToRender, $context);
@@ -394,10 +391,18 @@ trait DomainTraits
         }
     }
 
+    public function api(): void
+    {
+        $this->isRestFul = true;
+        if (is_bool($this->domainAction) && $this->domainAction === true) {
+            echo $this->controller->apiResponse->response(['success' => 'Created Successfully.'], 201);
+        } else {
+            echo $this->controller->apiResponse->response(['success' => 'The request was unsuccessful'], 201);
+        }
+    }
+
     public function getSubmitValue(): string
     {
         return $this->getFileName() . '-' . strtolower($this->controller->thisRouteController());
     }
-
-
 }

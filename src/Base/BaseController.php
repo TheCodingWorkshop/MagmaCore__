@@ -7,18 +7,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
+use MagmaCore\Auth\Authorized;
 use MagmaCore\Base\BaseRedirect;
+use MagmaCore\Utility\Stringify;
 use MagmaCore\Session\Flash\Flash;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
+use MagmaCore\Ash\TemplateExtension;
 use MagmaCore\Middleware\Middleware;
 use MagmaCore\Session\Flash\FlashType;
+use MagmaCore\CommanderBar\CommanderBar;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
 
@@ -31,13 +36,17 @@ class BaseController extends AbstractBaseController
     /** @var array */
     protected array $routeParams;
     /** @var object */
-    protected Object $twig;
+    protected Object $templateEngine;
     /** @var */
     protected object $template;
     /** @var array */
     protected array $callBeforeMiddlewares = [];
     /** @var array */
     protected array $callAfterMiddlewares = [];
+    /** @var object */
+    protected object|null $tableSettings = null;
+    /** @var object */
+    protected mixed $controllerSettings = null;
 
     /**
      * Main class constructor
@@ -48,10 +57,9 @@ class BaseController extends AbstractBaseController
     {
         parent::__construct($routeParams);
         $this->routeParams = $routeParams;
-        $this->twig = new BaseView();
+        $this->templateEngine = new BaseView();
 
         $this->diContainer(Yaml::file('providers'));
-
         $this->registerSubscribedServices();
     }
 
@@ -67,15 +75,15 @@ class BaseController extends AbstractBaseController
      * @return void
      */
     public function __call($name, $argument)
-    {   
-        if (is_string($name) && $name !=='') {
+    {
+        if (is_string($name) && $name !== '') {
             $method = $name . 'Action';
             if (method_exists($this, $method)) {
                 if ($this->before() !== false) {
                     call_user_func_array([$this, $method], $argument);
                     $this->after();
                 }
-            }else {
+            } else {
                 throw new \BadMethodCallException("Method {$method} does not exists.");
             }
         } else {
@@ -92,7 +100,7 @@ class BaseController extends AbstractBaseController
      *
      * @return array
      */
-    protected function callBeforeMiddlewares() : array
+    protected function callBeforeMiddlewares(): array
     {
         return $this->callBeforeMiddlewares;
     }
@@ -106,7 +114,7 @@ class BaseController extends AbstractBaseController
      *
      * @return array
      */
-    protected function callAfterMiddlewares() : array
+    protected function callAfterMiddlewares(): array
     {
         return $this->callAfterMiddlewares;
     }
@@ -116,47 +124,139 @@ class BaseController extends AbstractBaseController
      * @return void
      */
     protected function before()
-    { 
+    {
         $object = new self($this->routeParams);
         (new Middleware())->middlewares($this->callBeforeMiddlewares())
-        ->middleware($object, function($object){
-            return $object;
-        });
+            ->middleware($object, function ($object) {
+                return $object;
+            });
     }
 
     /**
      * After method. Call after controller action method
+     * 
      * @return void
      */
     protected function after()
-    { 
+    {
         $object = new self($this->routeParams);
         (new Middleware())->middlewares($this->callAfterMiddlewares())
-        ->middleware($object, function($object){
-            return $object;
-        });
+            ->middleware($object, function ($object) {
+                return $object;
+            });
+    }
 
+    private function userCommanderList()
+    {
+        $items = Yaml::file('user');
+        if ($items) {
+            if ($this->thisRouteAction() === 'index') {
+                return $items['index'];
+            } else {
+                return $items['not_index'];
+            }
+        }
+    }
+
+    private function commanderBar()
+    {
+        if (!Authorized::grantedUser()) {
+            return false;
+        }
+        $tableSettings = '';
+        if (isset($tableSettings)) {
+            $tableSettings = $this->controllerSettings
+            ->createForm(
+                "/admin/{$this->thisRouteController()}/settings",
+                $this->controllerSettingsModel->getRepo()->findObjectBy(['controller_name' => $this->thisRouteController()])
+            );
+
+        }
+        $commander = new CommanderBar();
+        $commander->create(
+            $this,
+            $this->userCommanderList(),
+            $this->tableGrid->getDataColumns(),
+            NULL,
+            NULL,
+            $this->userCommanderHeading(),
+            ($tableSettings !== null) ? $tableSettings : ''
+        );
+
+        return $commander->commanderWrapper();
+    }
+
+    private function userCommanderHeading()
+    {
+        $controller = Stringify::capitalize($this->thisRouteController());
+        return match ($this->thisRouteAction()) {
+            'index' => $controller . ' ' . 'Listings',
+            'new' => 'Create new ' . $controller,
+            'edit' => 'Edit ' . $this->findOr404()->firstname,
+            'show' => 'Viewing ' . $this->findOr404()->firstname,
+            'hard-delete' => 'Deleteing ' . $this->findOr404()->firstname,
+            'perferences' => $this->findOr404()->firstname . ' Perferences',
+            'privileges' => $this->findOr404()->firstname . ' Privileges',
+            default => 'Unknown'
+        };
+    }
+
+    private function iconPicker()
+    {
+        return '';
     }
 
     /**
      * Render a template response using Twig templating engine
      *
-     * @param string $template
-     * @param array $context - The context (arguments) of the template
-     * @return response
+     * @param string $template - the rendering template
+     * @param array $context - template data context
+     * @return Response
      * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * @throws BaseLogicException
      */
-    public function render(string $template, array $context = [])
+    public function view(string $template, array $context = [])
     {
-        if (null === $this->twig) {
-            throw new BaseLogicException('You can not use the render method if the Twig Bundle is not available.');
+        if (null === $this->templateEngine) {
+            throw new BaseLogicException(
+                'You can not use the render method if the build in template engine is not available.'
+            );
         }
-        $response = (new ResponseHandler($this->twig->twigRender($template, $context)))->handler();
+        $templateContext = array_merge(
+            ['current_user' => Authorized::grantedUser()],
+            ['func' => new TemplateExtension($this)],
+            ['app' => Yaml::file('app')],
+            ['menu' => Yaml::file('menu')],
+            ['commanderBar' => $this->commanderBar()],
+            ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
+        );
+
+        //$additionalContext = [['this' => $this, 'routes' => (isset($this->routeParams) ? $this->routeParams : [])]];
+        $response = (new ResponseHandler(
+            $this->templateEngine->ashRender($template, array_merge($context, $templateContext))
+        ))->handler();
         if ($response) {
             return $response;
         }
+    }
+
+    public function getRoutes(): array
+    {
+        return $this->routeParams;
+    }
+
+    /**
+     * Alias of view() method
+     *
+     * @param string $template - the rendering template
+     * @param array $context - template data context
+     * @return Response
+     * @throws LoaderError
+     * @throws BaseLogicException
+     */
+    public function render(string $template, array $context = [])
+    {
+        return $this->view($template, $context);
     }
 
     /**
@@ -170,10 +270,11 @@ class BaseController extends AbstractBaseController
     public function redirect(string $url, bool $replace = true, int $responseCode = 303)
     {
         $this->redirect = new BaseRedirect(
-            $url, 
-            $this->routeParams, 
-            $replace, 
-            $responseCode);
+            $url,
+            $this->routeParams,
+            $replace,
+            $responseCode
+        );
 
         if ($this->redirect) {
             $this->redirect->redirect();
@@ -185,16 +286,15 @@ class BaseController extends AbstractBaseController
         if (isset($_SERVER['REQUEST_URI'])) {
             return $_SERVER['REQUEST_URI'];
         }
-
     }
 
-    public function getSiteUrl(?string $path = null) : string
+    public function getSiteUrl(?string $path = null): string
     {
         return sprintf(
             "%s://%s%s",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
             $_SERVER['SERVER_NAME'],
-            ($path !==null) ? $path : $_SERVER['REQUEST_URI']
+            ($path !== null) ? $path : $_SERVER['REQUEST_URI']
         );
     }
 
@@ -208,7 +308,7 @@ class BaseController extends AbstractBaseController
      * @param string $type
      * @return void
      */
-    public function flashAndRedirect(bool $action, ?string $redirect = null, string $message, string $type = FlashType::SUCCESS) : void
+    public function flashAndRedirect(bool $action, ?string $redirect = null, string $message, string $type = FlashType::SUCCESS): void
     {
         if (is_bool($action)) {
             $this->flashMessage($message, $type);
@@ -236,7 +336,7 @@ class BaseController extends AbstractBaseController
      *
      * @return string
      */
-    public function flashWarning() : string
+    public function flashWarning(): string
     {
         return FlashType::WARNING;
     }
@@ -246,7 +346,7 @@ class BaseController extends AbstractBaseController
      *
      * @return string
      */
-    public function flashSuccess() : string
+    public function flashSuccess(): string
     {
         return FlashType::SUCCESS;
     }
@@ -256,7 +356,7 @@ class BaseController extends AbstractBaseController
      *
      * @return string
      */
-    public function flashDanger() : string
+    public function flashDanger(): string
     {
         return FlashType::DANGER;
     }
@@ -266,7 +366,7 @@ class BaseController extends AbstractBaseController
      *
      * @return string
      */
-    public function flashInfo() : string
+    public function flashInfo(): string
     {
         return FlashType::INFO;
     }
@@ -277,7 +377,7 @@ class BaseController extends AbstractBaseController
      * @param string $locale
      * @return string
      */
-    public function locale(?string $locale = null) : ?string
+    public function locale(?string $locale = null): ?string
     {
         /*if (null !== $locale)
             return Translation::getInstance()->$locale;*/
@@ -290,9 +390,8 @@ class BaseController extends AbstractBaseController
      *
      * @return Object
      */
-    public function getSession() : Object
+    public function getSession(): Object
     {
         return SessionTrait::sessionFromGlobal();
     }
-
 }

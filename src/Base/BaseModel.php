@@ -174,7 +174,6 @@ class BaseModel
             throw new DataRelationshipInvalidArgumentException('');
         }
         return $relationship;
-
     }
 
     /**
@@ -186,7 +185,7 @@ class BaseModel
      */
     public function create(string $dataSchema = null): static
     {
-        if ($dataSchema !==null) {
+        if ($dataSchema !== null) {
             $newSchema = BaseApplication::diGet($dataSchema);
             if (!$newSchema instanceof DataSchemaBuilderInterface) {
                 throw new BaseInvalidArgumentException('');
@@ -209,6 +208,12 @@ class BaseModel
         return $this->create($schema)->getSchemaColumns();
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $model
+     * @return array
+     */
     public function getFillables(string $model): array
     {
         if (!$this->fillable) {
@@ -237,13 +242,40 @@ class BaseModel
             $props = $reflectionProperty->getValue($this->dataSchemaObject);
             $this->dbColumns = $props->getRepo()
                 ->getEm()
-                    ->getCrud()
-                        ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
-            
+                ->getCrud()
+                ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
+
             return $this->dbColumns;
-            
+
             $reflectionProperty->setAccessible(false);
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param array $conditions
+     * @param mixed $data
+     * @return mixed
+     */
+    public function unsanitizeData(array $conditions, mixed $data = null)
+    {
+        if ($conditions) {
+            $serializeData = $this->getRepo()->findOneBy($conditions);
+            if ($serializeData) {
+                foreach ($serializeData as $serialData) {
+                    if (is_null($data)) {
+                        throw new \Exception();
+                    }
+                    if (is_array($data)) {
+                        return array_map(fn($d) => unserialize($serialData[$d]), $data);
+                    } elseif (is_string($data)) {
+                        return unserialize($serialData[$data]);
+                    } 
+
+                }
+            }
+        }
+            
+    }
 }

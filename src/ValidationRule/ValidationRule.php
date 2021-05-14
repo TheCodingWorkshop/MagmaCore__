@@ -13,18 +13,19 @@ declare(strict_types=1);
 namespace MagmaCore\ValidationRule;
 
 use MagmaCore\Utility\Stringify;
+use MagmaCore\Base\BaseController;
 use MagmaCore\ValidationRule\ValidationRuleMethods;
 use MagmaCore\ValidationRule\ValidationRuleInterface;
-use MagmaCore\Base\Exception\BaseBadMethodCallException;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\ValidationRule\ValidationBadMethodCallException;
+use MagmaCore\ValidationRule\ValidationInvalidArgumentException;
 
 class ValidationRule implements ValidationRuleInterface
 {
 
-    protected object $controller;
-    protected object $validationClass;
-    protected ValidationRuleMethods $validationRules;
-    protected const ALLOWABLE_RULES = [
+    private object $controller;
+    private object $validationClass;
+    private ValidationRuleMethods $validationRules;
+    private const ALLOWABLE_RULES = [
         'strings',
         'integre',
         'array',
@@ -73,6 +74,16 @@ class ValidationRule implements ValidationRuleInterface
     }
 
     /**
+     * Return the calling controller object
+     *
+     * @return void
+     */
+    public function getController(): BaseController
+    {
+        return $this->controller;
+    }
+
+    /**
      * Resolve the array of possible rules pass from the validation class
      *
      * @param mixed $rule
@@ -97,13 +108,16 @@ class ValidationRule implements ValidationRuleInterface
                 return array_walk($rulePieces, function ($callback) {
                     if ($callback) {
                         list($method, $argument) = $this->resolveCallback($callback);
-                        if (!method_exists($this->validationRuleFuncs, $method)) {
-                            throw new BaseBadMethodCallException(
+                        $classRule = '\MagmaCore\ValidationRule\Rules\\' . Stringify::studlyCaps($method);
+                        if (!method_exists(
+                            $classRule, 
+                            $newMethod = Stringify::camelCase($method))) {
+                            throw new ValidationBadMethodCallException(
                                 $method . '() does not exists within ' . __CLASS__
                             );
                         }
                         call_user_func_array(
-                            array($this->validationRuleFuncs, $method),
+                            array(new $classRule, $newMethod),
                             [
                                 $this->controller, 
                                 $this->validationClass, 
@@ -167,7 +181,7 @@ class ValidationRule implements ValidationRuleInterface
     private function throwInvalidRuleException(mixed $rule): void
     {
         if (!in_array($rule, self::ALLOWABLE_RULES, true)) {
-            throw new BaseInvalidArgumentException('Invalid validation rule ' . $rule);
+            throw new ValidationInvalidArgumentException($rule . ' is not a supported validation rule ' . $rule);
         }
     }
 }

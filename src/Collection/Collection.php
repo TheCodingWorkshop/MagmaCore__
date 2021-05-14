@@ -184,7 +184,7 @@ class Collection implements CollectionInterface
      * @param [type] $length
      * @return static
      */
-    public function slice($offset, $length = null): static
+    public function slice(int $offset, $length = null): static
     {
         return new static(array_slice($this->items, $offset, $length, true));
     }
@@ -379,20 +379,20 @@ class Collection implements CollectionInterface
         return $this->size();
     }
 
-    public function flat($array) { 
-        if (!is_array($array)) { 
-          return FALSE; 
-        } 
-        $result = array(); 
-        foreach ($array as $key => $value) { 
-          if (is_array($value)) { 
-            $result = array_merge($result, $this->flat($value)); 
-          } 
-          else { 
-            $result[$key] = $value; 
-          } 
-        } 
-        return $result; 
-      } 
+    public function flat($array)
+    {
+        if (!is_array($array)) {
+            return FALSE;
+        }
+        $result = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = array_merge($result, $this->flat($value));
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
 
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
-use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
+use MagmaCore\Utility\Stringify;
+use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 use MagmaCore\FormBuilder\Exception\FormBuilderOutOfBoundsException;
+use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 
 trait FormBuilderTrait
 {
@@ -89,7 +91,7 @@ trait FormBuilderTrait
                 } else {
                     $checked = '';
                 }
-                $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $index . '" class="' . implode(' ', $attr['class']) . '" value="' . $choice . '"' . $checked . '>' . ' ' . htmlspecialchars(ucwords($choice)) . "\n<br>";
+                $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $index . '" class="' . implode(' ', $attr['class']) . '" value="' . $choice . '"' . $checked . '>' . ' ' . htmlspecialchars(Stringify::capitalize($choice)) . "\n<br>";
             }
             return $val;
         }
@@ -148,5 +150,18 @@ trait FormBuilderTrait
             }
         }
     }
+
+    public function filterArray(array $fields): mixed
+    {
+        $v = [];
+        if (is_array($fields)) {
+            foreach ($fields as $key => $value) {
+                $v = $value;
+            }
+        }
+        return $v;
+    
+    }
+
 
 }

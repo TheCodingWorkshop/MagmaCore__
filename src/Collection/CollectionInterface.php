@@ -124,7 +124,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
      * @param [type] $length
      * @return static
      */
-    public function slice($offset, $length = null): static;
+    public function slice(int $offset, $length = null): static;
 
     /**
      * Returns the values of the collection items

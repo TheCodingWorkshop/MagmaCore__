@@ -7,15 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare (strict_types = 1);
 
-namespace MagmaCore\Ash;
+declare(strict_types=1);
 
-interface TemplateLoaderInterface
+namespace MagmaCore\ValidationRule;
+
+use MagmaCore\Base\Exception\BaseBadMethodCallException;
+
+class ValidationBadMethodCallException extends BaseBadMethodCallException
 {
-
-    public function getCachekey();
-    public function isFresh();
-    public function exists();
-
 }

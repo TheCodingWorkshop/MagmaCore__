@@ -48,7 +48,8 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9",
+        "mockery/mockery": "^1.4"
     },
     "suggest": {
         "paragonise/anti-csrf": "Added for csrf form protection"

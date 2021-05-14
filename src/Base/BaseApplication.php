@@ -30,6 +30,7 @@ class BaseApplication extends AbstractBaseBootLoader
     protected array $containerProviders = [];
     protected string|null $routeHandler;
     protected string|null $newRouter;
+    protected string|null $theme;
 
     /** @return void */
     public function __construct()
@@ -58,6 +59,28 @@ class BaseApplication extends AbstractBaseBootLoader
     public function getPath(): string
     {
         return $this->appPath;
+    }
+
+    /**
+     * Set the default theming qualified namespace
+     *
+     * @param string $theme
+     * @return void
+     */
+    public function setTheme(string $theme): self
+    {
+        $this->theme = $theme;
+        return $this;
+    }
+
+    /**
+     * Returns the theme qualified namespace
+     *
+     * @return string
+     */
+    public function getTheme(): string
+    {
+        return isset($this->theme) ? $this->theme : '';
     }
 
     /**
@@ -297,7 +320,7 @@ class BaseApplication extends AbstractBaseBootLoader
     {
         return $this->errorLevel;
     }
-
+    
     public function run(): void
     {
         BaseConstants::load($this->app());

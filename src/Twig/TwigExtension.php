@@ -20,15 +20,16 @@ use MagmaCore\Utility\Yaml;
 use InvalidArgumentException;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Utility\Singleton;
+use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseController;
-use MagmaCore\Session\SessionTrait;
 
+use MagmaCore\Session\SessionTrait;
 use MagmaCore\Utility\DateFormatter;
 use Symfony\Component\Asset\Package;
 use Twig\Extension\AbstractExtension;
 use MagmaCore\Translation\Translation;
-use MagmaCore\Auth\Model\PermissionModel;
 
+use MagmaCore\Auth\Model\PermissionModel;
 use MagmaCore\Twig\Extensions\NavBarExtension;
 use MagmaCore\Twig\Extensions\IconNavExtension;
 use MagmaCore\Twig\Extensions\SearchBoxExtension;
@@ -176,8 +177,9 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
      */
     public function getPermissionName(int $permID): string
     {
-        $permName = (new PermissionModel())->getRepo()->findObjectBy(['id' => $permID], ['permission_name']);
-        return $permName->permission_name;
+        return '';
+        // $permName = (new PermissionModel())->getRepo()->findObjectBy(['id' => $permID], ['permission_name']);
+        // return $permName->permission_name;
     }
 
 
@@ -226,6 +228,41 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
     {
         return (new IconNavExtension())->getModal($values);
     }
+
+    /**
+     * @inheritdoc
+     * @param mixed $values
+     * @return string
+     */
+    public function getDropdown(array $items = [], string|null $status = null, array $row = [], string|null $controller = null): string
+    {
+        $element = '';
+        $_controller = ($controller !==null) ? $controller : '';
+        $_row = ($row) ? $row : [];
+        if (is_array($items) && count($items) > 0) {
+            $element .= '<div uk-dropdown="pos: left-center; mode: click">';
+                $element .= '<ul class="uk-nav uk-dropdown-nav">';
+                    $element .= '<li class="uk-active"><a href="#">' . ($status !==null) ? Stringify::capitalize($status) : 'Status Unknown' . '</a></li>';
+                    foreach ($items as $key => $item) {
+                        $element .= '<li>';
+                        $element .= '<a data-turbo="false" href="'.(isset($item['path']) ? $item['path']:'') . '">';
+                        $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
+                        $element .= Stringify::capitalize($item['name']);
+                        $element .= '</a>';
+                        $element .= '</li>';
+                        $element .= PHP_EOL;
+                    }
+                    $element .= '<li class="uk-nav-divider"></li>';
+                    $element .= '<li><a data-turbo="false" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="ion-28"><ion-icon name="trash"></ion-icon></a></li>';
+                $element .= '</ul>';
+                $element .= PHP_EOL;
+            $element .= '</div>';
+            $element .= PHP_EOL;
+        }
+
+        return $element;
+    }
+
 
     /**
      * @inheritdoc

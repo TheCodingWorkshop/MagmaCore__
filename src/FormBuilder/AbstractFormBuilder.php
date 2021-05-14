@@ -29,6 +29,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'target' => '_self', /* defaults loads into itself */
         'novalidate' => false,
         "autocomplete" => false,
+        "leave_form_open" => false
         //"onSubmit" => "UIkitNotify()"
     ];
 
@@ -37,6 +38,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'textarea',
         'select',
         'checkbox',
+        'multiple_checkbox',
         'radio',
         'text',
         'range',

@@ -17,62 +17,68 @@ use MagmaCore\RestFul\RestResponse;
 class RestHandler extends RestResponse
 {
 
+    /** @var string */
     protected string $contentType;
+    /** @var array */
     protected array $data = [];
-    protected $response;
+    /** @var string */
     protected const DEFAULT_CONTENT = 'json';
+    /** @var int */
     protected const CODE_404 = 404;
+    /** @var int */
     protected const CODE_500 = 500;
+    /** @var int */
+    protected const CODE_200 = 200;
 
     /**
-     * Undocumented function
+     * Return various reponse including json reponse for RestFul API call
      *
-     * @param mixed $data
-     * @param string|null $contentType
+     * @param array $data
+     * @param int $code - defaults to 200
+     * @param string|null $type
+     * @return mixed
      */
-    public function __construct(mixed $data, ?string $contentType = self::DEFAULT_CONTENT)
+    public function response(array $data, int $code = self::CODE_200, string|null $type = self::DEFAULT_CONTENT): mixed
     {
-        $this->data = $data;
-        $this->contentType = $contentType;
-    }
-
-    public function response()
-    {
-        if (empty($this->data)) {
-            $code = self::CODE_404;
-            $this->data = ['error' => 'No data found!'];
+        if (empty($data)) {
+            $code = $code;
+            $data = ['error' => 'No data found!'];
         } else {
-            $code = 200;
+            $code = $code;
         }
-        $this->setHttpHeaders($this->contentType, $code);
-        if (strpos($this->contentType, 'json') !== false) {
-            $response = $this->jsonEncodedData($this->data);
-        } elseif (strpos($this->contentType, 'html') !== false) {
-            $response = $this->htmlEncodedData($this->data);
-        } elseif (strpos($this->contentType, 'xml') !== false) {
-            $response = $this->xmlEncodedData($this->data);
+        $this->setHttpHeaders($type, $code);
+        if (strpos($type, 'json') !== false) {
+            $response = $this->jsonEncodedData($data);
+        } elseif (strpos($type, 'html') !== false) {
+            $response = $this->htmlEncodedData($data);
+        } elseif (strpos($type, 'xml') !== false) {
+            $response = $this->xmlEncodedData($data);
         } else {
-            $response = $this->data;
+            $response = $data;
         }
 
         return $response;
     }
 
-    private function jsonEncodedData($data)
+    /**
+     * Return a json encoded response as a string
+     *
+     * @param array $data
+     * @return string
+     */
+    private function jsonEncodedData(array $data): string
     {
-        //if (null !== $data) {
-        $json = json_encode($data);
-        if ($json) {
-            return $json;
+        if ($data !== null) {
+            $json = json_encode($data);
+            if ($json) {
+                return $json;
+            }
         }
-        // }
-
-        // return null;
     }
 
     private function htmlEncodedData(array $data)
     {
-        if (null !== $data) {
+        if ($data !==null) {
             $html = "<table border=\"1\">";
             if (count($data) > 0) {
                 foreach ($data as $key => $value) {
@@ -92,7 +98,7 @@ class RestHandler extends RestResponse
 
     private function xmlEncodedData(array $data)
     {
-        if (null !== $data) {
+        if ($data !==null) {
             $xml = new \SimpleXMLElement('<?xml version="1.0"?><mobile></mobile>');
             foreach ($data as $key => $value) {
                 $xml->addChild($key, $value);

@@ -106,7 +106,6 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
      */
     public function thisRouteID(): int|false
     {
-
         $ID = isset($this->routeParams['id']) ? $this->routeParams['id'] : false;
         $ID = intval($ID);
         return $ID;

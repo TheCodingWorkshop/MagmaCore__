@@ -20,6 +20,7 @@ class Convert
     {
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '. $this->unit[$i];
     }
+
     public static function timeFormat($time, $short = false)
     {
         $SECOND = 1;

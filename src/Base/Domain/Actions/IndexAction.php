@@ -58,8 +58,15 @@ class IndexAction implements DomainActionLogicInterface
         $this->schema = $objectSchema;
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
-        
-        $this->args = Yaml::file('controller')[$controller->thisRouteController()];
+
+        //$this->args = Yaml::file('controller')[$controller->thisRouteController()];
+        $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
+        $a = [];
+        foreach ($cs as $arg) {
+            $a = $arg;
+        }
+        $this->args = ['records_per_page' => $a['records_per_page'], 'query' => $a['query'], 'filter_by' => unserialize($a['filter']), 'filter_alias' => $a['alias'], 'sort_columns' => unserialize($a['sortable']), 'additional_conditions' => [], 'selectors' => []];
+
         $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
         $this->tableData = $controller->tableGrid;
 

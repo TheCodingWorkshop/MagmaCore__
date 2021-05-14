@@ -7,19 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
-use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
-use MagmaCore\Datatable\AbstractDatatable;
+use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
 use MagmaCore\Http\RequestHandler;
+use MagmaCore\Themes\ThemeBuilder;
+use MagmaCore\Datatable\AbstractDatatable;
+use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
 class Datatable extends AbstractDatatable
 {
 
     protected string $element = '';
+    protected object $tb;
+
+    private int|false $currentPage = false;
+    private int|false $totalPages = false;
+    private int|false $totalRecords = false;
+    private array $dataColumns = [];
 
     /**
      * Undocumented function
@@ -27,36 +36,46 @@ class Datatable extends AbstractDatatable
      * @param array $attributes
      * @return void
      */
-    public function __construct()
+    public function __construct(ThemeBuilder $themeBuilder)
     {
+        $this->tb = $themeBuilder->create(Uikit::class);
         parent::__construct();
     }
 
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = []) : self
+    /**
+     * Undocumented function
+     *
+     * @param string $dataColumnString
+     * @param array $dataRepository
+     * @param array $sortController
+     * @param array $dbColumns
+     * @return self
+     */
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], object|null $callingController = null): self
     {
         $this->dataColumnObject = new $dataColumnString();
         if (!$this->dataColumnObject instanceof DatatableColumnInterface) {
             throw new DatatableUnexpectedValueException($dataColumnString . ' is not a valid data column object.');
         }
-        $this->dataColumns = $this->dataColumnObject->columns($dbColumns);
+        $this->dataColumns = $this->dataColumnObject->columns($dbColumns, $callingController);
         $this->sortController = $sortController;
         $this->getRepositoryParts($dataRepository);
         return $this;
-
     }
 
-    private function getRepositoryParts(array $dataRepository) : void
+    private function getRepositoryParts(array $dataRepository): void
     {
         list(
-            $this->dataOptions, 
-            $this->currentPage, 
-            $this->totalPages, 
-            $this->totalRecords, 
-            $this->direction, 
-            $this->sortDirection, 
-            $this->tdClass, 
-            $this->tableColumn, 
-            $this->tableOrder) = $dataRepository;
+            $this->dataOptions,
+            $this->currentPage,
+            $this->totalPages,
+            $this->totalRecords,
+            $this->direction,
+            $this->sortDirection,
+            $this->tdClass,
+            $this->tableColumn,
+            $this->tableOrder
+        ) = $dataRepository;
     }
 
     public function totalRecords()
@@ -69,75 +88,80 @@ class Datatable extends AbstractDatatable
         return $this->tableColumn;
     }
 
-    public function table() : null|string
+    public function table(): null|string
     {
         extract($this->attr, EXTR_SKIP);
         $status = (new RequestHandler())
-        ->handler()
-        ->query
-        ->getAlnum($this->sortController['query']);
+            ->handler()
+            ->query
+            ->getAlnum($this->sortController['query']);
 
         $this->element .= $before;
         if (is_array($this->dataColumns) && count($this->dataColumns) > 0) {
-            if (is_array($this->dataOptions) && $this->dataOptions !=null) {
-                $this->element .= '<table id="' . (isset($table_id) ? $table_id : '') . '" class="'. implode(' ', $table_class) .'">' . "\n";
-                    $this->element .= ($show_table_thead) ? $this->tableGridElements($status) : false;
-                    $this->element .= '<tbody>' . "\n";
-                        foreach ($this->dataOptions as $row) {
-                            $this->element .= '<tr>' . "\n";
-                                foreach ($this->dataColumns as $column) {
-                                    if (isset($column['show_column']) && $column['show_column'] != false) {
-                                        $this->element .= '<td class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '' ) . ' ' . $column['class'] . '">';
-                                            if (is_callable($column['formatter'])) {
-                                                $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
-                                            } else {
-                                                $this->element .= (isset($row[$column['db_row']]) ? $row[$column['db_row']] : '');
-                                            }
-                                        $this->element .= '</td>' . "\n";
-                                    }
-                                }
-                            $this->element .= '</tr>' . "\n";
+            if (is_array($this->dataOptions) && $this->dataOptions != null) {
+                $this->element .= '<table id="' . (isset($table_id) ? $table_id : '') . '" class="' . implode(' ', $this->tb->theme('table_class')) . '">' . "\n";
+                $this->element .= ($show_table_thead) ? $this->tableGridElements($status) : false;
+                $this->element .= '<tbody>' . "\n";
+                foreach ($this->dataOptions as $row) {
+                    $this->element .= '<tr>' . "\n";
+                    foreach ($this->dataColumns as $column) {
+                        if (isset($column['show_column']) && $column['show_column'] != false) {
+                            $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
+                            if (is_callable($column['formatter'])) {
+                                $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
+                            } else {
+                                $this->element .= (isset($row[$column['db_row']]) ? $row[$column['db_row']] : '');
+                            }
+                            $this->element .= '</td>' . "\n";
                         }
-                    $this->element .= '</tbody>' . "\n";
-                    //$this->element .= ($show_table_tfoot) ? $this->tableGridElements($status, true) : '';
+                    }
+                    $this->element .= '</tr>' . "\n";
+                }
+                $this->element .= '</tbody>' . "\n";
+                //$this->element .= ($show_table_tfoot) ? $this->tableGridElements($status, true) : '';
                 $this->element .= '</table>' . "\n";
             }
         }
         $this->element .= $after;
 
         return $this->element;
-        
     }
 
-    protected function tableGridElements(string $status, bool $inFoot = false) : string
+    protected function tableGridElements(string $status, bool $inFoot = false): string
     {
         $element = sprintf('<%s>', ($inFoot) ? 'tfoot' : 'thead');
-            $element .= '<tr>';
-                foreach ($this->dataColumns as $column) {
-                    if (isset($column['show_column']) && $column['show_column'] != false) {
-                        $element .= '<th>';
-                        $element .= $this->tableSorting($column, $status);
-                        $element .= '</th>';
-                    }
-                }
-            $element .= '</tr>';
+        $element .= '<tr>';
+        foreach ($this->dataColumns as $column) {
+            if (isset($column['show_column']) && $column['show_column'] != false) {
+                $element .= '<th id="toggle-' . $column['db_row'] . '">';
+                $element .= $this->tableSorting($column, $status);
+                $element .= '</th>';
+            }
+        }
+        $element .= '</tr>';
         $element .= sprintf('</%s>', ($inFoot) ? 'tfoot' : 'thead');
 
         return $element;
     }
 
-    private function tableSorting(array $column, string $status) : string
+    /**
+     * Return the table sorting classes and arrow directions
+     *
+     * @param array $column
+     * @param string $status
+     * @return string
+     */
+    private function tableSorting(array $column, string $status): string
     {
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
-            $element .= '<a class="uk-link-reset" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
+            $element .= '<a class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
 
             $element .= $column['dt_row'];
 
             $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
 
             $element .= '</a>';
-            
         } else {
             $element .= $column['dt_row'];
         }
@@ -145,103 +169,130 @@ class Datatable extends AbstractDatatable
     }
 
     /**
-     * Return the table pagination. Pagination will work in conjunction with 
-     * return query and will attemp to display the correct information based on
-     * that query
-     * 
+     * Returns the previous pagination link
+     *
+     * @param string $status
+     * @param mixed $queryStatus
      * @return string
      */
-    public function pagination() : string
+    public function previousPaging(string $status, mixed $queryStatus): string
     {
-        extract($this->attr);
-
-        $element = '<section class="uk-margin-medium-top uk-padding-small uk-padding-remove-bottom">';
-        $element .= '<nav aria-label="Pagination" uk-navbar>';
-
-        /**
-         * table meta information
-         */
-        $element .= '<div class="uk-navbar-left" style="margin-top: -15px;">';
-        $element .= sprintf(
-            '&nbsp;Showing&nbsp<span>%s</span> - <span>%s</span>&nbsp; of &nbsp;<span>%s</span>&nbsp;',
-            $this->currentPage,
-            $this->totalPages,
-            $this->totalRecords
-        );
-        $element .= '<span class="uk-text-meta uk-text-warning uk-margin-small-left"></span>';
-        $element .= '<form oninput="result.value=parseInt(a.value)">';
-            $element .= '<input onchange="saveChanges(this);" type="range" id="a" name="a" value="50" />';
-            $element .= '<span style="margin-top: -13px;" class="uk-badge uk-badge-primary"><output name="result" for="b">' . $this->sortController['records_per_page'] . '</output></span>';
-        $element .= '</form>';
-        $element .= '</div>';
-
-        $queryStatus = ($this->sortController['query'] ? $this->sortController['query'] : '');
-        $status = (isset($_GET[$queryStatus]) ? $_GET[$queryStatus] : '');
-
-        /**
-         * pagination simple or numbers 
-         */
-        $element .= '<div class="uk-navbar-right">';
-        $element .= '<ul class="uk-pagination">';
-
-        $element .= '<li class="' . ($this->currentPage == 1 ? 'uk-disabled' : 'uk-active') . '">';
-
+        $element = '';
+        $element .= '<li class="' . ($this->currentPage == 1 ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
         if ($this->currentPage == 1) {
             $element .= sprintf(
-                '<a href="%s"><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a>',
-                'javascript:void(0);'
+                '<a href="%s">',
+                'javascript:void()'
             );
-        } else {
-            if ($status) {
-                $element .= sprintf(
-                    '<a href="?' . $queryStatus . '=%s&page=%s">',
-                    $status,
-                    ($this->currentPage - 1)
-                );
-            } else {
-                $element .= sprintf(
-                    '<a href="?page=%s">',
-                    ($this->currentPage - 1)
-                );
-            }
-            $element .= '<span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a>';
-
-        }
-        $element .= '</li>';
-
-        /** NEXT */
-        $element .= '<li class="uk-margin-auto-left ' . ($this->currentPage == $this->totalPages ? 'uk-disabled' : 'uk-active') . '">';
-        if ($this->currentPage == $this->totalPages) {
+        } elseif ($status) {
             $element .= sprintf(
-                '<a href="%s">Next <span class="uk-margin-small-left" uk-pagination-next></span>',
-                'javascript:void(0);'
+                '<a href="?' . $queryStatus . '=%s&page=%s">',
+                $status,
+                ($this->currentPage - 1)
             );
         } else {
-
-            if ($status) {
-                $element .= sprintf(
-                    '<a href="?' . $queryStatus . '=%s&page=%s">',
-                    $status,
-                    ($this->currentPage + 1)
-                );
-            } else {
-                $element .= sprintf(
-                    '<a href="?page=%s">',
-                    ($this->currentPage + 1)
-                );
-            }
-            $element .= 'Next <span class="uk-margin-small-left" uk-pagination-next></span></a>';
+            $element .= sprintf('<a href="?page=%s">', ($this->currentPage - 1));
         }
-        $element .= '</li>';
-
-        $element .= '</ul>';
-        $element .= '</div>';
-
-        $element .= '</nav>';
-        $element .= '</section>';
+        $element .= '<span>Previous</span></a>' . PHP_EOL;
+        $element .= '</li>' . PHP_EOL;
 
         return $element;
     }
 
+    /**
+     * Returns the next pagination link
+     *
+     * @param string $status
+     * @param mixed $queryStatus
+     * @return string
+     */
+    public function nextPaging(string $status, mixed $queryStatus): string
+    {
+        $element = '';
+        $element .= '<li class="' . ($this->currentPage == $this->totalPages ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
+        if ($this->currentPage == $this->totalPages) {
+            $element .= sprintf(
+                '<a href="%s">',
+                'javascript:void()'
+            );
+        } elseif ($status) {
+            $element .= sprintf(
+                '<a href="?' . $queryStatus . '=%s&page=%s">',
+                $status,
+                ($this->currentPage + 1)
+            );
+        } else {
+            $element .= sprintf('<a href="?page=%s">', ($this->currentPage + 1));
+        }
+        $element .= '<span>Next</span></a>' . PHP_EOL;
+        $element .= '</li>' . PHP_EOL;
 
+        return $element;
+    }
+
+    /**
+     * Get the queried string set within the controllers configuration file
+     *
+     * @return string
+     */
+    public function getQueriedStatus(): string
+    {
+        return (isset($this->sortController['query']) ? $this->sortController['query'] : '');
+    }
+
+    /**
+     * Get the queried status
+     *
+     * @return mixed
+     */
+    public function getStatus(): mixed
+    {
+        $statusQueried = $this->getQueriedStatus();
+        return (isset($_GET[$statusQueried]) ? $_GET[$statusQueried] : '');
+    }
+
+    /**
+     * Return the current queried page number
+     *
+     * @return integer|false
+     */
+    public function getCurrentPage(): int|false
+    {
+        return (isset($this->currentPage) ? $this->currentPage : false);
+    }
+
+    /**
+     * Return the total filtered pages for the queried model
+     *
+     * @return integer|false
+     */
+    public function getTotalPages(): int|false
+    {
+        return (isset($this->totalPages) ? $this->totalPages : false);
+    }
+
+    /**
+     * Return the total records for the queried model
+     *
+     * @return integer|false
+     */
+    public function getTotalRecords(): int|false
+    {
+        return (isset($this->totalRecords) ? $this->totalRecords : false);
+    }
+
+    public function pagination(): string
+    {
+        return '';
+    }
+
+    /**
+     * Return an array of the relevant data columns
+     *
+     * @return array
+     */
+    public function getDataColumns(): array
+    {
+        return $this->dataColumns;
+    }
 }

@@ -18,7 +18,8 @@ abstract class AbstractDatatableColumn implements DatatableColumnInterface
     /**
      * @inheritdoc
      * @param array $dbColumns
+     * @param object|null $callingController
      * @return array
      */
-    abstract public function columns(array $dbColumns = []) : array;
+    abstract public function columns(array $dbColumns = [], object|null $callingController = null) : array;
 }

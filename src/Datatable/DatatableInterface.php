@@ -22,10 +22,11 @@ interface DatatableInterface
      * @param string $dataColumnObjectName - the data columns object
      * @param array $dataRepositoryObject - the repository object containing mixed data
      * @param array $sortController - an array of columns to sort by defined within the controller classes
+     * @param object $callingController - the controller which is calling the object
      * @return self
      * @throws InvalidArgumentException
      */
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = []) : self;
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], object|null $callingController = null) : self;
 
     /**
      * Generate the data table using the objects and properties pass to

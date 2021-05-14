@@ -72,5 +72,5 @@ interface DomainActionLogicInterface
      *
      * @return void
      */
-    public function end(): void;
+    public function end(string|null $type = null): void;
 }

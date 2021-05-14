@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\RouterFactory;
 use MagmaCore\Session\SessionFacade;
@@ -177,6 +178,11 @@ abstract class AbstractBaseBootLoader
         error_reporting($this->app()->getErrorHandlerLevel());
         set_error_handler($this->app()->getErrorHandling()['error']);
         set_exception_handler($this->app()->getErrorHandling()['exception']);
+    }
+
+    public function getTheming()
+    {
+        (new ThemeBuilder())->create($this->app()->getTheme());
     }
 
     /**

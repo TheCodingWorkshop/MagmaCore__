@@ -41,7 +41,7 @@ class RadioType implements FormBuilderTypeInterface
      */
     public function __construct(array $fields, $options = null, array $settings = [])
     {
-        $this->fields = $fields;
+        $this->fields = $this->filterArray($fields);
         $this->options = ($options !=null) ? $options : null;
         $this->settings = $settings;
         if (is_array($this->baseOptions)) {
@@ -59,7 +59,7 @@ class RadioType implements FormBuilderTypeInterface
         return [
             'type' => 'radio',
             'name' => '',
-            'id' => $this->fields['name'],
+            'id' => (isset($this->fields['name']) ? $this->fields['name'] : ''),
             'class' => ['uk-radio'],
             'value' => ''
         ];
