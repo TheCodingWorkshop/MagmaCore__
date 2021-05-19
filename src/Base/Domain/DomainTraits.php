@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
+use Closure;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Domain\DomainLogicRules;
@@ -404,5 +405,28 @@ trait DomainTraits
     public function getSubmitValue(): string
     {
         return $this->getFileName() . '-' . strtolower($this->controller->thisRouteController());
+    }
+
+    public function isSet(string $key, array $array): mixed
+    {
+        return array_key_exists($key, $array) ? $array[$key] : '';
+    }
+
+    /**
+     * Return a closure with data relating to the current query. simple joining
+     * multiple matching data tables together.
+     *
+     * @param Closure $closure
+     * @return self
+     */
+    public function mergeRelationship(Closure $closure): self
+    {
+        if ($closure) {
+            if (!$closure instanceof Closure) {
+                throw new \Exception();
+            }
+            $this->dataRelationship = $closure($this->controller->repository);
+        }
+        return $this;
     }
 }

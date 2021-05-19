@@ -107,11 +107,15 @@ class Datatable extends AbstractDatatable
                     foreach ($this->dataColumns as $column) {
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
+                            //$this->element .= '<div id="toggle-custom">';
+
+                            
                             if (is_callable($column['formatter'])) {
                                 $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                             } else {
                                 $this->element .= (isset($row[$column['db_row']]) ? $row[$column['db_row']] : '');
                             }
+                            //$this->element .= '</div>';
                             $this->element .= '</td>' . "\n";
                         }
                     }

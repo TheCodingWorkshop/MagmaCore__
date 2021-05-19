@@ -43,7 +43,7 @@ class IconNavExtension
     {
         $html = '';
         if (is_array($icons) && count($icons) > 0) {
-            $html .= '<ul class="' . ($vertical === true ? 'uk-iconnav uk-iconnav-vertical' : 'uk-iconnav') . '">';
+            $html .= '<ul class="uk-invisible-hover ' . ($vertical === true ? 'uk-iconnav uk-iconnav-vertical' : 'uk-iconnav') . '">';
             foreach ($icons as $key => $_icon) {
                 extract($_icon);
 

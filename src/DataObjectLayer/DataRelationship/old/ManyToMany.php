@@ -47,7 +47,7 @@ class ManyToMany extends AbstractDataRelationship
      *
      * @return string
      */
-    public function getBelongsToManySchema(): string
+    public function getSchema(): string
     {
         return $this->belongsToMany->getSchema();
     }
@@ -57,7 +57,7 @@ class ManyToMany extends AbstractDataRelationship
      *
      * @return string
      */
-    public function getBelongsToManySchemaID()
+    public function getSchemaID()
     {
         return $this->belongsToMany->getSchemaID();
     }
@@ -78,11 +78,11 @@ class ManyToMany extends AbstractDataRelationship
     ): static {
 
         $t1 = $this->getHasOneSchema();
-        $t2 = $this->getBelongsToManySchema();
-        $columnPivot = $this->tablePivot->getEntity()->getColumns($this->schemaObject);
+        $t2 = $this->getSchema();
+        $columnPivot = $this->tablePivot->getColumns($this->schemaObject);
 
         $this->query .= "SELECT " . implode(', ', $this->filterSelection($t1, $selectors)) . ", ";
-        $this->query .= $str = $t2 . '.' . $this->getBelongsToManySchemaID() ?? $childSelector;
+        $this->query .= $str = $t2 . '.' . $this->getSchemaID() ?? $childSelector;
         $this->query .= " AS ";
         $this->query .= str_replace('.', '_', $str) . ", ";
         $this->query .= $str = $t2 . '.' . $manyToManySelector;

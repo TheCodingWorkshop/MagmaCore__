@@ -7,13 +7,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\CommanderBar;
+namespace MagmaCore\DataObjectLayer\DataRelationship;
 
-interface CommanderBarInterface
+interface DataRelationshipInterface
 {
 
-    
-    
+    public function tables(string $tableLeft, string $tableRight);
+
+    public function pivot(string $tablePivot);
 }

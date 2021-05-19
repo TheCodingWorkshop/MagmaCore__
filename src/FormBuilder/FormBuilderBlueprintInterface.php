@@ -32,6 +32,15 @@ interface FormBuilderBlueprintInterface
         string|null $placeholder = null
     ): array;
 
+    public function textarea(
+        string $name,
+        array $class = [],
+        mixed $id = null,
+        string|null $placeholder = null,
+        int $rows = 5,
+        int $cols = 33,
+    ): array;
+
     public function email(
         string $name,
         array $class = [],
@@ -70,6 +79,13 @@ interface FormBuilderBlueprintInterface
     public function checkbox(
         string $name,
         array $class = [],
+        mixed $value = null
+    ): array;
+
+    public function select(
+        string $name,
+        array $class = [],
+        string $id = null,
         mixed $value = null
     ): array;
 

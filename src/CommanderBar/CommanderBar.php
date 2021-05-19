@@ -13,85 +13,57 @@ declare(strict_types=1);
 namespace MagmaCore\CommanderBar;
 
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Themes\ThemeBuilder;
+use MagmaCore\Base\BaseController;
 use MagmaCore\Themes\ThemeBuilderInterface;
 use MagmaCore\CommanderBar\CommanderBarInterface;
+use MagmaCore\CommanderBar\ApplicationCommanderInterface;
 
 class CommanderBar implements CommanderBarInterface
 {
 
     private ?ThemeBuilderInterface $themeBuilder = null;
-    private array $managerItems = [];
-    private array $visibleColumns = [];
-    private object $controller;
-    private object|null $formSettings = null;
-    private string|null $heading = null;
-    private string|null $icon = null;
-    private string|null $tableForm = null;
+    private $controller;
 
-    public function __construct(?ThemeBuilder $themeBuilder = null)
+    public function __construct(BaseController $controller)
     {
-        $this->themeBuilder = $themeBuilder;
+        if ($controller)
+            $this->controller = $controller;
+        if (!$this->controller->commander instanceof ApplicationCommanderInterface) {
+            throw new \Exception();
+        }
     }
 
     /**
-     * Undocumented function
+     * Build the main commander structure and load all the necessary components
      *
-     * @param object $controller
-     * @param array $managerItems
-     * @param array $visibleColumns
-     * @param object|null $formSettings
-     * @param string|null $icon
-     * @param string|null $heading
-     * @return void
+     * @return string
      */
-    public function create(
-        object $controller,
-        array $managerItems = [],
-        array $visibleColumns = [],
-        ?object $formSettings = null,
-        ?string $icon = null,
-        ?string $heading,
-        ?string $tableForm = null
-    ): void {
-        if ($managerItems)
-            $this->managerItems = $managerItems;
-        if ($controller)
-            $this->controller = $controller;
-        if ($formSettings)
-            $this->formSettings = $formSettings;
-        if ($visibleColumns)
-            $this->visibleColumns = $visibleColumns;
-        if ($icon !== null)
-            $this->icon = $icon;
-        if ($heading !== null)
-            $this->heading = $heading;
-        if ($tableForm !==null)
-            $this->tableForm = $tableForm;
-    }
-
-    public function commanderWrapper()
+    public function build(): string
     {
         $commander = '';
         $commander .= PHP_EOL;
-        $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; bottom: #transparent-sticky-navbar">';
+        $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
         $commander .= '<nav class="uk-navbar" uk-navbar style="position: relative; z-index: 980; color: white!important;">';
-
         $commander .= PHP_EOL;
-        $commander .= ' <div class="uk-navbar-left">';
-        $commander .= $this->commanderHeading();
+        $commander .= ' <div class="nav-overlay uk-navbar-left">';
+        $commander .= $this->heading();
         $commander .= '<ul class="uk-navbar-nav">';
-        $commander .= $this->commanderNotifications();
-        $commander .= $this->commanderManager();
-        $commander .= $this->commanderCustomizer();
+        $commander .= $this->notifications();
+        $commander .= $this->manager();
+        $commander .= $this->customizer();
         $commander .= '</ul>';
         $commander .= '</div>';
         $commander .= PHP_EOL;
 
-        $commander .= PHP_EOL;
-        $commander .= '<div class="uk-navbar-right">';
-        $commander .= $this->commanderAction();
+        $commander .= '<div class="nav-overlay uk-navbar-center">';
+        $commander .= $this->controller->commander->getGraphs();
         $commander .= '</div>';
+
+        $commander .= PHP_EOL;
+        $commander .= '<div class="nav-overlay uk-navbar-right">';
+        $commander .= $this->actions();
+        $commander .= '</div>';
+        $commander .= $this->commanderOverlaySearch();
         $commander .= PHP_EOL;
 
         $commander .= '</nav>';
@@ -100,7 +72,7 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    public function commanderManager()
+    private function manager()
     {
         if (isset($this->controller)) {
             if (in_array($this->controller->thisRouteAction(), ['new'])) {
@@ -115,11 +87,11 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
         $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';
         $commander .= '<div class="uk-width-1-3">';
-        
-        if (is_array($this->managerItems) && count($this->managerItems) > 0) {
+
+        if (is_array($lists = $this->controller->commander->getUserYml()) && count($lists) > 0) {
             $commander .= '<ul class="uk-nav uk-navbar-dropdown-nav">';
-            foreach ($this->managerItems as $key => $value) {
-                if (isset($value['nav_header']) && $value['nav_header'] !=='') {
+            foreach ($lists as $key => $value) {
+                if (isset($value['nav_header']) && $value['nav_header'] !== '') {
                     $commander .= '<li class="uk-nav-header">' . $value['nav_header'] . '</li>';
                 }
                 if ($this->controller->thisRouteAction() === $key) {
@@ -127,12 +99,11 @@ class CommanderBar implements CommanderBarInterface
                 }
                 $commander .= PHP_EOL;
                 $commander .= '<li>';
-                $commander .= '<a href="' . (isset($value['path']) ? $value['path'] : $this->path($key)) . '">';
+                $commander .= '<a uk-toggle="target: #toggle-custom; cls: highlight" href="' . (isset($value['path']) ? $value['path'] : $this->path($key)) . '">';
                 $commander .= (isset($value['name']) ? Stringify::capitalize($value['name']) : '');
                 $commander .= '</a>';
                 $commander .= '</li>';
                 $commander .= PHP_EOL;
-
             }
             $commander .= '<li class="uk-nav-divider"></li>';
             $commander .= '<li>';
@@ -142,14 +113,34 @@ class CommanderBar implements CommanderBarInterface
             $commander .= '</li>';
             $commander .= '</ul>';
         }
-        
+
         $commander .= '</div>';
         $commander .= PHP_EOL;
         $commander .= '<div class="uk-width-expand">';
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
-        $commander .= '<h3 class="uk-card-title">Statistics</h3>';
-        $commander .= '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>';
+        $commander .= '<h3 class="uk-card-title">Change Status</h3>';
+        if (is_array($statusColumns = $this->controller->repository->getColumnStatus()) && count($statusColumns) > 0) {
+            $commander .= '<ul class="uk-nav uk-dropdown-nav">';
+            foreach ($statusColumns as $key => $value) {
+                foreach ($value as $val) {
+                    $commander .= '<li>';
+                    $commander .= '<a class="uk-text-success uk-link-reset uk-text-capitalize" href="?' . $key . '=' . $val . '">';
+                    $badgeColor = ['pending' => 'warning', 'active' => 'success', 'trash' => 'danger', 'lock' => 'secondary'];
+                    $commander .= '<span class="uk-badge uk-badge-' . $badgeColor[$val] . ' uk-margin-small-right">';
+                    $commander .= $this->controller->repository->getRepo()->count([$key => $val]);
+                    $commander .= '</span>' . Stringify::capitalize($val);
+                    $commander .= '</a>';
+                    $commander .= '';
+                    $commander .= '</li>';
+                }
+            }
+            $commander .= '<li class="uk-nav-divider"></li>';
+            $commander .= '<li><a class="ion-24" href="/admin/user/index">';
+            $commander .= '<ion-icon size="large" name="home-outline"></ion-icon> <span class="uk-text-meta"><span class="uk-badge uk-text-bolder">' . $this->controller->repository->getRepo()->count() . ' </span> total records within this model</span></a>';
+            $commander .= '</li>';
+            $commander .= '</ul>' . PHP_EOL;
+        }
         $commander .= '</div>';
         $commander .= '</div>';
         $commander .= '</div>';
@@ -162,7 +153,13 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    private function path($key)
+    /**
+     * Undocumented function
+     *
+     * @param string $key
+     * @return string
+     */
+    private function path($key): string
     {
         return sprintf(
             '/%s/%s/%s/%s',
@@ -173,14 +170,13 @@ class CommanderBar implements CommanderBarInterface
         );
     }
 
-    public function commanderCustomizer()
+    private function customizer()
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new'])) {
+            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new', 'perferences', 'privileges'])) {
                 return '';
             }
         }
-
         $commander = '';
         $commander .= '<li>';
         $commander .= '<a href="#"><ion-icon size="large" name="settings-outline"></ion-icon></a>';
@@ -194,8 +190,8 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<hr>';
         $commander .= PHP_EOL;
         $commander .= '<div class="uk-form-controls">';
-        if (is_array($this->visibleColumns)) {
-            foreach ($this->visibleColumns as $column) {
+        if (is_array($columns = $this->controller->tableGrid->getDataColumns())) {
+            foreach ($columns as $column) {
                 if (isset($column['show_column']) && $column['show_column'] != false) {
                     if ($column['db_row'] === 'id') {
                         $column['show_column'] = true;
@@ -219,7 +215,16 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
         $commander .= '<h3 class="uk-card-title">Settings</h3>';
-        $commander .= $this->tableForm ? $this->tableForm : '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>';
+        $commander .= $this->controller
+            ->controllerSettings
+            ->createForm(
+                "/admin/{$this->controller->thisRouteController()}/settings",
+                $this->controller
+                    ->controllerRepository
+                    ->getRepo()
+                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>'
+            );
+
         $commander .= '</div>';
         $commander .= '</div>';
         $commander .= '</div>';
@@ -233,17 +238,17 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    public function commanderNotifications()
+    public function notifications()
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new'])) {
+            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new', 'perferences', 'privileges'])) {
                 return '';
             }
         }
         //$off = '<ion-icon name="notifications-off-outline"></ion-icon>';
         $commander = '';
         $commander .= '<li class="uk-active">';
-        $commander .= '<a href="#" class="uk-text-muted">';
+        $commander .= '<a href="javascript:void()" class="uk-text-muted">';
         $commander .= '<ion-icon size="large" name="notifications-outline"></ion-icon>';
         $commander .= '<span><sup class="uk-badge">3</sup></span>';
         $commander .= '</a>';
@@ -252,17 +257,17 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    public function commanderHeading()
+    public function heading()
     {
         $commander = '';
-        $commander .= '<span class="ion-32 uk-text-emphasis"><ion-icon name="' . (isset($this->icon) ? $this->icon : 'help-outline') . '"></ion-icon></span>';
-        $commander .= '<a class="uk-navbar-item uk-logo uk-text-emphasis" href="#">' . (isset($this->heading) ? $this->heading : 'Unknow Heading') . '</a>';
+        $commander .= '<span class="ion-32 uk-text-emphasis"><ion-icon name="help-outline"></ion-icon></span>';
+        $commander .= '<a class="uk-navbar-item uk-logo uk-text-emphasis" href="#">' .$this->controller->commander->getHeaderBuild($this->controller) . '</a>';
         $commander .= PHP_EOL;
 
         return $commander;
     }
 
-    public function commanderAction()
+    public function actions()
     {
         $commander = '';
         $commander .= PHP_EOL;
@@ -285,10 +290,10 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    public function commanderFiltering() 
+    public function commanderFiltering()
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['new', 'edit', 'show'])) {
+            if (in_array($this->controller->thisRouteAction(), ['new', 'edit', 'show', 'perferences', 'privileges'])) {
                 // return '<a href="/admin/user/new" uk-tooltip="Add New" class="ion-28 uk-margin-small-right uk-text-muted">
                 // <ion-icon name="add-circle-outline"></ion-icon>
                 // </a>';
@@ -297,34 +302,25 @@ class CommanderBar implements CommanderBarInterface
         }
 
         return '
-       <a href="#" uk-tooltip="Filter Users.." class="ion-28 uk-margin-small-right uk-text-muted">
+       <a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-28 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
         <ion-icon name="funnel-outline"></ion-icon>
         </a>
 
-        <div class="uk-navbar-dropdown" uk-drop="mode: click; cls-drop: uk-navbar-dropdown; boundary: !nav">
+        ';
+    }
+    private function commanderOverlaySearch()
+    {
+        return '
+        <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
 
-        <div class="uk-grid-small uk-flex-middle" uk-grid>
-            <div class="uk-width-expand">
-                <form class="uk-search uk-search-navbar uk-width-1-1">
-                    <input class="uk-search-input" name="s" type="search" placeholder="Filter..." autofocus>
-                    <hr/>
-                    <div class="uk-margin">
-                        <div class="uk-form-label"></div>
-                        <div class="uk-form-controls">
-                            <label><input class="uk-radio" type="radio" name="radio1"> Firstnmae</label><br>
-                            <label><input class="uk-radio" type="radio" name="radio1"> Lastname</label><br>
-                            <label><input class="uk-radio" type="radio" name="radio1"> Email</label><br>
-                            <label><input class="uk-radio" type="radio" name="radio1"> ID</label>
-    
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="uk-width-auto">
-                <a class="uk-navbar-dropdown-close" href="#" uk-close></a>
-            </div>
+        <div class="uk-navbar-item uk-width-expand">
+            <form class="uk-search uk-search-navbar uk-width-1-1">
+                <input name="s" class="uk-search-input" type="search" placeholder="Filtering ' . Stringify::pluralize(ucwords($this->controller->thisRouteController())) . '...." autofocus>
+            </form>
         </div>
-    
+
+        <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()"><ion-icon size="large" name="close-outline"></ion-icon></a>
+
     </div>
         ';
     }
@@ -333,7 +329,7 @@ class CommanderBar implements CommanderBarInterface
     {
         if (isset($this->controller)) {
             return match ($this->controller->thisRouteAction()) {
-                'new', 'edit', 'show', 'hard-delete' => 'Listings',
+                'new', 'edit', 'show', 'hard-delete', 'perferences', 'privileges' => 'Listings',
                 default => 'Add new'
             };
         }
@@ -343,10 +339,16 @@ class CommanderBar implements CommanderBarInterface
     {
         if (isset($this->controller)) {
             return match ($this->controller->thisRouteAction()) {
-                'new', 'edit', 'show', 'hard-delete' => '/' . $this->controller->thisRouteNamespace() . '/' . $this->controller->thisRouteController() . '/' . 'index',
+                'new', 'edit', 'show', 'hard-delete', 'perferences', 'privileges' => '/' . $this->controller->thisRouteNamespace() . '/' . $this->controller->thisRouteController() . '/' . 'index',
                 'index' => '/admin/user/new',
                 default => 'javascript:history.back()'
             };
         }
     }
+
+    public function __toString()
+    {
+        return $this->build();
+    }
+
 }

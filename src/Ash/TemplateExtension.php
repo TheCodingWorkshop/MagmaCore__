@@ -14,12 +14,12 @@ namespace MagmaCore\Ash;
 
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Convert;
-use MagmaCore\Utility\Utilities;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Ash\Components\Uikit\UikitNavigationExtension;
 use MagmaCore\Ash\Components\Uikit\UikitPaginationExtension;
 use MagmaCore\Ash\Components\Bootstrap\BsNavigationExtension;
+use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
 
@@ -53,6 +53,7 @@ class TemplateExtension
 
             UikitNavigationExtension::NAME => UikitNavigationExtension::class,
             UikitPaginationExtension::NAME => UikitPaginationExtension::class,
+            UikitCommanderBarExtension::NAME => UikitCommanderBarExtension::class,
             UikitFlashMessagesExtension::NAME => UikitFlashMessagesExtension::class,
             BsNavigationExtension::NAME => BsNavigationExtension::class
 
@@ -95,7 +96,7 @@ class TemplateExtension
      * @param string $extensionName
      * @return void
      */
-    public function templateExtension(string|null $extensionName): mixed
+    public function templateExtension(string|null $extensionName, ?string $header = null, ?string $headerIcon = null): mixed
     {
         if (count($this->extensions) > 0) {
             if (in_array($extensionName, array_keys($this->extensions))) {
@@ -103,7 +104,7 @@ class TemplateExtension
                     if ($extensionName === $name) {
                         $ext = BaseApplication::diGet($extension);
                         if ($ext) {
-                            return call_user_func([$ext, 'register'], $this->controller);
+                            return call_user_func_array([$ext, 'register'], [$this->controller, $header, $headerIcon]);
                         }
                     }
                 }

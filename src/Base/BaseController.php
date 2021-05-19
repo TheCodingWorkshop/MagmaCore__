@@ -16,14 +16,13 @@ use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Base\BaseRedirect;
-use MagmaCore\Utility\Stringify;
 use MagmaCore\Session\Flash\Flash;
 use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Ash\TemplateExtension;
 use MagmaCore\Middleware\Middleware;
 use MagmaCore\Session\Flash\FlashType;
-use MagmaCore\CommanderBar\CommanderBar;
+use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
 
@@ -43,10 +42,6 @@ class BaseController extends AbstractBaseController
     protected array $callBeforeMiddlewares = [];
     /** @var array */
     protected array $callAfterMiddlewares = [];
-    /** @var object */
-    protected object|null $tableSettings = null;
-    /** @var object */
-    protected mixed $controllerSettings = null;
 
     /**
      * Main class constructor
@@ -146,65 +141,6 @@ class BaseController extends AbstractBaseController
             });
     }
 
-    private function userCommanderList()
-    {
-        $items = Yaml::file('user');
-        if ($items) {
-            if ($this->thisRouteAction() === 'index') {
-                return $items['index'];
-            } else {
-                return $items['not_index'];
-            }
-        }
-    }
-
-    private function commanderBar()
-    {
-        if (!Authorized::grantedUser()) {
-            return false;
-        }
-        $tableSettings = '';
-        if (isset($tableSettings)) {
-            $tableSettings = $this->controllerSettings
-            ->createForm(
-                "/admin/{$this->thisRouteController()}/settings",
-                $this->controllerSettingsModel->getRepo()->findObjectBy(['controller_name' => $this->thisRouteController()])
-            );
-
-        }
-        $commander = new CommanderBar();
-        $commander->create(
-            $this,
-            $this->userCommanderList(),
-            $this->tableGrid->getDataColumns(),
-            NULL,
-            NULL,
-            $this->userCommanderHeading(),
-            ($tableSettings !== null) ? $tableSettings : ''
-        );
-
-        return $commander->commanderWrapper();
-    }
-
-    private function userCommanderHeading()
-    {
-        $controller = Stringify::capitalize($this->thisRouteController());
-        return match ($this->thisRouteAction()) {
-            'index' => $controller . ' ' . 'Listings',
-            'new' => 'Create new ' . $controller,
-            'edit' => 'Edit ' . $this->findOr404()->firstname,
-            'show' => 'Viewing ' . $this->findOr404()->firstname,
-            'hard-delete' => 'Deleteing ' . $this->findOr404()->firstname,
-            'perferences' => $this->findOr404()->firstname . ' Perferences',
-            'privileges' => $this->findOr404()->firstname . ' Privileges',
-            default => 'Unknown'
-        };
-    }
-
-    private function iconPicker()
-    {
-        return '';
-    }
 
     /**
      * Render a template response using Twig templating engine
@@ -227,11 +163,9 @@ class BaseController extends AbstractBaseController
             ['func' => new TemplateExtension($this)],
             ['app' => Yaml::file('app')],
             ['menu' => Yaml::file('menu')],
-            ['commanderBar' => $this->commanderBar()],
             ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
         );
 
-        //$additionalContext = [['this' => $this, 'routes' => (isset($this->routeParams) ? $this->routeParams : [])]];
         $response = (new ResponseHandler(
             $this->templateEngine->ashRender($template, array_merge($context, $templateContext))
         ))->handler();

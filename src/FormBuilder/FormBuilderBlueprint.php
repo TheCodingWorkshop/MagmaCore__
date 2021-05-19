@@ -15,11 +15,13 @@ namespace MagmaCore\FormBuilder;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
+use MagmaCore\FormBuilder\Type\SelectType;
 use MagmaCore\FormBuilder\Type\SubmitType;
 use MagmaCore\FormBuilder\Type\CheckboxType;
 use MagmaCore\FormBuilder\Type\PasswordType;
-use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
+use MagmaCore\FormBuilder\Type\TextareaType;
 use MagmaCore\FormBuilder\Type\MultipleCheckboxType;
+use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 
 class FormBuilderBlueprint implements FormBuilderBlueprintInterface
 {
@@ -78,6 +80,28 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
 
     }
+
+    public function textarea(
+        string $name,
+        array $class = [],
+        mixed $id = null,
+        string|null $placeholder = null,
+        int $rows = 5,
+        int $cols = 33,
+    ): array {
+        return [
+            TextareaType::class => [
+                'name' => $name,
+                'class' => $class,
+                'id' => $id,
+                'placeholder' => $placeholder,
+                'rows' => $rows,
+                'cols' => $cols
+            ]
+        ];
+
+    }
+
 
     public function email(
         string $name,
@@ -148,6 +172,24 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
             ]
         ];
     }
+
+    public function select(
+        string $name,
+        array $class = [],
+        string $id = null,
+        mixed $size = null
+    ): array
+    {
+        return [
+            SelectType::class => [
+                'name' => $name,
+                'class' => $class,
+                'id' => $id,
+                'size' => $size
+            ]
+        ];
+    }
+
 
     /**
      * Undocumented function

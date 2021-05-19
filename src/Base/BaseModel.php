@@ -258,7 +258,7 @@ class BaseModel
      * @param mixed $data
      * @return mixed
      */
-    public function unsanitizeData(array $conditions, mixed $data = null)
+    public function unserializeData(array $conditions, mixed $data = null)
     {
         if ($conditions) {
             $serializeData = $this->getRepo()->findOneBy($conditions);
