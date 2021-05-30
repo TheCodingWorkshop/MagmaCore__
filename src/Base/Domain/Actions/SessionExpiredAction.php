@@ -22,7 +22,7 @@ use MagmaCore\Base\Domain\DomainTraits;
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class IndexAction implements DomainActionLogicInterface
+class SessionExpiredAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
@@ -56,26 +56,12 @@ class IndexAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
 
-        $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
-        $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
-        $a = [];
-        foreach ($cs as $arg) {
-            $a = $arg;
-        }
-        $this->args = [
-            'records_per_page' => $this->isSet('records_per_page', $a), 
-            'query' => $this->isSet('query', $a), 
-            'filter_by' => unserialize($this->isSet('filter', $a)),
-            'filter_alias' => $this->isSet('alias', $a), 
-            'sort_columns' => unserialize($this->isSet('sortable', $a)), 
-            'additional_conditions' => [], 
-            'selectors' => []
-        ];
+        // if ($this->hasRouteWithID()) {
+        //     if ($this->isRouteIDEqual()) {
+        //         $this->singular = $controller->findOr404();
+        //     }
+        // }
 
-        $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
-        $this->tableData = $controller->tableGrid;
-
-        if ($this->tableData)
-            return $this;
+        return $this;
     }
 }

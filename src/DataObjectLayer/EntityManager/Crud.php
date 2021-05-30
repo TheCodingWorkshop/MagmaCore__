@@ -60,7 +60,7 @@ class Crud implements CrudInterface
         return (string)$this->tableSchema;
     }
 
-    public function getMapping() : Object
+    public function getMapping(): Object
     {
         return $this->dataMapper;
     }
@@ -83,6 +83,33 @@ class Crud implements CrudInterface
     public function lastID(): int
     {
         return $this->dataMapper->getLastId();
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $selectors
+     * @param array $joinSelectors
+     * @param string $joinTo
+     * @param string $joinType
+     * @param array $conditions
+     * @param array $parameters
+     * @return void
+     */
+    public function join(
+        array $selectors = [],
+        array $joinSelectors = [],
+        string $joinTo,
+        string $joinType,
+        array $conditions = [],
+        array $parameters = [],
+        array $extras = []
+    ) {
+
+        $args = ['table' => $this->getSchema(), 'type' => 'join', 'selectors' => $selectors, 'join_to_selectors' => $joinSelectors, 'join_to' => $joinTo, 'join_type' => $joinType, 'conditions' => $conditions, 'params' => $parameters, 'extras' => $extras];
+        $query = $this->queryBuilder->buildQuery($args)->joinQuery();
+        $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions, $parameters));
+        return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->results() : NULL;
     }
 
     /**
@@ -227,7 +254,7 @@ class Crud implements CrudInterface
                     break;
                 case 'columns':
                     $data = $this->dataMapper->columns();
-                    break;    
+                    break;
                 case 'fetch':
                     $data = $this->dataMapper->result();
                     break;

@@ -21,7 +21,7 @@ use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
-use MagmaCore\DataObjectLayer\DataRelationship\DataRelationshipInterface;
+use MagmaCore\DataObjectLayer\DataRelationship\DataRelationalInterface;
 use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
 
 class BaseModel
@@ -170,7 +170,7 @@ class BaseModel
     public function addRelationship(string $relationshipType): object
     {
         $relationship = BaseApplication::diGet($relationshipType);
-        if (!$relationship instanceof DataRelationshipInterface) {
+        if (!$relationship instanceof DataRelationalInterface) {
             throw new DataRelationshipInvalidArgumentException('');
         }
         return $relationship;

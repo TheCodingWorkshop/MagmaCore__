@@ -17,7 +17,6 @@ use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
@@ -50,17 +49,23 @@ trait ControllerTrait
         }
     }
 
-    public function addDefinitions(?array $args = null)
+    /**
+     * Alias of diContainer
+     *
+     * @param array|null $args
+     * @return mixed
+     */
+    public function addDefinitions(?array $args = null): mixed
     {
         return $this->diContainer($args);
     }
 
     /**
-     * Undocumented function
+     * Register all event subscribers and listeners
      *
      * @return void
      */
-    public function registerSubscribedServices()
+    public function registerSubscribedServices(): void
     {
         $fileServices = Yaml::file('events');
         $services = $fileServices ? $fileServices : self::getSubscribedEvents();
@@ -70,37 +75,10 @@ trait ControllerTrait
                     if (isset($key) && is_string($key) && $key !== '') {
                         switch ($key) {
                             case 'listeners':
-                                foreach ($params as $listeners => $values) {
-                                    if (isset($listeners)) {
-
-                                        if (!class_exists($values['class'])) {
-                                            throw new BaseBadFunctionCallException($values['class'] . ' Listener class was not found within /App/EventListener');
-                                        }
-
-                                        $listenerObject = BaseApplication::diGet($values['class']);
-                                        /*if (!$listenerObject instanceof ListenerProviderInterface) {
-                                            throw new BaseInvalidArgumentException($listenerObject . ' is not a valid Listener Object.');
-                                        }*/
-                                        if ($this->eventDispatcher) {
-                                            if (in_array('name', $values['props'])) {
-                                                $this->eventDispatcher->addListener($values['props']['name']::NAME, [$listenerObject, $values['props']['event']]);
-                                            }
-                                        }
-                                    }
-                                }
+                                $this->resolveListeners($params);
                                 break;
                             case 'subscribers':
-                                foreach ($params as $subscribers => $values) {
-                                    if (isset($subscribers)) {
-                                        $subscriberObject = BaseApplication::diGet($values['class']);
-                                        if (!$subscriberObject instanceof EventSubscriberInterface) {
-                                            throw new BaseInvalidArgumentException($subscriberObject . ' is not a valid subscriber object.');
-                                        }
-                                        if ($this->eventDispatcher) {
-                                            $this->eventDispatcher->addSubscriber($subscriberObject);
-                                        }
-                                    }
-                                }
+                                $this->resolveSubscribers($params);
                                 break;
                         }
                     }
@@ -110,50 +88,61 @@ trait ControllerTrait
     }
 
     /**
-     * Undocumented function
+     * Resolve the event listeners from the events.yml file
      *
+     * @param array $parameters
      * @return void
      */
-    public function registerEventListenerServices()
+    private function resolveListeners(array $parameters): void
     {
-        $eventListenerLocation = Yaml::file('listeners');
-        $eventListeners = $eventListenerLocation ? $eventListenerLocation : self::getListenersForEvent();
-        if (is_array($eventListeners) && count($eventListeners) > 0) {
-            foreach ($eventListeners as $eventListener) {
-                foreach ($eventListener as $event => $listeners) {
-                    if (isset($event) && is_string($event) && $event !== '') {
+        foreach ($parameters as $listeners => $values) {
+            if (isset($listeners)) {
 
-                        foreach ($listeners['listeners'] as $key => $value) {
-
-                            $listenerObject = BaseApplication::diGet($value[0]);
-                            if (!$listenerObject) {
-                                throw new BaseInvalidArgumentException('Invalid Event Listener object.');
-                            }
-
-                            $newEvent = "\App\Event\\" . $event;
-                            if (!class_exists($newEvent)) {
-                                throw new BaseBadFunctionCallException("The event class {$newEvent} does not exists.");
-                            }
-
-                            if (!method_exists($listenerObject, $value[2])) {
-                                throw new BaseBadMethodCallException("The listener method {$value[2]} does not exists.");
-                            }
-
-                            if ($this->eventDispatcher) {
-                                $this->eventDispatcher->addListener($newEvent::NAME, [$listenerObject, $value[2]]);
-                            }
-                        }
-                        /*
-                            $this->eventDispatcher->dispatch(new $newEvent(new $params['listener'][2]()), $newEvent::NAME);
-                        }*/
+                if (!class_exists($values['class'])) {
+                    throw new BaseBadFunctionCallException($values['class'] . ' Listener class was not found within /App/EventListener');
+                }
+                $listenerObject = BaseApplication::diGet($values['class']);
+                /*if (!$listenerObject instanceof ListenerProviderInterface) {
+                throw new BaseInvalidArgumentException($listenerObject . ' is not a valid Listener Object.');
+            }*/
+                if ($this->eventDispatcher) {
+                    if (in_array('name', $values['props'])) {
+                        $this->eventDispatcher->addListener($values['props']['name']::NAME, [$listenerObject, $values['props']['event']]);
                     }
                 }
             }
         }
-        return false;
     }
 
-    public function getColumnParts(string $columnString, string $part = 'sortable')
+    /**
+     * Resolve the events subscribers from the events.yml file
+     *
+     * @param array $parameters
+     * @return void
+     */
+    private function resolveSubscribers(array $parameters): void
+    {
+        foreach ($parameters as $subscribers => $values) {
+            if (isset($subscribers)) {
+                $subscriberObject = BaseApplication::diGet($values['class']);
+                if (!$subscriberObject instanceof EventSubscriberInterface) {
+                    throw new BaseInvalidArgumentException($subscriberObject . ' is not a valid subscriber object.');
+                }
+                if ($this->eventDispatcher) {
+                    $this->eventDispatcher->addSubscriber($subscriberObject);
+                }
+            }
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $columnString
+     * @param string $part
+     * @return array
+     */
+    public function getColumnParts(string $columnString, string $part = 'sortable'): array
     {
         $columns = BaseApplication::diGet($columnString);
         if ($columns) {
@@ -218,16 +207,19 @@ trait ControllerTrait
     {
         if (is_array($controllers = Yaml::file('controller'))) {
             foreach ($controllers as $key => $setting) {
+                if ($this->thisRouteAction() !== 'index') {
+                    continue;
+                }
                 if (!in_array($controller, array_keys($controllers))) {
                     throw new BaseException('Cannot initialize settings for ' . Stringify::capitalize($key) . 'Controller. Please ensure your controller.yml is referencing specific the controller name. As the array key without the controller suffix');
                 }
-
                 $find = $this->controllerSettingsModel
                     ->getRepo()
-                    ->findObjectBy(['controller_name' => $controller]);
+                    ->findObjectBy(['controller_name' => $key]);
 
-                if ($find !== null && $controller === $find->controller_name) {
-                    return false;
+
+                if (!is_null($find) && $key === trim($find->controller_name)) {
+                    continue;
                 }
                 $controllerSettings = [
                     'controller_name' => $key,

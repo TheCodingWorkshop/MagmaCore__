@@ -16,7 +16,7 @@ use MagmaCore\Mailer\Exception\MailerException;
 
 class Mailer implements MailerInterface
 {
-    /** @var Object */
+    /** @var object */
     protected Object $transporterObject;
     /** @var array */
     protected array $options = [];
@@ -26,7 +26,7 @@ class Mailer implements MailerInterface
     /**
      * Undocumented function
      *
-     * @param Object $transporterObject
+     * @param object $transporterObject
      * @param array|null $settings
      */
     public function __construct(Object $transporterObject, ?array $settings = null, ?string $dotEnvString = null)

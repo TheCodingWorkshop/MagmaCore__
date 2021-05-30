@@ -181,7 +181,8 @@ trait DomainTraits
                     ($formAction !== null) ? $formAction : $this->domainRoute(),
                     ($data !== null) ? $data : $this->findSomeData()
                 )
-            ]
+                ],
+                $this->getDataRelationship()
         );
         return $this;
     }
@@ -216,7 +217,6 @@ trait DomainTraits
      */
     public function table(array $tableParams = [], object|null $column = null, object|null $repository = null, array $tableData = []): self
     {
-
         /* Create the table object and pass the dataColumn and repository object */
         $table = $this->tableData
             ->create(
@@ -238,7 +238,6 @@ trait DomainTraits
         /* Create data table context which gets pass to the twig rendering template */
         if ($this->tableData) {
             $tableContext = [
-                'results' => $this->tableRepository,
                 'table' => $table,
                 'pagination' => $this->controller->tableGrid->pagination(),
                 'columns' => $this->controller->tableGrid->getColumns(),
@@ -247,9 +246,14 @@ trait DomainTraits
                 'search_query' => $this->controller->request->handler()->query->getAlnum($this->args['filter_alias'])
             ];
         }
-
         $this->superContext = array_merge($this->context, (!empty($tableData)) ? $tableData : $tableContext);
         return $this;
+    }
+
+    function array_flatten($array,) {
+        foreach ($array as $arr) {
+            return $arr;
+        }
     }
 
     /**
@@ -263,9 +267,25 @@ trait DomainTraits
     {
         $this->superContext = array_merge(
             $this->context,
-            ['row' => $this->controller->toArray($this->controller->findOr404())]
+            ['row' => $this->controller->toArray($this->controller->findOr404())],
+            $this->getDataRelationship()
         );
         return $this;
+    }
+
+    /**
+     * Render a notification
+     *
+     * @return self
+     */
+    public function notification(): self
+    {
+        return $this;
+    }
+
+    private function getDataRelationship()
+    {
+        return isset($this->dataRelationship) ? ['relationship' => $this->dataRelationship] : [];
     }
 
     /**
@@ -419,13 +439,17 @@ trait DomainTraits
      * @param Closure $closure
      * @return self
      */
-    public function mergeRelationship(Closure $closure): self
+    public function mergeRelationship(Closure $closure = null): self
     {
         if ($closure) {
             if (!$closure instanceof Closure) {
                 throw new \Exception();
             }
-            $this->dataRelationship = $closure($this->controller->repository);
+            $this->dataRelationship = $closure($this->controller->repository, $this->controller->relationship);
+
+            // var_dump($this->dataRelationship);
+            // die;
+
         }
         return $this;
     }

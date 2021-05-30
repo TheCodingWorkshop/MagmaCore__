@@ -15,8 +15,8 @@ use MagmaCore\Mailer\MailerFactory;
 
 class MailerFacade
 {
-    /** @var Object */
-    protected Object $mailer;
+    /** @var object */
+    protected object $mailer;
 
     /**
      * Facade main constructor method which creates an object the mailer factory

@@ -24,7 +24,7 @@ interface DataRelationshipInterface
      * @param string $relationship
      * @return static
      */
-    public function type(string $relationship): static;
+    public function type(string $relationship): self;
 
     /**
      * Undocumented function
@@ -33,7 +33,7 @@ interface DataRelationshipInterface
      * @param string $tableRight
      * @return void
      */
-    public function tables(string $tableLeft, string $tableRight): static;
+    public function tables(string $tableLeft, string $tableRight): self;
 
     /**
      * Undocumented function
@@ -41,6 +41,6 @@ interface DataRelationshipInterface
      * @param string $tablePivot
      * @return void
      */
-    public function pivot(string $tablePivot): static;
+    public function pivot(string $tablePivot): self;
 
 }

@@ -64,7 +64,6 @@ class EditAction implements DomainActionLogicInterface
                     $this->enforceRules($rules, $controller);
                     $formData = $controller->formBuilder->getData();
                     $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
-
                     $action = $controller->repository->getRepo()
                         ->validateRepository(
                             $entityCollection,

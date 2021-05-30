@@ -37,9 +37,9 @@ abstract class AbstractQueryBuilder implements QueryBuilderInterface
         'type' => '',
         'raw' => '',
 
-        'table_join' => '',
-        'join_key' => '',
-        'join' => []
+        'join_to' => '',
+        'join_to_selectors' => [],
+        'join_type' => '',
     ];
 
     /** @var array */
@@ -98,5 +98,15 @@ abstract class AbstractQueryBuilder implements QueryBuilderInterface
     {
         return self::QUERY_TYPES;
     }
+
+    public function aliasSelectors(string $parent, array $selectors, $default = ['*']) 
+    {
+        $filter = array_map(
+            fn ($selector): string => $parent . '.' . $selector,
+            $selectors
+        );
+        return (empty($filter)) ? $default : $filter;
+    }
+
 
 }

@@ -18,6 +18,7 @@ use MagmaCore\Utility\Paginator;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManager;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryTrait;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
+use MagmaCore\DataObjectLayer\DataRepository\DataRelationshipTrait;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
@@ -42,6 +43,7 @@ class DataRepository implements DataRepositoryInterface
 {
 
     use DataRepositoryTrait;
+    use DataRelationshipTrait;
 
     protected EntityManagerInterface $em;
 
@@ -55,7 +57,7 @@ class DataRepository implements DataRepositoryInterface
      *
      * @return object|false
      */
-    public function getEm() : EntityManager|false
+    public function getEm(): EntityManager|false
     {
         return $this->em;
     }
@@ -94,6 +96,18 @@ class DataRepository implements DataRepositoryInterface
     public function getSchemaID(): string
     {
         return (string)$this->em->getCrud()->getSchemaID();
+    }
+
+    public function findWithRelationship(
+        array $selectors = [],
+        array $joinSelectors = [],
+        string $joinTo,
+        string $joinType,
+        array $conditions = [],
+        array $parameters = [],
+        array $extras = []
+    ) {
+        return $this->em->getCrud()->join($selectors, $joinSelectors, $joinTo, $joinType, $conditions, $parameters, $extras);
     }
 
     /**
@@ -206,7 +220,7 @@ class DataRepository implements DataRepositoryInterface
      * @param array $items
      * @return boolean
      */
-    public function findAndDelete(array $items = []) : bool
+    public function findAndDelete(array $items = []): bool
     {
         if (is_array($items) && count($items) > 0) {
             foreach ($items as $item) {
@@ -236,7 +250,6 @@ class DataRepository implements DataRepositoryInterface
                 if ($delete) {
                     return ($delete == true) ? true : false;
                 }
-                
             }
         } catch (Throwable $throwable) {
             throw $throwable;
@@ -275,7 +288,7 @@ class DataRepository implements DataRepositoryInterface
      * @param Object $request
      * @return array|false
      */
-    public function findWithSearchAndPaging(Object $request, array $args = []): array|false
+    public function findWithSearchAndPaging(Object $request, array $args = [], array $relationship = []): array|false
     {
         list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
 
@@ -295,6 +308,17 @@ class DataRepository implements DataRepositoryInterface
         } else {
             $queryConditions = array_merge($args['additional_conditions'], $conditions);
             $results = $this->findBy($args['selectors'], $queryConditions, $parameters, $optional);
+            // list($leftSelectors, $rightSelectors, $joinTo, $joinType, $_conditions) = $relationship;
+            // $results = $this->findWithRelationship(
+            //     $leftSelectors,
+            //     $rightSelectors,
+            //     $joinTo,
+            //     $joinType,
+            //     $conditions,
+            //     $parameters,
+            //     $optional
+
+            // );
         }
         return [
             $results,
@@ -316,7 +340,7 @@ class DataRepository implements DataRepositoryInterface
      * @param array $args
      * @return array|false
      */
-    private function getCurrentQueryStatus(Object $request, array $args) : array|false
+    private function getCurrentQueryStatus(Object $request, array $args): array|false
     {
         $totalRecords = 0;
         $req = $request->query;

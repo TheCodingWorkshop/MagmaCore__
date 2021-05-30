@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * This file is part of the MagmaCore package.
  *
@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\QueryBuilder;
@@ -27,7 +28,7 @@ class QueryBuilder extends AbstractQueryBuilder
         parent::__construct();
     }
 
-    public function buildQuery(array $args = []) : self
+    public function buildQuery(array $args = []): self
     {
         if (count($args) < 0) {
             throw new DataLayerInvalidArgumentException('Your BuildQuery method has no defined argument. Please fix this');
@@ -37,7 +38,7 @@ class QueryBuilder extends AbstractQueryBuilder
         return $this;
     }
 
-    public function insertQuery() : string
+    public function insertQuery(): string
     {
         if ($this->isQueryTypeValid('insert')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
@@ -50,7 +51,7 @@ class QueryBuilder extends AbstractQueryBuilder
         return false;
     }
 
-    public function selectQuery() : string
+    public function selectQuery(): string
     {
         if ($this->isQueryTypeValid('select')) {
             $selectors = (!empty($this->key['selectors'])) ? implode(", ", $this->key['selectors']) : '*';
@@ -61,12 +62,50 @@ class QueryBuilder extends AbstractQueryBuilder
             }
             $this->sqlQuery = $this->hasConditions();
             return $this->sqlQuery;
-
         }
         return false;
     }
-    
-    public function updateQuery() : string
+
+    public function joinQuery()
+    {
+        if ($this->isQueryTypeValid('join')) {
+            if (
+                isset($this->key['selectors']) &&
+                count($this->key['selectors']) > 0
+            ) {
+                $selectors = implode(', ', $this->aliasSelectors($this->key['table'], $this->key['selectors']));
+            }
+            if (
+                isset($this->key['join_to_selectors']) &&
+                count($this->key['join_to_selectors']) > 0
+            ) {
+                $joinSelectors = implode(', ', $this->aliasSelectors('', $this->key['join_to_selectors']));
+            }
+            $this->sqlQuery = "SELECT 
+            {$selectors}
+            AS
+            {$this->key['table']},
+            " . str_replace('.', '', $joinSelectors) . "
+            AS
+            {$this->key['join_to']}
+            FROM
+            {$this->key['table']},
+            {$this->key['join_to']},
+            user_role
+            WHERE 
+            users.id = user_role.user_id
+            AND roles.id = user_role.role_id
+            ";
+            $this->sqlQuery = $this->hasConditions();
+
+            return $this->sqlQuery;
+        }
+
+        return false;
+    }
+
+
+    public function updateQuery(): string
     {
         if ($this->isQueryTypeValid('update')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
@@ -90,7 +129,7 @@ class QueryBuilder extends AbstractQueryBuilder
         return false;
     }
 
-    public function deleteQuery() : string
+    public function deleteQuery(): string
     {
         if ($this->isQueryTypeValid('delete')) {
             $index = array_keys($this->key['conditions']);
@@ -107,7 +146,7 @@ class QueryBuilder extends AbstractQueryBuilder
         return false;
     }
 
-    public function searchQuery() : string
+    public function searchQuery(): string
     {
         if ($this->isQueryTypeValid('search')) {
             if (is_array($this->key['selectors']) && $this->key['selectors'] != '') {
@@ -140,11 +179,11 @@ class QueryBuilder extends AbstractQueryBuilder
 
     private function hasConditions()
     {
-        if (isset($this->key['conditions']) && $this->key['conditions'] !='') {
+        if (isset($this->key['conditions']) && $this->key['conditions'] != '') {
             if (is_array($this->key['conditions'])) {
                 $sort = [];
                 foreach (array_keys($this->key['conditions']) as $where) {
-                    if (isset($where) && $where !='') {
+                    if (isset($where) && $where != '') {
                         $sort[] = $where . " = :" . $where;
                     }
                 }
@@ -160,6 +199,4 @@ class QueryBuilder extends AbstractQueryBuilder
 
         return $this->sqlQuery;
     }
-
-
 }

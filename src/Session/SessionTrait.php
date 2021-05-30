@@ -91,7 +91,7 @@ trait SessionTrait
      * can fetch the global variable and use this trait method in any class
      * which reference this trait
      * 
-     * @return Object
+     * @return object
      * @throws LogicException
      * @throws GlobalManagerException
      */
@@ -102,7 +102,6 @@ trait SessionTrait
         if (!$storedSessionObject) {
             throw new SessionException("No session object found within the global manager");
         }
-
         return $storedSessionObject;
     }
 
@@ -115,5 +114,7 @@ trait SessionTrait
     public static function registerUserSession(int $userID)
     {
         $_SESSION['user_id'] = $userID;
+        $_SESSION['last_login'] = time();
+        $_SESSION['is_login'] = true;
     }
 }

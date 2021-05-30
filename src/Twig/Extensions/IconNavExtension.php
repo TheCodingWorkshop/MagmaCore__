@@ -66,7 +66,7 @@ class IconNavExtension
                 $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : 'Unknown');
                 
                 $html .=  "\n" . sprintf(
-                    '<li><a href="%s"%s%s%s>%s</a>',
+                    '<li><a data-turbo="false" href="%s"%s%s%s>%s</a>',
  
                     ($path ? $path : $toggleID),
                     (isset($tooltip) ? ' uk-tooltip="' . $tooltip . '"' : ' uk-tooptip="' . $key . '"'),

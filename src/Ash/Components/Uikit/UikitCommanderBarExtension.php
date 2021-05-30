@@ -34,6 +34,10 @@ class UikitCommanderBarExtension
      */
     public function register(object $controller = null, ?string $header = null, ?string $headerIcon = null): mixed
     {
-        return (new CommanderFactory())->create($controller);
+        if (!isset($controller->commander)) {
+            return false;
+        } else {
+            return (new CommanderFactory())->create($controller);
+        }
     }
 }

@@ -13,12 +13,13 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRelationship\Relationships;
 
 use MagmaCore\DataObjectLayer\DataRelationship\DataRelationship;
+use MagmaCore\DataObjectLayer\DataRelationship\DataRelationalInterface;
 
 /**
  * Both tables can have only one record on each side of the relationship.
  * each primary key value relates to none or only one record in the related table
  */
-class ManyToMany extends DataRelationship
+class ManyToMany extends DataRelationship implements DataRelationalInterface
 {
 
     private string $query = '';
@@ -48,7 +49,7 @@ class ManyToMany extends DataRelationship
      * @param array $rightSelectors
      * @return void
      */
-    public function find(array $leftSelectors = ['id', 'firstname', 'lastname', 'email'], array $rightSelectors = ['role_name']): self
+    public function manyToMany(array $leftSelectors = [], array $rightSelectors = []): self
     {
         $_leftSelectors = implode(', ', $this->filterSelection($this->getLeft()->getSchema(), $leftSelectors));
         $_rightSelectors = implode(', ', $this->filterSelection('', $rightSelectors));

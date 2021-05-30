@@ -12,11 +12,12 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\EventDispatcher\Event;
+use MagmaCore\Base\Contracts\BaseActionEventInterface;
 
 /**
  * Base action event which all app event class can build from
  */
-class BaseActionEvent extends Event
+class BaseActionEvent extends Event implements BaseActionEventInterface
 {
 
     /** @var string - name of the event */

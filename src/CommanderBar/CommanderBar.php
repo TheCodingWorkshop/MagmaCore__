@@ -88,7 +88,7 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';
         $commander .= '<div class="uk-width-1-3">';
 
-        if (is_array($lists = $this->controller->commander->getUserYml()) && count($lists) > 0) {
+        if (is_array($lists = $this->controller->commander->getYml()) && count($lists) > 0) {
             $commander .= '<ul class="uk-nav uk-navbar-dropdown-nav">';
             foreach ($lists as $key => $value) {
                 if (isset($value['nav_header']) && $value['nav_header'] !== '') {
@@ -119,28 +119,36 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div class="uk-width-expand">';
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
-        $commander .= '<h3 class="uk-card-title">Change Status</h3>';
-        if (is_array($statusColumns = $this->controller->repository->getColumnStatus()) && count($statusColumns) > 0) {
-            $commander .= '<ul class="uk-nav uk-dropdown-nav">';
-            foreach ($statusColumns as $key => $value) {
-                foreach ($value as $val) {
-                    $commander .= '<li>';
-                    $commander .= '<a class="uk-text-success uk-link-reset uk-text-capitalize" href="?' . $key . '=' . $val . '">';
-                    $badgeColor = ['pending' => 'warning', 'active' => 'success', 'trash' => 'danger', 'lock' => 'secondary'];
-                    $commander .= '<span class="uk-badge uk-badge-' . $badgeColor[$val] . ' uk-margin-small-right">';
-                    $commander .= $this->controller->repository->getRepo()->count([$key => $val]);
-                    $commander .= '</span>' . Stringify::capitalize($val);
-                    $commander .= '</a>';
-                    $commander .= '';
+        if (isset($this->controller)) {
+            if (in_array($this->controller->thisRouteAction(), ['new'])) {
+                $commander .= '<h3 class="uk-card-title">Change Status</h3>';
+                if (is_array($statusColumns = $this->controller->repository->getColumnStatus()) && count($statusColumns) > 0) {
+                    $commander .= '<ul class="uk-nav uk-dropdown-nav">';
+                    foreach ($statusColumns as $key => $value) {
+                        foreach ($value as $val) {
+                            $commander .= '<li>';
+                            $commander .= '<a class="uk-text-success uk-link-reset uk-text-capitalize" href="?' . $key . '=' . $val . '">';
+                            $badgeColor = ['pending' => 'warning', 'active' => 'success', 'trash' => 'danger', 'lock' => 'secondary'];
+                            $commander .= '<span class="uk-badge uk-badge-' . $badgeColor[$val] . ' uk-margin-small-right">';
+                            $commander .= $this->controller->repository->getRepo()->count([$key => $val]);
+                            $commander .= '</span>' . Stringify::capitalize($val);
+                            $commander .= '</a>';
+                            $commander .= '';
+                            $commander .= '</li>';
+                        }
+                    }
+                    $commander .= '<li class="uk-nav-divider"></li>';
+                    $commander .= '<li><a class="ion-24" href="/admin/user/index">';
+                    $commander .= '<ion-icon size="large" name="home-outline"></ion-icon> <span class="uk-text-meta"><span class="uk-badge uk-text-bolder">' . $this->controller->repository->getRepo()->count() . ' </span> total records within this model</span></a>';
                     $commander .= '</li>';
+                    $commander .= '</ul>' . PHP_EOL;
                 }
+            } else {
+                    $commander .= '<p>Not enough data to generate a graph</p>';
+                /* display individual user graph */
             }
-            $commander .= '<li class="uk-nav-divider"></li>';
-            $commander .= '<li><a class="ion-24" href="/admin/user/index">';
-            $commander .= '<ion-icon size="large" name="home-outline"></ion-icon> <span class="uk-text-meta"><span class="uk-badge uk-text-bolder">' . $this->controller->repository->getRepo()->count() . ' </span> total records within this model</span></a>';
-            $commander .= '</li>';
-            $commander .= '</ul>' . PHP_EOL;
         }
+
         $commander .= '</div>';
         $commander .= '</div>';
         $commander .= '</div>';
@@ -222,7 +230,8 @@ class CommanderBar implements CommanderBarInterface
                 $this->controller
                     ->controllerRepository
                     ->getRepo()
-                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>'
+                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
+                $this->controller
             );
 
         $commander .= '</div>';
@@ -340,7 +349,7 @@ class CommanderBar implements CommanderBarInterface
         if (isset($this->controller)) {
             return match ($this->controller->thisRouteAction()) {
                 'new', 'edit', 'show', 'hard-delete', 'perferences', 'privileges' => '/' . $this->controller->thisRouteNamespace() . '/' . $this->controller->thisRouteController() . '/' . 'index',
-                'index' => '/admin/user/new',
+                'index' => '/admin/' . $this->controller->thisRouteController() . '/new',
                 default => 'javascript:history.back()'
             };
         }
