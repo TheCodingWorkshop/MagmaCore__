@@ -23,13 +23,13 @@ class Yaml
      * the specified directory else throw an exception
      *
      * @param string $filename
-     * @return boolean
+     * @return void
      * @throws Exception
      */
     private function isFileExists(string $filename)
     {
         if (!file_exists($filename))
-            throw new \Exception($filename . ' does not exists');
+            throw new Exception($filename . ' does not exists');
     }
 
     /**
@@ -37,7 +37,7 @@ class Yaml
      *
      * @param string $yamlFile
      * @return void
-     * @throws ParseException
+     * @throws ParseException|Exception
      */
     public function getYaml(string $yamlFile)
     {
@@ -46,7 +46,7 @@ class Yaml
                 $this->isFileExists($file);
                 $parts = parse_url($file);
                 $path = $parts['path'];
-                if (strpos($path, $yamlFile) !== false) {
+                if (str_contains($path, $yamlFile)) {
                     return SymfonyYaml::parseFile($file);
                 }
             }
@@ -60,7 +60,8 @@ class Yaml
      * Load a yaml configuration into the yaml parser
      *
      * @param string $yamlFile
-     * @return void
+     * @return array
+     * @throws Exception
      */
     public static function file(string $yamlFile) : array
     {

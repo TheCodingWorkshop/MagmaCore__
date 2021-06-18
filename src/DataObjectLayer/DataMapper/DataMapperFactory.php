@@ -14,7 +14,6 @@ namespace MagmaCore\DataObjectLayer\DataMapper;
 
 use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerEnvironment;
-use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 
 class DataMapperFactory
 {
@@ -34,9 +33,8 @@ class DataMapperFactory
      * expose the environment methods with the database connection class.
      *
      * @param string $databaseDriverFactory
-     * @param Object $dataMapperEnvironmentConfiguration
+     * @param DataLayerEnvironment $environment
      * @return DataMapperInterface
-     * @throws DataLayerUnexpectedValueException
      */
     public function create(string $databaseDriverFactory, DataLayerEnvironment $environment): DataMapperInterface
     {

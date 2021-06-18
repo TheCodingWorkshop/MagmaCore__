@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\Drivers;
 
-use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
-use MagmaCore\DataObjectLayer\Drivers\MysqlDatabaseConnection;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 
 class DatabaseDriverFactory
@@ -29,9 +27,9 @@ class DatabaseDriverFactory
      * @return DatabaseDriverInterface
      * @throws DataLayerUnexpectedValueException
      */
-    public function create(object $environment, string|null $dbDriverConnection = null, string $pdoDriver): DatabaseDriverInterface
+    public function create(object $environment, ?string $dbDriverConnection, string $pdoDriver): DatabaseDriverInterface
     {
-        if (is_object($environment) && !is_null($environment)) {
+        if (is_object($environment)) {
             $dbConnection = ($dbDriverConnection !==null) ? new $dbDriverConnection($environment, $pdoDriver) : new MysqlDatabaseConnection($environment, $pdoDriver);
             if (!$dbConnection instanceof DatabaseDriverInterface) {
                 throw new DataLayerUnexpectedValueException();   

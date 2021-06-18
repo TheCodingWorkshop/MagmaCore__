@@ -11,13 +11,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Traits;
 
+use JetBrains\PhpStorm\Pure;
+
 trait FormalizerTrait
 {
 
     /**
      * Add a model repository the form builder object
      *
-     * @param object $repository
+     * @param object|null $repository
      * @return static
      */
     public function addRepository(object $repository = null): static
@@ -44,7 +46,7 @@ trait FormalizerTrait
      * @param string $fieldName
      * @return mixed
      */
-    public function hasValue(string $fieldName): mixed
+    #[Pure] public function hasValue(string $fieldName): mixed
     {
         if (is_array($arrayRepo = $this->getRepository())) {
             return empty($arrayRepo[$fieldName]) ? '' : $arrayRepo[$fieldName];

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
 
+use Exception;
+
 trait CacheStorageTrait
 {
 
@@ -50,7 +52,7 @@ trait CacheStorageTrait
      * @param int|null $maxlen
      * @return boolean|string The contents of the cache file or false on error
      */
-    protected function readCacheFile(string $cacheEntryPathAndFilename, int $offset = null, int $maxlen = null)
+    protected function readCacheFile(string $cacheEntryPathAndFilename, int $offset = null, int $maxlen = null): bool|string
     {
         //file_get_contents($cacheEntryPathAndFilename);
         for ($i = 0; $i < 3; $i++) {
@@ -68,7 +70,7 @@ trait CacheStorageTrait
                     flock($file, LOCK_UN);
                 }
                 fclose($file);
-            } catch (\Exception $e) {
+            } catch (Exception) {
             }
             if ($data !== false) {
                 return $data;
@@ -97,15 +99,19 @@ trait CacheStorageTrait
                     continue;
                 }
                 if (flock($file, LOCK_EX) !== false) {
-                    $result = fwrite($file, $value) === false ?: true;
+                    if (fwrite($file, $value) === false) {
+                        $result = fwrite($file, $value) === false;
+                    } else {
+                        $result = true;
+                    }
                     flock($file, LOCK_UN);
                 }
                 fclose($file);
-            } catch (\Exception $e) {
+            } catch (Exception) {
             }
             if ($result !== false) {
                 clearstatcache(true, $cacheEntryPathAndFilename);
-                return $result;
+                return true;
             }
             usleep(rand(10, 500));
         }

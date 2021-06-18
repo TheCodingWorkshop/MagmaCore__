@@ -11,16 +11,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\Router;
 
-use MagmaCore\Router\RouterInterface;
-use MagmaCore\Router\Router;
-
 class RouterFactory
 {
 
     /** @var Object - Router Object */
     protected Object $routerObject;
-    /** @var string */
-    protected ?string $url = null;
+    /** @var string|null */
+    protected ?string $url;
 
     /**
      * Router factory constructor
@@ -37,7 +34,7 @@ class RouterFactory
      * Undocumented function
      *
      * @param string|null $routerString
-     * @return void
+     * @return \MagmaCore\Router\RouterInterface
      */
     public function create(?string $routerString = null) : RouterInterface
     {

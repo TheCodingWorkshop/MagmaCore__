@@ -19,11 +19,11 @@ class Utilities
      * Pull a particular property from each assoc. array in a numeric array, 
      * returning and array of the property values from each item.
      *
-     *  @param  array  $a    Array to get data from
-     *  @param  string $prop Property to read
+     *  @param array $a    Array to get data from
+     *  @param string $prop Property to read
      *  @return array        Array of property values
      */
-    static function pluck($a, $prop)
+    static function pluck(array $a, string $prop): array
     {
         $out = array();
 
@@ -38,30 +38,30 @@ class Utilities
     /**
      * Return a string from an array or a string
      *
-     * @param  array|string $a Array to join
-     * @param  string $join Glue for the concatenation
-     * @return string Joined string
+     * @param array|string $a Array to join
+     * @param string $join Glue for the concatenation
+     * @return array|string Joined string
      */
-    public static function _flatten($a, $join = ' AND ')
+    public static function _flatten($a, string $join = ' AND '): array|string
     {
         if (!$a) {
             return '';
-        } else if ($a && is_array($a)) {
+        } else if (is_array($a)) {
             return implode($join, $a);
         }
         return $a;
     }
 
     /**
-     * Convert an index base array to an dimensional array using the keys as the 
-     * value. Or alternativly combine 2 array for one multidemensional array.
+     * Convert an index base array to an dimensional array using the keys as the
+     * value. Or alternatively combine 2 array for one multidimensional array.
      * At the end ensure all array keys are lowercase and replace any space
      * with an underscore.
      *
-     * @param mixed $sortables
+     * @param mixed $options
      * @return array
      */
-    public static function arrayDimensional(mixed $options): mixed
+    public static function arrayDimensional(mixed $options): array
     {
         $newOptions = array_combine(str_replace(' ', '_', $options), $options);
         return array_change_key_case($newOptions);

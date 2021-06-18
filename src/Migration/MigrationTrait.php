@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Migration;
 
-use MagmaCore\Migration\Migrate;
-
 trait MigrationTrait
 {
     
@@ -41,7 +39,7 @@ trait MigrationTrait
         $parts = explode('_', $newClassName);
         if (isset($parts[1]) && $parts[1] !=='') {
             $parentClass = $parts[1];
-            $content = $content = file_get_contents($this->rootPath . 'Stubs/ExampleMigrationChange.stub');
+            $content = file_get_contents($this->rootPath . 'Stubs/ExampleMigrationChange.stub');
             $commonPattern = ['{{ className }}', '{{ classGeneratedFrom }}'];
             $commonReplacement = [$hashClassName, $newClassName];
             $pattern = array_merge($commonPattern, ['{{ extendClass }}', '{{ change }}']);
@@ -56,7 +54,7 @@ trait MigrationTrait
 
     }
 
-    private function downMethod(string $table)
+    private function downMethod(string $table): string
     {
         return "Drop table {$table}";
     }
@@ -73,36 +71,23 @@ trait MigrationTrait
 
     public function logBefore(string $direction)
     {
-        $msg ='';
         if ($direction) {
             $this->direction = $direction;
-            switch($direction) {
-                case Migrate::MIGRATE_UP;
-                    $msg = 'Starting migration....';
-                    break;
-                case Migrate::MIGRATE_DOWN;
-                    $msg = 'Dropping table...';
-                    break;
-                case Migrate::MIGRATE_CHANGE;
-                    $msg = 'Making changes...';
-                    break;
-
-            }
+            $msg = match ($direction) {
+                Migrate::MIGRATE_UP => 'Starting migration....',
+                Migrate::MIGRATE_DOWN => 'Dropping table...',
+                Migrate::MIGRATE_CHANGE => 'Making changes...',
+            };
             echo $this->migrateLog($msg);
         }
     }
 
     public function logAfter()
     {
-        $msg ='';
-            switch($this->direction) {
-                case Migrate::MIGRATE_UP;
-                case Migrate::MIGRATE_DOWN;
-                case Migrate::MIGRATE_CHANGE;
-                    $msg = 'OK...';
-                    break;
-
-            }
+        $msg = match ($this->direction) {
+            Migrate::MIGRATE_UP, Migrate::MIGRATE_DOWN, Migrate::MIGRATE_CHANGE => 'OK...',
+            default => '',
+        };
             echo $this->migrateLog($msg);
     }
 
@@ -133,7 +118,7 @@ trait MigrationTrait
     /**
      * Resolves the class name and figure out if the class contains certain
      * string. either Drop or change. And will always return up as default.
-     * This helper method is used to determin the direction of which method 
+     * This helper method is used to determine the direction of which method
      * gets executed.
      *
      * @param array $filePrefixArray
@@ -174,7 +159,7 @@ trait MigrationTrait
     public function isFile($file)
     {
         if ($file === '.' || $file === '..') {
-          return;
+          //return;
         }
 
     }

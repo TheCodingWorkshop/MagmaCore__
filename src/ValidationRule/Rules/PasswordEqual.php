@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\ValidationRule\Rules;
 
-use MagmaCore\Error\Error;
 use MagmaCore\ValidationRule\ValidationRuleMethods;
 
 class PasswordEqual extends ValidationRuleMethods

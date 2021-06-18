@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataSchema;
 
 use MagmaCore\DataSchema\Traits\DataSchemaTypesTrait;
-use MagmaCore\DataSchema\DataSchemaTypeInterface;
 use MagmaCore\DataSchema\Exception\DataSchemaInvalidArgumentException;
 
 class DataSchemaBaseType implements DataSchemaTypeInterface
@@ -21,7 +20,7 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
 
     use DataSchemaTypesTrait;
 
-    /** @var const array */
+    /** @var array */
     protected const SCHEMA_COLUMNS = [
         'name',
         'type',

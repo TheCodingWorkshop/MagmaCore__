@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
-use MagmaCore\Cache\CacheFactory;
-
 class CacheFacade
 {
 
@@ -28,13 +26,14 @@ class CacheFacade
      * @param string|null $cacheIdentifier
      * @param string|null $storage
      * @param array $options
-     * @return void
+     * @return CacheInterface
      */
     public function create(
         ?string $cacheIdentifier = null,
         ?string $storage = null,
         array $options = []
-    ) {
+    ): CacheInterface
+    {
         return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
     }
 }

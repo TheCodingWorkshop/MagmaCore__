@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Mailer;
 
-use MagmaCore\Mailer\MailerFactory;
-
 class MailerFacade
 {
     /** @var object */
@@ -34,11 +32,11 @@ class MailerFacade
      * below. Note this basic mail method does not send attachments
      *
      * @param string $subject
-     * @param string $from - Who the eail from
-     * @param string $to - Who sending the email to
+     * @param string $from
+     * @param string $to
      * @param string $message
      * @return void
-     * @throws MailerException
+     * @throws Exception\MailerException
      */
     public function basicMail(string $subject, string $from, string $to, string $message)
     {

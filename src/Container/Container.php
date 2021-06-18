@@ -14,12 +14,10 @@ namespace MagmaCore\Container;
 
 use MagmaCore\Container\Exception\DependencyIsNotInstantiableException;
 use MagmaCore\Container\Exception\DependencyHasNoDefaultValueException;
-use MagmaCore\Container\Exception\ContainerException;
-use MagmaCore\Container\ContainerExceptionInterface;
-use MagmaCore\Container\ContainerInterface;
-use MagmaCore\Container\SettableInterface;
 use ReflectionClass;
 use Closure;
+use ReflectionException;
+use ReflectionParameter;
 
 /** PSR-11 Container */
 class Container implements ContainerInterface, SettableInterface
@@ -29,10 +27,8 @@ class Container implements ContainerInterface, SettableInterface
     protected array $instance = [];
     /** @var array */
     protected array $services = [];
-    /** @var array */
-    protected array $excludes = [];
     /** @var Object */
-    protected ?Object $service = null;
+    protected object $service;
     /** @var array */
     protected array $unregister = [];
 
@@ -53,11 +49,11 @@ class Container implements ContainerInterface, SettableInterface
     /**
      * @inheritdoc
      * @param string $id Identifier of the entry to look for.
-     * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
-     * @throws ContainerExceptionInterface Error while retrieving the entry.
      * @return mixed Entry.
+     * @throws ContainerExceptionInterface Error while retrieving the entry.*@throws ReflectionException
+     * @throws NotFoundExceptionInterface|ReflectionException  No entry was found for **this** identifier.
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         if (!$this->has($id)) {
             $this->set($id);
@@ -80,12 +76,12 @@ class Container implements ContainerInterface, SettableInterface
      * Resolves a single dependency
      *
      * @param string $concrete
-     * @return mixed|Object
-     * @throws ContainerException
-     * @throws DependencyIsNotInstantiableException
+     * @return mixed
      * @throws DependencyHasNoDefaultValueException
+     * @throws DependencyIsNotInstantiableException
+     * @throws ReflectionException
      */
-    protected function resolved($concrete)
+    protected function resolved(string $concrete): mixed
     {
         if ($concrete instanceof Closure) {
             return $concrete($this);
@@ -94,7 +90,7 @@ class Container implements ContainerInterface, SettableInterface
         $reflection = new ReflectionClass($concrete);
         /* Check to see whether the class is instantiable */
         if (!$reflection->isInstantiable()) {
-            throw new DependencyIsNotInstantiableException("Class {$concrete} is not instantiable.");
+            throw new DependencyIsNotInstantiableException("Class " . $concrete . " is not instantiable.");
         }
 
         /* Get the class constructor */
@@ -108,7 +104,7 @@ class Container implements ContainerInterface, SettableInterface
         $parameters = $constructor->getParameters();
         $dependencies = $this->getDependencies($parameters, $reflection);
         /* Get the new instance with dependency resolved */
-        return $reflection->newInstanceArgs((array)$dependencies);
+        return $reflection->newInstanceArgs($dependencies);
     }
 
     /**
@@ -116,9 +112,10 @@ class Container implements ContainerInterface, SettableInterface
      *
      * @param ReflectionParameter $parameters
      * @param ReflectionClass $reflection
-     * @return void
+     * @return array
+     * @throws DependencyHasNoDefaultValueException|ReflectionException
      */
-    protected function getDependencies($parameters, ReflectionClass $reflection)
+    protected function getDependencies(ReflectionParameter $parameters, ReflectionClass $reflection): array
     {
         $dependencies = [];
         foreach ($parameters as $parameter) {
@@ -140,7 +137,6 @@ class Container implements ContainerInterface, SettableInterface
     }
 
     /**
-     * @inheritdoc
      * @param array $services
      * @return self
      */
@@ -153,7 +149,6 @@ class Container implements ContainerInterface, SettableInterface
     }
 
     /**
-     * @inheritdoc
      * @return array
      */
     public function getServices(): array
@@ -162,7 +157,6 @@ class Container implements ContainerInterface, SettableInterface
     }
 
     /**
-     * @inheritdoc
      * @param array $args
      * @return self
      */

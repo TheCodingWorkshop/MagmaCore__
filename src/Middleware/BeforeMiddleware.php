@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Middleware;
 
-use MagmaCore\Middleware\MiddlewareInterface;
 use Closure;
 
 class BeforeMiddleware implements MiddlewareInterface

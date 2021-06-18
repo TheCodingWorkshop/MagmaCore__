@@ -15,8 +15,8 @@ use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerFactory;
 use MagmaCore\DataObjectLayer\DataLayerEnvironment;
 use MagmaCore\DataObjectLayer\DataLayerConfiguration;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
+use Symfony\Component\Dotenv\Dotenv;
 
 class DataRepositoryFactory
 {
@@ -77,7 +77,7 @@ class DataRepositoryFactory
     {
         $dataLayerEnvironment = new DataLayerEnvironment(
             new DataLayerConfiguration(
-            \Symfony\Component\Dotenv\Dotenv::class,
+            Dotenv::class,
             ($dataLayerConfiguration !==null) ? $dataLayerConfiguration : NULL,
             ),
             Yaml::file('app')['database']['default_driver'] /* second argument */

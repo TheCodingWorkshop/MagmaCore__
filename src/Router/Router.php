@@ -13,12 +13,11 @@ declare(strict_types=1);
 namespace MagmaCore\Router;
 
 use Closure;
+use ReflectionException;
 use ReflectionMethod;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Router\RouterTrait;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\Router\RouterInterface;
 use MagmaCore\Router\Exception\RouterNoRoutesFound;
 use MagmaCore\Router\Exception\NoActionFoundException;
 use MagmaCore\Router\Exception\RouterBadFunctionCallException;
@@ -62,7 +61,7 @@ class Router implements RouterInterface
 
     /**
      * Create the controller object name using the parameters defined within
-     * the yaml configuration file. Route parametes are accessible using 
+     * the yaml configuration file. Route parameters are accessible using
      * the $this->params property and can fetch any key defined. ie
      * `controller, action, namespace, id etc..`
      *
@@ -72,8 +71,7 @@ class Router implements RouterInterface
     {
         $controllerName = $this->params['controller'] . $this->controllerSuffix;
         $controllerName = Stringify::studlyCaps($controllerName);
-        $controllerName = $this->getNamespace() . $controllerName;
-        return $controllerName;
+        return $this->getNamespace() . $controllerName;
     }
 
     /**
@@ -84,8 +82,7 @@ class Router implements RouterInterface
     public function createAction(): string
     {
         $action = $this->params['action'];
-        $action = Stringify::camelCase($action);
-        return $action;
+        return Stringify::camelCase($action);
     }
 
     /**
@@ -93,15 +90,16 @@ class Router implements RouterInterface
      *
      * @param string $url
      * @return array
+     * @throws RouterNoRoutesFound
      */
     private function dispatchWithException(string $url): array
     {
         $url = $this->removeQueryStringVariables($url);
         if (!$this->match($url)) {
-            throw new RouterNoRoutesFound("Route {$url} does not match any valid route.", 404);
+            throw new RouterNoRoutesFound("Route " . $url . " does not match any valid route.", 404);
         }
         if (!class_exists($controller = $this->createController())) {
-            throw new RouterBadFunctionCallException("Class {$controller} does not exists.");
+            throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
         }
 
         return [$controller];
@@ -109,7 +107,7 @@ class Router implements RouterInterface
 
     /**
      * @inheritDoc
-     * @throws RouterException
+     * @throws RouterNoRoutesFound|ReflectionException
      */
     public function dispatch(string $url)
     {
@@ -123,7 +121,7 @@ class Router implements RouterInterface
                 $controllerObject->$action();
             }
         } else {
-            throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");;
+            throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
         }
     }
 
@@ -133,6 +131,7 @@ class Router implements RouterInterface
      * @param object $controllerObject
      * @param string $newAction
      * @return mixed
+     * @throws ReflectionException
      */
     private function resolveControllerActionDependencies(object $controllerObject, string $newAction): mixed
     {
@@ -205,15 +204,6 @@ class Router implements RouterInterface
      * to be removed before the route is matched to the routing table. For
      * example:
      *
-     *   URL                           $_SERVER['QUERY_STRING']  Route
-     *   -------------------------------------------------------------------
-     *   localhost                     ''                        ''
-     *   localhost/?                   ''                        ''
-     *   localhost/?page=1             page=1                    ''
-     *   localhost/posts?page=1        posts&page=1              posts
-     *   localhost/posts/index         posts/index               posts/index
-     *   localhost/posts/index?page=1  posts/index&page=1        posts/index
-     *
      * A URL of the format localhost/?page (one variable name, no value) won't
      * work however. (NB. The .htaccess file converts the first ? to a & when
      * it's passed through to the $_SERVER variable).
@@ -221,11 +211,11 @@ class Router implements RouterInterface
      * @param string $url The full URL
      * @return string The URL with the query string variables removed
      */
-    protected function removeQueryStringVariables($url): string
+    protected function removeQueryStringVariables(string $url): string
     {
         if ($url != '') {
             $parts = explode('&', $url, 2);
-            if (strpos($parts[0], '=') === false) {
+            if (!str_contains($parts[0], '=')) {
                 $url = $parts[0];
             } else {
                 $url = '';
@@ -239,10 +229,9 @@ class Router implements RouterInterface
      * Get the namespace for the controller class. The namespace defined in the
      * route parameters is added if present.
      *
-     * @param string $controllerName
      * @return string The request URL
      */
-    protected function getNamespace()
+    protected function getNamespace(): string
     {
         if (array_key_exists('namespace', $this->params)) {
             $this->namespace .= $this->params['namespace'] . '\\';

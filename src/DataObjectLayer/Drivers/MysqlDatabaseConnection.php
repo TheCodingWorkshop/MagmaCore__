@@ -15,7 +15,6 @@ namespace MagmaCore\DataObjectLayer\Drivers;
 use PDO;
 use PDOException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
-use MagmaCore\DataObjectLayer\Drivers\AbstractDatabaseDriver;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
 class MysqlDatabaseConnection extends AbstractDatabaseDriver
@@ -26,6 +25,7 @@ class MysqlDatabaseConnection extends AbstractDatabaseDriver
 
     /** @var string $driver */
     protected const PDO_DRIVER = 'mysql';
+    private object $environment;
 
     /**
      * Class constructor. piping the class properties to the constructor
@@ -48,10 +48,10 @@ class MysqlDatabaseConnection extends AbstractDatabaseDriver
     /**
      * Opens a new Mysql database connection
      *
-     * @return PDO_MYSQL
+     * @return PDO
      * @throws DataLayerException
      */
-    public function open()
+    public function open(): PDO
     {
         try {
             return new PDO(
@@ -60,8 +60,8 @@ class MysqlDatabaseConnection extends AbstractDatabaseDriver
                 $this->environment->getDbPassword(),
                 $this->params
             );
-        } catch (PDOException $expection) {
-            throw new DataLayerException($expection->getMessage(), (int)$expection->getCode());
+        } catch (PDOException $e) {
+            throw new DataLayerException($e->getMessage(), (int)$e->getCode());
         }
     }
 }

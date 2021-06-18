@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\StringCollection;
 
-use MagmaCore\StringCollection\StringCollectionInterface;
-
-class StringCollection implements StringCollectionInterface
+class StringCollection
 {
 
     /**
@@ -24,7 +22,8 @@ class StringCollection implements StringCollectionInterface
      */
     public function __construct(string $str)
     {
-        $this->str = (string)$str;
+        if ($str)
+            $this->str = (string)$str;
     }
 
     /**
@@ -35,5 +34,10 @@ class StringCollection implements StringCollectionInterface
     public function raw(): string
     {
         return $this->str;
+    }
+
+    public function upper(): string
+    {
+        return ucfirst($this->str);
     }
 }

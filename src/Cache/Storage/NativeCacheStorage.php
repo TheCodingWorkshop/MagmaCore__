@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
 
+use Exception;
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Cache\Exception\CacheException;
-use MagmaCore\Cache\Storage\AbstractCacheStorage;
-use MagmaCore\Cache\Storage\CacheStorageTrait;
 use MagmaCore\Utility\Files;
 
 class NativeCacheStorage extends AbstractCacheStorage
@@ -28,7 +28,7 @@ class NativeCacheStorage extends AbstractCacheStorage
      * @param Object $envConfigurations
      * @param array $options
      */
-    public function __construct(Object $envConfigurations, array $options = [])
+    #[Pure] public function __construct(Object $envConfigurations, array $options = [])
     {
         parent::__construct($envConfigurations, $options);
     }
@@ -36,19 +36,19 @@ class NativeCacheStorage extends AbstractCacheStorage
     /**
      * Saves data in a cache file.
      *
-     * @param string $entryIdentifier An identifier for this specific cache entry
+     * @param string $key
      * @param string $value The data to be stored
-     * @param int $ttl
+     * @param int|null $ttl
      * @return void
-     * @throws CacheException if the directory does not exist or is not writable 
-     *                        or exceeds the maximum allowed path length, or if no 
+     * @throws CacheException if the directory does not exist or is not writable
+     *                        or exceeds the maximum allowed path length, or if no
      *                        cache frontend has been set.
      * @api
      */
-    public function setCache(string $entryIdentifier, string $value, int $ttl = null): void
+    public function setCache(string $key, string $value, int $ttl = null): void
     {
-        $this->isCacheValidated($entryIdentifier);
-        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($entryIdentifier);
+        $this->isCacheValidated($key);
+        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
         $result = $this->writeCacheFile($cacheEntryPathAndFilename, $value);
         if ($result !== false) {
             return;
@@ -58,11 +58,13 @@ class NativeCacheStorage extends AbstractCacheStorage
 
     /**
      * @inheritDoc
+     * @param string $key
+     * @return string|bool
      */
-    public function getCache(string $entryIdentifier)
+    public function getCache(string $key): string|bool
     {
-        $this->isCacheValidated($entryIdentifier, false);
-        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($entryIdentifier);
+        $this->isCacheValidated($key, false);
+        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
         if (!file_exists($cacheEntryPathAndFilename)) {
             return false;
         }
@@ -72,29 +74,28 @@ class NativeCacheStorage extends AbstractCacheStorage
 
     /**
      * @inheritDoc
+     * @param string $key
+     * @return bool
      */
-    public function hasCache(string $entryIdentifier): bool
+    public function hasCache(string $key): bool
     {
-        $this->isCacheValidated($entryIdentifier, false);
-        return file_exists($this->cacheEntryPathAndFilename($entryIdentifier));
+        $this->isCacheValidated($key, false);
+        return file_exists($this->cacheEntryPathAndFilename($key));
     }
 
     /**
      * @inheritDoc
+     * @param string $key
      */
-    public function removeCache(string $entryIdentifier): bool
+    public function removeCache(string $key): bool
     {
-        $this->isCacheValidated($entryIdentifier);
-        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($entryIdentifier);
+        $this->isCacheValidated($key);
+        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
         for ($i = 0; $i < 3; $i++) {
-            try {
-                $result = $this->tryRemoveWithLock($cacheEntryPathAndFilename);
-                if ($result === true) {
-                    clearstatcache(true, $cacheEntryPathAndFilename);
-                    return $result;
-                }
-            } catch (CacheException $e) {
-                throw $e;
+            $result = $this->tryRemoveWithLock($cacheEntryPathAndFilename);
+            if ($result === true) {
+                clearstatcache(true, $cacheEntryPathAndFilename);
+                return true;
             }
             usleep(rand(10, 500));
         }
@@ -104,6 +105,7 @@ class NativeCacheStorage extends AbstractCacheStorage
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
     public function flush(): void
     {

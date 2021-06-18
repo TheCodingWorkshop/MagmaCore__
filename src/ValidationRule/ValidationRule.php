@@ -13,11 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\ValidationRule;
 
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Base\BaseController;
-use MagmaCore\ValidationRule\ValidationRuleMethods;
-use MagmaCore\ValidationRule\ValidationRuleInterface;
-use MagmaCore\ValidationRule\ValidationBadMethodCallException;
-use MagmaCore\ValidationRule\ValidationInvalidArgumentException;
 
 class ValidationRule implements ValidationRuleInterface
 {
@@ -34,6 +29,8 @@ class ValidationRule implements ValidationRuleInterface
         'unique',
         'equal'
     ];
+    private ValidationRuleMethods $validationRuleFuncs;
+    private mixed $rule;
 
     /**
      * Undocumented function
@@ -76,9 +73,9 @@ class ValidationRule implements ValidationRuleInterface
     /**
      * Return the calling controller object
      *
-     * @return void
+     * @return object
      */
-    public function getController(): BaseController
+    public function getController(): object
     {
         return $this->controller;
     }
@@ -87,12 +84,12 @@ class ValidationRule implements ValidationRuleInterface
      * Resolve the array of possible rules pass from the validation class
      *
      * @param mixed $rule
-     * @return mixed
+     * @return bool
      */
-    private function resolvedRule(mixed $rule): mixed
+    private function resolvedRule(mixed $rule): bool
     {
         if (is_string($rule)) {
-            $rule = (string)$rule;
+            $rule = $rule;
             /**
              * Explode the string and look for the pipe character that way we can separate 
              * our rules into callables
@@ -150,16 +147,16 @@ class ValidationRule implements ValidationRuleInterface
      * any optional argument supplied with the rule.
      *
      * @param mixed $callback
-     * @return mixed
+     * @return array|bool
      */
-    private function resolveCallback(mixed $callback): mixed
+    private function resolveCallback(mixed $callback): array|bool
     {
         if ($callback) {
             $stringify = new Stringify(); /* Call to the stringify utility class */
             $extract = $this->exploder($callback);
             if (isset($extract) && count($extract) > 1) { /* meaning if we have 2 elements */
                 $validCallback = $stringify->camelCase($extract[0]);
-                $args = (isset($extract[1]) ? $extract[1] : null);
+                $args = ($extract[1] ?? null);
             } else {
                 $validCallback = $stringify->camelCase($callback);
                 $args = null;

@@ -20,12 +20,11 @@ class Sanitizer
      * Sanitize class
      * Global sanitization and filtering. the method accepts an array of argument which will
      * be check to determine whether the value is of a 'string, integer or an array'. Uses
-     * native PHP filtering. Incase an argument is not supplied the method will the use
+     * native PHP filtering. Incas an argument is not supplied the method will the use
      * JSON data stream. if content is coming in via an API
      *
      * @param array $dirtyData - an associative array of key value pairs
-     * @return array
-     * @throws BaseInvalidArgumentException
+     * @return array|null
      */
     public static function clean(array $dirtyData = []) : ?array
     {

@@ -15,6 +15,7 @@ namespace MagmaCore\FormBuilder;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
+use MagmaCore\FormBuilder\Type\HiddenType;
 use MagmaCore\FormBuilder\Type\SelectType;
 use MagmaCore\FormBuilder\Type\SubmitType;
 use MagmaCore\FormBuilder\Type\CheckboxType;
@@ -76,6 +77,31 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
                     $this->args($name, $class, $value, $placeholder),
                     ['disabled' => $disabled]
                 )
+            ]
+        ];
+
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param array $class
+     * @return array
+     */
+    public function hidden(
+        string $name,
+        mixed $value = null,
+        array $class = []
+    ): array {
+        return [
+            HiddenType::class => [
+                array_merge(
+                    $this->arg($name, $class, $value),
+                    []
+                )
+
             ]
         ];
 
@@ -249,7 +275,14 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
      * @param boolean $wrapper
      * @return array
      */
-    public function settings(bool $inlineFlipIcon = false, string $inlineIcon = null, bool $showLabel = true, string $newLabel = null, bool $wrapper = false, string|null $checkboxLabel = null, string|null $description = null): array
+    public function settings(
+        bool $inlineFlipIcon = false,
+        ?string $inlineIcon = null,
+        bool $showLabel = true,
+        ?string $newLabel = null,
+        bool $wrapper = false,
+        ?string $checkboxLabel = null,
+        ?string $description = null): array
     {
         return [
             'inline_flip_icon' => $inlineFlipIcon,

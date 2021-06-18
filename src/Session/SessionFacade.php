@@ -13,28 +13,25 @@ declare(strict_types=1);
 namespace MagmaCore\Session;
 
 use MagmaCore\Session\GlobalManager\GlobalManager;
-use MagmaCore\Session\SessionEnvironment;
-use MagmaCore\Session\SessionFactory;
 
 final class SessionFacade
 {
 
-    /** @var string - a string which identifies the current session */
-    protected string $sessionIdentifier;
+    /** @var string|null - a string which identifies the current session */
+    protected ?string $sessionIdentifier;
 
-    /** @var string - the namespace reference to the session storage type */
-    protected string $storage;
+    /** @var string|null - the namespace reference to the session storage type */
+    protected ?string $storage;
 
     /** @var Object - the session environment object */
     protected Object $sessionEnvironment;
 
     /**
-     * Main session facade class which pipes the properties to the method arguments. 
-     * 
-     * @param array $sessionEnvironment - expecting a session.yaml configuration file
-     * @param string $sessionIdentifier
+     * Main session facade class which pipes the properties to the method arguments.
+     *
+     * @param array|null $sessionEnvironment - expecting a session.yaml configuration file
+     * @param string|null $sessionIdentifier
      * @param null|string $storage - optional defaults to nativeSessionStorage
-     * @return void
      */
     public function __construct(
         array $sessionEnvironment = null,
@@ -52,14 +49,14 @@ final class SessionFacade
      * session object within the global manager. So session can be fetch throughout
      * the application by using the GlobalManager::get('session_global') to get
      * the session object
-     * 
+     *
      * @return object
-     * @throws SessionUnexpectedValueException
+     * @throws GlobalManager\GlobalManagerException
      */
     public function setSession(): Object
     {
-        $this->session = (new SessionFactory())->create($this->sessionIdentifier, $this->storage, $this->sessionEnvironment);
-        GlobalManager::set('session_global', $this->session);
-        return $this->session;
+        $session = (new SessionFactory())->create($this->sessionIdentifier, $this->storage, $this->sessionEnvironment);
+        GlobalManager::set('session_global', $session);
+        return $session;
     }
 }

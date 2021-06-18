@@ -11,15 +11,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataSchema;
 
-use MagmaCore\DataSchema\DataSchemaBlueprint;
-
 interface DataSchemaBuilderInterface
-{ 
+{
     /**
      * Method which should be implemented when using this database schema component
      * We can call the database schema methods to build a table schema
-     * 
-     * @param BuildSchema $schema
+     *
      * @return string
      */
     public function createSchema() : string;

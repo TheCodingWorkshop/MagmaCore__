@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\Drivers;
 
 use PDO;
-use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 
 abstract class AbstractDatabaseDriver implements DatabaseDriverInterface
 {
@@ -25,8 +24,12 @@ abstract class AbstractDatabaseDriver implements DatabaseDriverInterface
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ];
+    /**
+     * @var object|null
+     */
+    private ?object $dbh;
 
-    public function PdoParams()
+    public function PdoParams(): array
     {
         return $this->params;
     }

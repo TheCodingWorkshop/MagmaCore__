@@ -62,7 +62,7 @@ interface CrudInterface
      * @param string $primaryKey
      * @return bool
      */
-    public function update(array $fields = [], string $primaryKey): bool;
+    public function update(array $fields, string $primaryKey): bool;
 
     /**
      * Delete method which will permanently delete a row from the storage table
@@ -90,7 +90,7 @@ interface CrudInterface
      * @param string $resultType
      * @return mixed
      */
-    public function rawQuery(string $rawQuery, ?array $conditions = [], string $resultType = 'column');
+    public function rawQuery(string $rawQuery, ?array $conditions = [], string $resultType = 'column'): mixed;
 
     /**
      * Returns a single table row as an object
@@ -103,11 +103,11 @@ interface CrudInterface
 
     /**
      * @param string $type
-     * @param string $field
-     * @param array|null $conditions
+     * @param string|null $field
+     * @param array $conditions
      * @return mixed
      */
-    public function aggregate(string $type, ?string $field = 'id', array $conditions = []);
+    public function aggregate(string $type, ?string $field = 'id', array $conditions = []): mixed;
 
     /**
      * Returns the total number of records based on the method arguments

@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\QueryBuilder;
 
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\DataObjectLayer\QueryBuilder\AbstractQueryBuilder;
 
 class QueryBuilder extends AbstractQueryBuilder
 {
@@ -48,7 +47,6 @@ class QueryBuilder extends AbstractQueryBuilder
                 return $this->sqlQuery;
             }
         }
-        return false;
     }
 
     public function selectQuery(): string
@@ -63,11 +61,11 @@ class QueryBuilder extends AbstractQueryBuilder
             $this->sqlQuery = $this->hasConditions();
             return $this->sqlQuery;
         }
-        return false;
     }
 
-    public function joinQuery()
+    public function joinQuery(): string
     {
+        $selectors = $joinSelectors = '';
         if ($this->isQueryTypeValid('join')) {
             if (
                 isset($this->key['selectors']) &&
@@ -101,7 +99,6 @@ class QueryBuilder extends AbstractQueryBuilder
             return $this->sqlQuery;
         }
 
-        return false;
     }
 
 
@@ -126,7 +123,6 @@ class QueryBuilder extends AbstractQueryBuilder
                 return $this->sqlQuery;
             }
         }
-        return false;
     }
 
     public function deleteQuery(): string
@@ -143,7 +139,6 @@ class QueryBuilder extends AbstractQueryBuilder
 
             return $this->sqlQuery;
         }
-        return false;
     }
 
     public function searchQuery(): string
@@ -174,10 +169,9 @@ class QueryBuilder extends AbstractQueryBuilder
 
             return $this->sqlQuery;
         }
-        return false;
     }
 
-    private function hasConditions()
+    private function hasConditions(): string
     {
         if (isset($this->key['conditions']) && $this->key['conditions'] != '') {
             if (is_array($this->key['conditions'])) {

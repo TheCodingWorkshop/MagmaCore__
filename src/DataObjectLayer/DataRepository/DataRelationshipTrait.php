@@ -11,25 +11,24 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use Exception;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\Collection\Collection;
-use MagmaCore\DataObjectLayer\Exception\DataLayerException;
-use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryValidationInterface;
 
 trait DataRelationshipTrait
 {
 
+    /**
+     * @throws Exception
+     */
     public function findManyToMany(string $tablePivot)
     {
         if ($tablePivot) {
             $newPivotObject = BaseApplication::diGet($tablePivot);
             if (!$newPivotObject) {
-                throw new \Exception();
+                throw new Exception();
             }
-
-            /* explode the pivot table string and extract both assocative tables */
+            /* explode the pivot table string and extract both associative tables */
             $tableNames = explode('_', $newPivotObject->getSchema());
             if (is_array($tableNames) && count($tableNames) > 0) {
                 $test = array_filter($tableNames, function($tableName) {
@@ -42,7 +41,7 @@ trait DataRelationshipTrait
                         if (class_exists($newModelClass = $namespace . $modelName)) {
                             $newModelObject = BaseApplication::diGet($newModelClass);
                             if (!$newModelObject) {
-                                throw new \Exception();
+                                throw new Exception();
                             }
 
                         }

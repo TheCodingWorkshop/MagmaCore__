@@ -12,13 +12,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
+use JetBrains\PhpStorm\Pure;
+
 final class DataLayerConfiguration
 {
 
-    /** @var array */
-    protected ?array $dataLayerConfiguration = null;
-    /** @var Object */
-    protected Object $dotEnv;
+    /** @var array|null */
+    private ?array $dataLayerConfiguration;
 
     /**
      * Main class constructor
@@ -43,13 +43,13 @@ final class DataLayerConfiguration
      * 
      * @return array
      */
-    public function baseConfiguration(): array
+    #[Pure] public function baseConfiguration(): array
     {
         if (is_array($this->dataLayerConfiguration) && ($this->dataLayerConfiguration !== null) && count($this->dataLayerConfiguration) > 0) {
             return $this->dataLayerConfiguration;
         }
 
-        $baseConfigurations = [
+        return [
 
             'driver' => [
 
@@ -71,8 +71,6 @@ final class DataLayerConfiguration
             ]
 
         ];
-
-        return $baseConfigurations;
     }
 
     /**
@@ -82,7 +80,7 @@ final class DataLayerConfiguration
      */
     public function dbUsername(): string
     {
-        return $_ENV['DB_USER'] ? $_ENV['DB_USER'] : 'root';
+        return $_ENV['DB_USER'] ?: 'root';
     }
 
     /**
@@ -92,6 +90,6 @@ final class DataLayerConfiguration
      */
     public function dbPassword(): string
     {
-        return $_ENV['DB_PASSWORD'] ? $_ENV['DB_PASSWORD'] : '';
+        return $_ENV['DB_PASSWORD'] ?: '';
     }
 }

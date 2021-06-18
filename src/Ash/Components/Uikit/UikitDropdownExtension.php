@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Utility\Stringify;
 
 class UikitDropdownExtension
@@ -22,13 +23,14 @@ class UikitDropdownExtension
     /**
      * Get the session flash messages on the fly.
      *
-     * @param object $controller - the current controller object
+     * @param object|null $controllerObj
+     * @param array $items
+     * @param string|null $status
+     * @param array $row
+     * @param string|null $controller - the current controller object
      * @return string
-     * @throws GlobalManager
-     * @throws Exception
-     * @throws GlobalManagerException
      */
-    public function register(
+    #[Pure] public function register(
         object $controllerObj = null,
         array $items = [], 
         string|null $status = null, 
@@ -44,7 +46,7 @@ class UikitDropdownExtension
                     $element .= '<li class="uk-active"><a href="#">' . ($status !==null) ? Stringify::capitalize($status) : 'Status Unknown' . '</a></li>';
                     foreach ($items as $key => $item) {
                         $element .= '<li>';
-                        $element .= '<a data-turbo="false" href="'.(isset($item['path']) ? $item['path']:'') . '">';
+                        $element .= '<a data-turbo="false" href="'.($item['path'] ?? '') . '">';
                         $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
                         $element .= Stringify::capitalize($item['name']);
                         $element .= '</a>';

@@ -15,10 +15,10 @@ namespace MagmaCore\Collection;
 class CollectionProxy
 {
 
-    /** @var - the collection being used */
-    protected $collection;
-    /** @var string - the method being proxied */
-    protected $method;
+    /** @var CollectionInterface - the collection being used */
+    protected CollectionInterface $collection;
+    /** @var string - the method being proxies */
+    protected string $method;
 
     /**
      * Create a new proxy instance

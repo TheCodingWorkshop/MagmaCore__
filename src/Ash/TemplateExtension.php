@@ -26,7 +26,7 @@ use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
 class TemplateExtension
 {
 
-    /** @var trait - holds common function used across template extensions */
+    /** @var TemplateTraits - holds common function used across template extensions */
     use TemplateTraits;
 
     /** @var array */
@@ -37,14 +37,14 @@ class TemplateExtension
     protected string $string;
 
     private array $ext = [];
-    private array $extensions = [];
+    private array $extensions;
     private object $controller;
 
     /**
      * Return an array of all the template extension class with the const extension 
      * name as the key which represent the extension logic
      *
-     * @return array
+     * @return void
      */
     public function __construct(object $controller)
     {
@@ -61,7 +61,7 @@ class TemplateExtension
     }
 
     /**
-     * Return a formated human readable date format
+     * Return a formatted human readable date format
      *
      * @param mixed $time
      * @param boolean $short
@@ -73,17 +73,56 @@ class TemplateExtension
     }
 
     /**
+     * Construct the user define path. Path must be specified based on the its 
+     * controller ie. to access the index action within the dashboard controller this 
+     * path must be declared as admin_dashboard_index which will simple return 
+     * /admin/dashboard/index. An exception will be thrown if the current path doesn't 
+     * match the current namespace controller and action 
+     *
+     * @param string $path
+     * @param mixed $token
+     * @return string
+     */
+    public function path(string $path, mixed $token = null): string
+    {
+        $string = explode('_', $path);
+        $sep = '/';
+
+        // if (isset($string[1]) && $string[1] === $this->controller->thisRouteController()) {
+        //     if (isset($string[0]) && $string[0] !== $this->controller->thisRouteNamespace()) {
+        //         throw new LoaderError('Invalid path namespace');
+        //     }
+        //     if (isset($string[1]) && $string[1] !== $this->controller->thisRouteController()) {
+        //         throw new LoaderError('Invalid path controller');
+        //     }
+        //     if (isset($string[2]) && $string[2] !== $this->controller->thisRouteAction()) {
+        //         throw new LoaderError('Invalid path action');
+        //     }
+
+        // }
+        if ($token !==null) {
+            $newArray = [$string[0], $string[1], $token, $string[2]];
+            return $sep . implode('/', array_replace($string, $newArray));
+        } else {
+            return $sep . implode('/', $string);
+        }
+
+        
+    }
+
+    /**
      * Undocumented function
      *
      * @param string $string
      * @return string
+     * @throws \Exception
      */
     public function locale(string $string): string
     {
         if (is_string($string)) {
             $locale = Yaml::file('locale')['en'];
             if (!in_array($string, array_keys($locale))) {
-                throw new TemplateLocaleOutOfBoundException($string . ' is an invalid translation stirng.');
+                throw new TemplateLocaleOutOfBoundException($string . ' is an invalid translation string.');
             }
 
             return $locale[$string];
@@ -91,9 +130,36 @@ class TemplateExtension
     }
 
     /**
+     * Expose framework database configuration options to the template
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function config(string $name): mixed
+    {
+        if (isset($this->controller->settingsRepository)) {
+            return $this->controller->settingsRepository->get($name);
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param mixed $key
+     * @param mixed $array
+     * @return mixed
+     */
+    public function isSet(mixed $key, mixed $array): mixed
+    {
+        return array_key_exists($key, $array) ? (is_array($array) ? $array[$key] : $array->$key) : '';
+    }
+
+    /**
      * Return a registered extension
      *
-     * @param string $extensionName
+     * @param string|null $extensionName
+     * @param string|null $header
+     * @param string|null $headerIcon
      * @return void
      */
     public function templateExtension(string|null $extensionName, ?string $header = null, ?string $headerIcon = null): mixed

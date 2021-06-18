@@ -15,13 +15,14 @@ class Breadcrumbs
 {
 
     /**
-     * This function will take $_SERVER['REQUEST_URI'] and build a breadcrumb based on the 
+     * This function will take $_SERVER['REQUEST_URI'] and build a breadcrumb based on the
      * user's current path
      *
      * @param string $separator
+     * @param string $home
      * @return string
      */
-    public function breadcrumbs($separator = ' &raquo; ', $home = 'Dashboard') : string
+    public function breadcrumbs(string $separator = ' &raquo; ', string $home = 'Dashboard') : string
     {
         // This gets the REQUEST_URI (/path/to/file.php), splits the string (using '/') into an array, and then filters out any empty values
         $path  = array_filter(explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));

@@ -32,6 +32,20 @@ interface FormBuilderBlueprintInterface
         string|null $placeholder = null
     ): array;
 
+    /**
+     * Undocumented function
+     *
+     * @param string $name
+     * @param mixed $value
+     * @param array $class
+     * @return array
+     */
+    public function hidden(
+        string $name,
+        mixed $value = null,
+        array $class = []
+    ): array;
+
     public function textarea(
         string $name,
         array $class = [],

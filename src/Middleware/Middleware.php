@@ -35,7 +35,7 @@ class Middleware
         $output = [];
         if ($middlewares) {
             foreach ($middlewares as $key => $middleware) {
-                if (strpos($middleware, $key) !== false) {
+                if (str_contains($middleware, $key)) {
                     if ($middleware) {
                         $output[] = $this->$key = BaseApplication::diGet($middleware);
                     } else {
@@ -72,10 +72,10 @@ class Middleware
      * through.
      *
      * @param mixed $object
-     * @param Closure $next
+     * @param Closure $func
      * @return mixed
      */
-    public function middleware(Object $object, Closure $func)
+    public function middleware(Object $object, Closure $func): mixed
     {
         $function = $this->getNextFunc($func);
         /*

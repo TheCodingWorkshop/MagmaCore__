@@ -20,7 +20,7 @@ interface CacheStorageInterface
      *
      * @param string $key An identifier for this specific cache entry
      * @param string $value The data to be stored
-     * @param integer $ttl Lifetime of this cache entry in seconds. 
+     * @param int|null $ttl Lifetime of this cache entry in seconds.
      *                If NULL is specified, the default lifetime is used. "0" means unlimited lifetime.
      * @return void
      * @api

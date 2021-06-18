@@ -69,7 +69,7 @@ class Sortable
         }
     }
 
-    public function sortDescAsc()
+    public function sortDescAsc(): string
     {
         if ($this->getDirection()) {
             return $this->getDirection() == 'ASC' ? 'desc' : 'asc';

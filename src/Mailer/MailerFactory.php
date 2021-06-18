@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\Mailer;
 
 use MagmaCore\Mailer\Exception\MailerInvalidArgumentException;
-use MagmaCore\Mailer\MailerInterface;
 
 class MailerFactory
 {
@@ -21,7 +20,7 @@ class MailerFactory
     protected ?array $settings = null;
 
     /**
-     * Factory main contructor method. Which allows application to define their own
+     * Factory main constructor method. Which allows application to define their own
      * mail server settings. Through the constructor argument
      *
      * @param array|null $settings
@@ -40,12 +39,12 @@ class MailerFactory
      */
     public function create(string $transportString) : MailerInterface
     {
-        $this->transporterObject = new $transportString(true);
-        if (!$this->transporterObject) {
+        $transporterObject = new $transportString(true);
+        if (!$transporterObject) {
             throw new MailerInvalidArgumentException($transportString . ' is not a valid mailer object');
         }
         return new Mailer(
-            $this->transporterObject, 
+            $transporterObject,
             $this->settings, 
             \Symfony\Component\Dotenv\Dotenv::class
         );

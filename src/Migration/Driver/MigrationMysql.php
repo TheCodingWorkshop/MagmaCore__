@@ -68,14 +68,15 @@ class MigrationMysql extends AbstractMigration
     /**
      * Persist the migration to the database
      *
+     * @param array $fields
      * @return boolean
      */
-    public function saveMigration(array $migrationFields): bool
+    public function saveMigration(array $fields): bool
     {
         return $this->clientRepository
             ->getClientRepository()
                 ->getClientCrud()
-                    ->create($migrationFields);
+                    ->create($fields);
     }
 
     /**

@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\Storage;
 
-use MagmaCore\Session\Exception\SessionNoCookieFoundException;
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Cookie\CookieFacade;
 
 class NativeSessionStorage extends AbstractSessionStorage
@@ -57,9 +57,9 @@ class NativeSessionStorage extends AbstractSessionStorage
      *
      * @param string $key
      * @param mixed $default
-     * @return void
+     * @return mixed
      */
-    public function getSession(string $key, mixed $default = null)
+    #[Pure] public function getSession(string $key, mixed $default = null): mixed
     {
         if ($this->hasSession($key)) {
             return $_SESSION[$key];
@@ -106,9 +106,9 @@ class NativeSessionStorage extends AbstractSessionStorage
      *
      * @param string $key
      * @param mixed $default
-     * @return void
+     * @return mixed
      */
-    public function flush(string $key, mixed $default = null)
+    public function flush(string $key, mixed $default = null): mixed
     {
         if ($this->hasSession($key)) {
             $value = $_SESSION[$key];

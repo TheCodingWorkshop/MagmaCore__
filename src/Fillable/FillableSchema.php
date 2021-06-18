@@ -16,6 +16,7 @@ use Closure;
 use MagmaCore\Fillable\Faker\Faker;
 use MagmaCore\Fillable\Exception\FillableNoValueException;
 use MagmaCore\Fillable\Exception\FillableOutOfRangeException;
+use Throwable;
 
 class FillableSchema
 {
@@ -42,7 +43,7 @@ class FillableSchema
 
     /**
      * Collect the model object for which this fillable will be applicable 
-     * to. We can use the object to fetch the atabase columns
+     * to. We can use the object to fetch the database columns
      *
      * @param object $model
      * @return static
@@ -54,7 +55,7 @@ class FillableSchema
         return $this;
     }
 
-    public function create(int $rows = 20, Closure $callback)
+    public function create(int $rows, Closure $callback)
     {
         set_time_limit(31);
         $i = 1;
@@ -68,7 +69,7 @@ class FillableSchema
     /**
      * The value to pass for the fillable column
      *
-     * @param mixed $value
+     * @param mixed $bindValues
      * @return static
      */
     public function fill(mixed $bindValues): static
@@ -79,7 +80,7 @@ class FillableSchema
     }
 
     /**
-     * Bind the fillable propertie to the corresponding column name. We can then 
+     * Bind the fillable properties to the corresponding column name. We can then
      * build the query to run this fillable
      *
      * @param Closure $callback
@@ -111,12 +112,13 @@ class FillableSchema
      * Undocumented function
      *
      * @return boolean
+     * @throws Throwable
      */
     public function push(): bool
     {
         $this->throwException();
         try {
-            $i = 0;
+            //$i = 0;
             set_time_limit(31);
             $i = 1;
             do {
@@ -127,7 +129,7 @@ class FillableSchema
                 $i++;
                 return $save;
             } while ($i <= 20);
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             throw $th;
         }
     }

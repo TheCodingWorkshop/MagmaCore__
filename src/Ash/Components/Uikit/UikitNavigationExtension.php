@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 
@@ -22,10 +23,11 @@ class UikitNavigationExtension
     public const NAME = 'uikit_navigation';
 
     /**
-     * @param object $controller
+     * @param object|null $controller
      * @return string
+     * @throws Exception
      */
-    public function register(object $controller = null): mixed
+    public function register(object $controller = null): string
     {
         $element = $activeOpen = '';
         if (isset($controller)) {
@@ -41,19 +43,19 @@ class UikitNavigationExtension
 
                         $isParent = (isset($item['children']) && count($item['children']) > 0);
                         if ($controller->thisRouteController() === strtolower($item['name'])) {
-                            $activeOpen = ' uk-open';
+                            $activeOpen = ' ';
                         }
 
                         $element .= '<li class="' . ($isParent ? 'uk-parent' . $activeOpen : '') . '">';
-                        $element .= '<a href="' . (isset($item['path']) ? $item['path'] : '') . '">';
-                        $element .= Stringify::capitalize((isset($item['name']) ? $item['name'] : 'Unknown'));
+                        $element .= '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
+                        $element .= Stringify::capitalize(($item['name'] ?? 'Unknown'));
                         $element .= '</a>';
                         if (isset($item['children']) && count($item['children']) > 0) {
                             $element .= '<ul class="uk-nav-sub">';
                             foreach ($item['children'] as $child) {
                                 $element .= '<li>';
-                                $element .= '<a href="' . (isset($child['path']) ? $child['path'] : '') . '">';
-                                $element .= Stringify::capitalize(isset($child['name']) ? $child['name'] : 'Unknown Child');
+                                $element .= '<a href="' . ($child['path'] ?? '') . '">';
+                                $element .= Stringify::capitalize($child['name'] ?? 'Unknown Child');
                                 $element .= '</a>';
                                 $element .= '</li>';
                             }

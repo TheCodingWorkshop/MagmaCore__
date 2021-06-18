@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class CacheConfig
 {
 
@@ -23,7 +25,7 @@ class CacheConfig
      * 
      * @return array
      */
-    public function baseConfiguration(): array
+    #[ArrayShape(['use_cache' => "bool", 'key' => "string", 'cache_path' => "string", 'cache_expires' => "int", 'default_storage' => "string", 'drivers' => "array[]"])] public function baseConfiguration(): array
     {
         return [
             'use_cache' => true,

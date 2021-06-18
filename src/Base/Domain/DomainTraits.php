@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain;
 
 use Closure;
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Base\Domain\DomainLogicRules;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
@@ -30,9 +30,10 @@ trait DomainTraits
 
 
     /**
-     * Retunns the current template directory path
+     * Returns the current template directory path
      *
      * @return string
+     * @throws Exception
      */
     private function templateDir(): string
     {
@@ -49,8 +50,7 @@ trait DomainTraits
     private function getFilename(): string
     {
         $parts = explode('::', str_replace('Action', '', $this->method));
-        $end = $parts[array_key_last($parts)];
-        return $end;
+        return $parts[array_key_last($parts)];
     }
 
     /**
@@ -75,14 +75,15 @@ trait DomainTraits
 
     /**
      * Get the template file extension from the twig config file. note [2]. this
-     * referers to the current index of our template file extension. Which is
+     * referrers to the current index of our template file extension. Which is
      * defined in the config index in position 2
-     * 
+     *
      * extension example [0 => .html, 1 => .twig, 2 => .html.twig]
-     * So depending on what extensions you are using 
+     * So depending on what extensions you are using
      *
      * @param int $indexPos - the index position of the file extension
      * @return string
+     * @throws Exception
      */
     public function getFileExt(int $indexPos): string
     {
@@ -93,11 +94,11 @@ trait DomainTraits
      * Append the client directory name when dealing with non dynamic routes ie
      * routes which doesn't defined a dynamic namespace within the route.yml file
      *
-     * @return void
+     * @return string
+     * @throws Exception
      */
-    public function fileDirectoryFromNamespace()
+    public function fileDirectoryFromNamespace(): string
     {
-        $append = '';
         if (empty($this->getNamespace()) || $this->getNamespace() == '') {
             return Yaml::file('routes')['client_dir'] . '/';
         }
@@ -107,9 +108,10 @@ trait DomainTraits
     /**
      * Returns both variant of the file. ie. file within the template directory as a string
      * and just a path to the file without the directory string concat.
-     * 
+     *
      * @param int $ext - the file extension index position
      * @return array
+     * @throws Exception
      */
     private function getFile(int $ext): array
     {
@@ -122,25 +124,25 @@ trait DomainTraits
     }
 
     /**
-     * Purpose of this method is to attempt to build the twig template file based on the 
+     * Purpose of this method is to attempt to build the twig template file based on the
      * name of the method. For consistency all methods should follow the framework practice
-     * all method should have the Action suffix. Although the method wouldn't be considered a 
+     * all method should have the Action suffix. Although the method wouldn't be considered a
      * action method without the Action suffix
-     * 
+     *
      * @param string|null $filename
-     * @param string $methodName
      * @param int $extension - the file extension defaults to 2 (.html.twig)
-     * @return self
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
+     * @throws Exception
      */
-    public function render(string|null $filename = null, int $extension = 0): self
+    public function render(?string $filename = null, int $extension = 0): self
     {
         if ($filename !== null) {
             $this->fileToRender = $filename;
         } else {
             list($fullPath, $filePath) = $this->getFile($extension);
             if (!file_exists($fullPath)) {
-                throw new \Exception(
-                    "{$filePath} template file could be located within {$this->templateDir()}"
+                throw new Exception(
+                    $filePath ." template file could be located within {$this->templateDir()}"
                 );
             }
             $this->fileToRender = $filePath;
@@ -154,7 +156,7 @@ trait DomainTraits
      * template which uses these chainable methods
      *
      * @param array $context
-     * @return self
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
      */
     public function with(array $context = []): self
     {
@@ -166,11 +168,12 @@ trait DomainTraits
      * If the render action contains a form we can chain the form to the with method
      * and will merge all the array context together to create the superContext for
      * our twig template. All forms will array key of 'form' as defined to keep things
-     * consistant
+     * consistent
      *
      * @param Object $formRendering
      * @param string|null $formAction
-     * @return self
+     * @param mixed|null $data
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
      */
     public function form(Object $formRendering, string|null $formAction = null, mixed $data = null): self
     {
@@ -189,12 +192,12 @@ trait DomainTraits
 
     /**
      * Return the object for any edit route from any controller which has a findOr404
-     * method else will just return null and thats if we are not passing a third
+     * method else will just return null and that's if we are not passing a third
      * argument to our $this->form() method above.
      *
      * @return object|null
      */
-    private function findSomeData()
+    private function findSomeData(): ?object
     {
         if (method_exists($this->controller, 'findOr404')) {
             if (!empty($this->controller->thisRouteID())) {
@@ -212,8 +215,9 @@ trait DomainTraits
      *
      * @param array $tableParams
      * @param object|null $column = null
+     * @param object|null $repository
      * @param array $tableData
-     * @return self
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
      */
     public function table(array $tableParams = [], object|null $column = null, object|null $repository = null, array $tableData = []): self
     {
@@ -250,18 +254,18 @@ trait DomainTraits
         return $this;
     }
 
-    function array_flatten($array,) {
+    function array_flatten($array) {
         foreach ($array as $arr) {
             return $arr;
         }
     }
 
     /**
-     * Singular can be used to display information about single object. Method 
-     * which chains the singular() method would be able to access the data 
+     * Singular can be used to display information about single object. Method
+     * which chains the singular() method would be able to access the data
      * using the variable (row) within the rendered twig template.
      *
-     * @return self
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
      */
     public function singular(): self
     {
@@ -276,22 +280,23 @@ trait DomainTraits
     /**
      * Render a notification
      *
-     * @return self
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
      */
     public function notification(): self
     {
         return $this;
     }
 
-    private function getDataRelationship()
+    private function getDataRelationship(): array
     {
         return isset($this->dataRelationship) ? ['relationship' => $this->dataRelationship] : [];
     }
 
     /**
-     * The end method which finally renders the BaseController render method and 
+     * The end method which finally renders the BaseController render method and
      * pass the populated arguments based on the method chaining
      *
+     * @param string|null $type
      * @return void
      */
     public function end(string|null $type = null): void
@@ -349,12 +354,12 @@ trait DomainTraits
     /**
      * Dynamically construct the action routes
      *
-     * @param Object $controller
+     * @param string $ds
      * @return string
      */
     public function domainRoute(string $ds = '/'): string
     {
-
+        $route = '';
         if ($this->controller->thisRouteAction() === $this->getFileName()) {
             if ($this->hasRouteWithID()) {
                 if ($this->isRouteIDEqual()) {
@@ -374,9 +379,9 @@ trait DomainTraits
      *
      * @param array $rules
      * @param object $controller
-     * @return Closure
+     * @return bool
      */
-    public function enforceRules(array $rules = [], Object $controller)
+    public function enforceRules(array $rules = [], Object $controller): bool
     {
         if (sizeof($rules) > 0) {
             foreach ($rules as $rule) {
@@ -410,6 +415,7 @@ trait DomainTraits
                 }
             }
         }
+        return false;
     }
 
     public function api(): void
@@ -436,14 +442,15 @@ trait DomainTraits
      * Return a closure with data relating to the current query. simple joining
      * multiple matching data tables together.
      *
-     * @param Closure $closure
-     * @return self
+     * @param Closure|null $closure
+     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
+     * @throws Exception
      */
     public function mergeRelationship(Closure $closure = null): self
     {
         if ($closure) {
             if (!$closure instanceof Closure) {
-                throw new \Exception();
+                throw new Exception();
             }
             $this->dataRelationship = $closure($this->controller->repository, $this->controller->relationship);
 

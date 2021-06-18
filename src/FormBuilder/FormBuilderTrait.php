@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use MagmaCore\Utility\Stringify;
-use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 use MagmaCore\FormBuilder\Exception\FormBuilderOutOfBoundsException;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 
@@ -19,10 +18,10 @@ trait FormBuilderTrait
      * choices array of looping select, radio or multi-checkbox options
      *
      * @param array $attr
-     * @param mixed $options
+     * @param mixed|null $options
      * @return string
      */
-    protected function renderHtmlElement(array $attr, $options = null)
+    protected function renderHtmlElement(array $attr, mixed $options = null): string
     {
         $val = '';
         if (is_array($attr) && count($attr) > 0) {
@@ -48,12 +47,11 @@ trait FormBuilderTrait
      * @param array $options
      * @return bool|string
      */
-    protected function renderSelectOptions(array $options)
+    protected function renderSelectOptions(array $options): bool|string
     {
         $output = '';
         if (is_array($options) && count($options) > 0) {
             foreach ($options['choices'] as $key => $choice) {
-                $selected = '';
                 if ($choice == $key && $key != '') {
                     $selected = ' selected';
                 } elseif (isset($options['default']) && $options['default'] != null && $options['default'] == $key) {
@@ -75,7 +73,7 @@ trait FormBuilderTrait
      * @param null $options
      * @return bool|string
      */
-    protected function renderInputOptions(array $attr, $options = null)
+    protected function renderInputOptions(array $attr, $options = null): bool|string
     {
         if (!is_array($options)) {
             $options = array();
@@ -91,7 +89,7 @@ trait FormBuilderTrait
                 } else {
                     $checked = '';
                 }
-                $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $index . '" class="' . implode(' ', $attr['class']) . '" value="' . $choice . '"' . $checked . '>' . ' ' . htmlspecialchars(Stringify::capitalize($choice)) . "\n<br>";
+                $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $index . '" class="' . implode(' ', $attr['class']) . '" value="' . $index . '"' . $checked . '>' . ' ' . Stringify::capitalize($choice) . "\n<br>";
             }
             return $val;
         }
@@ -138,7 +136,7 @@ trait FormBuilderTrait
      * type default options
      *
      * @param array $fields - array option from controller
-     * @param array $options - the array options from the extension classes
+     * @param array $extensionOptions
      * @param string $extensionObjectName - the name of the object the exception been thrown in
      * @return void
      */
@@ -146,7 +144,7 @@ trait FormBuilderTrait
     {
         foreach (array_keys($fields) as $index) {
             if (!in_array($index, array_keys($extensionOptions), true)) {
-                throw new FormBuilderOutOfBoundsException("One or more key '{$index}' is not a valid key for the object type $extensionObjectName");
+                throw new FormBuilderOutOfBoundsException("One or more key " . $index . " is not a valid key for the object type $extensionObjectName");
             }
         }
     }

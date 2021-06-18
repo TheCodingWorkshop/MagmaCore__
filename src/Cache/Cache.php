@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Cache\Exception\CacheException;
-use MagmaCore\Cache\AbstractCache;
 use MagmaCore\Cache\Storage\CacheStorageInterface;
 use Throwable;
 
@@ -24,10 +24,10 @@ class Cache extends AbstractCache
      * Main class constructor
      *
      * @param string|null $cacheIdentifier
-     * @param CacheStorageInterface|null $storage
+     * @param CacheStorageInterface $storage
      * @param array $options
      */
-    public function __construct(string|null $cacheIdentifier = null, CacheStorageInterface $storage, array $options = [])
+    #[Pure] public function __construct(?string $cacheIdentifier, CacheStorageInterface $storage, array $options = [])
     {
         parent::__construct($cacheIdentifier, $storage, $options);
     }
@@ -39,6 +39,7 @@ class Cache extends AbstractCache
      * @param mixed $value
      * @param int|null $ttl
      * @return bool
+     * @throws CacheException
      */
     public function set(string $key, mixed $value, int|null $ttl = null): bool
     {
@@ -58,6 +59,7 @@ class Cache extends AbstractCache
      * @param string $key
      * @param mixed $default
      * @return mixed
+     * @throws CacheException
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -78,6 +80,7 @@ class Cache extends AbstractCache
      *
      * @param string $key
      * @return boolean
+     * @throws CacheException
      */
     public function delete(string $key): bool
     {
@@ -107,6 +110,7 @@ class Cache extends AbstractCache
      * @param iterable $keys
      * @param mixed $default
      * @return iterable
+     * @throws CacheException
      */
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
@@ -124,6 +128,7 @@ class Cache extends AbstractCache
      * @param iterable $values
      * @param integer|null $ttl
      * @return bool
+     * @throws CacheException
      */
     public function setMultiple(iterable $values, int|null $ttl = null): bool
     {
@@ -139,6 +144,7 @@ class Cache extends AbstractCache
      * @inheritdoc
      * @param iterable $keys
      * @return boolean
+     * @throws CacheException
      */
     public function deleteMultiple(iterable $keys): bool
     {

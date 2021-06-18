@@ -14,8 +14,8 @@ namespace MagmaCore\Utility;
 class Curl
 {
 
-    public static function get($url)
-	{
+    public static function get($url): bool|string
+    {
 		if(function_exists("curl_init")){
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);

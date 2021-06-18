@@ -18,17 +18,18 @@ class DataLayerEnvironment
     
     /** @var Object */
     protected Object $environmentConfiguration;
+    private string $currentDriver;
 
     /**
      * Main construct class
-     * 
-     * @param array $credentials
-     * @return void
+     *
+     * @param Object $environmentConfiguration
+     * @param string|null $defaultDriver
      */
     public function __construct(Object $environmentConfiguration, ?string $defaultDriver = null)
     {
         $this->environmentConfiguration = $environmentConfiguration;
-        if (empty($defaultDriver) || is_null($defaultDriver)) {
+        if (empty($defaultDriver)) {
             throw new DataLayerInvalidArgumentException('Please specify your default database driver within the app.yml file under the database settings');
         }
         $this->currentDriver  = $defaultDriver;
@@ -46,10 +47,8 @@ class DataLayerEnvironment
 
     /**
      * Get the user defined database connection array
-     * 
-     * @param string $driver
+     *
      * @return array
-     * @throws DataLayerInvalidArgumentException
      */
     public function getDatabaseCredentials() : array
     {

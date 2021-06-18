@@ -21,10 +21,10 @@ class UikitPaginationExtension
     /**
      * Register the UIkit default pagination html wrapper
      *
-     * @param object $controller
-     * @return mixed
+     * @param object|null $controller
+     * @return string
      */
-    public function register(object $controller = null): mixed
+    public function register(object $controller = null): string
     {
         return '
         <section class="uk-margin-medium-top uk-padding-small uk-padding-remove-bottom">

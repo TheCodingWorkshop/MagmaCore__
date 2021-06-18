@@ -16,9 +16,9 @@ interface FlashInterface
 
     /**
      * Method for adding a flash message to the session
-     * 
+     *
      * @param string $message
-     * @param string $type
+     * @param string|null $type
      * @return void
      */
     public function add(string $message, ?string $type = null) : void;
@@ -28,6 +28,6 @@ interface FlashInterface
      * 
      * @return mixed
      */
-    public function get();
+    public function get(): mixed;
 
 }

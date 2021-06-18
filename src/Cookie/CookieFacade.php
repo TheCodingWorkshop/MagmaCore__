@@ -12,10 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
 
-use MagmaCore\Cookie\CookieFactory;
-use MagmaCore\Cookie\CookieEnvironment;
 use MagmaCore\Cookie\Store\NativeCookieStore;
-use MagmaCore\Cookie\CookieConfig;
 
 class CookieFacade
 {

@@ -16,7 +16,6 @@ use PDOException;
 use LogicException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransactionInterface;
 
 class DatabaseTransaction implements DatabaseTransactionInterface
 {
@@ -43,7 +42,7 @@ class DatabaseTransaction implements DatabaseTransactionInterface
     /**
      * @inheritdoc
      * @return bool true on success or false on failure
-     * @throws PDOException - if a transaction as already started or the driver does not support transaction
+     * @throws PDOException|DataLayerException - if a transaction as already started or the driver does not support transaction
      */
     public function start(): bool
     {
@@ -62,7 +61,7 @@ class DatabaseTransaction implements DatabaseTransactionInterface
     /**
      * @inheritdoc
      * @return bool true on success or false on failure
-     * @throws PDOException - If theres no active transaction
+     * @throws PDOException|DataLayerException - If theres no active transaction
      */
     public function commit(): bool
     {
@@ -81,7 +80,7 @@ class DatabaseTransaction implements DatabaseTransactionInterface
     /**
      * @inheritdoc
      * @return bool true on success or false on failure
-     * @throws PDOException - If theres no active transaction
+     * @throws PDOException|DataLayerException - If theres no active transaction
      */
     public function revert(): bool
     {

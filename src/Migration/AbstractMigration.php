@@ -12,13 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Migration;
 
-use MagmaCore\Migration\Migrate;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\Migration\MigrationTrait;
-use MagmaCore\Migration\MigrateInterface;
 use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Migration\Exception\MigrationInvalidArgumentException;
+use ReflectionClass;
+use ReflectionMethod;
 
 abstract class AbstractMigration implements MigrationInterface
 {
@@ -38,13 +37,12 @@ abstract class AbstractMigration implements MigrationInterface
     protected string $schemaPath = 'App/Schema/';
     /** @var string */
     protected string $rootPath;
-    
+
     /**
      * Main class constructor
      *
-     * @param object $dataAccess
+     * @param object $dataRepository
      * @param string|null $dataSchema
-     * @return void
      */
     public function __construct(object $dataRepository, string|null $dataSchema = null)
     {
@@ -79,7 +77,7 @@ abstract class AbstractMigration implements MigrationInterface
      * Return all the database migration fields
      *
      * @param array $conditions
-     * @return array
+     * @return array|null
      */
     abstract public function getMigrations(array $conditions = []): array|null;
 
@@ -119,6 +117,7 @@ abstract class AbstractMigration implements MigrationInterface
      */
     public function createMigrationFromSchema(): void
     {
+        $hashClassName = '';
         $files = $this->scan($this->schemaPath);
         if (is_array($files) && count($files) > 0) {
             foreach ($files as $file) {
@@ -127,7 +126,7 @@ abstract class AbstractMigration implements MigrationInterface
                 }
                 $className = $this->getFileName($file);
                 if (class_exists($newClassName = '\App\Schema\\' . $className)) {
-                    $direction = $this->resolveMigrationClass(Migrate::FILES_ALTERING, $className);
+                    //$direction = $this->resolveMigrationClass(Migrate::FILES_ALTERING, $className);
                     $object = BaseApplication::diGet($newClassName);
                     if (!$object) {
                         throw new MigrationInvalidArgumentException('');
@@ -148,7 +147,7 @@ abstract class AbstractMigration implements MigrationInterface
                      * in pivot directory to be loaded after main directory migration
                      */
                     $this->migrateLog(
-                        Migrate::CREATE_MIGRATION . " {$className} [#" . count($this->counter) . "]" . Migrate::END_MIGRATION
+                        Migrate::CREATE_MIGRATION . $className . " [#" . count($this->counter) . "]" . Migrate::END_MIGRATION
                     );
                     if (!str_contains($newClassName, '_')) {
                     $this->buildMigrationFile($hashClassName, $schemaContent, $newClassName);
@@ -161,15 +160,15 @@ abstract class AbstractMigration implements MigrationInterface
     }
 
     /**
-     * Helper method which relocated files from one specified directory to 
-     * another specified directory. The method works in conjuction with the 
-     * createMigrationFromSchema() and attemps to move specific files define
-     * by an array of file prefix which is checked agains the current $file
+     * Helper method which relocated files from one specified directory to
+     * another specified directory. The method works in conjunction with the
+     * createMigrationFromSchema() and attempts to move specific files define
+     * by an array of file prefix which is checked against the current $file
      * using PHP str_contains() method.
-     * 
+     *
      * @param string $file
      * @param string $currentPath
-     * @param string $relocationPath
+     * @param string|null $relocationPath
      * @return void
      */
     public function fileRelocation(string $file, string $currentPath, string|null $relocationPath = null): void
@@ -197,7 +196,7 @@ abstract class AbstractMigration implements MigrationInterface
     public function createDir($pathName)
     {
         if (!is_dir($pathName)) {
-            mkdir($pathName, 0777);
+            mkdir($pathName);
         }
     }
 
@@ -218,6 +217,8 @@ abstract class AbstractMigration implements MigrationInterface
      * Compute the difference between migration files created and the already
      * created database migrations
      *
+     * @param array $array1
+     * @param array $array2
      * @return array
      */
     public function migrationDifferences(array $array1 = [], array $array2 = []): array
@@ -234,7 +235,7 @@ abstract class AbstractMigration implements MigrationInterface
      * Execute the migration. Creating the migration table if not already
      * exists and running the proper method (up(), down(), change())
      *
-     * @param string|null $position
+     * @param string|null $direction
      * @return void
      */
     public function migrate(string|null $direction = Migrate::MIGRATE_UP): void
@@ -275,14 +276,14 @@ abstract class AbstractMigration implements MigrationInterface
 
     /**
      * Using PHP ReflectionClass to get a reflection of the $migrateObject variable
-     * then retrive an array of all the public methods within that class. We then
+     * then retrieve an array of all the public methods within that class. We then
      * use array_map to iterate over the $methods and return a new array of just the 
      * method names.
      * We will iterate over each method name and use $migrateObject variable along with
      * the value of the foreach loop $migrateObject->$fill() to check whether is method
      * null if not null then we do an equal comparison between the $fill and $direction
      * 
-     * Only then if it matches it will exeucte 
+     * Only then if it matches it will execute
      *
      * @param MigrateInterface $migrateObject
      * @param string $direction
@@ -290,8 +291,8 @@ abstract class AbstractMigration implements MigrationInterface
      */
     private function executeMigrationCommand(MigrateInterface $migrateObject, string $direction)
     {   
-        $reflect = new \ReflectionClass($migrateObject);
-        $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $reflect = new ReflectionClass($migrateObject);
+        $methods = $reflect->getMethods(ReflectionMethod::IS_PUBLIC);
         $migrateMethods = array_map(fn($method) => $method->name, $methods);
         if (is_array($migrateMethods) && sizeof($migrateMethods) > 0) {
             if (in_array($direction, $migrateMethods)) {

@@ -12,22 +12,24 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash;
 
-use MagmaCore\Ash\Template;
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Ash\Error\LoaderError;
 use MagmaCore\Ash\Exception\FileNotFoundException;
+use Throwable;
 
 class TemplateEnvironment
 {
 
     /** @var int - cache directory permission */
     protected const CACHE_DIR_PERMISSION = 0744;
+    private object $extension;
 
     /**
      * Main class constructor
      * 
-     * @param array $options - yml template otpions
+     * @param array $options - yml template options
      * @param string $path - name of the template directory
      * @param string|null $rootPath - the path to the template directory
      */
@@ -64,7 +66,7 @@ class TemplateEnvironment
     /**
      * Undocumented function
      *
-     * @return void
+     * @return string
      */
     public function getPath(): string
     {
@@ -78,9 +80,9 @@ class TemplateEnvironment
     /**
      * Undocumented function
      *
-     * @return void
+     * @return array|string|string[]
      */
-    public function getTemplate()
+    public function getTemplate(): array|string
     {
         return str_replace('\\', '/', $this->getPath());
     }
@@ -159,19 +161,19 @@ class TemplateEnvironment
      * Default template context which can be access from any html templates
      *
      * @return array
+     * @throws Exception
+     * @throws Throwable
      */
     public function defaultContext(): array
     {
         if (!class_exists(TemplateExtension::class)) {
             throw new FileNotFoundException('The core template extension class is missing.');
         }
-        $templateContext = array_merge(
+        return array_merge(
             ['current_user' => ($user = Authorized::grantedUser()) ? $user : NULL],
             ['func' => new TemplateExtension($this)],
             ['app' => Yaml::file('app')],
             ['menu' => Yaml::file('menu')]
         );
-
-        return $templateContext;
     }
 }

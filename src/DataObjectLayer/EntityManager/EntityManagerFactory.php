@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\EntityManager;
 
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
 use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilderInterface;
 use MagmaCore\DataObjectLayer\DataMapper\DataMapperInterface;
 
@@ -38,14 +37,12 @@ class EntityManagerFactory
     }
 
     /**
-     * Create the entityManager obejct and inject the dependency which is the crud object
+     * Create the entityManager object and inject the dependency which is the crud object
      *
      * @param string $crudString
      * @param string $tableSchema
      * @param string $tableSchemaID
-     * @param array $options
      * @return EntityManagerInterface
-     * @throws BaseUnexpectedValueException
      */
     public function create(string $crudString, string $tableSchema, string $tableSchemaID) : EntityManagerInterface
     {

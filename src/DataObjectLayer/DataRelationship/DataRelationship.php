@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRelationship;
 
+use Exception;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\DataObjectLayer\DataRelationship\DataRelationshipInterface;
 
 /**
  * Both tables can have only one record on each side of the relationship.
@@ -25,24 +25,20 @@ class DataRelationship implements DataRelationshipInterface
     private object $tableLeft;
     private object $tableRight;
     private object $tablePivot;
-    private object $relationship;
-
-    public function __construct()
-    {
-    }
 
     /**
      * Undocumented function
      *
      * @param string $relationship
      * @return static
+     * @throws Exception
      */
     public function type(string $relationship): self
     {
         if ($relationship) {
-            $this->relationship = BaseApplication::diGet($relationship);
-            if (!$this->relationship) {
-                throw new \Exception();
+            $relationship1 = BaseApplication::diGet($relationship);
+            if (!$relationship1) {
+                throw new Exception();
             }
         }
         return $this;
@@ -53,23 +49,24 @@ class DataRelationship implements DataRelationshipInterface
      *
      * @param string $tableLeft
      * @param string $tableRight
-     * @return void
+     * @return DataRelationship
+     * @throws Exception
      */
     public function tables(string $tableLeft, string $tableRight): self
     {
         if (empty($tableLeft) || empty($tableRight)) {
-            throw new \Exception();
+            throw new Exception();
         }
 
         if ($tableLeft) {
             $this->tableLeft = BaseApplication::diGet($tableLeft);
             if (!$this->tableLeft) {
-                throw new \Exception();
+                throw new Exception();
             }
             if ($tableRight) {
                 $this->tableRight = BaseApplication::diGet($tableRight);
                 if (!$this->tableRight) {
-                    throw new \Exception();
+                    throw new Exception();
                 }
             }
         }
@@ -81,31 +78,32 @@ class DataRelationship implements DataRelationshipInterface
      * Undocumented function
      *
      * @param string $tablePivot
-     * @return void
+     * @return DataRelationship
+     * @throws Exception
      */
     public function pivot(string $tablePivot): self
     {
         if ($tablePivot) {
             $this->tablePivot = BaseApplication::diGet($tablePivot);
             if (!$this->tablePivot) {
-                throw new \Exception();
+                throw new Exception();
             }
         }
 
         return $this;
     }
 
-    public function getPivot()
+    public function getPivot(): object
     {
         return $this->tablePivot;
     }
 
-    public function getLeft()
+    public function getLeft(): object
     {
         return $this->tableLeft;
     }
 
-    public function getRight()
+    public function getRight(): object
     {
         return $this->tableRight;
     }

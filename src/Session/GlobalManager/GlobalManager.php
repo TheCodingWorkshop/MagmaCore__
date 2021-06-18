@@ -12,9 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\GlobalManager;
 
-use MagmaCore\Session\GlobalManager\GlobalManagerInterface;
-use MagmaCore\Session\GlobalManager\GlobalManagerException;
-
 class GlobalManager implements GlobalManagerInterface
 {
 
@@ -24,9 +21,8 @@ class GlobalManager implements GlobalManagerInterface
      * @param string $name
      * @param mixed $context
      * @return void
-     * @throws GlobalManagerException
      */
-    public static function set(string $name, $context): void
+    public static function set(string $name, mixed $context): void
     {
         if ($name !== '') {
             $GLOBALS[$name] = $context;
@@ -40,26 +36,23 @@ class GlobalManager implements GlobalManagerInterface
      * @return mixed
      * @throws GlobalManagerException
      */
-    public static function get(string $name)
+    public static function get(string $name): mixed
     {
         self::isGlobalValid($name);
-        try {
-            return $GLOBALS[$name];
-        } catch (GlobalManagerException $ex) {
-            throw $ex;
-        }
+        return $GLOBALS[$name];
     }
 
     /**
      * Check whether the global name is set else throw an exception
-     * 
+     *
      * @param string $name
      * @return void
+     * @throws GlobalManagerException
      */
     protected static function isGlobalValid(string $name): void
     {
         if (!isset($GLOBALS[$name]) || empty($name)) {
-            throw new GlobalManagerException("Invalid global. Please ensure you've set the global state for {$name}");
+            throw new GlobalManagerException("Invalid global. Please ensure you've set the global state for " . $name);
         }
     }
 }

@@ -13,8 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Collection;
 
 use Closure;
-use MagmaCore\Collection\Collection;
-use MagmaCore\Collection\CollectionProxy;
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Base\Exception\BaseException;
 
 trait CollectionTrait
@@ -50,7 +49,10 @@ trait CollectionTrait
         'empty'
     ];
 
-    public function __get($key) 
+    /**
+     * @throws BaseException
+     */
+    public function __get($key)
     {
         if (!in_array($key, self::$proxies)) {
             throw new BaseException("Property [{$key}] does not exist on this collection instance.");
@@ -75,7 +77,7 @@ trait CollectionTrait
      * @param mixed $items
      * @return array
      */
-    public function arrayableItems($items): array
+    public function arrayableItems(mixed $items): array
     {
         return (array)$items;
     }
@@ -86,7 +88,7 @@ trait CollectionTrait
      * @param array $inputArray
      * @return boolean
      */
-    public static function isAssoc(array $inputArray)
+    public static function isAssoc(array $inputArray): bool
     {
         $keys = array_keys($inputArray);
         return array_keys($keys) !== $keys;
@@ -97,7 +99,7 @@ trait CollectionTrait
      *
      * @return Collection
      */
-    public function collect(): Collection
+    #[Pure] public function collect(): Collection
     {
         return new Collection($this->all());
     }
@@ -114,13 +116,14 @@ trait CollectionTrait
         });
     }
 
-/**
+    /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     * @param mixed ...$args
      * @return mixed
      */
-    function value($value, ...$args)
+    function value(mixed $value, ...$args): mixed
     {
         return $value instanceof Closure ? $value(...$args) : $value;
     }
@@ -129,12 +132,12 @@ trait CollectionTrait
 /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param  iterable  $array
+     * @param iterable $array
      * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param mixed|null $default
      * @return mixed
      */
-    public function first($array, callable $callback = null, $default = null)
+    public function first(iterable $array, callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
             if (empty($array)) {

@@ -12,9 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use PDO;
-use Throwable;
-use PDOException;
 use PDOStatement;
 
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
@@ -22,7 +21,6 @@ use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
 
 class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {
@@ -35,9 +33,8 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
 
     /**
      * Main constructor class
-     * 
-     * @param DatabaseConnectionInterface
-     * @return void
+     *
+     * @param DatabaseDriverInterface $dbh
      */
     public function __construct(DatabaseDriverInterface $dbh)
     {
@@ -46,14 +43,13 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
     }
 
     /**
-     * Check the incoming $valis isn't empty else throw an exception
+     * Check the incoming $value isn't empty else throw an exception
      * 
      * @param mixed $value
      * @param string|null $errorMessage
      * @return void
-     * @throws DataMapperException
      */
-    private function isEmpty($value, string $errorMessage = null)
+    private function isEmpty(mixed $value, string $errorMessage = null)
     {
         if (empty($value)) {
             throw new DataLayerNoValueException($errorMessage);
@@ -74,7 +70,7 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
         }
     }
 
-    public function getConnection()
+    public function getConnection(): DatabaseDriverInterface
     {
         return $this->dbh;
     }
@@ -92,24 +88,17 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
     /**
      * @inheritDoc
      *
-     * @param [type] $value
-     * @return void
+     * @param mixed $value
+     * @return int
      */
-    public function bind($value)
+    public function bind(mixed $value): int
     {
-        switch ($value) {
-            case is_bool($value):
-            case intval($value):
-                $dataType = PDO::PARAM_INT;
-                break;
-            case is_null($value):
-                $dataType = PDO::PARAM_NULL;
-                break;
-            default:
-                $dataType = PDO::PARAM_STR;
-                break;
-        }
-        return $dataType;
+        return match ($value) {
+            is_bool($value) => PDO::PARAM_BOOL,
+            intval($value) => PDO::PARAM_INT,
+            is_null($value) => PDO::PARAM_NULL,
+            default => PDO::PARAM_STR,
+        };
     }
 
     /**
@@ -128,7 +117,6 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
                 return $this;
             }
         }
-        return false;
     }
 
     /**
@@ -169,9 +157,9 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
     /**
      * @inheritDoc
      *
-     * @return void
+     * @return bool
      */
-    public function execute()
+    public function execute(): bool
     {
         if ($this->statement)
             return $this->statement->execute();
@@ -216,7 +204,7 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
             return $this->statement->fetchColumn();
     }
 
-    public function columns()
+    public function columns(): array
     {
         if ($this->statement)
             return $this->statement->fetchAll(PDO::FETCH_COLUMN);
@@ -250,11 +238,11 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
 
     /**
      * Persist queries to database
-     * 
-     * @param string $query
+     *
+     * @param string $sqlQuery
      * @param array $parameters
      * @return void
-     * @throws Throwable
+     * @throws DataLayerException
      */
     public function persist(string $sqlQuery, array $parameters): void
     {
@@ -273,6 +261,7 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      *
      * @param string $statement
      * @return void
+     * @throws DataLayerException
      */
     public function exec(string $statement): void
     {

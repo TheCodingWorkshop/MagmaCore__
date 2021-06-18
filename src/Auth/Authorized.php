@@ -11,9 +11,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
+use Exception;
 use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Auth\Model\RememberedLoginModel as RememberedLogin;
 use MagmaCore\Auth\Roles\Roles;
+use MagmaCore\Session\GlobalManager\GlobalManagerException;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Cookie\CookieFacade;
 use App\Model\UserModel;
@@ -47,13 +49,13 @@ class Authorized
      * @param boolean $rememberMe Remember the login if true
      * @return void
      * @throws GlobalManagerException
-     * @throws Exception
+     * @throws Exception|Exception
      */
-    public static function login(Object $userModel, $rememberMe)
+    public static function login(Object $userModel, bool $rememberMe)
     {
         /* Set userID Session here */
         session_regenerate_id(true);
-        SessionTrait::registerUserSession($userModel->id ? $userModel->id : 0);
+        SessionTrait::registerUserSession($userModel->id ?? false);
         if ($rememberMe) {
             $rememberLogin = new RememberedLogin();
             list($token, $timestampExpiry) = $rememberLogin->rememberedLogin($userModel->id);
@@ -68,7 +70,6 @@ class Authorized
      * Helper function for getting the current user ID from the active session
      *
      * @return int
-     * @throws GlobalManagerException
      */
     protected static function getCurrentSessionID(): int
     {
@@ -76,13 +77,12 @@ class Authorized
     }
 
     /**
-     * Register the current logged in user to the Session so there info can 
+     * Register the current logged in user to the Session so there info can
      * be accessible globally.
-     *
-     * @return object|null
-     * @throws BaseUnexpectedValueException
+     * @return mixed
+     * @throws Throwable
      */
-    public static function grantedUser()
+    public static function grantedUser(): mixed
     {
         $userSessionID = self::getCurrentSessionID();
         if (isset($userSessionID) && $userSessionID !==0) {
@@ -135,7 +135,6 @@ class Authorized
      * Remember the originally-requested page in the session
      *
      * @return void
-     * @throws GlobalManagerException
      */
     public static function rememberRequestedPage() : void
     {
@@ -147,7 +146,6 @@ class Authorized
      * or default to the homepage
      *
      * @return string
-     * @throws GlobalManagerException
      */
     public static function getReturnToPage() : string
     {

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Type;
 
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\FormBuilder\FormBuilderTrait;
 use MagmaCore\FormBuilder\FormBuilderTypeInterface;
@@ -32,7 +34,7 @@ class InputType implements FormBuilderTypeInterface
     /** @var array returns an array of form settings */
     protected array $settings = [];
     /** @var mixed */
-    protected $options = null;
+    protected mixed $options = null;
     /** @var array returns an array of default options set */
     protected array $baseOptions = [];
 
@@ -40,10 +42,10 @@ class InputType implements FormBuilderTypeInterface
      * Main class constructor
      *
      * @param array $fields
-     * @param mixed $options
+     * @param mixed|null $options
      * @param array $settings
      */
-    public function __construct(array $fields, $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         $this->fields = $this->filterArray($fields);
         $this->options = ($options !=null) ? $options : null;
@@ -58,12 +60,12 @@ class InputType implements FormBuilderTypeInterface
      *
      * @return array
      */
-    public function getBaseOptions() : array
+    #[ArrayShape(['type' => "string", 'name' => "string", 'id' => "mixed|string", 'class' => "string[]", 'checked' => "false", 'required' => "false", 'disabled' => "false", 'autofocus' => "false", 'autocomplete' => "false"])] public function getBaseOptions() : array
     {
         return [
             'type' => $this->type, 
             'name' => '', 
-            'id' => (isset($this->fields['name']) ? $this->fields['name'] : ''), 
+            'id' => ($this->fields['name'] ?? ''),
             'class' => ['uk-input'],
             'checked' => false, 
             'required' => false, 
@@ -83,8 +85,7 @@ class InputType implements FormBuilderTypeInterface
     private function buildExtensionName() : string
     {
         $extensionName = lcfirst(str_replace(' ', '', ucwords(str_replace(array('-', '_'), ' ', $this->type . 'Type'))));
-        $extensionName = ucwords($extensionName);
-        return $extensionName;
+        return ucwords($extensionName);
     }
 
     /**
@@ -108,16 +109,16 @@ class InputType implements FormBuilderTypeInterface
     /**
      * @inheritdoc
      *
-     * @param array $extensionOptions
+     * @param array $options
      * @return void
      */
-    public function configureOptions(array $extensionOptions = []) : void
+    public function configureOptions(array $options = []) : void
     {
         if (empty($this->type)) {
             throw new FormBuilderInvalidArgumentException('Sorry please set the ' . $this->type . ' property in your extension class.');
         }
         if (!$this->buildExtensionObject()) {
-            $defaultWithExtensionOptions = (!empty($extensionOptions) ? array_merge($this->getBaseOptions(), $extensionOptions) : $this->getBaseOptions());
+            $defaultWithExtensionOptions = (!empty($options) ? array_merge($this->getBaseOptions(), $options) : $this->getBaseOptions());
             if ($this->fields) { /* field options set from the constructor */
                 $this->throwExceptionOnBadInvalidKeys(
                     $this->fields, 
@@ -173,7 +174,7 @@ class InputType implements FormBuilderTypeInterface
         return (!empty($this->settings) ? array_merge($defaults, $this->settings) : $defaults);
     }
 
-    public function filtering()
+    #[Pure] public function filtering(): string
     {
         return $this->renderHtmlElement($this->attr, $this->options);
     }

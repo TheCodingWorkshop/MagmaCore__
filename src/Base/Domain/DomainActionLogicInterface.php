@@ -11,19 +11,19 @@ interface DomainActionLogicInterface
      * Undocumented function
      *
      * @param Object $controller
-     * @param string $entityObject
-     * @param string $eventDispatcher
+     * @param string|null $entityObject
+     * @param string|null $eventDispatcher
      * @param string|null $objectSchema
      * @param string $method
-     * @param string $class
+     * @param array $rules
      * @param array $additionalContext
      * @return self
      */
     public function execute(
         Object $controller,
-        string|null $entityObject = null,
-        string|null $eventDispatcher = null,
-        string|null $objectSchema = null,
+        ?string $entityObject,
+        ?string $eventDispatcher,
+        ?string $objectSchema,
         string $method,
         array $rules = [],
         array $additionalContext = []
@@ -70,6 +70,7 @@ interface DomainActionLogicInterface
     /**
      * Undocumented function
      *
+     * @param string|null $type
      * @return void
      */
     public function end(string|null $type = null): void;

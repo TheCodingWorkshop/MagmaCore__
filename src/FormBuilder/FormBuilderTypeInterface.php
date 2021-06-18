@@ -57,15 +57,15 @@ interface FormBuilderTypeInterface
      * particular input/field. So we can filter it out here before being sent
      * back to the controller class
      *
-     * @return array - return the filtered or unfiltered string
+     * @return string - return the filtered or unfiltered string
      */
-    public function filtering();
+    public function filtering(): string;
 
     /**
      * Render the form view to the builder method within the base class
      *
-     * @return string|mixed
+     * @return mixed
      */
-    public function view();
+    public function view(): mixed;
 
 }

@@ -12,14 +12,13 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-use MagmaCore\FormBuilder\FormBuilder;
 
 class ClientFormBuilder extends FormBuilder
 {
     /**
      * @var mixed
      */
-    protected $repositoryObject;
+    protected mixed $repositoryObject;
 
     protected string $repositoryObjectName;
 
@@ -30,7 +29,7 @@ class ClientFormBuilder extends FormBuilder
      * within the constructor of our form builder class. Only instances of
      * data repository is allowed will throw an exception otherwise
      *
-     * @param string $repositoryObjectName - the name of the repository we want to instantiate
+     * @param string|null $repositoryObjectName - the name of the repository we want to instantiate
      */
     public function __construct(?string $repositoryObjectName = null)
     {
@@ -73,13 +72,12 @@ class ClientFormBuilder extends FormBuilder
      * Cast repository object to an array
      *
      * @param Object $data
-     * @return array
+     * @return bool|array
      */
-    public function castArray(Object $data)
+    public function castArray(Object $data): bool|array
     {
         if ($data !=null) {
-            $data = (array)$data;
-            return $data;
+            return (array)$data;
         }
         return false;
     }

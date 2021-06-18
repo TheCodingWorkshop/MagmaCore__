@@ -15,23 +15,12 @@ namespace MagmaCore\Cache;
 use MagmaCore\Cache\Exception\CacheInvalidArgumentException;
 use MagmaCore\Cache\Storage\CacheStorageInterface;
 use MagmaCore\Cache\Storage\NativeCacheStorage;
-use MagmaCore\Cache\CacheEnvironmentConfigurations;
-use MagmaCore\Cache\Cache;
 
 class CacheFactory
 {
 
     /** @var object */
     protected Object $envConfigurations;
-
-    /**
-     * Main factory constructor method
-     *
-     * @param object $envConfigurations
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * Factory create method which create the cache object and instantiate the storage option
@@ -57,7 +46,7 @@ class CacheFactory
                 0
             );
         }
-        $defaultStorage = ($storageObject != null) ? $storageObject : new NativeCacheStorage($this->envConfigurations, $options);
+        $defaultStorage = $storageObject != null ? $storageObject : new NativeCacheStorage($this->envConfigurations, $options);
 
         return new Cache($cacheIdentifier, $defaultStorage, $options);
     }

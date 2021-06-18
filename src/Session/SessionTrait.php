@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session;
 
+use LogicException;
 use MagmaCore\Session\Exception\SessionException;
 use MagmaCore\Session\GlobalManager\GlobalManager;
+use MagmaCore\Session\GlobalManager\GlobalManagerException;
 
 trait SessionTrait
 {
@@ -65,10 +67,10 @@ trait SessionTrait
      * @param bool $deleteOldSession
      * @return string
      */
-    public function sessionRegeneration(int $sessionExpiration = 10, bool $deleteOldSession = false)
+    public function sessionRegeneration(int $sessionExpiration = 10, bool $deleteOldSession = false): string
     {
         if (isset($_SESSION['OBSOLETE']) && $_SESSION['OBSOLETE'] == true) {
-            return;
+            return '';
         }
         // Set current session to expire in 10 seconds
         $_SESSION['OBSOLETE'] = true;
@@ -93,9 +95,9 @@ trait SessionTrait
      * 
      * @return object
      * @throws LogicException
-     * @throws GlobalManagerException
+     * @throws GlobalManagerException|SessionException
      */
-    public static function sessionFromGlobal()
+    public static function sessionFromGlobal(): object
     {
         /* Get the stored session Object */
         $storedSessionObject = GlobalManager::get('session_global');
@@ -111,7 +113,7 @@ trait SessionTrait
      * @param integer $userID
      * @return void
      */
-    public static function registerUserSession(int $userID)
+    public static function registerUserSession(mixed $userID)
     {
         $_SESSION['user_id'] = $userID;
         $_SESSION['last_login'] = time();

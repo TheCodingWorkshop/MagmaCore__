@@ -37,10 +37,10 @@ class ColorType extends InputType implements FormExtensionTypeInterface
     /**
      * @inheritdoc
      *
-     * @param array $extensionOptions
+     * @param array $options
      * @return void
      */
-    public function configureOptions(array $extensionOptions = []): void
+    public function configureOptions(array $options = []): void
     {
         $this->defaults = [ /* No current defaults available */
         ];

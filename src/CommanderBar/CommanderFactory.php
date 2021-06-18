@@ -11,19 +11,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar;
 
-use MagmaCore\Base\BaseApplication;
-use MagmaCore\CommanderBar\ApplicationCommanderInterface;
+use Exception;
 
 class CommanderFactory
 {
-    
+
     /**
-     * Create the commande bar object and pass the required object arguments
+     * Create the command bar object and pass the required object arguments
      *
-     * @param object $controller
-     * @return CommanderBarInterface
+     * @param object|null $controller
+     * @return CommanderBar|CommanderBarInterface
+     * @throws Exception
      */
-    public function create(?object $controller = null)
+    public function create(?object $controller = null): CommanderBar|CommanderBarInterface
     {
         return new CommanderBar($controller);
     }

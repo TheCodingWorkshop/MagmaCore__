@@ -21,31 +21,32 @@ trait DataRepositoryTrait
 {
 
     /**
-     * Validate a model before persisting data to the database. These models are 
+     * Validate a model before persisting data to the database. These models are
      * auto loaded once they are created. Models must follow the framework principle
-     * meaing model should adopt a naming convention ie. if your model is called UserModel
-     * then your validation class should be called UserValidate and should be located under 
+     * meaning model should adopt a naming convention ie. if your model is called UserModel
+     * then your validation class should be called UserValidate and should be located under
      * namespace App\Validate. This directory is located within your App directory
      * within the Validate sub-directory.
-     * 
+     *
      * Validation classes must extends AbstractDataRepositoryValidation and will be force to
      * employ the following methods (validateBeforePersist(), getErrors(), fields() validate()
      * validateDataBag()). Developers
      * can create their own helper methods to help with validating your data.
-     * 
+     *
      * The AbstractDataRepositoryValidation() class also provides some small helper method which
-     * will be accessible within your validation class so long as you extends this class within 
+     * will be accessible within your validation class so long as you extends this class within
      * yours. Please see documentation for all available helper methods within this class. for
      * more on what they do and how you can use them
-     * 
-     * this method returns an array of the validated data and any errors that was generated. You can 
+     *
+     * this method returns an array of the validated data and any errors that was generated. You can
      * also fill your data bag with what ever data you want to return or expose to your controller
      * objects for event dispatching
      *
      * @param Collection $entityCollection
      * @param string $entityObject - use to create the validation object namespace
      * @param Object|null $dataRepository
-     * @return self
+     * @return DataRepositoryTrait|DataRepository
+     * @throws DataLayerException
      */
     public function validateRepository(Collection $entityCollection, string $entityObject, ?Object $dataRepository = null) : self
     {
@@ -66,7 +67,7 @@ trait DataRepositoryTrait
                     }
                     break;
                 default :
-                    throw new DataLayerException('Invalid datarepository validation object.');
+                    throw new DataLayerException('Invalid dataRepository validation object.');
                     break;
             endswitch;
         }

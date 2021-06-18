@@ -14,8 +14,6 @@ namespace MagmaCore\Session;
 
 use MagmaCore\Session\Exception\SessionUnexpectedValueException;
 use MagmaCore\Session\Storage\SessionStorageInterface;
-use MagmaCore\Session\SessionInterface;
-use MagmaCore\Session\SessionEnvironment;
 
 class SessionFactory
 {
@@ -26,15 +24,14 @@ class SessionFactory
     }
 
     /**
-     * Session factory which create the session object and instantiate the choosen
+     * Session factory which create the session object and instantiate the chosen
      * session storage which defaults to nativeSessionStorage. This storage object accepts
      * the session environment object as the only argument.
-     * 
+     *
      * @param string $sessionIdentifier
      * @param string $storage
-     * @param SessionEnvironment $SessionEnvironment
+     * @param SessionEnvironment $sessionEnvironment
      * @return SessionInterface
-     * @throws BaseUnexpectedValueException
      */
     public function create(
         string $sessionIdentifier,

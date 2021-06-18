@@ -25,7 +25,8 @@ class BruteForce
      * @param object $user
      * @param object $repository
      * @param string $passwordHash
-     * @return void
+     * @param string $email
+     * @return object
      */
     public function isForceable(object $user, object $repository, string $passwordHash, string $email): object
     {
@@ -59,7 +60,7 @@ class BruteForce
         }
     }
 
-    
+
 
     public function getForceableErrors(): array
     {

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\QueryBuilder;
 
+use Exception;
+
 interface QueryBuilderInterface
 {
 
@@ -18,7 +20,7 @@ interface QueryBuilderInterface
      * Insert query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function insertQuery() : string;
 
@@ -26,7 +28,7 @@ interface QueryBuilderInterface
      * Select query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function selectQuery() : string;
 
@@ -34,7 +36,7 @@ interface QueryBuilderInterface
      * Update query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function updateQuery() : string;
 
@@ -42,7 +44,7 @@ interface QueryBuilderInterface
      * Delete query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function deleteQuery() : string;
 
@@ -50,7 +52,7 @@ interface QueryBuilderInterface
      * Search|Select query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function searchQuery() : string;
 
@@ -58,7 +60,7 @@ interface QueryBuilderInterface
      * Raw query string
      *
      * @return string
-     * @throws QueryBuilderException
+     * @throws Exception
      */
     public function rawQuery() : string;
 

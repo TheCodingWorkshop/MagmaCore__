@@ -11,10 +11,10 @@ interface ClientFormBuilderInterface
      * which is the action where the form will be posted
      *
      * @param string $action - form action
-     * @param object $dataRepository
-     * @param object $callingController
+     * @param object|null $dataRepository
+     * @param object|null $callingController
      * @return string
      */
-    public function createForm(string $action, ?Object $dataRepository = null, object $callingController = null);
+    public function createForm(string $action, ?Object $dataRepository = null, ?object $callingController = null): string;
 
 }

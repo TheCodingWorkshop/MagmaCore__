@@ -11,19 +11,21 @@ declare(strict_types=1);
 
 namespace MagmaCore\Router;
 
+use Closure;
+
 interface RouterInterface
 {
 
     /**
      * Add a route to the routing table
      *
-     * @param string $route  The route URL
-     * @param array  $params Parameters (controller, action, etc.)
-     * @param Closure $cb - optional callback function
+     * @param string $route The route URL
+     * @param array $params Parameters (controller, action, etc.)
+     * @param Closure|null $cb - optional callback function
      *
      * @return void
      */
-    public function add(string $route, array $params = [], \Closure $cb = null);
+    public function add(string $route, array $params = [], Closure $cb = null);
 
     /**
      * Dispatch the route, creating the controller object and running the

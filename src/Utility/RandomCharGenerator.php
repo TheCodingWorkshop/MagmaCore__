@@ -36,7 +36,8 @@ class RandomCharGenerator
 
     }
 
-    public static function randomNumberGenerator($requiredLength = 7, $highestDigit = 8) {
+    public static function randomNumberGenerator($requiredLength = 7, $highestDigit = 8): string
+    {
         $sequence = '';
         for ($i = 0; $i < $requiredLength; ++$i) {
             $sequence .= mt_rand(0, $highestDigit);

@@ -18,7 +18,7 @@ interface FormBuilderInterface
      * Undocumented function
      *
      * @param array $args
-     * @return void
+     * @return FormBuilderInterface
      */
     public function form(array $args = []) : self;
 
@@ -33,16 +33,16 @@ interface FormBuilderInterface
     public function add(array $args = [], $options = null, array $settings = []) : self;
 
     /**
-     * This methods get chain at the very end after each add() method. And will attemp to build
+     * This methods get chain at the very end after each add() method. And will attempt to build
      * the required input based on each add() method arguments. Theres an option to have
-     * HTML elemets wrap around each input tag for better styling of each element
+     * HTML elements wrap around each input tag for better styling of each element
      *
-     * @return mixed
+     * @param array $args
+     * @return string|bool
      */
-    public function build(?array $args = null);
+    public function build(array $args = []): string|bool;
 
     /**
-     * @param Object $request
      * @return array
      */
     public function canHandleRequest() : array;
@@ -59,16 +59,16 @@ interface FormBuilderInterface
     /**
      * Instantiate the external csrf fields
      *
-     * @param mixed $lock
-     * @return bool
+     * @param mixed|null $lock
+     * @return string
      */
-    public function csrfForm($lock = null);
+    public function csrfForm(mixed $lock = null): string;
 
     /**
      * Wrapper function for validating csrf token
      *
      * @return bool
      */
-    public function csrfValidate();
+    public function csrfValidate(): bool;
 
 }

@@ -12,12 +12,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\Storage;
 
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Session\Exception\SessionInvalidArgumentException;
 
 interface SessionStorageInterface
 {
     /**
-     * session_name wrapper with explicit arguppment to set a session_name
+     * session_name wrapper with explicit argument to set a session_name
      *
      * @param string $sessionName
      * @return void
@@ -34,7 +35,7 @@ interface SessionStorageInterface
     /**
      * session_id wrapper with explicit argument to set a session_id
      *
-     * @param $SessionID
+     * @param string $sessionID
      * @return void
      */
     public function setSessionID(string $sessionID): void;
@@ -44,7 +45,7 @@ interface SessionStorageInterface
      *
      * @return string
      */
-    public function getSessionID();
+    public function getSessionID(): string;
 
     /**
      * sets a specific value to a specific key of the session
@@ -52,7 +53,7 @@ interface SessionStorageInterface
      * @param string $key   The key of the item to store.
      * @param mixed  $value The value of the item to store. Must be serializable.
      * @return void
-     * @throws BaseIna MUST be thrown if the $key string is not a legal value.
+     * @throws BaseInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
     public function setSession(string $key, mixed $value): void;
 
@@ -74,7 +75,7 @@ interface SessionStorageInterface
      * @return mixed
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function getSession(string $key, mixed $default = null);
+    public function getSession(string $key, mixed $default = null): mixed;
 
     /**
      * Removes the value for the specified key from the session
@@ -99,7 +100,7 @@ interface SessionStorageInterface
      * @param mixed $default - The default value to return if the requested value cannot be found
      * @return mixed
      */
-    public function flush(string $key, mixed $default = null);
+    public function flush(string $key, mixed $default = null): mixed;
 
     /**
      * Determines whether an item is present in the session.

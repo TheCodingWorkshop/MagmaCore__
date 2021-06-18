@@ -11,20 +11,20 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
-use MagmaCore\Datatable\DatatableColumnInterface;
-
 abstract class AbstractDatatableColumn implements DatatableColumnInterface
 {
+    private object $controller;
+
     /**
      * @inheritdoc
      * @param array $dbColumns
      * @param object|null $callingController
      * @return array
      */
-    abstract public function columns(array $dbColumns = [], object|null $callingController = null) : array;
+    abstract public function columns(array $dbColumns, ?object $callingController) : array;
 
     /**
-     * Checks wheather model has defined any status columns and returns true
+     * Checks whether model has defined any status columns and returns true
      * if there is one or false otherwise
      *
      * @param object $controller
@@ -34,7 +34,7 @@ abstract class AbstractDatatableColumn implements DatatableColumnInterface
     {
         $this->controller = $controller;
         $columns = $controller->repository->getColumnStatus();
-        return (is_array($columns) && count($columns) > 0) ? true : false;
+        return is_array($columns) && count($columns) > 0;
     }
 
     /**

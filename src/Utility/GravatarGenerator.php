@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
-use MagmaCore\Utility\Yaml;
+use Exception;
 
 class GravatarGenerator
 {
@@ -34,7 +34,7 @@ class GravatarGenerator
      * @source https://gravatar.com/site/implement/images/php/
      * @throws Exception
      */
-    public static function setGravatar($email, $img = false, $atts = [])
+    public static function setGravatar($email, bool $img = false, array $atts = []): string
     {
         $gravatar = Yaml::file('app')['gravatar'];
 
@@ -53,6 +53,11 @@ class GravatarGenerator
         }
 
         return $url;
+    }
+
+    public static function getGravatar(string $email, $default, $size): string
+    {
+        return "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
     }
 
 }

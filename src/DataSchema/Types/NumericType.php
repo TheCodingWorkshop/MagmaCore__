@@ -18,7 +18,7 @@ use MagmaCore\DataSchema\DataSchemaTypeInterface;
 class NumericType extends DataSchemaBaseType implements DataSchemaTypeInterface
 {
 
-    /** @var array - intgre schema types */
+    /** @var array - integre schema types */
     protected array $types = [
         'tinyint',
         'smallint',

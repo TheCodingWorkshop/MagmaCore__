@@ -15,7 +15,6 @@ namespace MagmaCore\DataObjectLayer\Drivers;
 use PDO;
 use PDOException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
-use MagmaCore\DataObjectLayer\Drivers\AbstractDatabaseDriver;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
 class SqliteDatabaseConnection extends AbstractDatabaseDriver
@@ -23,6 +22,8 @@ class SqliteDatabaseConnection extends AbstractDatabaseDriver
 
     /** @var string $driver */
     protected const PDO_DRIVER = 'sqlite';
+    private object $environment;
+    private string $pdoDriver;
 
     /**
      * Class constructor. piping the class properties to the constructor
@@ -45,10 +46,10 @@ class SqliteDatabaseConnection extends AbstractDatabaseDriver
     /**
      * Opens a new Sqlite database connection
      *
-     * @return PDO_SQLITE
+     * @return PDO
      * @throws DataLayerException
      */
-    public function open()
+    public function open(): PDO
     {
         try {
             return new PDO(
@@ -57,8 +58,8 @@ class SqliteDatabaseConnection extends AbstractDatabaseDriver
                 $this->credential->getDbPassword(),
                 $this->params
             );
-        } catch(PDOException $expection) {
-            throw new DataLayerException($expection->getMessage(), (int)$expection->getCode());
+        } catch(PDOException $e) {
+            throw new DataLayerException($e->getMessage(), (int)$e->getCode());
         }
 
     }

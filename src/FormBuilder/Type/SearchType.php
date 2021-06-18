@@ -26,10 +26,10 @@ class SearchType extends InputType implements FormExtensionTypeInterface
      * @inheritdoc
      *
      * @param array $fields
-     * @param mixed $options
+     * @param mixed|null $options
      * @param array $settings
      */
-    public function __construct(array $fields, $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
         parent::__construct($fields, $options, $settings);
@@ -49,14 +49,14 @@ class SearchType extends InputType implements FormExtensionTypeInterface
              * following characters: ' or " 
              */
             'list' => '',
-            'pattern' => Yaml::file('app')['securtity']['search_pattern'],
+            'pattern' => Yaml::file('app')['security']['search_pattern'],
             'maxlength' => '',
             'minlength' => '',
             'placeholder' => '',
             'readonly' => false,
             'size' => '',
             'spellcheck' => '',
-            'title' => 'Inavlid input'
+            'title' => 'Invalid input'
         ];
 
         parent::configureOptions($this->defaults);

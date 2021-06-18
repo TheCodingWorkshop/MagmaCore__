@@ -12,6 +12,7 @@ declare (strict_types = 1);
 
 namespace MagmaCore\DataSchema\Traits;
 
+use Exception;
 use MagmaCore\Base\BaseApplication;
 
 trait DataSchemaTrait
@@ -50,14 +51,14 @@ trait DataSchemaTrait
     /**
      * Undocumented function
      *
-     * @param string $identifier
      * @param Callable $callback
-     * @return static
+     * @return string
+     * @throws Exception
      */
-    public function setConstraints(Callable $callback)
+    public function setConstraints(Callable $callback): string
     {
         if (!is_callable($callback)) {
-            throw new \Exception();
+            throw new Exception();
         }
 
         $out = $this->addKeys();
@@ -70,9 +71,9 @@ trait DataSchemaTrait
     /**
      * Undocumented function
      *
-     * @return void
+     * @return array|string
      */
-    public function addKeys()
+    public function addKeys(): array|string
     {
         $key = '';
         if (isset($this->primaryKey)) {

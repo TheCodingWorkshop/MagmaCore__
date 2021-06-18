@@ -11,22 +11,30 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
+use InvalidArgumentException;
+
 interface DatatableInterface
 {
 
     /**
      * Method which initialize the data table. Pulls in the data column
-     * object and the object repository. To build the various parts on the 
+     * object and the object repository. To build the various parts on the
      * data table
-     * 
-     * @param string $dataColumnObjectName - the data columns object
-     * @param array $dataRepositoryObject - the repository object containing mixed data
+     *
+     * @param string $dataColumnString
+     * @param array $dataRepository
      * @param array $sortController - an array of columns to sort by defined within the controller classes
-     * @param object $callingController - the controller which is calling the object
+     * @param array $dbColumns
+     * @param object|null $callingController - the controller which is calling the object
      * @return self
      * @throws InvalidArgumentException
      */
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], object|null $callingController = null) : self;
+    public function create(
+        string $dataColumnString,
+        array $dataRepository = [],
+        array $sortController = [],
+        array $dbColumns = [],
+        ?object $callingController) : self;
 
     /**
      * Generate the data table using the objects and properties pass to

@@ -32,7 +32,7 @@ class RestResponse
         header('Content-Type:' . $contentType);
     }
 
-    public function getHttpStatusMessage(int $code)
+    public function getHttpStatusMessage(int $code): string
     {
         $statusCode = [
             100 => 'Continue',

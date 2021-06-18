@@ -25,7 +25,7 @@ class DateFormatter
      * Undocumented function
      *
      * @param int $time
-     * @return void
+     * @return string
      */
     public static function formatShort(int $time) : string
     {

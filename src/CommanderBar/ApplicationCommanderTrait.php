@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar;
 
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 
@@ -22,6 +23,7 @@ trait ApplicationCommanderTrait
      * pluralize or just a normal justify lower case controller name
      *
      * @param object $controller
+     * @param string $type
      * @return string
      */
     public function getName(object $controller, string $type = 'lower'): string
@@ -41,7 +43,7 @@ trait ApplicationCommanderTrait
      * if available. Not all table will have a query column
      *
      * @param object $controller
-     * @return string|null
+     * @return string
      */
     public function getStatusColumn(object $controller): string
     {
@@ -51,6 +53,8 @@ trait ApplicationCommanderTrait
         );
         if ($queryColumn) {
             return $queryColumn->query;
+        } else {
+            return '';
         }
     }
 
@@ -60,9 +64,9 @@ trait ApplicationCommanderTrait
      * controller.
      *
      * @param object $controller
-     * @return mixed
+     * @return string
      */
-    public function getStatusColumnFromQueryParams(object $controller): mixed
+    public function getStatusColumnFromQueryParams(object $controller): string
     {
         $queriedValue = $this->getStatusColumn($controller);
         if (isset($_GET[$queriedValue]) && $_GET[$queriedValue] !== '') {
@@ -79,11 +83,12 @@ trait ApplicationCommanderTrait
      * @param object $controller
      * @param array $innerRoutes
      * @return void
+     * @throws Exception
      */
     public function getHeaderBuildException(object $controller, array $innerRoutes): void
     {
         if (!in_array($controller->thisRouteAction(), $innerRoutes)) {
-            throw new \Exception('This route is invalid. Because you did not assigned it to the INNER_ROUTES constant within the RoleCommander class.');
+            throw new Exception('This route is invalid. Because you did not assigned it to the INNER_ROUTES constant within the RoleCommander class.');
         }
 
     }
@@ -110,11 +115,12 @@ trait ApplicationCommanderTrait
      *
      * @param string $file
      * @return array
+     * @throws Exception
      */
     public function findYml(string $file): array
     {
         if (!file_exists(CONFIG_PATH . '/' . $file . '.yml')) {
-            throw new \Exception($file . '.yml does not exist within your config directory. Your commander bar uses this to generate the manager links, plus more.');
+            throw new Exception($file . '.yml does not exist within your config directory. Your commander bar uses this to generate the manager links, plus more.');
         }
         if ($list = Yaml::file($file)) {
             return ($this->controller->thisRouteAction() === 'index') ? $list['index'] : $list['not_index'];

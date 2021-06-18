@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\ValidationRule;
+namespace MagmaCore\ValidationRule\Exception;
 
 use MagmaCore\Base\Exception\BaseException;
 

@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
-use MagmaCore\Utility\Token;
-
 class HashGenerator
 {
 

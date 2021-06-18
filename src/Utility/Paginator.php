@@ -14,13 +14,13 @@ namespace MagmaCore\Utility;
 class Paginator
 {
 
-    /** @var int */
+    /** @var float */
     protected float $totalPages;
 
     /** @var int */
     protected int $page;
     
-    /** @var int */
+    /** @var float */
     protected float $offset;
 
     /**
@@ -28,9 +28,8 @@ class Paginator
      *
      * @param integer $totalRecords Total number of records
      * @param integer $recordsPerPage Number of records on each page
-     * @param string $page Current page
+     * @param int $page Current page
      *
-     * @return void
      */
     public function __construct(int $totalRecords, int $recordsPerPage, int $page)
     {
@@ -60,8 +59,8 @@ class Paginator
 
     /**
      * Gte the current page
-     * 
-     * @return void
+     *
+     * @return int
      */
     public function getPage() : int
     {

@@ -33,7 +33,8 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
         string $parentModel,
         array $selectors,
         $defaultSelector = ['*']
-    ) {
+    ): array
+    {
         $filter = array_map(
             fn ($selector): string => $parentModel . '.' . $selector,
             $selectors
@@ -47,7 +48,7 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
      *
      * @param array $leftSelectors
      * @param array $rightSelectors
-     * @return void
+     * @return ManyToMany
      */
     public function manyToMany(array $leftSelectors = [], array $rightSelectors = []): self
     {
@@ -72,7 +73,7 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
      * Undocumented function
      *
      * @param array $conditions
-     * @return void
+     * @return ManyToMany
      */
     public function where(array $conditions = []): self /* ['id' => 'user_id'] */
     {
@@ -85,7 +86,7 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
         return $this;
     }
 
-    public function and(array $conditions = [])
+    public function and(array $conditions = []): static
     {
         if (is_array($conditions) && count($conditions) > 0) {
             foreach ($conditions as $key => $value) {
@@ -97,7 +98,7 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
         return $this;
     }
 
-    public function limit(array $conditions = [])
+    public function limit(array $conditions = []): static
     {
         if (is_array($conditions) && count($conditions) > 0) {
             foreach ($conditions as $key => $value) {

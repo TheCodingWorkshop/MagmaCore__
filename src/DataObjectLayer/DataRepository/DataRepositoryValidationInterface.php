@@ -22,9 +22,9 @@ interface DataRepositoryValidationInterface
      * 
      * @param Collection $entityCollection - collection object
      * @param object|null $dataRepository - the repository for the entity
-     * @return mixed
+     * @return array
      */
-    public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null);
+    public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null): array;
 
     /**
      * Returns an array of generated errors from the validation method
@@ -63,7 +63,7 @@ interface DataRepositoryValidationInterface
      * @param object|null $dataRepository
      * @return void
      */
-    public function validate(Collection $entityCollection, object|null $dataRepository = null): void;
+    public function validate(Collection $entityCollection, ?object $dataRepository = null): void;
 
 
 }

@@ -26,10 +26,10 @@ class UrlType extends InputType implements FormExtensionTypeInterface
      * @inheritdoc
      *
      * @param array $fields
-     * @param mixed $options
+     * @param mixed|null $options
      * @param array $settings
      */
-    public function __construct(array $fields, $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
         parent::__construct($fields, $options, $settings);

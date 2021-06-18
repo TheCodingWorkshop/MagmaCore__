@@ -13,9 +13,6 @@ namespace MagmaCore\Session\Flash;
 
 use MagmaCore\Session\Exception\SessionUnexpectedValueException;
 use MagmaCore\Session\SessionInterface;
-use MagmaCore\Session\Flash\FlashInterface;
-use MagmaCore\Session\Flash\Flash;
-use MagmaCore\Session\SessionEnvironment;
 
 class FlashFactory
 {
@@ -25,15 +22,13 @@ class FlashFactory
     { }
 
     /**
-     * Session factory which create the session object and instantiate the choosen
+     * Session factory which create the session object and instantiate the chosen
      * session storage which defaults to nativeSessionStorage. This storage object accepts
      * the session environment object as the only argument.
-     * 
-     * @param string $sessionIdentifier
-     * @param string $storage
-     * @param SessionEnvironment $SessionEnvironment
-     * @return SessionInterface
-     * @throws BaseUnexpectedValueException
+     *
+     * @param SessionInterface|null $session
+     * @param string|null $flashKey
+     * @return FlashInterface
      */
     public function create(?SessionInterface $session = null, ?string $flashKey = null) : FlashInterface
     {

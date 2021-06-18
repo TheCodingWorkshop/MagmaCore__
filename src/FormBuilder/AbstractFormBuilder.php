@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-use MagmaCore\FormBuilder\FormBuilderInterface;
 
 abstract class AbstractFormBuilder implements FormBuilderInterface
 {
@@ -87,7 +86,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
      * @param $value
      * @return bool
      */
-    protected function setAttributes(string $key, $value)
+    protected function setAttributes(string $key, $value): bool
     {
         if (empty($key)) {
             throw new FormBuilderInvalidArgumentException('Invalid or empty attribute key. Ensure the key is present and valid');
@@ -95,7 +94,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         switch ($key):
             case 'action':
                 if (!is_string($key)) {
-                    throw new FormBuilderInvalidArgumentException('Invalif action key. This must be a string.');
+                    throw new FormBuilderInvalidArgumentException('Invalid action key. This must be a string.');
                 }
                 break;
             case 'method':
@@ -113,9 +112,8 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
                     throw new FormBuilderInvalidArgumentException();
                 }
                 break;
-            case 'class':
-                break;
             case 'id':
+            case 'class':
                 break;
             case 'novalidate':
             case 'autocomplete' :
@@ -141,7 +139,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
      * @param $value
      * @return bool
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value): bool
     {
         if (empty($key)) {
             throw new FormBuilderInvalidArgumentException('Invalid or empty attribute key. Ensure the key is present and valid');

@@ -13,28 +13,26 @@ declare(strict_types=1);
 namespace MagmaCore\Cache;
 
 use MagmaCore\Cache\Exception\CacheInvalidArgumentException;
-use MagmaCore\Cache\CacheInterface;
 
 abstract class AbstractCache implements CacheInterface
 {
 
-    /** @var string regular exppression - ensure cache name is of correct values */
+    /** @var string regular expression - ensure cache name is of correct values */
     const PATTERN_ENTRYIDENTIFIER = '/^[a-zA-Z0-9_\.]{1,64}$/';
-    /** @var Object */
-    protected ?Object $storage = null;
-    /** @var string */
-    protected ?string $cacheIdentifier = null;
+    /** @var object|null */
+    protected ?object $storage;
+    /** @var string|null */
+    protected ?string $cacheIdentifier;
     /** @var array */
     protected array $options = [];
 
     /**
-     * Main abstract parent class. Which pipes all the properties to their constructor 
+     * Main abstract parent class. Which pipes all the properties to their constructor
      * arguments
      *
-     * @param string $cacheIdentifier
-     * @param Object $storage
+     * @param string|null $cacheIdentifier
+     * @param Object|null $storage
      * @param array $options
-     * @return void
      */
     public function __construct(?string $cacheIdentifier = null, ?Object $storage = null, array $options = [])
     {

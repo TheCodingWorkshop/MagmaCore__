@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\EntityManager;
 
-use MagmaCore\DataObjectLayer\EntityManager\CrudInterface;
-
 class EntityManager implements EntityManagerInterface
 {
 
@@ -22,7 +20,7 @@ class EntityManager implements EntityManagerInterface
     protected CrudInterface $crud;
 
     /**
-     * Main constructor clas
+     * Main constructor class
      * 
      * @return void
      */

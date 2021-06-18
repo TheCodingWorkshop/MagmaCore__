@@ -12,20 +12,16 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use Closure;
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Collection\Collection;
-use MagmaCore\ValidationRule\ValidationRule;
 
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
 {
 
     protected const FIRST = 0;
     protected const LAST = 1;
-
-    public function __construct()
-    {
-    }
 
     /**
      * @inheritdoc
@@ -34,7 +30,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param object|null $dataRepository - the repository for the entity
      * @return mixed
      */
-    abstract public function validateBeforePersist(Collection $entityCollection, ?Object $dataRepository = null);
+    abstract public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null): array;
 
     /**
      * @inheritdoc
@@ -58,9 +54,9 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         }
     }
 
-    public function getCreator($dataCollection)
+    #[Pure] public function getCreator($dataCollection)
     {
-        return $this->setDefaultValue($dataCollection, 'created_byid', isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0);
+        return $this->setDefaultValue($dataCollection, 'created_byid', $_SESSION['user_id'] ?? 0);
     }
 
     /**
@@ -71,7 +67,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param array $cleanData
      * @return array
      */
-    public function getCsrf(array $cleanData)
+    #[Pure] public function getCsrf(array $cleanData): array
     {
         $csrf = [
             '_CSRF_INDEX' => $cleanData['_CSRF_INDEX'],
@@ -87,21 +83,18 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param array $args
      * @param string $key
      * @param integer $flag
-     * @return void
+     * @return string
      */
-    public function getArrayPosition(array $args, string $key, int $flag = self::FIRST)
+    public function getArrayPosition(array $args, string $key, int $flag = self::FIRST): string
     {
+        $index = '';
         if (isset($args[$key]) && $args[$key] !=='') {
             $parts = explode(' ', $args[$key]);
             if ($parts) {
-                switch ($flag) {
-                    case 0 :
-                        $index = $parts[array_key_first($parts)];
-                        break;
-                    case 1 :
-                        $index = $parts[array_key_last($parts)];
-                        break;
-                }
+                $index = match ($flag) {
+                    0 => $parts[array_key_first($parts)],
+                    1 => $parts[array_key_last($parts)],
+                };
             }
         } else {
             $index = $args[$key];
@@ -118,7 +111,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param mixed $default
      * @return mixed
      */
-    public function setDefaultValue(array $cleanData, string $field, $default)
+    public function setDefaultValue(array $cleanData, string $field, mixed $default): mixed
     {
         $value = $default;
         if (isset($cleanData[$field]) && $cleanData[$field] !='') {
@@ -132,31 +125,29 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
 
     public function getCreatedBy(array $cleanData)
     {
-        $createdById = $this->setDefaultValue($cleanData, 'created_byid', SessionTrait::sessionFromGlobal()->get('user_id') ?? 0);
-        return $createdById;
+        return $this->setDefaultValue($cleanData, 'created_byid', SessionTrait::sessionFromGlobal()->get('user_id') ?? 0);
     }
-    
+
     /**
-     * Contains an array of returned data from the fields() method and merges it with an 
-     * array pass to the argument within this getAttr(array $data) method. 
+     * Contains an array of returned data from the fields() method and merges it with an
+     * array pass to the argument within this getAttr(array $data) method.
      * The fields() method is an abstract method defined within AbstractDataRepositoryValidation()
-     * and should be employed within each App/Validation/**Validation class 
+     * and should be employed within each App/Validation/**Validation class
      * example. array_merge($this->fields(), $data)
-     * 
-     * @param $cleanData
+     *
+     * @param array $cleanData
      * @return array
      */
     protected function mergeWithFields(array $cleanData): array
     {
-        $cleanData = (!empty($this->fields()) ? array_merge($cleanData, $this->fields()) : $cleanData);
-        return $cleanData;
+        return (!empty($this->fields()) ? array_merge($cleanData, $this->fields()) : $cleanData);
     }
 
     /**
      * Check if the data is set before passing to the database handler. This helps to 
      * prevent 'undefined index' errors. We can also pass back default values using the 
      * third argument. Useful when updating records as we can pass back default values which
-     * should prevent database field from accidently being changed to a different value as we 
+     * should prevent database field from accidentally being changed to a different value as we
      * are passing back the same value if nothing was set or changed within the submitted form.
      *
      * @param string $key
@@ -167,7 +158,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
     public function isSet(string $key, mixed $cleanData, mixed $dataRepository = null): mixed
     {
         if (is_object($cleanData)) {
-            return isset($cleanData->$key) ? $cleanData->$key : (($dataRepository !== null) ? $dataRepository->$key : null);
+            return $cleanData->$key ?? (($dataRepository !== null) ? $dataRepository->$key : null);
         } elseif (is_array($cleanData)) {
             return array_key_exists($key, $cleanData) ? $cleanData[$key] : (($dataRepository !== null) ? $dataRepository->$key : null);
         } else {
@@ -186,7 +177,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
 
     }
 
-    public function dovalidation(Collection $entityCollection, Null|Object $dataRepository = null, Closure $callback)
+    public function dovalidation(Collection $entityCollection, ?object $dataRepository, Closure $callback)
     {
         if (null !== $entityCollection) {
             if (is_object($entityCollection) && $entityCollection->count() > 0) {
@@ -195,31 +186,6 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
                         if (!$callback instanceof Closure) {
                             throw new BaseInvalidArgumentException('');
                         }
-                        $callback($this->key, $this->value, $entityCollection, $dataRepository);
-                        // switch ($this->key):
-                        //     case 'password_hash':
-                        //     case 'client_password_hash':
-                        //         if ($this->rules) {
-                        //             $this->rules->addRule("required|unique|email");
-                        //         }
-                        //         break;
-                        //     case 'email':
-                        //         if ($this->rules) {
-                        //             $this->rules->addRule("required|unique|email");
-                        //         }
-                        //         break;
-                        //     case 'firstname':
-                        //     case 'lastname':
-                        //         if ($this->rules) {
-                        //             $this->rules->addRule("required");
-                        //         }
-                        //         break;
-                        //     default:
-                        //         if ($entityCollection === $dataRepository) {
-                        //             $this->errors = Error::display('err_unchange');
-                        //         }
-                        //         break;
-                        // endswitch;
                     endif;
                 endforeach;
             }

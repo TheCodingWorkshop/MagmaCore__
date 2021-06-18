@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
-use MagmaCore\Utility\Yaml;
+use Exception;
 
 class Token
 {

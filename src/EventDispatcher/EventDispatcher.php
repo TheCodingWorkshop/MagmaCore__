@@ -11,13 +11,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\EventDispatcher;
 
-use MagmaCore\EventDispatcher\EventDispatcherInterface;
-use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use MagmaCore\EventDispatcher\StoppableEventInterface;
 use Closure;
-use is_array;
-use array_filter;
-use count;
+use function count;
+use function get_class;
+use function is_array;
 
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -41,7 +38,7 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function dispatch(object $event, string $eventName = null): object
     {
-        $eventName = $eventName ?? \get_class($event);
+        $eventName = $eventName ?? get_class($event);
         if (empty($this->listeners[$eventName])) {
             $listeners = $this->listeners[$eventName];
         } else {
@@ -54,11 +51,12 @@ class EventDispatcher implements EventDispatcherInterface
 
         return $event;
     }
+
     /**
      * Gets the listeners of a specific event or all listeners sorted by descending priority.
      *
-     * @param string $eventName
-     * @return array - The event listeners for the specified event, 
+     * @param string|null $eventName
+     * @return array - The event listeners for the specified event,
      *                  or all event listeners by event name
      */
     public function getListeners(string $eventName = null) : array
@@ -81,13 +79,14 @@ class EventDispatcher implements EventDispatcherInterface
 
         return array_filter($this->sorted);
     }
+
     /**
      * Checks whether an event has any registered listeners.
      *
-     * @param string $eventName
-     * @return boolean - true if the specified event has any listeners, false otherwise
+     * @param string|null $eventName
+     * @return bool - true if the specified event has any listeners, false otherwise
      */
-    public function hasListeners(string $eventName = null)
+    public function hasListeners(string $eventName = null): bool
     {
         if (null !== $eventName) {
             return !empty($this->listeners[$eventName]);
@@ -103,11 +102,11 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Check if a an actual event was called
      *
-     * @param string $eventName
+     * @param string|null $eventName
      * @param integer $priority
-     * @return boolean
+     * @return bool
      */
-    public function isListening(string $eventName = null, int $priority = 0)
+    public function isListening(string $eventName = null, int $priority = 0): bool
     {
         if (isset($this->listeners[$eventName][$priority])) {
             return true;
@@ -199,13 +198,13 @@ class EventDispatcher implements EventDispatcherInterface
      * @param array $value
      * @return void
      */
-    private function arrayClosure($value)
+    private function arrayClosure(array &$value)
     {
         if (
-            \is_array($value) &&
+            is_array($value) &&
             isset($value[0]) &&
             $value[0] instanceof Closure &&
-            2 >= \count($value)
+            2 >= count($value)
         ) {
             $value[0] = $value[0]();
             $value[1] = $value[1] ?? '__invoke';
@@ -219,7 +218,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param callable $listener - the listener to remove
      * @return void
      */
-    public function removeListeners(string $eventName, $listener)
+    public function removeListeners(string $eventName, callable $listener)
     {
         if (empty($this->listeners[$eventName])) {
             return;
@@ -229,7 +228,8 @@ class EventDispatcher implements EventDispatcherInterface
             $listener[0] = $listener[0]();
             $listener[1] = $listener[1] ?? '__invoke';
         }*/
-        $this->arrayClosure($listener);
+        $value1 = (array)$listener;
+        $this->arrayClosure($value1);
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
             foreach ($listeners as $key => $value) {
                 if ($value !== $listener) {

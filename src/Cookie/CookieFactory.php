@@ -14,8 +14,6 @@ namespace MagmaCore\Cookie;
 
 use MagmaCore\Cookie\Exception\CookieUnexpectedValueException;
 use MagmaCore\Cookie\Store\CookieStoreInterface;
-use MagmaCore\Cookie\CookieInterface;
-use MagmaCore\Cookie\CookieEnvironment;
 
 class CookieFactory
 {
@@ -26,16 +24,15 @@ class CookieFactory
     }
 
     /**
-     * Cookie factory which create the cookie object and instantiate the choosen
+     * Cookie factory which create the cookie object and instantiate the chosen
      * cookie store object which defaults to nativeCookieStore. This store object accepts
      * the cookie environment object as the only argument.
-     * 
-     * @param string $cookieStore
+     *
+     * @param string|null $cookieStore
      * @param CookieEnvironment $cookieEnvironment
      * @return CookieInterface
-     * @throws CookieUnexpectedValueException
      */
-    public function create(?string $cookieStore = null, CookieEnvironment $cookieEnvironment): CookieInterface
+    public function create(?string $cookieStore, CookieEnvironment $cookieEnvironment): CookieInterface
     {
         $cookieStoreObject = new $cookieStore($cookieEnvironment);
         if (!$cookieStoreObject instanceof CookieStoreInterface) {

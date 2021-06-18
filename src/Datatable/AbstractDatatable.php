@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
-use MagmaCore\Datatable\DatatableInterface;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
 abstract class AbstractDatatable implements DatatableInterface
@@ -67,7 +66,7 @@ abstract class AbstractDatatable implements DatatableInterface
     protected function validAttributes(string $key, $value) : void
     {
         if (empty($key)) {
-            throw new DatatableUnexpectedValueException('Inavlid or empty attribute key. Ensure the key is present and of the correct data type ' . $value);
+            throw new DatatableUnexpectedValueException('Invalid or empty attribute key. Ensure the key is present and of the correct data type ' . $value);
         }
         switch ($key) {
             case 'status' :

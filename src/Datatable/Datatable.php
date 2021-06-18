@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
+use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Themes\ThemeBuilder;
-use MagmaCore\Datatable\AbstractDatatable;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
 class Datatable extends AbstractDatatable
@@ -29,12 +29,20 @@ class Datatable extends AbstractDatatable
     private int|false $totalPages = false;
     private int|false $totalRecords = false;
     private array $dataColumns = [];
+    private mixed $dataColumnObject;
+    private array $sortController;
+    private mixed $dataOptions;
+    private mixed $direction;
+    private mixed $sortDirection;
+    private mixed $tdClass;
+    private mixed $tableColumn;
+    private mixed $tableOrder;
 
     /**
      * Undocumented function
      *
-     * @param array $attributes
-     * @return void
+     * @param ThemeBuilder $themeBuilder
+     * @throws ThemeBuilderInvalidArgumentException
      */
     public function __construct(ThemeBuilder $themeBuilder)
     {
@@ -49,9 +57,10 @@ class Datatable extends AbstractDatatable
      * @param array $dataRepository
      * @param array $sortController
      * @param array $dbColumns
+     * @param object|null $callingController
      * @return self
      */
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], object|null $callingController = null): self
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], ?object $callingController): self
     {
         $this->dataColumnObject = new $dataColumnString();
         if (!$this->dataColumnObject instanceof DatatableColumnInterface) {
@@ -78,7 +87,7 @@ class Datatable extends AbstractDatatable
         ) = $dataRepository;
     }
 
-    public function totalRecords()
+    public function totalRecords(): bool|int
     {
         return $this->totalRecords;
     }
@@ -96,10 +105,11 @@ class Datatable extends AbstractDatatable
             ->query
             ->getAlnum($this->sortController['query']);
 
+        $before = $show_table_thead = $after = '';
         $this->element .= $before;
         if (is_array($this->dataColumns) && count($this->dataColumns) > 0) {
             if (is_array($this->dataOptions) && $this->dataOptions != null) {
-                $this->element .= '<table id="' . (isset($table_id) ? $table_id : '') . '" class="' . implode(' ', $this->tb->theme('table_class')) . '">' . "\n";
+                $this->element .= '<table id="' . ($table_id ?? '') . '" class="' . implode(' ', $this->tb->theme('table_class')) . '">' . "\n";
                 $this->element .= ($show_table_thead) ? $this->tableGridElements($status) : false;
                 $this->element .= '<tbody>' . "\n";
                 foreach ($this->dataOptions as $row) {
@@ -108,12 +118,10 @@ class Datatable extends AbstractDatatable
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
                             //$this->element .= '<div id="toggle-custom">';
-
-                            
                             if (is_callable($column['formatter'])) {
                                 $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                             } else {
-                                $this->element .= (isset($row[$column['db_row']]) ? $row[$column['db_row']] : '');
+                                $this->element .= ($row[$column['db_row']] ?? '');
                             }
                             //$this->element .= '</div>';
                             $this->element .= '</td>' . "\n";
@@ -181,8 +189,7 @@ class Datatable extends AbstractDatatable
      */
     public function previousPaging(string $status, mixed $queryStatus): string
     {
-        $element = '';
-        $element .= '<li class="' . ($this->currentPage == 1 ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
+        $element = '<li class="' . ($this->currentPage == 1 ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
         if ($this->currentPage == 1) {
             $element .= sprintf(
                 '<a href="%s">',
@@ -212,8 +219,7 @@ class Datatable extends AbstractDatatable
      */
     public function nextPaging(string $status, mixed $queryStatus): string
     {
-        $element = '';
-        $element .= '<li class="' . ($this->currentPage == $this->totalPages ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
+        $element = '<li class="' . ($this->currentPage == $this->totalPages ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
         if ($this->currentPage == $this->totalPages) {
             $element .= sprintf(
                 '<a href="%s">',
@@ -241,7 +247,7 @@ class Datatable extends AbstractDatatable
      */
     public function getQueriedStatus(): string
     {
-        return (isset($this->sortController['query']) ? $this->sortController['query'] : '');
+        return ($this->sortController['query'] ?? '');
     }
 
     /**
@@ -252,7 +258,7 @@ class Datatable extends AbstractDatatable
     public function getStatus(): mixed
     {
         $statusQueried = $this->getQueriedStatus();
-        return (isset($_GET[$statusQueried]) ? $_GET[$statusQueried] : '');
+        return ($_GET[$statusQueried] ?? '');
     }
 
     /**
@@ -262,7 +268,7 @@ class Datatable extends AbstractDatatable
      */
     public function getCurrentPage(): int|false
     {
-        return (isset($this->currentPage) ? $this->currentPage : false);
+        return ($this->currentPage ?? false);
     }
 
     /**
@@ -272,7 +278,7 @@ class Datatable extends AbstractDatatable
      */
     public function getTotalPages(): int|false
     {
-        return (isset($this->totalPages) ? $this->totalPages : false);
+        return ($this->totalPages ?? false);
     }
 
     /**
@@ -282,7 +288,7 @@ class Datatable extends AbstractDatatable
      */
     public function getTotalRecords(): int|false
     {
-        return (isset($this->totalRecords) ? $this->totalRecords : false);
+        return ($this->totalRecords ?? false);
     }
 
     public function pagination(): string

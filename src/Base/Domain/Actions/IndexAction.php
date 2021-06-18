@@ -18,7 +18,7 @@ use MagmaCore\Base\Domain\DomainTraits;
 /**
  * Class which handles the domain logic when adding a new item to the database
  * items are sanitize and validated before persisting to database. The class will 
- * also diaptched any validation error before persistence. The logic also implements
+ * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
@@ -27,6 +27,10 @@ class IndexAction implements DomainActionLogicInterface
 
     use DomainTraits;
 
+    private object $controller;
+    private string $method;
+    private ?string $schema;
+
     /** @return void - not currently being used */
     public function __construct()
     {
@@ -34,19 +38,21 @@ class IndexAction implements DomainActionLogicInterface
 
     /**
      * execute logic for adding new items to the database()
-     * 
+     *
      * @param Object $controller - The controller object implementing this object
-     * @param string $eventDispatcher - the eventDispatcher for the current object
-     * @param string $objectSchema
+     * @param string|null $entityObject
+     * @param string|null $eventDispatcher - the eventDispatcher for the current object
+     * @param string|null $objectSchema
      * @param string $method - the name of the method within the current controller object
+     * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return void
+     * @return IndexAction
      */
     public function execute(
-        Object $controller,
-        string|null $entityObject = null,
-        string|null $eventDispatcher = null,
-        string|null $objectSchema = null,
+        object $controller,
+        ?string $entityObject,
+        ?string $eventDispatcher,
+        ?string $objectSchema,
         string $method,
         array $rules = [],
         array $additionalContext = []
@@ -78,4 +84,5 @@ class IndexAction implements DomainActionLogicInterface
         if ($this->tableData)
             return $this;
     }
+
 }

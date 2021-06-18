@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\QueryBuilder;
 
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilderInterface;
 
 class QueryBuilderFactory
 {

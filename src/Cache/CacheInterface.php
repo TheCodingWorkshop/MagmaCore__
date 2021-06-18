@@ -36,16 +36,15 @@ interface CacheInterface
     /**
      * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
      *
-     * @param string                 $key   The key of the item to store.
-     * @param mixed                  $value The value of the item to store. Must be serializable.
-     * @param null|int|\DateInterval $ttl   Optional. The TTL value of this item. If no value is sent and
+     * @param string $key The key of the item to store.
+     * @param mixed $value The value of the item to store. Must be serializable.
+     * @param int|null $ttl Optional. The TTL value of this item. If no value is sent and
      *                                      the driver supports TTL then the library may set a default value
      *                                      for it or let the driver take care of that.
      *
      * @return bool True on success and false on failure.
      *
-     * @throws CacheRepositoryInvalidArgumentException
-     *   MUST be thrown if the $key string is not a legal value.
+     * @throws CacheRepositoryInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
     public function set(string $key, mixed $value, int|null $ttl = null): bool;
 
@@ -83,15 +82,14 @@ interface CacheInterface
     /**
      * Persists a set of key => value pairs in the cache, with an optional TTL.
      *
-     * @param iterable               $values A list of key => value pairs for a multiple-set operation.
-     * @param null|int|\DateInterval $ttl    Optional. The TTL value of this item. If no value is sent and
+     * @param iterable $values A list of key => value pairs for a multiple-set operation.
+     * @param int|null $ttl Optional. The TTL value of this item. If no value is sent and
      *                                       the driver supports TTL then the library may set a default value
      *                                       for it or let the driver take care of that.
      *
      * @return bool True on success and false on failure.
      *
-     * @throws CacheRepositoryInvalidArgumentException
-     *   MUST be thrown if $values is neither an array nor a Traversable,
+     * @throws CacheRepositoryInvalidArgumentException MUST be thrown if $values is neither an array nor a Traversable,
      *   or if any of the $values are not a legal value.
      */
     public function setMultiple(iterable $values, int|null $ttl = null): bool;

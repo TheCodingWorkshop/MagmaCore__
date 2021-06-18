@@ -12,11 +12,11 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer;
 
 use MagmaCore\DataObjectLayer\DataMapper\DataMapperFactory;
+use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverFactory;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerFactory;
 use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilderFactory;
 use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilder;
 use MagmaCore\DataObjectLayer\EntityManager\Crud;
-use MagmaCore\DataObjectLayer\DataLayerEnvironment;
 
 class DataLayerFactory
 {
@@ -35,7 +35,6 @@ class DataLayerFactory
      * @param DataLayerEnvironment $environment
      * @param string $tableSchema
      * @param string $tableSchemaID
-     * @param array|null $options
      */
     public function __construct(DataLayerEnvironment $environment, string $tableSchema, string $tableSchemaID)
     {
@@ -54,7 +53,7 @@ class DataLayerFactory
     {
         /* build the data mapper factory object */
         $dataMapperFactory = new DataMapperFactory();
-        $dataMapper = $dataMapperFactory->create(\MagmaCore\DataObjectLayer\Drivers\DatabaseDriverFactory::class, $this->environment);
+        $dataMapper = $dataMapperFactory->create(DatabaseDriverFactory::class, $this->environment);
         if ($dataMapper) {
             /* build the query builder factory object */
             $queryBuilderFactory = new QueryBuilderFactory();

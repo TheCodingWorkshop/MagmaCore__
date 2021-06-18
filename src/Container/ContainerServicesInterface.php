@@ -33,14 +33,14 @@ interface ContainerServicesInterface
 
     /**
      * Unregister a service from being instantiable
-     * 
+     *
      * @param array $args - optional argument
-     * @return void;
+     * @return ContainerServicesInterface ;
      */
     public function unregister(array $args = []): self;
 
     /**
-     * Register service or services with autowiring
+     * Register service or services with auto-wiring
      *
      * @return void
      */

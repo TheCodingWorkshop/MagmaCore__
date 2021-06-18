@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Type;
 
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\FormBuilder\FormBuilderTypeInterface;
 use MagmaCore\FormBuilder\FormBuilderTrait;
 
@@ -28,7 +29,7 @@ class TextareaType implements FormBuilderTypeInterface
     /** @var array returns an array of form settings */
     protected array $settings = [];
     /** @var mixed */
-    protected $options = null;
+    protected mixed $options = null;
     /** @var array returns an array of default options set */
     protected array $baseOptions = [];
 
@@ -36,10 +37,10 @@ class TextareaType implements FormBuilderTypeInterface
      * @inheritdoc
      *
      * @param array $fields
-     * @param mixed $options
+     * @param mixed|null $options
      * @param array $settings
      */
-    public function __construct(array $fields, $options = null, array $settings = [])
+    #[Pure] public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         $this->fields = $fields;
         $this->options = ($options !=null) ? $options : null;
@@ -77,12 +78,12 @@ class TextareaType implements FormBuilderTypeInterface
      * Options which are defined for this object type
      * Pass the default array to the parent::configureOptions to merge together
      *
-     * @param array $extensionOptions
+     * @param array $options
      * @return void
      */
-    public function configureOptions(array $extensionOptions = []): void
+    public function configureOptions(array $options = []): void
     {
-        $defaultWithExtensionOptions = (!empty($extensionOptions) ? array_merge($this->baseOptions, $extensionOptions) : $this->baseOptions);
+        $defaultWithExtensionOptions = (!empty($options) ? array_merge($this->baseOptions, $options) : $this->baseOptions);
         if ($this->fields) {
             $this->throwExceptionOnBadInvalidKeys(
                 $this->fields, 
@@ -140,7 +141,7 @@ class TextareaType implements FormBuilderTypeInterface
      * 
      * @return mixed - return the filtered or unfiltered string
      */
-    public function filtering()
+    #[Pure] public function filtering(): string
     {
         return  $this->renderHtmlElement($this->attr);
     }
@@ -148,9 +149,9 @@ class TextareaType implements FormBuilderTypeInterface
     /**
      * Render the form view to the builder method within the base class
      *
-     * @return string|mixed
+     * @return string
      */
-    public function view()
+    public function view(): string
     { 
         return sprintf('<textarea %s>%s</textarea>', $this->filtering(), $this->options);
     }

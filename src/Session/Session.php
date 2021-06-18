@@ -14,28 +14,26 @@ namespace MagmaCore\Session;
 
 use MagmaCore\Session\Exception\SessionException;
 use MagmaCore\Session\Exception\SessionInvalidArgumentException;
-use MagmaCore\Session\SessionInterface;
 use MagmaCore\Session\Storage\SessionStorageInterface;
 use Throwable;
 
 class Session implements SessionInterface
 {
 
-    /** @var SessionStorageInterface */
-    protected SessionStorageInterface $storage;
+    /** @var SessionStorageInterface|null */
+    protected ?SessionStorageInterface $storage;
 
     /** @var string */
     protected string $sessionIdentifier;
 
-    /** @var const */
+    /** @var string */
     protected const SESSION_PATTERN = '/^[a-zA-Z0-9_\.]{1,64}$/';
 
     /**
      * Class constructor
      *
      * @param string $sessionIdentifier
-     * @param SessionStorageInterface $storage
-     * @throws SessionInvalidArgumentException
+     * @param SessionStorageInterface|null $storage
      */
     public function __construct(string $sessionIdentifier, SessionStorageInterface $storage = null)
     {
@@ -47,7 +45,7 @@ class Session implements SessionInterface
         $this->storage = $storage;
     }
 
-    public function getStorage()
+    public function getStorage(): ?SessionStorageInterface
     {
         return $this->storage;
     }
@@ -60,7 +58,7 @@ class Session implements SessionInterface
      * @return void
      * @throws SessionException
      */
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         $this->ensureSessionKeyIsValid($key);
         try {
@@ -78,7 +76,7 @@ class Session implements SessionInterface
      * @return void
      * @throws SessionException
      */
-    public function setArray(string $key, $value): void
+    public function setArray(string $key, mixed $value): void
     {
         $this->ensureSessionKeyIsValid($key);
         try {
@@ -92,11 +90,11 @@ class Session implements SessionInterface
      * @inheritdoc
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed|null $default
      * @return void
-     * @throws SessionException
+     * @throws SessionException|Throwable
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         try {
             return $this->storage->getSession($key, $default);
@@ -110,7 +108,7 @@ class Session implements SessionInterface
      *
      * @param string $key
      * @return boolean
-     * @throws SessionException
+     * @throws SessionException|Throwable
      */
     public function delete(string $key): bool
     {
@@ -138,10 +136,10 @@ class Session implements SessionInterface
      *
      * @param string $key
      * @param [type] $value
-     * @return void
-     * @throws SessionException
+     * @return mixed
+     * @throws SessionException|Throwable
      */
-    public function flush(string $key, $value = null)
+    public function flush(string $key, $value = null): mixed
     {
         $this->ensureSessionKeyIsValid($key);
         try {
@@ -156,7 +154,7 @@ class Session implements SessionInterface
      *
      * @param string $key
      * @return boolean
-     * @throws SessiopnInvalidArgumentException
+     * @throws SessionInvalidArgumentException
      */
     public function has(string $key): bool
     {

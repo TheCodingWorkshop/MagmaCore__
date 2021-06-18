@@ -13,14 +13,12 @@ declare(strict_types=1);
 namespace MagmaCore\DataSchema;
 
 use MagmaCore\DataSchema\Traits\DataSchemaTrait;
-use MagmaCore\DataSchema\AbstractDataSchema;
-use MagmaCore\DataSchema\DataSchemaBlueprint;
 use MagmaCore\DataSchema\Exception\DataSchemaUnexpectedValueException;
 
 class DataSchema extends AbstractDataSchema
 {
 
-    /** @var traits */
+    /** @var DataSchemaTrait */
     use DataSchemaTrait;
 
     /** @var array - contains an array of schema type objects */
@@ -40,15 +38,14 @@ class DataSchema extends AbstractDataSchema
     protected const ADD = 'add';
     protected const CHANGE = 'change';
     protected const DROP = 'drop';
+    private object $dataModel;
 
     /**
      * Main class constructor
-     *
-     * @param DataSchemaBlueprint $blueprint
-     * @return void
      */
     public function __construct()
     {
+        parent::__construct();
     }
 
     /**
@@ -92,7 +89,7 @@ class DataSchema extends AbstractDataSchema
     public function row(mixed $args = null): static
     {
         if (is_array($args)) {
-            $args = (array)$args;
+            $args = $args;
             foreach ($args as $schemaObjectType => $schemaObjectOptions) {
                 $newSchemaObject = new $schemaObjectType($schemaObjectOptions);
                 if (!$newSchemaObject instanceof DataSchemaTypeInterface) {
@@ -121,7 +118,7 @@ class DataSchema extends AbstractDataSchema
             foreach ($this->schemaObject as $schema) {
                 $this->element .= $bt4 . $schema->render() . $eol;
             }
-            if (is_callable($callback) && $callback !==null) {
+            if (is_callable($callback)) {
                 $this->element .= $bt4 . call_user_func_array($callback, [$this]) . $eol;
             }
             $this->element .= $bt3 . ')' . $eol;
@@ -141,6 +138,7 @@ class DataSchema extends AbstractDataSchema
      * table. It can also be used drop and add constraints on an existing
      * table as well
      *
+     * @param string $type
      * @param Callable $callback
      * @return string
      */
@@ -196,16 +194,16 @@ class DataSchema extends AbstractDataSchema
      */
     public function dropColumn(string $columnName): string
     {
-        $this->dropColumn = $columnName;
-        return $this->dropColumn;
+        $dropColumn = $columnName;
+        return $dropColumn;
     }
 
     /**
      * Modify an existing column datatype or column constraints
      *
-     * @return void
+     * @return string
      */
-    public function modifyColumn()
+    public function modifyColumn(): string
     {
         return $this->addColumn();
     }

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie\Store;
 
+use JetBrains\PhpStorm\Pure;
+
 class NativeCookieStore extends AbstractCookieStore
 {
 
@@ -20,7 +22,7 @@ class NativeCookieStore extends AbstractCookieStore
      *
      * @param Object $cookieEnvironment
      */
-    public function __construct(Object $cookieEnvironment)
+    #[Pure] public function __construct(Object $cookieEnvironment)
     {
         parent::__construct($cookieEnvironment);
     }

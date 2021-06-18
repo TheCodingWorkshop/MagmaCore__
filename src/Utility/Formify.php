@@ -14,7 +14,7 @@ namespace MagmaCore\Utility;
 class Formify
 {
 
-    public function referrer()
+    public function referrer(): string
     {
         return '<input type="hidden" name="referredby" id="referredby" value="' . $_SERVER['HTTP_REFERER'] . '">';
     }
@@ -24,9 +24,9 @@ class Formify
      *
      * @param [type] $checked
      * @param [type] $current
-     * @return boolean
+     * @return string
      */
-    public function isChecked($checked, $current)
+    public function isChecked($checked, $current): string
     {   
         if ($checked == $current)
             return ' checked="checked"';
@@ -35,11 +35,11 @@ class Formify
     /**
      * Undocumented function
      *
-     * @param [type] $selected
-     * @param [type] $current
-     * @return boolean
+     * @param $selected
+     * @param $current
+     * @return bool|string
      */
-    public function isSelected($selected, $current)
+    public function isSelected($selected, $current): bool|string
     {
         if ($selected == $current)
             return ' selected="selected"';

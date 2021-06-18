@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\Fillable\Faker;
 
 use MagmaCore\Utility\PasswordEncoder;
-use MagmaCore\Fillable\Faker\Generator;
 use MagmaCore\Utility\RandomCharGenerator;
 use MagmaCore\Fillable\Exception\FillableNoValueException;
 use MagmaCore\Fillable\Exception\FillableInvalidArgumentException;
@@ -27,8 +26,6 @@ class Faker
     private string $_lastname;
     /** @var string $_name - placeholder variable */
     private string $_name;
-    /** @var string $_email - placeholder variable */
-    private string $_email;
 
     /** @var string $firstname - generate a random firstname string */
     public string $firstname;
@@ -100,11 +97,11 @@ class Faker
      * exception if the faker badge type is not supported
      *
      * @param string $type
-     * @return mixed
+     * @return string|array
      * @throws FillableInvalidArgumentException
      * @throws FillableNoValueException
      */
-    public function string(string $type): mixed
+    public function string(string $type): string|array
     {
         if (!in_array($type, self::SUPPORT_BADGE)) {
             throw new FillableInvalidArgumentException('You have pass and invalid faker badge ' . $type . ' Please choose from ' . implode(',', self::SUPPORT_BADGE));
@@ -120,7 +117,7 @@ class Faker
                     break;
                 case 'name':
                     /* 
-                        if firstname and lastname is set we can concat both values togther to
+                        if firstname and lastname is set we can concat both values together to
                         get a full name string 
                     */
                     if (isset($this->_firstname) && isset($this->_lastname)) {
@@ -137,12 +134,12 @@ class Faker
                     break;
                 case 'email':
                     if (!isset($this->_firstname) && !isset($this->_lastname) || !isset($this->_name)) {
-                        $this->_email = Generator::FIRSTNAME[$this->randomizer(Generator::FIRSTNAME)];
-                        $this->_email .= Generator::LASTNAME[$this->randomizer(Generator::LASTNAME)];
+                        $_email = Generator::FIRSTNAME[$this->randomizer(Generator::FIRSTNAME)];
+                        $_email .= Generator::LASTNAME[$this->randomizer(Generator::LASTNAME)];
 
-                        return str_replace(' ', $this->randomDelimiter(Generator::DELIMITER), $this->_email . Generator::EMAIL[rand(0, count(Generator::EMAIL) - 1)]);
+                        return str_replace(' ', $this->randomDelimiter(), $_email . Generator::EMAIL[rand(0, count(Generator::EMAIL) - 1)]);
                     } else {
-                        return str_replace(' ', $this->randomDelimiter(Generator::DELIMITER), $this->_name . Generator::EMAIL[rand(0, count(Generator::EMAIL) - 1)]);
+                        return str_replace(' ', $this->randomDelimiter(), $this->_name . Generator::EMAIL[rand(0, count(Generator::EMAIL) - 1)]);
                     }
                     break;
                 case 'remoteIP':
@@ -163,7 +160,7 @@ class Faker
         if (empty($value)) {
             throw new FillableNoValueException('Please specify the argument for this method ' . __METHOD__ . ' You can specify a string value or an array which will be randomize.');
         }
-        if (is_string($value) && !is_null($value)) {
+        if (is_string($value)) {
             return $value;
         } else {
             if (is_array($value) && count($value) > 0) {
@@ -173,9 +170,9 @@ class Faker
     }
 
     /**
-     * Generate a random fake password. Using the framework build in ramdom character 
+     * Generate a random fake password. Using the framework build in random character
      * generator class. Or a string can be pass to the method to generate. There is also
-     * an optional flag for hashing the fake password before psersisting to the database
+     * an optional flag for hashing the fake password before persisting to the database
      * this flag can be set to false to insert a raw password. Password are hash by default
      *
      * @param string|null $password
@@ -185,6 +182,7 @@ class Faker
      */
     public function fakePassword(string|null $password = null, int $length = 8, bool $hash = true): string
     {
+        $result = '';
         $pass = ($password !== null) ? $password : RandomCharGenerator::generate($length);
         if ($pass) {
             if ($hash) {
@@ -201,9 +199,9 @@ class Faker
      *
      * @param integer $min
      * @param integer $max
-     * @return void
+     * @return string
      */
-    public function phoneNumber(int $min = 7, int $max = 8)
+    public function phoneNumber(int $min = 7, int $max = 8): string
     {
         return Generator::PHONE_NUMBER[$this->randomizer(Generator::PHONE_NUMBER)] . RandomCharGenerator::randomNumberGenerator($min, $max);
     }

@@ -19,12 +19,16 @@ abstract class Singleton
      * array, because we'll allow our Singleton to have subclasses. Each item in
      * this array will be an instance of a specific Singleton's subclass.
      */
-    private static $instance = [];
+    private static array $instance = [];
 
     /**
      * Cloning and unserialization are not permitted for singletons
      */
     protected final function __clone(){}
+
+    /**
+     * @throws \Exception
+     */
     protected final function __wakeup()
     { 
         throw new \Exception("Cannot unserialize a singleton.");

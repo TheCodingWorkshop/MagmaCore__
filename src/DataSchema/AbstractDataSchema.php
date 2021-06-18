@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataSchema;
 
-use MagmaCore\DataSchema\DataSchemaInterface;
 use MagmaCore\DataSchema\Exception\DataSchemaInvalidArgumentException;
-use MagmaCore\DataObjectSchema\Exception\DataObjectSchemaInvalidArgumentException;
 
 abstract class AbstractDataSchema implements DataSchemaInterface
 {
@@ -26,6 +24,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
         'charset' => 'utf8mb4',
         'row_format' => 'dynamic'
     ];
+    private array $schemaAttr;
 
     /**
      * Main constructor method
@@ -42,7 +41,7 @@ abstract class AbstractDataSchema implements DataSchemaInterface
      * @param mixed $key
      * @return boolean
      */
-    protected function isEmptyThrowException($key)
+    protected function isEmptyThrowException(mixed $key): bool
     {
         if (empty($key)) {
             throw new DataSchemaInvalidArgumentException('Invalid or empty schema. Ensure the schema is not empty and is valid.');
@@ -55,9 +54,9 @@ abstract class AbstractDataSchema implements DataSchemaInterface
      * @param string $key
      * @param mixed $value
      * @return bool
-     * @throws DataObjectSchemaInvalidArgumentException
+     * @throws DataSchemaInvalidArgumentException
      */
-    protected function validateSchema(string $key, $value) : bool
+    protected function validateSchema(string $key, mixed $value) : bool
     {
         $this->isEmptyThrowException($key);
         switch ($key) {

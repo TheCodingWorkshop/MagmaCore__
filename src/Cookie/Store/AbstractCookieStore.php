@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie\Store;
 
-use MagmaCore\Cookie\Store\CookieStoreInterface;
-
 abstract class AbstractCookieStore implements CookieStoreInterface
 {
 

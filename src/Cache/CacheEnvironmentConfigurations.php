@@ -15,10 +15,10 @@ namespace MagmaCore\Cache;
 class CacheEnvironmentConfigurations
 {
 
-    /** @var string */
-    protected string $cacheIdentifier;
-    /** @var string */
-    protected string $fileCacheBasePath;
+    /** @var string|null */
+    protected ?string $cacheIdentifier;
+    /** @var string|null */
+    protected ?string $fileCacheBasePath;
     /** @var int */
     protected int $maximumPathLength;
 
@@ -26,13 +26,12 @@ class CacheEnvironmentConfigurations
      * Undocumented function
      *
      * @param string|null $cacheIdentifier
-     * @param string $fileCacheBasePath
+     * @param string|null $fileCacheBasePath
      * @param integer $maximumPathLength
-     * @return void
      */
     public function __construct(
-        ?string $cacheIdentifier = null,
-        string $fileCacheBasePath,
+        ?string $cacheIdentifier,
+        ?string $fileCacheBasePath,
         int $maximumPathLength = PHP_MAXPATHLEN
     ) {
         $this->cacheIdentifier = $cacheIdentifier;

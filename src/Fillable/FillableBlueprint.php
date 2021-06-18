@@ -13,12 +13,11 @@ declare(strict_types=1);
 namespace MagmaCore\Fillable;
 
 use MagmaCore\Fillable\Faker\Faker;
-use MagmaCore\Fillable\FillableBlueprintInterface;
 
 class FillableBlueprint implements FillableBlueprintInterface
 {
 
-    private $faker;
+    private Faker $faker;
 
     public function __construct(Faker $faker)
     {

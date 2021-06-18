@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Type;
 
+use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\FormBuilder\FormBuilderTypeInterface;
 use MagmaCore\FormBuilder\FormBuilderTrait;
 
@@ -28,18 +29,16 @@ class RadioType implements FormBuilderTypeInterface
     /** @var array returns an array of form settings */
     protected array $settings = [];
     /** @var mixed */
-    protected $options = null;
+    protected mixed $options = null;
     /** @var array returns an array of default options set */
     protected array $baseOptions = [];
 
     /**
-     * @inheritdoc
-     *
      * @param array $fields
-     * @param mixed $options
+     * @param mixed|null $options
      * @param array $settings
      */
-    public function __construct(array $fields, $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         $this->fields = $this->filterArray($fields);
         $this->options = ($options !=null) ? $options : null;
@@ -54,12 +53,12 @@ class RadioType implements FormBuilderTypeInterface
      *
      * @return array
      */
-    public function getBaseOptions() : array
+    #[ArrayShape(['type' => "string", 'name' => "string", 'id' => "mixed|string", 'class' => "string[]", 'value' => "string"])] public function getBaseOptions() : array
     {
         return [
             'type' => 'radio',
             'name' => '',
-            'id' => (isset($this->fields['name']) ? $this->fields['name'] : ''),
+            'id' => ($this->fields['name'] ?? ''),
             'class' => ['uk-radio'],
             'value' => ''
         ];
@@ -69,12 +68,12 @@ class RadioType implements FormBuilderTypeInterface
      * Options which are defined for this object type
      * Pass the default array to the parent::configureOptions to merge together
      *
-     * @param array $extensionOptions
+     * @param array $options
      * @return void
      */
-    public function configureOptions(array $extensionOptions = []): void
+    public function configureOptions(array $options = []): void
     {
-        $defaultWithExtensionOptions = (!empty($extensionOptions) ? array_merge($this->baseOptions, $extensionOptions) : $this->baseOptions);
+        $defaultWithExtensionOptions = (!empty($options) ? array_merge($this->baseOptions, $options) : $this->baseOptions);
         if ($this->fields) {
             $this->throwExceptionOnBadInvalidKeys(
                 $this->fields, 
@@ -129,10 +128,10 @@ class RadioType implements FormBuilderTypeInterface
      * there are cases where a tag is not required or valid within a
      * particular input/field. So we can filter it out here before being sent
      * back to the controller class
-     * 
-     * @return mixed - return the filtered or unfiltered string
+     *
+     * @return string - return the filtered or unfiltered string
      */
-    public function filtering()
+    public function filtering(): string
     {
         return $this->renderInputOptions($this->attr, $this->options);
     }
@@ -140,9 +139,9 @@ class RadioType implements FormBuilderTypeInterface
     /**
      * Render the form view to the builder method within the base class
      *
-     * @return string|mixed
+     * @return string
      */
-    public function view()
+    public function view(): string
     { 
         return sprintf('%s', $this->filtering());    
     }

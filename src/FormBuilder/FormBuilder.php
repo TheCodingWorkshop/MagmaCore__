@@ -11,13 +11,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
+use Exception;
 use Throwable;
 use MagmaCore\Error\Error;
 use ParagonIE\AntiCSRF\AntiCSRF;
 use MagmaCore\Http\RequestHandler;
 use MagmaCore\Session\SessionTrait;
-use MagmaCore\FormBuilder\FormBuilderTrait;
-use MagmaCore\FormBuilder\AbstractFormBuilder;
 use MagmaCore\FormBuilder\Traits\FormalizerTrait;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
@@ -51,7 +50,7 @@ class FormBuilder extends AbstractFormBuilder
      * Undocumented function
      *
      * @param array $args
-     * @return void
+     * @return FormBuilder
      */
     public function form(array $args = []) : self
     {
@@ -94,13 +93,15 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
-     * This methods get chain at the very end after each add() method. And will attemp to build
+     * This methods get chain at the very end after each add() method. And will attempt to build
      * the required input based on each add() method arguments. Theres an option to have
-     * HTML elemets wrap around each input tag for better styling of each element
+     * HTML elements wrap around each input tag for better styling of each element
      *
-     * @return mixed
+     * @param array $args
+     * @return string|bool
+     * @throws Exception
      */
-    public function build(?array $args = null)
+    public function build(array $args = []): string|bool
     { 
         if ($args) {
             $this->htmlAttr = array_merge(self::HTML_ELEMENT_PARTS, $args);
@@ -134,11 +135,11 @@ class FormBuilder extends AbstractFormBuilder
      * Undocumented function
      *
      * @param Object $objectType
-     * @return void
+     * @return string
      */
     private function processFormFields(Object $objectType) : string
     {
-        $html = '';
+        $html = $container = $before = $after = $show_label = $element_class =  $new_label = '';
         foreach (self::SUPPORT_INPUT_TYPES as $field) :    
             switch ($objectType->getType()) :
                 case $field :
@@ -162,7 +163,7 @@ class FormBuilder extends AbstractFormBuilder
                             $html .= ($show_label === true) ? $this->formLabel($objectType->getOptions(), '', $new_label) : '';
 
                             if (!empty($description) && in_array('uk-form-stacked', $this->formAttr['class'])) {
-                                $html .= "<div class=\"uk-text-meta uk-text-truncate uk-margin-small-bottom\">{$description}</div>";
+                                $html .= "<div class=\"uk-text-meta uk-margin-small-bottom\">{$description}</div>";
                             }
                             $inline_icon_class = '';
                             /* If we are adding inline icon to the element lets add the class for it */
@@ -208,6 +209,7 @@ class FormBuilder extends AbstractFormBuilder
      *
      * @param string $submit
      * @return boolean
+     * @throws Throwable
      */
     public function isFormValid(string $submit): bool
     {
@@ -234,10 +236,11 @@ class FormBuilder extends AbstractFormBuilder
 
     /**
      * @return array
+     * @throws Throwable
      */
     public function canHandleRequest() : array
     { 
-        $method = (isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '');
+        $method = ($_SERVER['REQUEST_METHOD'] ?? '');
         if ($method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
             if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
                 $method == 'DELETE';
@@ -282,6 +285,9 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     public function getMethod(string $method) : string
     {
         list($_method, $_post, $_json) = $this->canHandleRequest();
@@ -290,32 +296,31 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     public function getJson()
     {
         list($_method, $_post, $_json) = $this->canHandleRequest();
-        if ($_json) {
-            return $_json;
-        }
+        return $_json;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function getData() : array
     {
         list($_method, $_post, $_json) = $this->canHandleRequest();
-        if ($_post) {
-            return $_post;
-        }
+        return $_post;
 
     }
 
     /**
      * @return boolean
      */
-    public function isAjax()
+    public function isAjax(): bool
     {
-        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-        if ($isAjax) {
-            return $isAjax;
-        }
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
     
     /**
@@ -333,10 +338,11 @@ class FormBuilder extends AbstractFormBuilder
     /**
      * Instantiate the external csrf fields
      *
-     * @param mixed $lock
-     * @return bool
+     * @param mixed|null $lock
+     * @return string
+     * @throws Exception
      */
-    public function csrfForm($lock = null)
+    public function csrfForm(mixed $lock = null): string
     { 
         static $addCsrf;
         if ($addCsrf === null) {
@@ -352,7 +358,7 @@ class FormBuilder extends AbstractFormBuilder
      *
      * @return bool
      */
-    public function csrfValidate()
+    public function csrfValidate(): bool
     { 
         $addCsrf = new AntiCSRF();
         return $addCsrf->validateRequest();

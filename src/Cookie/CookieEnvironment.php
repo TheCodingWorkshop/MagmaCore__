@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
 
+use JetBrains\PhpStorm\Pure;
+use LogicException;
+
 class CookieEnvironment
 {
-
-    /** @var string - the current stable cookie version */
-    protected const COOKIE_VERSION = '1.0.0';
 
     /** @var array */
     protected array $cookieConfig;
@@ -30,7 +30,7 @@ class CookieEnvironment
     public function __construct(array $cookieConfig)
     {
         if (count($cookieConfig) < 0 || !is_array($cookieConfig)) {
-            throw new \LogicException('Session environment has failed to load. Ensure your are passing the correct yaml configuration file to the session facade class object');
+            throw new LogicException('Session environment has failed to load. Ensure your are passing the correct yaml configuration file to the session facade class object');
         }
         $this->cookieConfig = $cookieConfig;
     }
@@ -61,12 +61,9 @@ class CookieEnvironment
      * 
      * @return int
      */
-    public function getExpiration(): int
+    #[Pure] public function getExpiration(): int
     {
-        $expires = (isset($this->getConfig()['expires']) ? filter_var($this->getConfig()['expires'], FILTER_VALIDATE_INT) : 0);
-        if ($expires) {
-            return $expires;
-        }
+        return (isset($this->getConfig()['expires']) ? filter_var($this->getConfig()['expires'], FILTER_VALIDATE_INT) : 0);
     }
 
     /**
@@ -78,12 +75,9 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getPath(): string
+    #[Pure] public function getPath(): string
     {
-        $path = (isset($this->getConfig()['path']) ? filter_var($this->getConfig()['path'], FILTER_SANITIZE_STRING) : '/');
-        if ($path) {
-            return $path;
-        }
+        return (isset($this->getConfig()['path']) ? filter_var($this->getConfig()['path'], FILTER_SANITIZE_STRING) : '/');
     }
 
     /**
@@ -95,12 +89,9 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getDomain(): string
+    #[Pure] public function getDomain(): string
     {
-        $domain = (isset($this->getConfig()['domain']) ? $this->getConfig()['domain'] : isset($_SERVER['SERVER_NAME']));
-        if ($domain) {
-            return $domain;
-        }
+        return ($this->getConfig()['domain'] ?? $_SERVER['SERVER_NAME']);
     }
 
     /**
@@ -111,29 +102,23 @@ class CookieEnvironment
      * 
      * @return bool
      */
-    public function isSecure(): bool
+    #[Pure] public function isSecure(): bool
     {
-        $isSecure = (isset($this->getConfig()['secure']) ? $this->getConfig()['secure'] : isset($_SERVER['HTTPS']));
-        if (is_bool($isSecure)) {
-            return $isSecure;
-        }
+        return ($this->getConfig()['secure'] ?? isset($_SERVER['HTTPS']));
     }
 
     /**
-     * When TRUE the cookie will be made accessible only through the HTTP protocol. 
-     * This means that the cookie won't be accessible by scripting languages, 
-     * such as JavaScript. It has been suggested that this setting can effectively 
-     * help to reduce identity theft through XSS attacks (although it is not supported 
+     * When TRUE the cookie will be made accessible only through the HTTP protocol.
+     * This means that the cookie won't be accessible by scripting languages,
+     * such as JavaScript. It has been suggested that this setting can effectively
+     * help to reduce identity theft through XSS attacks (although it is not supported
      * by all browsers), but that claim is often disputed. TRUE or FALSE
-     * 
-     * @return null|bool
+     *
+     * @return bool
      */
-    public function isHttpOnly(): bool
+    #[Pure] public function isHttpOnly(): bool
     {
-        $isHttpOnly = (isset($this->getConfig()['httpOnly']) ? $this->getConfig()['httpOnly'] : true);
-        if (is_bool($isHttpOnly)) {
-            return $isHttpOnly;
-        }
+        return ($this->getConfig()['httpOnly'] ?? true);
     }
 
     /**
@@ -141,11 +126,8 @@ class CookieEnvironment
      * 
      * @return string
      */
-    public function getCookieName(): string
+    #[Pure] public function getCookieName(): string
     {
-        $cookieName = (isset($this->getConfig()['name']) ? $this->getConfig()['name'] : '');
-        if ($cookieName) {
-            return $cookieName;
-        }
+        return ($this->getConfig()['name'] ?? '');
     }
 }

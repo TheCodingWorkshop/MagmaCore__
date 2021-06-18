@@ -48,12 +48,8 @@ trait DataSchemaTypesTrait
                     throw new DataSchemaInvalidArgumentException('');
                 }
                 break;
-            case 'auto_increment':
-                if (!is_bool($value)) {
-                    throw new DataSchemaInvalidArgumentException('');
-                }
-                break;
             case 'null':
+            case 'auto_increment':
                 if (!is_bool($value)) {
                     throw new DataSchemaInvalidArgumentException('');
                 }
@@ -93,36 +89,28 @@ trait DataSchemaTypesTrait
         return (isset($auto_increment) && $auto_increment === true) ? ' AUTO_INCREMENT' : '';
     }
 
-    public function _attributes()
+    public function _attributes(): string
     {
         extract($this->getRow());
         return (isset($attributes) && $attributes !== '') ? ' ' . strtoupper($attributes) . ' ' : '';
     }
 
-    public function _null()
+    public function _null(): string
     {
         extract($this->getRow());
         return (isset($null) && $null === false) ? ' NOT NULL' : '';
     }
 
-    public function _default()
+    public function _default(): string
     {
         extract($this->getRow());
         if (isset($default)) {
-            switch ($default) {
-                case 'none':
-                    return '';
-                    break;
-                case 'null':
-                    return ' DEFAULT NULL';
-                    break;
-                case 'ct':
-                    return ' DEFAULT CURRENT_TIMESTAMP';
-                    break;
-                default:
-                    return ' DEFAULT ' . $default;
-                    break;
-            }
+            return match ($default) {
+                'none' => '',
+                'null' => ' DEFAULT NULL',
+                'ct' => ' DEFAULT CURRENT_TIMESTAMP',
+                default => ' DEFAULT ' . $default,
+            };
         }
     }
 }

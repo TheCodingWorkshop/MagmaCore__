@@ -14,6 +14,6 @@ namespace MagmaCore\Themes\Exception;
 
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
-class ThemeBuilderInvalidArgumentException implements BaseInvalidArgumentException
+class ThemeBuilderInvalidArgumentException extends BaseInvalidArgumentException
 {
 }

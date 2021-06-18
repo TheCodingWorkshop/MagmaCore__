@@ -16,12 +16,12 @@ class Convert
     /** @var array - units */
     protected array $units = ['b','kb','mb','gb','tb','pb'];
     
-    public function bytes(int $size)
+    public function bytes(int $size): string
     {
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '. $this->unit[$i];
     }
 
-    public static function timeFormat($time, $short = false)
+    public static function timeFormat($time, $short = false): string
     {
         $SECOND = 1;
         $MINUTE = 60 * $SECOND;
@@ -114,7 +114,7 @@ class Convert
         return "$time";
     }
 
-    public static function formatPeriod($end, $start)
+    public static function formatPeriod($end, $start): string
     {
         $duration = $end - $start;
         $hours = (int) ($duration / 60 / 60);

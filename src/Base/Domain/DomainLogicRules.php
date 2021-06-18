@@ -7,12 +7,19 @@ namespace MagmaCore\Base\Domain;
 use App\Entity\UserEntity;
 use MagmaCore\Error\Error;
 
+if (!class_exists(UserEntity::class)) {
+    die('UserEntity class does not exists within the application');
+}
+
 class DomainLogicRules
 {
 
     /**
      * Ensure the password is verified before the action is carried out
      *
+     * @param string $value
+     * @param string $key
+     * @param Object $controller
      * @return void
      */
     public function passwordRequired(string $value, string $key, Object $controller): void
@@ -25,7 +32,7 @@ class DomainLogicRules
     }
 
     /**
-     * Douvble checks the user password before persisting to database
+     * Double checks the user password before persisting to database
      *
      * @param string $value
      * @param string $key

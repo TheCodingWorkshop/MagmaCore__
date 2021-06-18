@@ -19,6 +19,7 @@ interface ApplicationCommanderInterface
      * pluralize or just a normal justify lower case controller name
      *
      * @param object $controller
+     * @param string $type
      * @return string
      */
     public function getName(object $controller, string $type = 'lower'): string;

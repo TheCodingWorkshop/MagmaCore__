@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\ClientRepository;
 
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
-use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
 
 class ClientRepositoryFactory
@@ -44,7 +43,7 @@ class ClientRepositoryFactory
 
     /**
      * The client repository is a internal data layer which expose methods for internal
-     * and external library data consumption. It also provides method for puting and droping
+     * and external library data consumption. It also provides method for putting and dropping
      * data from the client specified data entities.
      *
      * @param string $ClientRepositoryString
@@ -65,7 +64,7 @@ class ClientRepositoryFactory
     /**
      * As this class is a carbon copy of the DataRepositoryFactory. We are simple borrowing
      * this method and passing in the relevant arguments in for this class. This client class
-     * was design to be used interanll. Whilst the DataRepositoryFactory Object is acting as
+     * was design to be used internal. Whilst the DataRepositoryFactory Object is acting as
      * the middle man for the frontend application
      * 
      * @param array|null $dataLayerConfiguration

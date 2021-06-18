@@ -22,12 +22,13 @@ class Mailer implements MailerInterface
     protected array $options = [];
     /** @var array */
     protected array $setting = [];
-    
+
     /**
      * Undocumented function
      *
      * @param object $transporterObject
      * @param array|null $settings
+     * @param string|null $dotEnvString
      */
     public function __construct(Object $transporterObject, ?array $settings = null, ?string $dotEnvString = null)
     {
@@ -50,7 +51,7 @@ class Mailer implements MailerInterface
      * @param mixed $value
      * @return void
      */
-    public function isValid($value) : void
+    public function isValid(mixed $value) : void
     {
         if (empty($value)) {
             throw new MailerInvalidArgumentException('Invalid or empty argument provided. Please address this.');
@@ -69,7 +70,7 @@ class Mailer implements MailerInterface
         if (is_array($settings)) {
             foreach ($settings as $key => $value) {
                 if (isset($key) && $key !=='') {
-                    $this->setting[$key] = (isset($value) ? $value : '');
+                    $this->setting[$key] = ($value ?? '');
                 }
             }
         }
@@ -81,10 +82,10 @@ class Mailer implements MailerInterface
      * Please note. You cannot use both at the same time. We can only use the ENV file
      * or the pass an array of server settings through the MailerFacade constructor
      *
+     * @param string $param
      * @return mixed
-     * @throws MailerInvalidArgumentException
      */
-    protected function defaultOrEnv(string $param)
+    protected function defaultOrEnv(string $param): mixed
     {
         $this->isValid($param);
         if (isset($this->setting[$param]) && $this->setting[$param] !=='' && !isset($_ENV[$param])) {
@@ -128,7 +129,7 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string $subject
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function subject(string $subject) : self
     {
@@ -144,7 +145,7 @@ class Mailer implements MailerInterface
      * @param string $from
      * @param string|null $name
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function from(string $from, ?string $name = null) : self
     {
@@ -158,7 +159,7 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string $message
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function body(string $message, $externalSource = null, $externalSourcePath = null ) : self
     {
@@ -174,10 +175,10 @@ class Mailer implements MailerInterface
 
     /**
      * @inheritdoc
-     * @param mixed $args
+     * @param mixed|null $args
      * @return self
      */
-    public function address($args = null) : self
+    public function address(mixed $args = null) : self
     {
         if (is_array($args) && $args !=null) {
             foreach ($args as $name => $address) {
@@ -194,7 +195,7 @@ class Mailer implements MailerInterface
      * @param string $from
      * @param string|null $name
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function toReply(string $from, ?string $name = null) : self
     {
@@ -207,7 +208,7 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string $cc
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function cc(string $cc) : self
     {
@@ -220,7 +221,7 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string $bcc
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function bcc(string $bcc) : self
     {
@@ -231,11 +232,11 @@ class Mailer implements MailerInterface
 
     /**
      * @inheritdoc
-     * @param mixed $args
+     * @param mixed|null $args
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
-    public function attachments($args = null) : self
+    public function attachments(mixed $args = null) : self
     {
         if (is_array($args)) {
             foreach ($args as $name => $attachment) {
@@ -252,9 +253,10 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string|null $successMsg
      * @param boolean $saveMail
-     * @return void
+     * @return string
+     * @throws MailerException
      */
-    public function send(?string $successMsg = null, bool $saveMail = false)
+    public function send(?string $successMsg = null, bool $saveMail = false): string
     {
         try {
             if (!$this->transporterObject->send()) {
@@ -282,14 +284,13 @@ class Mailer implements MailerInterface
      * @param Object $transporterObject
      * @return void
      */
-    private function saveMail(Object $transporterObject)
+    private function saveMail(Object $transporterObject): void
     {
         $path = '{imap.gmail.com:993/imap/ssl}[Gmail]/Sent Mail';
         $imapStream = imap_open($path, $transporterObject->Username, $transporterObject->Password);
         $result = imap_append($imapStream, $path, $transporterObject->getSentMIMEMessage());
         imap_close($imapStream);
 
-        return $result;
     }
 
 }

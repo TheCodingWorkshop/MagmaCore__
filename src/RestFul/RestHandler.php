@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\RestFul;
 
-use MagmaCore\RestFul\RestResponse;
-
 class RestHandler extends RestResponse
 {
 
@@ -31,7 +29,7 @@ class RestHandler extends RestResponse
     protected const CODE_200 = 200;
 
     /**
-     * Return various reponse including json reponse for RestFul API call
+     * Return various response including json response for RestFul API call
      *
      * @param array $data
      * @param int $code - defaults to 200
@@ -40,18 +38,16 @@ class RestHandler extends RestResponse
      */
     public function response(array $data, int $code = self::CODE_200, string|null $type = self::DEFAULT_CONTENT): mixed
     {
+        //$code = $code;
         if (empty($data)) {
-            $code = $code;
             $data = ['error' => 'No data found!'];
-        } else {
-            $code = $code;
         }
         $this->setHttpHeaders($type, $code);
-        if (strpos($type, 'json') !== false) {
+        if (str_contains($type, 'json')) {
             $response = $this->jsonEncodedData($data);
-        } elseif (strpos($type, 'html') !== false) {
+        } elseif (str_contains($type, 'html')) {
             $response = $this->htmlEncodedData($data);
-        } elseif (strpos($type, 'xml') !== false) {
+        } elseif (str_contains($type, 'xml')) {
             $response = $this->xmlEncodedData($data);
         } else {
             $response = $data;
@@ -76,7 +72,7 @@ class RestHandler extends RestResponse
         }
     }
 
-    private function htmlEncodedData(array $data)
+    private function htmlEncodedData(array $data): ?string
     {
         if ($data !==null) {
             $html = "<table border=\"1\">";
@@ -96,7 +92,7 @@ class RestHandler extends RestResponse
         return null;
     }
 
-    private function xmlEncodedData(array $data)
+    private function xmlEncodedData(array $data): bool|string|null
     {
         if ($data !==null) {
             $xml = new \SimpleXMLElement('<?xml version="1.0"?><mobile></mobile>');

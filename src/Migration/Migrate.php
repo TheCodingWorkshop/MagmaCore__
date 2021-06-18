@@ -16,7 +16,7 @@ class Migrate
 {
 
     public const NEED_MIGRATION = 'You\'ve not created any migration files yet!';
-    public const CREATE_MIGRATION = 'Generating mirgation for...';
+    public const CREATE_MIGRATION = 'Generating migration for...';
     public const END_MIGRATION = ' ... OK';
 
     public const FILES_ALTERING = ['Drop', 'Change', 'Add', 'Modify'];

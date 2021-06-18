@@ -12,10 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache\Storage;
 
+use JetBrains\PhpStorm\Pure;
 use MagmaCore\Cache\Exception\CacheInvalidArgumentException;
 use MagmaCore\Cache\Exception\CacheException;
-use MagmaCore\Cache\Storage\IterableStorageInterface;
-use MagmaCore\Cache\Storage\CacheStorageTrait;
 use DirectoryIterator;
 
 abstract class AbstractCacheStorage implements IterableStorageInterface
@@ -113,7 +112,7 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
      * @param string $entryIdentifier
      * @return string
      */
-    protected function cacheEntryPathAndFilename($entryIdentifier): string
+    protected function cacheEntryPathAndFilename(string $entryIdentifier): string
     {
         return $this->cacheDirectory . $entryIdentifier . $this->cacheEntryFileExtension;
     }
@@ -121,9 +120,9 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
     /**
      * Tries to find the cache entry for the specified Identifier.
      * @param string $entryIdentifier The cache entry Identifier
-     * @return mixed The filenames (including path) as an array if one or more entries could be found, otherwise false
+     * @return false|string[] The filenames (including path) as an array if one or more entries could be found, otherwise false
      */
-    protected function findCacheFilesByIdentifier(string $entryIdentifier)
+    #[Pure] protected function findCacheFilesByIdentifier(string $entryIdentifier): array|bool
     {
         $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($entryIdentifier);
         return (file_exists($cacheEntryPathAndFilename) ? [$cacheEntryPathAndFilename] : false);
@@ -177,10 +176,10 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
      * Returns the data of the current cache entry pointed to by the cache entry
      * iterator.
      *
-     * @return mixed
+     * @return bool|string
      * @api
      */
-    public function current()
+    public function current(): bool|string
     {
         if ($this->cacheFilesIterator === null) {
             $this->rewind();

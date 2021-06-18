@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session;
 
+use MagmaCore\Session\Exception\SessionInvalidArgumentException;
+
 interface SessionInterface
 {
 
@@ -23,7 +25,7 @@ interface SessionInterface
      * @return void
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function set(string $key, $value): void;
+    public function set(string $key, mixed $value): void;
 
     /**
      * Sets the specific value to a specific array key of the session
@@ -33,17 +35,17 @@ interface SessionInterface
      * @return void
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function setArray(string $key, $value): void;
+    public function setArray(string $key, mixed $value): void;
 
     /**
      * gets/returns the value of a specific key of the session
      *
      * @param string $key   The key of the item to store.
-     * @param mixed  $default the default value to return if the request value can't be found
+     * @param mixed|null $default the default value to return if the request value can't be found
      * @return mixed
      * @throws SessionInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
-    public function get(string $key, $default = null);
+    public function get(string $key, mixed $default = null): mixed;
 
     /**
      * Removes the value for the specified key from the session
@@ -65,10 +67,10 @@ interface SessionInterface
      * Returns the requested value and remove it from the session
      *
      * @param string $key - The key to retrieve and remove the value for.
-     * @param mixed $default - The default value to return if the requested value cannot be found
+     * @param null $value
      * @return mixed
      */
-    public function flush(string $key, $value = null);
+    public function flush(string $key, $value = null): mixed;
 
     /**
      * Determines whether an item is present in the session.

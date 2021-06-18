@@ -34,7 +34,8 @@
         "symfony/asset": "^5.2",
         "flatbase/flatbase": "^0.4.1",
         "symfony/serializer-pack": "^1.0",
-        "phpmailer/phpmailer": "^6.2"
+        "phpmailer/phpmailer": "^6.2",
+      "ext-imap": "*"
     },
     "autoload": {
         "psr-4": {

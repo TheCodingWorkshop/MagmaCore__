@@ -89,17 +89,17 @@ abstract class AbstractQueryBuilder implements QueryBuilderInterface
         return isset($this->key[$key]);
     }
 
-    public function getSqlDefaults()
+    public function getSqlDefaults(): array
     {
         return self::SQL_DEFAULT;
     }
 
-    public function getQueryTypes()
+    public function getQueryTypes(): array
     {
         return self::QUERY_TYPES;
     }
 
-    public function aliasSelectors(string $parent, array $selectors, $default = ['*']) 
+    public function aliasSelectors(string $parent, array $selectors, $default = ['*']): array
     {
         $filter = array_map(
             fn ($selector): string => $parent . '.' . $selector,

@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\GlobalManager;
 
-use MagmaCore\Session\GlobalManager\GlobalManagerException;
-
 interface GlobalManagerInterface
 {
 
@@ -25,7 +23,7 @@ interface GlobalManagerInterface
      * @return void
      * @throws GlobalManagerException
      */
-    public static function set(string $name, $context): void;
+    public static function set(string $name, mixed $context): void;
 
     /**
      * Get the value/context of the set global variable
@@ -34,5 +32,5 @@ interface GlobalManagerInterface
      * @return mixed
      * @throws GlobalManagerException
      */
-    public static function get(string $name);
+    public static function get(string $name): mixed;
 }

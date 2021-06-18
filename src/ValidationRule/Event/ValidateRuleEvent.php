@@ -17,21 +17,22 @@ use MagmaCore\EventDispatcher\Event;
 class ValidateRuleEvent extends Event
 {
 
-        /** @var string - name of the event */
-        public const NAME = 'magmaCore.validation.rule_event.validation_rule_event';
-        /** @var array */
-        private array $context;
-        /** @var Object - the current controller object */
-        private Object $controller;
-        /** @var string - the controller method as a string */
-        private string $method;
-    
-        /**
-         * Main class constructor method. assigning properties to constructor arguments
-         *
-         * @param array $context - the usable data as an array
-         * @param Object $controllerObject
-         */
+    /** @var string - name of the event */
+    public const NAME = 'magmaCore.validation.rule_event.validation_rule_event';
+    /** @var array */
+    private array $context;
+    /** @var Object - the current controller object */
+    private Object $controller;
+    /** @var string - the controller method as a string */
+    private string $method;
+
+    /**
+     * Main class constructor method. assigning properties to constructor arguments
+     *
+     * @param string $method
+     * @param array $context - the usable data as an array
+     * @param Object $controllerObject
+     */
         public function __construct(string $method, array $context, Object $controllerObject)
         {
             $this->method = $method;

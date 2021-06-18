@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Container\Exception;
 
-use MagmaCore\Container\Exception\ContainerException;
 use MagmaCore\Container\NotFoundExceptionInterface;
 
 class DependencyHasNoDefaultValueException extends ContainerException implements NotFoundExceptionInterface

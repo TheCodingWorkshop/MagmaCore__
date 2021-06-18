@@ -12,10 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
+use JetBrains\PhpStorm\Pure;
+
 class Stringify
 {
 
-    private static function translateString(string $string)
+    private static function translateString(string $string): string
     {
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $string);
         if ($text) {
@@ -27,13 +29,13 @@ class Stringify
      * @param $text
      * @return string|string[]
      */
-    public static function slugify($text)
+    public static function slugify($text): array|string
     {
         $text = preg_replace('~[^\\pL\d]+~u', '-', $text); // replace non letter or digits by -
         $text = trim($text, '-');
         $text = self::translateString($text); // transliterate
         $text = strtolower($text);
-        $text = preg_replace('~[^-\w]+~', '', $text); // remove unwanted characterss
+        $text = preg_replace('~[^-\w]+~', '', $text); // remove unwanted characters
         if (empty($text)) {
             return 'n-a';
         }
@@ -48,7 +50,7 @@ class Stringify
      * @return string
      * @since 1.0.0
      */
-    public static function justify($string, $atts = '')
+    public static function justify($string, string $atts = '')
     {
         if (empty($string))
             return;
@@ -70,7 +72,7 @@ class Stringify
      * @uses 		strlen & substr
      * @param 		$string
      */
-    public static function pluralize($string)
+    public static function pluralize($string): string
     {
 
         $last = $string[strlen($string) - 1];
@@ -89,7 +91,7 @@ class Stringify
      * @param bool $full
      * @return bool|string
      */
-    public static function capitalize($string, $full = false)
+    #[Pure] public static function capitalize($string, bool $full = false): bool|string
     {
         if (!empty($string)) {
             // transliterate
@@ -119,9 +121,9 @@ class Stringify
      * Regular expression function that replaces spaces between words with hyphens.
      *
      * @param string $str - the string to convert
-     * @return string
+     * @return bool|string
      */
-    public static function slugToUrl($str)
+    public static function slugToUrl(string $str): bool|string
     {
         if (empty($str)) {
             return false;

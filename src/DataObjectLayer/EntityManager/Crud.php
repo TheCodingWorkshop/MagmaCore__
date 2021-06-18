@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\EntityManager;
 
+use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
 use MagmaCore\DataObjectLayer\DataMapper\DataMapper;
 use MagmaCore\DataObjectLayer\QueryBuilder\QueryBuilder;
-use MagmaCore\DataObjectLayer\EntityManager\CrudInterface;
 use Throwable;
 
 class Crud implements CrudInterface
@@ -57,7 +57,7 @@ class Crud implements CrudInterface
      */
     public function getSchema(): string
     {
-        return (string)$this->tableSchema;
+        return $this->tableSchema;
     }
 
     public function getMapping(): Object
@@ -72,13 +72,14 @@ class Crud implements CrudInterface
      */
     public function getSchemaID(): string
     {
-        return (string)$this->tableSchemaID;
+        return $this->tableSchemaID;
     }
 
     /**
      * @inheritdoc
      *
      * @return integer
+     * @throws Throwable
      */
     public function lastID(): int
     {
@@ -94,17 +95,20 @@ class Crud implements CrudInterface
      * @param string $joinType
      * @param array $conditions
      * @param array $parameters
-     * @return void
+     * @param array $extras
+     * @return array|null
+     * @throws DataLayerException
      */
     public function join(
-        array $selectors = [],
-        array $joinSelectors = [],
+        array $selectors,
+        array $joinSelectors,
         string $joinTo,
         string $joinType,
         array $conditions = [],
         array $parameters = [],
         array $extras = []
-    ) {
+    ): ?array
+    {
 
         $args = ['table' => $this->getSchema(), 'type' => 'join', 'selectors' => $selectors, 'join_to_selectors' => $joinSelectors, 'join_to' => $joinTo, 'join_type' => $joinType, 'conditions' => $conditions, 'params' => $parameters, 'extras' => $extras];
         $query = $this->queryBuilder->buildQuery($args)->joinQuery();
@@ -117,13 +121,14 @@ class Crud implements CrudInterface
      *
      * @param array $fields
      * @return boolean
+     * @throws DataLayerException
      */
     public function create(array $fields = []): bool
     {
         $args = ['table' => $this->getSchema(), 'type' => 'insert', 'fields' => $fields];
         $query = $this->queryBuilder->buildQuery($args)->insertQuery();
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields));
-        return ($this->dataMapper->numRows() == 1) ? true : false;
+        return $this->dataMapper->numRows() == 1;
     }
 
     /**
@@ -134,6 +139,7 @@ class Crud implements CrudInterface
      * @param array $parameters
      * @param array $optional
      * @return array
+     * @throws DataLayerException
      */
     public function read(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []): array
     {
@@ -149,13 +155,14 @@ class Crud implements CrudInterface
      * @param array $fields
      * @param string $primaryKey
      * @return boolean
+     * @throws DataLayerException
      */
-    public function update(array $fields = [], string $primaryKey): bool
+    public function update(array $fields, string $primaryKey): bool
     {
         $args = ['table' => $this->getSchema(), 'type' => 'update', 'fields' => $fields, 'primary_key' => $primaryKey];
         $query = $this->queryBuilder->buildQuery($args)->updateQuery();
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields));
-        return ($this->dataMapper->numRows() == 1) ? true : false;
+        return $this->dataMapper->numRows() == 1;
     }
 
     /**
@@ -163,13 +170,14 @@ class Crud implements CrudInterface
      *
      * @param array $conditions
      * @return boolean
+     * @throws DataLayerException
      */
     public function delete(array $conditions = []): bool
     {
         $args = ['table' => $this->getSchema(), 'type' => 'delete', 'conditions' => $conditions];
         $query = $this->queryBuilder->buildQuery($args)->deleteQuery();
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
-        return ($this->dataMapper->numRows() == 1) ? true : false;
+        return $this->dataMapper->numRows() == 1;
     }
 
     /**
@@ -178,6 +186,7 @@ class Crud implements CrudInterface
      * @param array $selectors
      * @param array $conditions
      * @return array
+     * @throws DataLayerException
      */
     public function search(array $selectors = [], array $conditions = []): array
     {
@@ -193,6 +202,7 @@ class Crud implements CrudInterface
      * @param array $selectors
      * @param array $conditions
      * @return Object|null
+     * @throws DataLayerException
      */
     public function get(array $selectors = [], array $conditions = []): ?Object
     {
@@ -204,9 +214,10 @@ class Crud implements CrudInterface
 
     /**
      * @inheritDoc
+     * @return mixed
      * @throws Throwable
      */
-    public function aggregate(string $type, ?string $field = 'id', array $conditions = [])
+    public function aggregate(string $type, ?string $field = 'id', array $conditions = []): mixed
     {
         $args = [
             'table' => $this->getSchema(), 'primary_key' => $this->getSchemaID(),
@@ -234,37 +245,28 @@ class Crud implements CrudInterface
     /**
      * @inheritDoc
      *
-     * @param string $sqlQuery
+     * @param string $rawQuery
      * @param array|null $conditions
      * @param string $resultType
-     * @return void
+     * @return mixed
+     * @throws DataLayerException
      */
-    public function rawQuery(string $sqlQuery, ?array $conditions = [], string $resultType = 'column')
+    public function rawQuery(string $rawQuery, ?array $conditions = [], string $resultType = 'column'): mixed
     {
-        $args = ['table' => $this->getSchema(), 'type' => 'raw', 'conditions' => $conditions, 'raw' => $sqlQuery];
+        $args = ['table' => $this->getSchema(), 'type' => 'raw', 'conditions' => $conditions, 'raw' => $rawQuery];
         $query = $this->queryBuilder->buildQuery($args)->rawQuery();
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         if ($this->dataMapper->numRows()) {
             if (!in_array($resultType, ['fetch', 'fetch_all', 'column', 'columns'])) {
                 throw new DataLayerInvalidArgumentException('Invalid 3rd argument. Your options are "fetch, fetch_all or column"');
             }
-            switch ($resultType) {
-                case 'column':
-                    $data = $this->dataMapper->column();
-                    break;
-                case 'columns':
-                    $data = $this->dataMapper->columns();
-                    break;
-                case 'fetch':
-                    $data = $this->dataMapper->result();
-                    break;
-                case 'fetch_all':
-                    $data = $this->dataMapper->results();
-                    break;
-                default:
-                    throw new DataLayerUnexpectedValueException('Please choose a return type for this method ie. "fetch, fetch_all or column."');
-                    break;
-            }
+            $data = match ($resultType) {
+                'column' => $this->dataMapper->column(),
+                'columns' => $this->dataMapper->columns(),
+                'fetch' => $this->dataMapper->result(),
+                'fetch_all' => $this->dataMapper->results(),
+                default => throw new DataLayerUnexpectedValueException('Please choose a return type for this method ie. "fetch, fetch_all or column."'),
+            };
             if ($data) {
                 return $data;
             }

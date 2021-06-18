@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
+use Throwable;
+
 interface DataMapperInterface
 {
 
@@ -23,12 +25,12 @@ interface DataMapperInterface
     public function prepare(string $sqlQuery) : self;
 
     /**
-     * Explicit dat type for the parameter usinmg the PDO::PARAM_* constants.
+     * Explicit dat type for the parameter using the PDO::PARAM_* constants.
      * 
      * @param mixed $value
-     * @return mixed
+     * @return int
      */
-    public function bind($value);
+    public function bind(mixed $value): int;
 
     /**
      * Combination method which combines both methods above. One of which  is
@@ -43,8 +45,8 @@ interface DataMapperInterface
 
     /**
      * returns the number of rows affected by a DELETE, INSERT, or UPDATE statement.
-     * 
-     * @return int|null
+     *
+     * @return int
      */
     public function numRows() : int;
 

@@ -16,8 +16,8 @@ class PasswordEncoder
 
     /**
      *
-     * @param string $password
-     * @return string
+     * @param string|null $password
+     * @return string|null
      */
     public static function encode(string $password = null) : ?string
     {

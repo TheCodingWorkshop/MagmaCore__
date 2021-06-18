@@ -12,15 +12,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use Throwable;
 use MagmaCore\Utility\Sortable;
 use MagmaCore\Utility\Paginator;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManager;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryTrait;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
-use MagmaCore\DataObjectLayer\DataRepository\DataRelationshipTrait;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
-use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
 /**
@@ -31,7 +29,7 @@ use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
  * 3. findBy(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = [])
  * 4. findOneBy(array $conditions)
  * 5. findObjectBy(array $conditions = [], array $selectors = [])
- * 6. findBySearch(rray $selectors = [], array $conditions = [], array $parameters = [], array $optional = [])
+ * 6. findBySearch(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = [])
  * 7. findByIdAndDelete(array $conditions)
  * 8. findByIdAndUpdate(array $fields = [], int $id)
  * 9. findWithSearchAndPaging(Object $request, array $args = [])
@@ -46,6 +44,7 @@ class DataRepository implements DataRepositoryInterface
     use DataRelationshipTrait;
 
     protected EntityManagerInterface $em;
+    private ?object $findAndReturn;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -62,7 +61,7 @@ class DataRepository implements DataRepositoryInterface
         return $this->em;
     }
     /**
-     * Checks whether the arguement is of the array type else throw an exception
+     * Checks whether the argument is of the array type else throw an exception
      *
      * @param array $conditions
      * @return void
@@ -87,9 +86,9 @@ class DataRepository implements DataRepositoryInterface
 
     /**
      * A quick and easy way of getting the schemaID within our the controller
-     * classe, the getSchemaID method is part of the crud interface method. We
-     * are simple just referrencing that method which will give all controller
-     * access to the primary key of the revelant database table.
+     * class, the getSchemaID method is part of the crud interface method. We
+     * are simple just referencing that method which will give all controller
+     * access to the primary key of the relevant database table.
      *
      * @return string
      */
@@ -99,8 +98,8 @@ class DataRepository implements DataRepositoryInterface
     }
 
     public function findWithRelationship(
-        array $selectors = [],
-        array $joinSelectors = [],
+        array $selectors,
+        array $joinSelectors,
         string $joinTo,
         string $joinType,
         array $conditions = [],
@@ -115,7 +114,7 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param integer $id
      * @return array
-     * @throws DataLayerInvalidArgumentException
+     * @throws DataLayerInvalidArgumentException|Throwable
      */
     public function find(int $id): array
     {
@@ -131,6 +130,7 @@ class DataRepository implements DataRepositoryInterface
      * @inheritDoc
      *
      * @return array
+     * @throws Throwable
      */
     public function findAll(): array
     {
@@ -149,6 +149,7 @@ class DataRepository implements DataRepositoryInterface
      * @param array $parameters
      * @param array $optional
      * @return array
+     * @throws Throwable
      */
     public function findBy(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []): array
     {
@@ -164,7 +165,7 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param array $conditions
      * @return array
-     * @throws DataLayerInvalidArgumentException
+     * @throws DataLayerInvalidArgumentException|Throwable
      */
     public function findOneBy(array $conditions): array
     {
@@ -188,7 +189,7 @@ class DataRepository implements DataRepositoryInterface
         $this->isArray($conditions);
         try {
             return $this->em->getCrud()->get($selectors, $conditions);
-        } catch (Throwable $ex) {
+        } catch (Throwable) {
             throw new DataLayerNoValueException('The method should have returned an object. But instead nothing has come back. Check that your source contains values.');
         }
     }
@@ -201,7 +202,7 @@ class DataRepository implements DataRepositoryInterface
      * @param array $parameters
      * @param array $optional
      * @return array
-     * @throws BaseInvalidArgumentException
+     * @throws BaseInvalidArgumentException|Throwable
      */
     public function findBySearch(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []): array
     {
@@ -219,6 +220,7 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param array $items
      * @return boolean
+     * @throws Throwable
      */
     public function findAndDelete(array $items = []): bool
     {
@@ -226,7 +228,7 @@ class DataRepository implements DataRepositoryInterface
             foreach ($items as $item) {
                 $delete = $this->findByIDAndDelete(['id' => $item]);
                 if ($delete) {
-                    return ($delete == true) ? true : false;
+                    return true;
                 }
             }
         }
@@ -238,7 +240,7 @@ class DataRepository implements DataRepositoryInterface
      *
      * @param array $conditions
      * @return boolean
-     * @throws DataLayerInvalidArgumentException
+     * @throws DataLayerInvalidArgumentException|Throwable
      */
     public function findByIdAndDelete(array $conditions): bool
     {
@@ -248,7 +250,7 @@ class DataRepository implements DataRepositoryInterface
             if ($result) {
                 $delete = $this->em->getCrud()->delete($conditions);
                 if ($delete) {
-                    return ($delete == true) ? true : false;
+                    return $delete == true;
                 }
             }
         } catch (Throwable $throwable) {
@@ -262,9 +264,9 @@ class DataRepository implements DataRepositoryInterface
      * @param array $fields
      * @param integer $id
      * @return boolean
-     * @throws BaseInvalidArgumentException
+     * @throws BaseInvalidArgumentException|Throwable
      */
-    public function findByIdAndUpdate(array $fields = [], int $id): bool
+    public function findByIdAndUpdate(array $fields, int $id): bool
     {
         $this->isArray($fields);
         try {
@@ -287,6 +289,7 @@ class DataRepository implements DataRepositoryInterface
      * @param array $args
      * @param Object $request
      * @return array|false
+     * @throws Throwable
      */
     public function findWithSearchAndPaging(Object $request, array $args = [], array $relationship = []): array|false
     {
@@ -297,6 +300,7 @@ class DataRepository implements DataRepositoryInterface
         $parameters = ['limit' => $args['records_per_page'], 'offset' => $paging->getOffset()];
         $optional = ['orderby' => $sorting->getColumn() . ' ' . $sorting->getDirection()];
 
+        $searchConditions = [];
         if ($request->query->getAlnum($args['filter_alias'])) {
             $searchRequest = $request->query->getAlnum($args['filter_alias']);
             if (is_array($args['filter_by'])) {
@@ -308,17 +312,6 @@ class DataRepository implements DataRepositoryInterface
         } else {
             $queryConditions = array_merge($args['additional_conditions'], $conditions);
             $results = $this->findBy($args['selectors'], $queryConditions, $parameters, $optional);
-            // list($leftSelectors, $rightSelectors, $joinTo, $joinType, $_conditions) = $relationship;
-            // $results = $this->findWithRelationship(
-            //     $leftSelectors,
-            //     $rightSelectors,
-            //     $joinTo,
-            //     $joinType,
-            //     $conditions,
-            //     $parameters,
-            //     $optional
-
-            // );
         }
         return [
             $results,
@@ -346,6 +339,7 @@ class DataRepository implements DataRepositoryInterface
         $req = $request->query;
         $status = $req->getAlnum($args['query']);
         $searchResults = $req->getAlnum($args['filter_alias']);
+        $conditions = [];
         if ($searchResults) {
             for ($i = 0; $i < count($args['filter_by']); $i++) {
                 $conditions = [$args['filter_by'][$i] => $searchResults];
@@ -374,6 +368,7 @@ class DataRepository implements DataRepositoryInterface
      * @param integer $id
      * @param array $selectors
      * @return self
+     * @throws Throwable
      */
     public function findAndReturn(int $id, array $selectors = []): self
     {
@@ -389,14 +384,9 @@ class DataRepository implements DataRepositoryInterface
     }
 
     /**
-     * @inheritDoc
-     *
-     * @return Object|null
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
+     * @return object|null
      */
-    public function or404()
+    public function or404(): ?object
     {
         if ($this->findAndReturn != null) {
             return $this->findAndReturn;

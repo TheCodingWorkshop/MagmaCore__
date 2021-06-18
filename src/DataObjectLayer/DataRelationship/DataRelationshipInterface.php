@@ -31,7 +31,7 @@ interface DataRelationshipInterface
      *
      * @param string $tableLeft
      * @param string $tableRight
-     * @return void
+     * @return DataRelationshipInterface
      */
     public function tables(string $tableLeft, string $tableRight): self;
 
@@ -39,7 +39,7 @@ interface DataRelationshipInterface
      * Undocumented function
      *
      * @param string $tablePivot
-     * @return void
+     * @return DataRelationshipInterface
      */
     public function pivot(string $tablePivot): self;
 

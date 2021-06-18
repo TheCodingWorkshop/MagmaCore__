@@ -16,11 +16,11 @@ interface CookieInterface
 
     /**
      * Set a cookie within the domain
-     * 
+     *
      * @param mixed $value
-     * @return self
+     * @return void
      */
-    public function set($value) : void;
+    public function set(mixed $value) : void;
 
     /**
      * Checks to see whether the cookie was set or not return true or false

@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Mailer;
 
+use MagmaCore\Mailer\Exception\MailerException;
+use MagmaCore\Mailer\Exception\MailerInvalidArgumentException;
+
 interface MailerInterface
 { 
 
@@ -19,7 +22,7 @@ interface MailerInterface
      *
      * @param string $subject
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function subject(string $subject) : self;
 
@@ -29,7 +32,7 @@ interface MailerInterface
      *
      * @param string $message
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function body(string $message) : self;
 
@@ -39,7 +42,7 @@ interface MailerInterface
      * @param string $from
      * @param string|null $name
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function from(string $from, ?string $name = null) : self;
 
@@ -51,10 +54,10 @@ interface MailerInterface
      * Where the key is the recipient name and the value being the recipient email
      * address.
      *
-     * @param mixed $args
+     * @param mixed|null $args
      * @return self
      */
-    public function address($args = null) : self;
+    public function address(mixed $args = null) : self;
 
     /**
      * Provide the email field for the recipient to reply to. If required. This would
@@ -64,7 +67,7 @@ interface MailerInterface
      * @param string $from
      * @param string|null $name
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function toReply(string $from, ?string $name = null) : self;
 
@@ -75,7 +78,7 @@ interface MailerInterface
      *
      * @param string $cc
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function cc(string $cc) : self;
 
@@ -85,7 +88,7 @@ interface MailerInterface
      *
      * @param string $bcc
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
     public function bcc(string $bcc) : self;
 
@@ -96,11 +99,11 @@ interface MailerInterface
      * as an array and pass those in 
      * ['me' => my_photo.jpg, 'you' => 'your_photo.png']
      *
-     * @param mixed $args
+     * @param mixed|null $args
      * @return self
-     * @throws MailerInvalidArgumerntException
+     * @throws MailerInvalidArgumentException
      */
-    public function attachments($args = null) : self;
+    public function attachments(mixed $args = null) : self;
 
     /**
      * The method which invokes the mail function which ultimately sends our email

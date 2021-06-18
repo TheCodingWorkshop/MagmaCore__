@@ -12,9 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Container;
 
-use MagmaCore\Container\NotFoundExceptionInterface;
-use MagmaCore\Container\ContainerExceptionInterface;
-
 /** PSR-11 Container */
 interface ContainerInterface
 {
@@ -28,7 +25,7 @@ interface ContainerInterface
      *
      * @return mixed Entry.
      */
-    public function get(string $id);
+    public function get(string $id): mixed;
 
     /**
      * Returns true if the container can return an entry for the given identifier.

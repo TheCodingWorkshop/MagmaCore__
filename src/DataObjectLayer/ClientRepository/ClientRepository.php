@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\ClientRepository;
 
-use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
 use Throwable;
 
@@ -44,6 +43,7 @@ class ClientRepository implements ClientRepositoryInterface
      * @param array $fields
      * @param string|null $primaryKey
      * @return boolean
+     * @throws Throwable
      */
     public function save(array $fields = [], ?string $primaryKey = null): bool
     {
@@ -65,6 +65,7 @@ class ClientRepository implements ClientRepositoryInterface
      *
      * @param array $condition
      * @return boolean
+     * @throws Throwable
      */
     public function drop(array $condition): bool
     {
@@ -82,11 +83,12 @@ class ClientRepository implements ClientRepositoryInterface
      *
      * @param array $conditions
      * @return array
+     * @throws Throwable
      */
-    public function get(array $selectors = [], array $conditions = []): array
+    public function get(array $conditions = []): array
     {
         try {
-            return $this->em->getCrud()->read($selectors, $conditions);
+            return $this->em->getCrud()->read([], $conditions);
         } catch (Throwable $throw) {
             throw $throw;
         }

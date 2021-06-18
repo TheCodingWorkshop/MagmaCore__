@@ -19,14 +19,13 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
 
     use SessionTrait;
 
-    /** @var array */
+    /** @var object */
     protected Object $sessionEnvironment;
 
     /**
      * abstract class constructor
      *
-     * @param array $options
-     * @return void
+     * @param Object $sessionEnvironment
      */
     public function __construct(Object $sessionEnvironment)
     {
@@ -66,7 +65,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
     /**
      * Set the name of the session ID
      *
-     * @param $sessionID
+     * @param string $sessionID
      * @return void
      */
     public function setSessionID(string $sessionID): void
@@ -79,7 +78,7 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      *
      * @return string
      */
-    public function getSessionID()
+    public function getSessionID(): string
     {
         return session_id();
     }
@@ -105,9 +104,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * 
      * @return bool
      */
-    public function isSessionStarted()
+    public function isSessionStarted(): bool
     {
-        return php_sapi_name() !== 'cli' ? $this->getSessionID() !== '' : false;
+        return php_sapi_name() !== 'cli' && $this->getSessionID() !== '';
     }
 
     /**

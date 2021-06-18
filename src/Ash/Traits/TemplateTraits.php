@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Traits;
 
-use MatthiasMullie\Minify;
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Ash\Exception\FileNotFoundException;
 
@@ -24,27 +24,32 @@ trait TemplateTraits
      * js files. These are loaded where ever the function is called. Uses internal method
      * to resolve the location of the files and will throw an exception if file is not found.
      *
-     * @param mixed $css
+     * @param mixed|null $js
+     * @param string $location
      * @return string
      * @throws FileNotFoundException
+     * @throws Exception
      */
-    public function addjs(mixed $js = null, string $location = 'footer')
+    public function addjs(mixed $js = null, string $location = 'footer'): string
     {
         $this->js = $js;
         $jsYmls = Yaml::file('assets')['scripts'];
-        $allJs = array_merge($jsYmls, isset($this->js) ? $this->js : []);
+        $allJs = array_merge($jsYmls, $this->js ?? []);
         if (is_array($allJs) && count($allJs) > 0) {
             foreach ($allJs as $file) {
                 if (isset($file['enable']) && $file['enable'] === true) {
                     if (isset($file['location']) && $file['location'] === $location) {
                         if (isset($file['cdn']) && $file['cdn'] === true) {
-                            $jsFile = isset($file['src']) ? $file['src'] : '';
+                            $jsFile = $file['src'] ?? '';
                         } else {
                             $jsFile = $this->resolvePath($file['src']);
                         }
                         if ($jsFile) {
                             //$minifier = new Minify\CSS($jsFile);
-                            echo '<script src="' . $jsFile . '"></script>' . "\n";
+                            $script = '<script>';
+                            $script .= ' src="' . $jsFile . '"';
+                            $script .= isset($file['reload']) && $$file['reload'] === true ? ' data-turbo-track="reload"' : '';
+                            echo '<script src="' . $jsFile . '" data-turbo-track="reload"></script>' . "\n";
                         }
                     }
                 }
@@ -61,23 +66,27 @@ trait TemplateTraits
      * @return string
      * @throws FileNotFoundException
      */
-    public function addcss(mixed $css = null)
+    public function addcss(mixed $css = null): string
     {
         $this->css = $css;
         $cssYmls = Yaml::file('assets')['stylesheets'];
-        $allCss = array_merge($cssYmls, isset($this->css) ? $this->css : []);
+        $allCss = array_merge($cssYmls, $this->css ?? []);
         if (is_array($allCss) && count($allCss) > 0) {
 
             foreach ($allCss as $file) {
                 if (isset($file['enable']) && $file['enable'] === true) {
                     if (isset($file['cdn']) && $file['cdn'] === true) {
-                        $cssFile = isset($file['href']) ? $file['href'] : '';
+                        $cssFile = $file['href'] ?? '';
                     } else {
                         $cssFile = $this->resolvePath($file['href']);
                     }
 
                     if ($cssFile) {
-                        echo '<link rel="stylesheet" href="' . $cssFile . '">' . "\n";
+                        $css = '<link rel="stylesheet"';
+                        $css .= ' href="' . $cssFile . '"';
+                        $css .= isset($file['reload']) && $file['reload'] === true ? ' data-turbo-frame="reload"' : '';
+                        $css .= '>' . "\n";
+                        echo $css;
                     }
                 }
             }
@@ -89,8 +98,8 @@ trait TemplateTraits
      * throw a file not found exception is the file being loaded doesn't exists.
      *
      * @param string $file
-     * @param string $type - defaults to a javascript file can be change within other methods
-     * @return void
+     * @return string
+     * @throws FileNotFoundException
      */
     private function resolvePath(string $file): string
     {

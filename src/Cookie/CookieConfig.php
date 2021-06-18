@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cookie;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class CookieConfig
 {
 
@@ -25,7 +27,7 @@ class CookieConfig
      * 
      * @return array
      */
-    public function baseConfig()
+    #[ArrayShape(['name' => "string", 'expires' => "int", 'path' => "string", 'domain' => "string", 'secure' => "false", 'httponly' => "bool"])] public function baseConfig(): array
     {
         return [
 

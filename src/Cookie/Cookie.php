@@ -17,14 +17,13 @@ use MagmaCore\Cookie\Store\CookieStoreInterface;
 class Cookie implements CookieInterface
 {
 
-    /** @var Object */
+    /** @var CookieStoreInterface */
     protected CookieStoreInterface $cookieStore;
 
     /**
      * Protected class constructor as this class will be a singleton
-     * 
-     * @param array $attributes
-     * @return void
+     *
+     * @param CookieStoreInterface $cookieStore
      */
     public function __construct(CookieStoreInterface $cookieStore)
     {
@@ -47,7 +46,7 @@ class Cookie implements CookieInterface
      * @param mixed $value
      * @return self
      */
-    public function set($value): void
+    public function set(mixed $value): void
     {
         $this->cookieStore->setCookie($value);
     }

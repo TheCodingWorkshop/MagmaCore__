@@ -11,14 +11,12 @@ declare (strict_types = 1);
 
 namespace MagmaCore\Ash;
 
-use MagmaCore\Ash\TemplateInterface;
-
 abstract class AbstractTemplate implements TemplateInterface
 {
     /** @var array template blocks definitions */
-    protected $blocks = array();
-    /** @var array - template configurations */
-    protected TemplateEnvironment $templateEnv;
+    protected array $blocks = array();
+    /** @var array|TemplateEnvironment - template configurations */
+    protected TemplateEnvironment|array $templateEnv;
 
     /**
      * Main constructor class
@@ -71,18 +69,18 @@ abstract class AbstractTemplate implements TemplateInterface
      * within various different placeholders {} {%%} {{}} {{{}}}
      *
      * @param mixed $code
-     * @return mixed
+     * @return string|array|bool|null
      */
-    public function codeCompiler(mixed $code): mixed
+    public function codeCompiler(mixed $code): string|array|bool|null
     {
         if ($code) {
             $code = $this->blockCompiler($code);
             $code = $this->yieldCompiler($code);
             $code = $this->functionEchosCompiler($code);
             $code = $this->escapedEchosCompiler($code);
+            $code = $this->variableCompiler($code);
             $code = $this->echosCompiler($code);
-            $code = $this->phpCompiler($code);
-            return $code;
+            return $this->phpCompiler($code);
         }        
         return false;
     }
@@ -91,9 +89,9 @@ abstract class AbstractTemplate implements TemplateInterface
      * Parse extends and include blocks within the rendered template.
      *
      * @param string $file
-     * @return mixed
+     * @return string|array|null
      */
-    public function fileIncludes(string $file): mixed
+    public function fileIncludes(string $file): string|array|null
     {
         if ($file) {
             $code = file_get_contents($file);
@@ -102,8 +100,7 @@ abstract class AbstractTemplate implements TemplateInterface
                 /* Pass the template directory to the method so the file can be found */
                 $code = str_replace($value[0], $this->fileIncludes(TEMPLATES . $value[2]), $code);
             }
-            $code = preg_replace('/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i', '', $code);
-            return $code;
+            return preg_replace('/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i', '', $code);
         }
     }
 
@@ -112,11 +109,22 @@ abstract class AbstractTemplate implements TemplateInterface
      * {% array_key_exists(arguments) %} to execute php code
      *
      * @param mixed $code
-     * @return mixed
+     * @return array|string|null
      */
-    public function phpCompiler($code): mixed
+    public function phpCompiler(mixed $code): array|string|null
     {
         return preg_replace('~\{%\s*(.+?)\s*\%}~is', '<?php $1 ?>', $code);
+    }
+
+    /**
+     * Compile php variables
+     *
+     * @param mixed $code
+     * @return array|string|null
+     */
+    public function variableCompiler(mixed $code): array|string|null
+    {
+        return preg_replace('~\{::\s*(.+?)\s*\}~is', '$1', $code);
     }
 
     /**
@@ -125,9 +133,9 @@ abstract class AbstractTemplate implements TemplateInterface
      * php function like 
      *
      * @param mixed $code
-     * @return mixed
+     * @return array|string|null
      */
-    public function echosCompiler($code): mixed
+    public function echosCompiler(mixed $code): array|string|null
     {
         return preg_replace('~\{{\s*(.+?)\s*\}}~is', '<?php echo $1 ?>', $code);
     }
@@ -138,25 +146,25 @@ abstract class AbstractTemplate implements TemplateInterface
      * method cane be extended by extending the base TemplateExtension class
      *
      * @param mixed $code
-     * @return mixed
+     * @return array|string|null
      */
-    public function functionEchosCompiler($code): mixed
+    public function functionEchosCompiler(mixed $code): array|string|null
     {
         return preg_replace('~\{@ \s*(.+?)\s*\ @}~is', '<?php echo $func->$1 ?>', $code);
     }
 
     /**
      * Compile native code using triple curly braces {{{ code }}}. using these
-     * triple curly braces uses php htmlentities which will convert some 
+     * triple curly braces uses php html entities which will convert some
      * characters to HTML entities like so
      * 
      * &lt;a href=&quot;&quot;&gt;&lt;/a&gt;
      * <a href=""></a>
      * 
      * @param mixed $code
-     * @return mixed
+     * @return array|string|null
      */
-    public function escapedEchosCompiler($code): mixed
+    public function escapedEchosCompiler(mixed $code): array|string|null
     {
         return preg_replace('~\{{{\s*(.+?)\s*\}}}~is', '<?php echo htmlentities($1, ENT_QUOTES, \'UTF-8\') ?>', $code);
     }
@@ -188,15 +196,14 @@ abstract class AbstractTemplate implements TemplateInterface
      * Undocumented function
      *
      * @param mixed $code
-     * @return void
+     * @return array|string|null
      */
-    public function yieldCompiler(mixed $code)
+    public function yieldCompiler(mixed $code): array|string|null
     {
         foreach ($this->blocks as $block => $value) {
             $code = preg_replace('/{% ?yield ?' . $block . ' ?%}/', $value, $code);
         }
-        $code = preg_replace('/{% ?yield ?(.*?) ?%}/i', '', $code);
-        return $code;
+        return preg_replace('/{% ?yield ?(.*?) ?%}/i', '', $code);
 
     }
 

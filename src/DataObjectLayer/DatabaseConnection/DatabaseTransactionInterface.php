@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DatabaseConnection;
 
+use PDOException;
+
 interface DatabaseTransactionInterface
 {
 

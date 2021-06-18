@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
+use MagmaCore\DataObjectLayer\ClientRepository\ClientRepository;
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryFactory;
 
 class DataLayerClientFacade
@@ -21,7 +22,7 @@ class DataLayerClientFacade
     protected string $tableSchemaID;
 
     /**
-     * Final class which ties the entire data layer togther. The data layer factory
+     * Final class which ties the entire data layer together. The data layer factory
      * is responsible for creating an object of all the component factories and injecting
      * the relevant parameters/arguments. ie the query builder factory, entity manager
      * factory and the data mapper factory.
@@ -29,7 +30,7 @@ class DataLayerClientFacade
      * @param string $clientIdentifier
      * @param string $tableSchema
      * @param string $tableSchemaID
-     * @return ClientRepository
+     * @return void
      */
     public function __construct(string $clientIdentifier, string $tableSchema, string $tableSchemaID)
     {
@@ -48,7 +49,7 @@ class DataLayerClientFacade
     {
         $factory = new ClientRepositoryFactory($this->clientIdentifier, $this->tableSchema, $this->tableSchemaID);
         if ($factory) {
-            $client = $factory->create(\MagmaCore\DataObjectLayer\ClientRepository\ClientRepository::class);
+            $client = $factory->create(ClientRepository::class);
             if ($client) {
                 return $client;
             }

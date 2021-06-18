@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session;
 
+use JetBrains\PhpStorm\Pure;
+
 /**
  * SessionEnvironment handles the session configuration from the application
  * which passes in the user define session options. This class also exposes
@@ -45,7 +47,7 @@ class SessionEnvironment
      * 
      * @return array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->sessionConfig;
     }
@@ -55,7 +57,7 @@ class SessionEnvironment
      * 
      * @return int
      */
-    public function getLifetime(): int
+    #[Pure] public function getLifetime(): int
     {
         $lifetime = (isset($this->getConfig()['lifetime']) ? filter_var($this->getConfig()['lifetime'], FILTER_VALIDATE_INT) : 120);
         if ($lifetime) {
@@ -69,23 +71,23 @@ class SessionEnvironment
      * 
      * @return string
      */
-    public function getPath(): string
+    #[Pure] public function getPath(): string
     {
-        $path = (isset($this->getConfig()['path']) ? $this->getConfig()['path'] : '');
+        $path = ($this->getConfig()['path'] ?? '');
         if ($path) {
             return $path;
         }
     }
 
     /**
-     * Cookie domain, for example 'www.php.net'. To make cookies visible on all 
+     * Cookie domain, for example 'www.php.net'. To make cookies visible on all
      * subdomains then the domain must be prefixed with a dot like '.php.net'.
-     * 
-     * @return string
+     *
+     * @return string|null
      */
-    public function getDomain(): ?string
+    #[Pure] public function getDomain(): ?string
     {
-        $domain = (isset($this->getConfig()['domain']) ? $this->getConfig()['domain'] : $_SERVER['SERVER_NAME']);
+        $domain = ($this->getConfig()['domain'] ?? $_SERVER['SERVER_NAME']);
         if ($domain) {
             return $domain;
         }
@@ -96,10 +98,9 @@ class SessionEnvironment
      * 
      * @return bool
      */
-    public function isSecure(): bool
+    #[Pure] public function isSecure(): bool
     {
-        $isSecure = (isset($this->getConfig()['secure']) ? $this->getConfig()['secure'] : isset($_SERVER['HTTPS']));
-        return $isSecure;
+        return ($this->getConfig()['secure'] ?? isset($_SERVER['HTTPS']));
     }
 
     /**
@@ -108,10 +109,9 @@ class SessionEnvironment
      * 
      * @return null|bool
      */
-    public function isHttpOnly(): ?bool
+    #[Pure] public function isHttpOnly(): ?bool
     {
-        $isHttpOnly = (isset($this->getConfig()['httpOnly']) ? $this->getConfig()['httpOnly'] : NULL);
-        return $isHttpOnly;
+        return ($this->getConfig()['httpOnly'] ?? NULL);
     }
 
     /**
@@ -119,20 +119,20 @@ class SessionEnvironment
      * 
      * @return string
      */
-    public function getSessionName(): string
+    #[Pure] public function getSessionName(): string
     {
-        $sessionName = (isset($this->getConfig()['session_name']) ? $this->getConfig()['session_name'] : '');
+        $sessionName = ($this->getConfig()['session_name'] ?? '');
         if ($sessionName) {
             return $sessionName;
         }
     }
 
     /**
-     * PHP sessio runtime configuration strings
+     * PHP session runtime configuration strings
      * 
      * @return array
      */
-    public function getSessionRuntimeConfigurations()
+    public function getSessionRuntimeConfigurations(): array
     {
         return array('session.gc_maxlifetime', 'session.gc_divisor', 'session.gc_probability', 'session.lifetime', 'session.use_cookies');
     }
@@ -146,7 +146,7 @@ class SessionEnvironment
      * 
      * @return mixed
      */
-    public function getSessionIniValues()
+    public function getSessionIniValues(): mixed
     {
         foreach ($this->getSessionRuntimeConfigurations() as $runtimeConfig) {
             switch ($runtimeConfig) {

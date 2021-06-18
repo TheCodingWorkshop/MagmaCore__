@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\Flash;
 
-use MagmaCore\Session\Flash\FlashInterface;
-use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Session\SessionInterface;
 
@@ -26,16 +24,16 @@ class Flash implements FlashInterface
     protected const FLASH_KEY = 'flash_message';
     /** @var string */
     protected string $flashKey;
-    /** @var SessionInterface */
-    protected SessionInterface $session;
+    /** @var ?SessionInterface */
+    protected ?SessionInterface $session;
 
     /**
      * Class constructor method which accepts a single default argument
-     * which allows the user to specfies their own flash key as a option
+     * which allows the user to specifies their own flash key as a option
      * else if not present will use the default set by the framework
-     * 
+     *
+     * @param Object|null $session
      * @param null|string $flashKey
-     * @return void
      */
     public function __construct(?Object $session = null, ?string $flashKey = null)
     {
@@ -76,7 +74,7 @@ class Flash implements FlashInterface
      * 
      * @return mixed
      */
-    public function get()
+    public function get(): mixed
     {
         if ($this->session->has($this->flashKey)) {
             return $this->session->flush($this->flashKey);

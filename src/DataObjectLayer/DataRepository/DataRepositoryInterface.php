@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
+use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
+
 interface DataRepositoryInterface
 {
 
@@ -41,7 +43,7 @@ interface DataRepositoryInterface
     public function findBy(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []) : array;
 
     /**
-     * Find and Return 1 row by the method arguement
+     * Find and Return 1 row by the method argument
      * 
      * @param array $conditions
      * @return array
@@ -65,7 +67,7 @@ interface DataRepositoryInterface
      * @param array $parameters = []
      * @param array $optional = []
      * @return array
-     * @throws InvalidDataRepositoryException
+     * @throws DataLayerInvalidArgumentException
      */
     public function findBySearch(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []) : array;
 
@@ -80,8 +82,8 @@ interface DataRepositoryInterface
 
     /**
      * Find and delete a row by its ID from storage device
-     * 
-     * @param array $condition
+     *
+     * @param array $conditions
      * @return bool
      */
     public function findByIdAndDelete(array $conditions) : bool;
@@ -94,15 +96,16 @@ interface DataRepositoryInterface
      * @param int id
      * @return bool
      */
-    public function findByIdAndUpdate(array $fields = [], int $id) : bool;
+    public function findByIdAndUpdate(array $fields, int $id) : bool;
 
     /**
      * Returns the storage data as an array along with formatted paginated results. This method
      * will also returns queried search results
-     * 
-     * @param array $args
+     *
      * @param Object $request
-     * @return array
+     * @param array $args
+     * @param array $relationship
+     * @return array|false
      */
     public function findWithSearchAndPaging(Object $request, array $args = [], array $relationship = []) : array|false;
 
@@ -120,6 +123,6 @@ interface DataRepositoryInterface
      *
      * @return Object|null
      */
-    public function or404();
+    public function or404(): ?object;
 
 }

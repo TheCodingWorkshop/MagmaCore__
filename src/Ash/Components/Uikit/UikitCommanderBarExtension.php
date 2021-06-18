@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
-use MagmaCore\Utility\Yaml;
-use App\Commander\UserCommander;
+use Exception;
+use MagmaCore\CommanderBar\CommanderBarInterface;
 use MagmaCore\CommanderBar\CommanderBar;
 use MagmaCore\CommanderBar\CommanderFactory;
 
@@ -26,13 +26,13 @@ class UikitCommanderBarExtension
     /**
      * Get the session flash messages on the fly.
      *
-     * @param object $controller - the current controller object
-     * @return string
-     * @throws GlobalManager
+     * @param object|null $controller - the current controller object
+     * @param string|null $header
+     * @param string|null $headerIcon
+     * @return CommanderBarInterface|bool|CommanderBar
      * @throws Exception
-     * @throws GlobalManagerException
      */
-    public function register(object $controller = null, ?string $header = null, ?string $headerIcon = null): mixed
+    public function register(object $controller = null, ?string $header = null, ?string $headerIcon = null): CommanderBarInterface|bool|CommanderBar
     {
         if (!isset($controller->commander)) {
             return false;
