@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use Exception;
 use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
@@ -49,7 +48,6 @@ class BaseController extends AbstractBaseController
      * Main class constructor
      *
      * @param array $routeParams
-     * @throws Exception
      */
     public function __construct(array $routeParams)
     {
@@ -68,9 +66,9 @@ class BaseController extends AbstractBaseController
      * with an "Action" suffix, e.g. indexAction, showAction etc.
      *
      * @param $name
-     * @param $argument
+     * @param $arguments
+     * @throws BaseException
      * @return void
-     * @throws Exception
      */
     public function __call($name, $argument)
     {
@@ -85,7 +83,7 @@ class BaseController extends AbstractBaseController
                 throw new \BadMethodCallException("Method {$method} does not exists.");
             }
         } else {
-            throw new Exception();
+            throw new \Exception();
         }
     }
 

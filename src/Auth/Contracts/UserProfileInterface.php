@@ -29,11 +29,11 @@ interface UserProfileInterface
 
     /**
      * Update the user first and lastname from their profile accounts page. Users name
-     * will be subject to the same validation as registering a new account meaning
+     * will be subject to the same validation as registering a new account meaning 
      * users can only use valid and allowed characters
      *
      * @param Collection $entityCollection
-     * @param Object $repository
+     * @param object|null $repository
      * @return array
      */
     public function updateProfileAfterValidation(Collection $entityCollection, Object $repository) : array;

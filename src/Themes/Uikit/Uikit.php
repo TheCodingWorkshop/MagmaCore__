@@ -37,6 +37,6 @@ class Uikit implements ThemeBuilderInterface
             ]
         ];
 
-        return $theme[$key] ?? '';
+        return isset($theme[$key]) ? $theme[$key] : '';
     }
 }

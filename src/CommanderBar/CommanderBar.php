@@ -76,7 +76,7 @@ class CommanderBar implements CommanderBarInterface
     private function manager(): string
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['new'])) {
+            if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetManager())) {
                 return '';
             }
         }
@@ -181,7 +181,7 @@ class CommanderBar implements CommanderBarInterface
     private function customizer(): string
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new', 'preferences', 'privileges'])) {
+            if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetCustomizer())) {
                 return '';
             }
         }
@@ -249,7 +249,7 @@ class CommanderBar implements CommanderBarInterface
     public function notifications(): string
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['edit', 'show', 'new', 'preferences', 'privileges'])) {
+            if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetNotification())) {
                 return '';
             }
         }
@@ -275,8 +275,15 @@ class CommanderBar implements CommanderBarInterface
 
     public function actions(): string
     {
+
+        if (isset($this->controller)) {
+            if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetAction())) {
+                return '';
+            }
+        }
+
         $commander = PHP_EOL;
-        $commander .= $this->commanderFiltering(); // filtering
+        $commander .= $this->commanderFiltering() ?? ''; // filtering
         $commander .= '<ul class="uk-iconnav">';
         $commander .= '<li>';
         $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="ion-28">';
@@ -295,23 +302,16 @@ class CommanderBar implements CommanderBarInterface
         return $commander;
     }
 
-    public function commanderFiltering(): string
+    public function commanderFiltering()
     {
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['new', 'edit', 'show', 'preferences', 'privileges'])) {
-                // return '<a href="/admin/user/new" uk-tooltip="Add New" class="ion-28 uk-margin-small-right uk-text-muted">
-                // <ion-icon name="add-circle-outline"></ion-icon>
-                // </a>';
-                return '';
+           if (!in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetFilter())) {
+                return '<a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-28 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
+                    <ion-icon name="funnel-outline"></ion-icon>
+                    </a>';
             }
         }
 
-        return '
-       <a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-28 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
-        <ion-icon name="funnel-outline"></ion-icon>
-        </a>
-
-        ';
     }
     private function commanderOverlaySearch(): string
     {

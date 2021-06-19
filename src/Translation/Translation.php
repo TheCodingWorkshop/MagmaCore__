@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Translation;
 
-use Exception;
-use MagmaCore\Session\Exception\SessionException;
-use MagmaCore\Session\GlobalManager\GlobalManagerException;
+use MagmaCore\Translation\TranslationInterface;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Session\SessionTrait;
 
@@ -22,12 +20,12 @@ class Translation implements TranslationInterface
 
     use SessionTrait;
 
-    private static ?Translation $instance = null;
+    private static $instance = null;
 
     /** @var array - Hold the translation strings */
-    private array $message;
+    private $message;
 
-    public static function getInstance(): ?Translation
+    public static function getInstance()
     {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -35,11 +33,6 @@ class Translation implements TranslationInterface
         return self::$instance;
     }
 
-    /**
-     * @throws SessionException
-     * @throws GlobalManagerException
-     * @throws Exception
-     */
     public function __construct()
     {
         $defaultLocale = Yaml::file('app')['settings']['default_locale'];
@@ -69,7 +62,7 @@ class Translation implements TranslationInterface
         }
     }
 
-    public function localeParser(): string
+    public function localeParser()
     {
         return substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
     }

@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Contracts;
 
-use Throwable;
-
 interface RememberedLoginInterface
 {
 

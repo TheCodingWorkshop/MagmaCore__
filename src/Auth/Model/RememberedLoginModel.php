@@ -13,10 +13,8 @@ namespace MagmaCore\Auth\Model;
 
 use MagmaCore\Auth\Contracts\RememberedLoginInterface;
 use MagmaCore\Base\AbstractBaseModel;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Utility\Token;
 use Throwable;
-use Exception;
 
 class RememberedLoginModel extends AbstractBaseModel implements RememberedLoginInterface
 { 
@@ -28,7 +26,7 @@ class RememberedLoginModel extends AbstractBaseModel implements RememberedLoginI
 
     /**
      * Main constructor class which passes the relevant information to the 
-     * base model parent constructor. This allows the repository to fetch the
+     * base model parent constructor. This allows the repsitory to fetch the
      * correct information from the database based on the model/entity
      * 
      * @throws BaseInvalidArgumentException
@@ -50,7 +48,7 @@ class RememberedLoginModel extends AbstractBaseModel implements RememberedLoginI
     }
 
     /**
-     * Returns the database table schema name
+     * Returns the databae table schema name
      * 
      * @return string
      */

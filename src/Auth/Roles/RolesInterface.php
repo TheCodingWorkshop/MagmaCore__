@@ -30,7 +30,7 @@ interface RolesInterface
      * @param string $permission
      * @return bool
      */
-    public function hasPermission(string $permission) : bool;
+    public function hasPermission($permission) : bool;
 
     
     /**
@@ -39,7 +39,7 @@ interface RolesInterface
      * @param string $roleName
      * @return boolean
      */
-    public function hasRole(string $roleName) : bool;
+    public function hasRole($roleName) : bool;
 
 
 }

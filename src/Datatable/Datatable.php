@@ -105,7 +105,7 @@ class Datatable extends AbstractDatatable
             ->query
             ->getAlnum($this->sortController['query']);
 
-        $before = $show_table_thead = $after = '';
+        $before = $after = '';
         $this->element .= $before;
         if (is_array($this->dataColumns) && count($this->dataColumns) > 0) {
             if (is_array($this->dataOptions) && $this->dataOptions != null) {
@@ -118,6 +118,8 @@ class Datatable extends AbstractDatatable
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
                             //$this->element .= '<div id="toggle-custom">';
+
+                            
                             if (is_callable($column['formatter'])) {
                                 $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                             } else {

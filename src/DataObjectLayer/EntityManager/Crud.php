@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\EntityManager;
 
-use Exception;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerUnexpectedValueException;
@@ -123,7 +122,6 @@ class Crud implements CrudInterface
      * @param array $fields
      * @return boolean
      * @throws DataLayerException
-     * @throws Exception
      */
     public function create(array $fields = []): bool
     {
@@ -142,7 +140,6 @@ class Crud implements CrudInterface
      * @param array $optional
      * @return array
      * @throws DataLayerException
-     * @throws Exception
      */
     public function read(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []): array
     {
@@ -159,7 +156,6 @@ class Crud implements CrudInterface
      * @param string $primaryKey
      * @return boolean
      * @throws DataLayerException
-     * @throws Exception
      */
     public function update(array $fields, string $primaryKey): bool
     {
@@ -175,7 +171,6 @@ class Crud implements CrudInterface
      * @param array $conditions
      * @return boolean
      * @throws DataLayerException
-     * @throws Exception
      */
     public function delete(array $conditions = []): bool
     {
@@ -192,7 +187,6 @@ class Crud implements CrudInterface
      * @param array $conditions
      * @return array
      * @throws DataLayerException
-     * @throws Exception
      */
     public function search(array $selectors = [], array $conditions = []): array
     {
@@ -209,7 +203,6 @@ class Crud implements CrudInterface
      * @param array $conditions
      * @return Object|null
      * @throws DataLayerException
-     * @throws Exception
      */
     public function get(array $selectors = [], array $conditions = []): ?Object
     {
@@ -257,7 +250,6 @@ class Crud implements CrudInterface
      * @param string $resultType
      * @return mixed
      * @throws DataLayerException
-     * @throws Exception
      */
     public function rawQuery(string $rawQuery, ?array $conditions = [], string $resultType = 'column'): mixed
     {

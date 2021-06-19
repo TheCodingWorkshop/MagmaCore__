@@ -115,7 +115,7 @@ class Container implements ContainerInterface, SettableInterface
      * @return array
      * @throws DependencyHasNoDefaultValueException|ReflectionException
      */
-    protected function getDependencies(ReflectionParameter $parameters, ReflectionClass $reflection): array
+    protected function getDependencies($parameters, ReflectionClass $reflection): array
     {
         $dependencies = [];
         foreach ($parameters as $parameter) {

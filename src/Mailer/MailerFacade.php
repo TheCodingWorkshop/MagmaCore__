@@ -35,10 +35,10 @@ class MailerFacade
      * @param string $from
      * @param string $to
      * @param string $message
-     * @return void
+     * @return mixed
      * @throws Exception\MailerException
      */
-    public function basicMail(string $subject, string $from, string $to, string $message)
+    public function basicMail(string $subject, string $from, string $to, string $message): mixed
     {
         return $this->mailer
         ->subject($subject)

@@ -28,6 +28,17 @@ trait DomainTraits
         'password_equal'
     ];
 
+    /**
+     * Unset the csrf token from the data array
+     * @param array $data
+     */
+    public function removeCsrfToken(array $data)
+    {
+        if ($data) {
+            unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
+        }
+
+    }
 
     /**
      * Returns the current template directory path
@@ -206,6 +217,7 @@ trait DomainTraits
                 return NULL;
             }
         }
+        return null;
     }
 
     /**

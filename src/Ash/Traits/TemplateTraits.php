@@ -30,7 +30,7 @@ trait TemplateTraits
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public function addjs(mixed $js = null, string $location = 'footer'): string
+    public function addjs(mixed $js = null, string $location = 'footer'): void
     {
         $this->js = $js;
         $jsYmls = Yaml::file('assets')['scripts'];
@@ -66,7 +66,7 @@ trait TemplateTraits
      * @return string
      * @throws FileNotFoundException
      */
-    public function addcss(mixed $css = null): string
+    public function addcss(mixed $css = null): void
     {
         $this->css = $css;
         $cssYmls = Yaml::file('assets')['stylesheets'];

@@ -253,10 +253,10 @@ class Mailer implements MailerInterface
      * @inheritdoc
      * @param string|null $successMsg
      * @param boolean $saveMail
-     * @return string
+     * @return mixed
      * @throws MailerException
      */
-    public function send(?string $successMsg = null, bool $saveMail = false): string
+    public function send(?string $successMsg = null, bool $saveMail = false): mixed
     {
         try {
             if (!$this->transporterObject->send()) {
@@ -266,7 +266,7 @@ class Mailer implements MailerInterface
                     $this->saveMail($this->transporterObject);
                 }
                 return $successMsg;
-            }    
+            }
         }catch(MailerException $exception) {
             throw $exception;
         }
