@@ -59,7 +59,7 @@ trait FormBuilderTrait
                 } else {
                     $selected = '';
                 }
-                $output .= '<option value="' . $key . '"' . $selected . '>' . htmlspecialchars(ucwords($choice)) . '</option>' . "\n";
+                $output .= '<option value="' . $key . '"' . $selected . '>' . $choice . '</option>' . "\n";
             }
 
             return $output;
@@ -80,16 +80,19 @@ trait FormBuilderTrait
         }
         $val = '';
         if (is_array($attr) && count($attr) > 0) {
-            foreach ($options['choices'] as $index => $choice) {
-                $checked = '';
-                if ($attr['value'] == $choice) {
-                    $checked = ' checked';
-                } elseif (isset($options['default']) && $options['default'] !=null && $options['default'] == $choice) {
-                    $checked = ' checked';
-                } else {
+            foreach ($options['choices'] as $choices) {
+                foreach ($choices as $key => $value) {
                     $checked = '';
+                    if ($attr['value'] == $key) {
+                        $checked = ' checked';
+                    } elseif (isset($options['default']) && $options['default'] !=null && $options['default'] == $key) {
+                        $checked = ' checked';
+                    } else {
+                        $checked = '';
+                    }
+                    $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $key . '" class="' . implode(' ', $attr['class']) . '" value="' . $key . '"' . $checked . '>' . ' ' . $value . "\n<br>";
+
                 }
-                $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $index . '" class="' . implode(' ', $attr['class']) . '" value="' . $index . '"' . $checked . '>' . ' ' . Stringify::capitalize($choice) . "\n<br>";
             }
             return $val;
         }

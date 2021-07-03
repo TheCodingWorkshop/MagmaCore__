@@ -42,35 +42,39 @@ class CommanderBar implements CommanderBarInterface
      */
     public function build(): string
     {
-        $commander = PHP_EOL;
-        $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
-        $commander .= '<nav class="uk-navbar" uk-navbar style="position: relative; z-index: 980; color: white!important;">';
-        $commander .= PHP_EOL;
-        $commander .= ' <div class="nav-overlay uk-navbar-left">';
-        $commander .= $this->heading();
-        $commander .= '<ul class="uk-navbar-nav">';
-        $commander .= $this->notifications();
-        $commander .= $this->manager();
-        $commander .= $this->customizer();
-        $commander .= '</ul>';
-        $commander .= '</div>';
-        $commander .= PHP_EOL;
+        if (!in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetCommander())) {
+            $commander = PHP_EOL;
+            $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
+            $commander .= '<nav class="uk-navbar" uk-navbar style="position: relative; z-index: 980; color: white!important;">';
+            $commander .= PHP_EOL;
+            $commander .= ' <div class="nav-overlay uk-navbar-left">';
+            $commander .= $this->heading();
+            $commander .= '<ul class="uk-navbar-nav">';
+            $commander .= $this->notifications();
+            $commander .= $this->manager();
+            $commander .= $this->customizer();
+            $commander .= '</ul>';
+            $commander .= '</div>';
+            $commander .= PHP_EOL;
 
-        $commander .= '<div class="nav-overlay uk-navbar-center">';
-        $commander .= $this->controller->commander->getGraphs();
-        $commander .= '</div>';
+            $commander .= '<div class="nav-overlay uk-navbar-center">';
+            $commander .= $this->controller->commander->getGraphs();
+            $commander .= '</div>';
 
-        $commander .= PHP_EOL;
-        $commander .= '<div class="nav-overlay uk-navbar-right">';
-        $commander .= $this->actions();
-        $commander .= '</div>';
-        $commander .= $this->commanderOverlaySearch();
-        $commander .= PHP_EOL;
+            $commander .= PHP_EOL;
+            $commander .= '<div class="nav-overlay uk-navbar-right">';
+            $commander .= $this->actions();
+            $commander .= '</div>';
+            $commander .= $this->commanderOverlaySearch();
+            $commander .= PHP_EOL;
 
-        $commander .= '</nav>';
-        $commander .= '</div>';
+            $commander .= '</nav>';
+            $commander .= '</div>';
 
-        return $commander;
+            return $commander;
+        }
+
+        return '';
     }
 
     private function manager(): string
@@ -103,6 +107,7 @@ class CommanderBar implements CommanderBarInterface
                 $commander .= (isset($value['name']) ? Stringify::capitalize($value['name']) : '');
                 $commander .= '</a>';
                 $commander .= '</li>';
+
                 $commander .= PHP_EOL;
             }
             $commander .= '<li class="uk-nav-divider"></li>';
@@ -120,7 +125,7 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
         if (isset($this->controller)) {
-            if (in_array($this->controller->thisRouteAction(), ['new'])) {
+            if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetManager())) {
                 $commander .= '<h3 class="uk-card-title">Change Status</h3>';
                 if (is_array($statusColumns = $this->controller->repository->getColumnStatus()) && count($statusColumns) > 0) {
                     $commander .= '<ul class="uk-nav uk-dropdown-nav">';
@@ -222,16 +227,16 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
         $commander .= '<h3 class="uk-card-title">Settings</h3>';
-        $commander .= $this->controller
-            ->controllerSettings
-            ->createForm(
-                "/admin/{$this->controller->thisRouteController()}/settings",
-                $this->controller
-                    ->controllerRepository
-                    ->getRepo()
-                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
-                $this->controller
-            );
+//        $commander .= $this->controller
+//            ->controllerSettings
+//            ->createForm(
+//                "/admin/{$this->controller->thisRouteController()}/index",
+//                $this->controller
+//                    ->controllerRepository
+//                    ->getRepo()
+//                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
+//                $this->controller
+//            );
 
         $commander .= '</div>';
         $commander .= '</div>';

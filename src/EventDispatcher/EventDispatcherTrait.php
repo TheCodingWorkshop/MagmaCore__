@@ -14,6 +14,7 @@ namespace MagmaCore\EventDispatcher;
 
 use Closure;
 use Exception;
+use MagmaCore\Base\BaseActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 

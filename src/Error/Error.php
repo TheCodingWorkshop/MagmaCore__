@@ -58,7 +58,7 @@ class Error implements ErrorInterface
      * 
      * @return ErrorInterface
      */
-    public function dispatchError(string|null $redirectPath = null): ErrorInterface
+    public function dispatchError(?string $redirectPath = null): ErrorInterface
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */

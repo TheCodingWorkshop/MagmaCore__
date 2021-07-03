@@ -189,7 +189,9 @@ class BaseController extends AbstractBaseController
         ];
     }
 
-
+    /**
+     * @return array
+     */
     public function getRoutes(): array
     {
         return $this->routeParams;

@@ -14,6 +14,7 @@ namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Utility\Yaml;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -68,14 +69,18 @@ class IndexAction implements DomainActionLogicInterface
         foreach ($cs as $arg) {
             $a = $arg;
         }
+        if (is_array($a) && empty($a)) {
+            $arg = Yaml::file('controller')[$controller->thisRouteController()];
+        }
+
         $this->args = [
-            'records_per_page' => $this->isSet('records_per_page', $a), 
-            'query' => $this->isSet('query', $a), 
-            'filter_by' => unserialize($this->isSet('filter', $a)),
-            'filter_alias' => $this->isSet('alias', $a), 
-            'sort_columns' => unserialize($this->isSet('sortable', $a)), 
-            'additional_conditions' => [], 
-            'selectors' => []
+            'records_per_page' => $this->isSet('records_per_page', $a) ?: $arg['records_per_page'],
+            'query' => $this->isSet('query', $a) ?: $arg['query'],
+            'filter_by' => unserialize($this->isSet('filter', $a)) ?: $arg['filter_by'],
+            'filter_alias' => $this->isSet('alias', $a) ?: $arg['filter_alias'],
+            'sort_columns' => unserialize($this->isSet('sortable', $a)) ?: $arg['sort_columns'],
+            'additional_conditions' => [] ?: $arg['additional_conditions'],
+            'selectors' => [] ?: $arg['selectors'],
         ];
 
         $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);

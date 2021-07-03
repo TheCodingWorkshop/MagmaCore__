@@ -24,6 +24,7 @@ class Authenticator
     protected array $errors = [];
     /** @var bool $action */
     protected bool $action = false;
+    private $validatedUser;
 
     /**
      * Authenticate the user by their email and password and only if their account 

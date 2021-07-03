@@ -440,11 +440,19 @@ trait DomainTraits
         }
     }
 
+    /**
+     * @return string
+     */
     public function getSubmitValue(): string
     {
         return $this->getFileName() . '-' . strtolower($this->controller->thisRouteController());
     }
 
+    /**
+     * @param string $key
+     * @param array $array
+     * @return mixed
+     */
     public function isSet(string $key, array $array): mixed
     {
         return array_key_exists($key, $array) ? $array[$key] : '';
@@ -465,9 +473,6 @@ trait DomainTraits
                 throw new Exception();
             }
             $this->dataRelationship = $closure($this->controller->repository, $this->controller->relationship);
-
-            // var_dump($this->dataRelationship);
-            // die;
 
         }
         return $this;
