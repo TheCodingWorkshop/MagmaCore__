@@ -59,8 +59,7 @@ class SettingsAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        $action = false;
-        
+
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { 
                 $controller->formBuilder->validateCsrf($controller); 
@@ -74,7 +73,9 @@ class SettingsAction implements DomainActionLogicInterface
                 ->dry();
 
                 $data = $entityCollection->all();
-                $this->removeCsrfToken($data);
+                if ($data) {
+                    unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
+                }
                 $data['controller_name'] = $controller->thisRouteController();
                 $action = $controller->controllerRepository
                     ->getRepo()

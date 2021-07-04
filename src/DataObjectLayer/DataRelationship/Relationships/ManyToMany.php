@@ -26,6 +26,7 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
 
     public function __construct()
     {
+        parent::__construct();
     }
 
     public function filterSelection(

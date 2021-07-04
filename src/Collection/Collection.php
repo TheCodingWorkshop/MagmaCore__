@@ -13,8 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Collection;
 
 use ArrayIterator;
-use MagmaCore\Collection\CollectionTrait;
-use MagmaCore\Collection\CollectionInterface;
+use JetBrains\PhpStorm\Pure;
 
 class Collection implements CollectionInterface
 {
@@ -33,7 +32,7 @@ class Collection implements CollectionInterface
     /**
      * Returns all the items within the collection
      *
-     * @return void
+     * @return array
      */
     public function all(): array
     {
@@ -73,22 +72,20 @@ class Collection implements CollectionInterface
         return new static(array_combine($this->keys(), $items));
     }
 
-    public function avg()
+    public function avg(): float|int
     {
         if ($size = $this->size()) {
             $array = array_filter($this->items);
-            $avg = array_sum($array) / $size;
-            return $avg;
+            return array_sum($array) / $size;
         }
     }
 
     /**
      * Calculates the sum of values within the specified array
      *
-     * @param array $array
      * @return static
      */
-    public function sum(): static
+    #[Pure] public function sum(): static
     {
         return new static(array_sum($this->items));
     }
@@ -108,7 +105,7 @@ class Collection implements CollectionInterface
      * @param mixed $to
      * @return static
      */
-    public function  range($from, $to): static
+    #[Pure] public function  range(mixed $from, mixed $to): static
     {
         return new static(range($from, $to));
     }
@@ -119,7 +116,7 @@ class Collection implements CollectionInterface
      * @param mixed $items
      * @return static
      */
-    public function merge(mixed $items): static
+    #[Pure] public function merge(mixed $items): static
     {
         return new static(array_merge($this->items, $items));
     }
@@ -130,7 +127,7 @@ class Collection implements CollectionInterface
      * @param mixed $items
      * @return static
      */
-    public function mergeRecursive(mixed $items): static
+    #[Pure] public function mergeRecursive(mixed $items): static
     {
         return new static(array_merge_recursive($this->items, $items));
     }
@@ -140,7 +137,7 @@ class Collection implements CollectionInterface
      *
      * @return mixed
      */
-    public function pop()
+    public function pop(): mixed
     {
         return array_pop($this->items);
     }
@@ -162,7 +159,7 @@ class Collection implements CollectionInterface
      *
      * @return static
      */
-    public function reverse(): static
+    #[Pure] public function reverse(): static
     {
         return new static(array_reverse($this->items, true));
     }
@@ -180,11 +177,11 @@ class Collection implements CollectionInterface
     /**
      * Extract a slice of the collection items
      *
-     * @param [type] $offset
-     * @param [type] $length
+     * @param int $offset
+     * @param null $length
      * @return static
      */
-    public function slice(int $offset, $length = null): static
+    #[Pure] public function slice(int $offset, $length = null): static
     {
         return new static(array_slice($this->items, $offset, $length, true));
     }
@@ -194,7 +191,7 @@ class Collection implements CollectionInterface
      *
      * @return static
      */
-    public function values(): static
+    #[Pure] public function values(): static
     {
         return new static(array_values($this->items));
     }
@@ -237,7 +234,7 @@ class Collection implements CollectionInterface
      *
      * @return static
      */
-    public function unique(): static
+    #[Pure] public function unique(): static
     {
         return new static(array_unique($this->items));
     }
@@ -248,7 +245,7 @@ class Collection implements CollectionInterface
      * @param mixed $items
      * @return static
      */
-    public function diff(mixed $items): static
+    #[Pure] public function diff(mixed $items): static
     {
         return new static(array_diff($this->items, $items));
     }
@@ -259,7 +256,7 @@ class Collection implements CollectionInterface
      * @param mixed $items
      * @return static
      */
-    public function diffAssoc(mixed $items): static
+    #[Pure] public function diffAssoc(mixed $items): static
     {
         return new static(array_diff_assoc($this->items, $items));
     }
@@ -284,7 +281,7 @@ class Collection implements CollectionInterface
      * @param mixed $items
      * @return static
      */
-    public function diffKeys(mixed $items): static
+    #[Pure] public function diffKeys(mixed $items): static
     {
         return new static(array_diff_key($this->items, $items));
     }
@@ -304,8 +301,8 @@ class Collection implements CollectionInterface
 
     /**
      * Run a filter over each of the collection item
-     * 
-     * @param Callable $callback
+     *
+     * @param callable|null $callback
      * @return static
      */
     public function filter(callable $callback = null): static
@@ -319,13 +316,13 @@ class Collection implements CollectionInterface
     /**
      * Get the first item from the collection passing the given truth test.
      *
-     * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param iterable $array
+     * @param  mixed  $callback
      * @return mixed
      */
-    public function first(callable|null $callback = null, $default = null)
+    public function first(iterable $array, $callback = null): mixed
     {
-        return $this->first($this->items, $callback, $default);
+        return $this->first($array, $callback);
     }
 
     /**
@@ -333,14 +330,14 @@ class Collection implements CollectionInterface
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->map(function ($value) {
             return $value;
         })->all();
     }
 
-    public function offsetExists(mixed $key)
+    public function offsetExists(mixed $key): bool
     {
         return isset($this->items[$key]);
     }
@@ -364,22 +361,22 @@ class Collection implements CollectionInterface
         unset($this->items[$key]);
     }
 
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->items);
     }
 
     /**
-     * Aliase of $this->size method
+     * Alias of $this->size method
      *
-     * @return void
+     * @return int
      */
-    public function count(): int
+    #[Pure] public function count(): int
     {
         return $this->size();
     }
 
-    public function flat($array)
+    public function flat($array): bool|array
     {
         if (!is_array($array)) {
             return FALSE;

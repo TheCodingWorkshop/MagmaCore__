@@ -24,14 +24,18 @@ class Authenticator
     protected array $errors = [];
     /** @var bool $action */
     protected bool $action = false;
-    private $validatedUser;
+    private UserModel $repository;
+    private object $user;
+    private object $object;
+    private ?object $validatedUser;
+    private string $email;
 
     /**
-     * Authenticate the user by their email and password and only if their account 
+     * Authenticate the user by their email and password and only if their account
      * status is active
-     * 
+     *
      * @param string $email
-     * @param string $password
+     * @param string $passqwordHash
      * @return object|null
      */
     public function authenticate(string $email, string $passqwordHash): ?object
@@ -56,10 +60,11 @@ class Authenticator
     }
 
     /**
-     * Returned the validatedd user object. If the credentials passed in matches
-     * a database record. else will generate a erorr from the validate() method
+     * Returned the validated user object. If the credentials passed in matches
+     * a database record. else will generate a error from the validate() method
      * below.
      *
+     * @param object $object
      * @param string|null $email
      * @param string|null $password
      * @return object
@@ -91,7 +96,7 @@ class Authenticator
      *
      * @return boolean
      */
-    public function isRememberingLogin()
+    public function isRememberingLogin(): bool
     {
         $remember = $this->object->request->handler()->get('remember_me');
         if ($remember) {

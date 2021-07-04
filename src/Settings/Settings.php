@@ -15,6 +15,10 @@ namespace MagmaCore\Settings;
 use App\Model\SettingModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
+if (class_exists(SettingModel)) {
+    throw new MissingSettngModelException();
+}
+
 class Settings
 {
 
@@ -31,9 +35,6 @@ class Settings
         $this->model = $model;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function get(string $name)
     {
         if (empty($name)) {
@@ -48,10 +49,8 @@ class Settings
 
     /**
      * Method will ensure if current $value is == to the $oldValue then return false
-     * but if the new $value doesn't not equal to the $oldvalue then add the new key 
+     * but if the new $value doesn't not equal to the $oldValue then add the new key
      * and value to schema table.
-     * 
-     * @inheritDoc
      */
     public function set(string $name, $value): bool
     {
@@ -78,9 +77,6 @@ class Settings
             return true;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function add(string $name, $value): bool
     {
         if (empty($name)) {
@@ -92,9 +88,6 @@ class Settings
         }
     }
 
-    /**
-     * @inheritdoc
-     */
     public function delete(string $name): bool
     {
         if (empty($name)) {

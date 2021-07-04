@@ -12,15 +12,6 @@ namespace MagmaCore\CommanderBar;
 
 trait CommanderUnsetterTrait
 {
-
-    /**
-     * @return array
-     */
-    public function unsetCommander(): array
-    {
-        return $this->noCommander;
-    }
-
     /**
      * @return array
      */

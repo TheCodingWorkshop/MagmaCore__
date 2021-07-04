@@ -22,7 +22,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
     /**
      * Returns all the items within the collection
      *
-     * @return void
+     * @return array
      */
     public function all(): array;
 
@@ -54,7 +54,6 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
     /**
      * Calculates the sum of values within the specified array
      *
-     * @param array $array
      * @return static
      */
     public function sum(): static;
@@ -70,7 +69,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
      * @param mixed $to
      * @return static
      */
-    public function  range($from, $to): static;
+    public function  range(mixed $from, mixed $to): static;
 
     /**
      * Merge the collection with the given argument 
@@ -93,7 +92,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
      *
      * @return mixed
      */
-    public function pop();
+    public function pop(): mixed;
 
     /**
      * Push elements on the end of the collection items
@@ -120,8 +119,8 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
     /**
      * Extract a slice of the collection items
      *
-     * @param [type] $offset
-     * @param [type] $length
+     * @param int $offset
+     * @param null $length
      * @return static
      */
     public function slice(int $offset, $length = null): static;
@@ -210,7 +209,7 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
 
     public function filter(callable $callback = null);
 
-    public function offsetExists(mixed $key);
+    public function offsetExists(mixed $key): bool;
 
     public function offsetGet(mixed $key);
 
@@ -218,12 +217,12 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
 
     public function offsetUnset(mixed $key);
 
-    public function getIterator();
+    public function getIterator(): \Traversable;
 
     /**
-     * Aliase of $this->size method
+     * Alias of $this->size method
      *
-     * @return void
+     * @return int
      */
     public function count(): int;
 }

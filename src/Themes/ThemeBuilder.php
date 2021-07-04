@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Themes;
 
-use MagmaCore\Themes\ThemeBuilderInterface;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 
 class ThemeBuilder
@@ -20,7 +19,7 @@ class ThemeBuilder
 
     protected object $themeBuilder;
 
-    public function create(string $themeBuilder)
+    public function create(string $themeBuilder): object|string
     {
         $this->themeBuilder = new $themeBuilder();
         if (!$this->themeBuilder instanceof ThemeBuilderInterface) {

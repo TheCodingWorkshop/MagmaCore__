@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session\Storage;
 
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Session\Exception\SessionInvalidArgumentException;
 
 interface SessionStorageInterface
@@ -52,7 +53,7 @@ interface SessionStorageInterface
      * @param string $key   The key of the item to store.
      * @param mixed  $value The value of the item to store. Must be serializable.
      * @return void
-     * @throws BaseIna MUST be thrown if the $key string is not a legal value.
+     * @throws BaseInvalidArgumentException MUST be thrown if the $key string is not a legal value.
      */
     public function setSession(string $key, mixed $value): void;
 

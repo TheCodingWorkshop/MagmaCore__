@@ -59,7 +59,7 @@ class ConfigAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-
+        $action = false;
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { 
                 $controller->formBuilder->validateCsrf($controller); 

@@ -21,8 +21,8 @@ class Error implements ErrorInterface
     protected array $errors = [];
     /** @var array */
     protected array $errorParams = [];
-    /** @var string */
-    protected ?string $errorCode = null;
+    /** @var string|null */
+    protected ?string $errorCode ;
     /** @var object */
     protected Object $object;
     /** @var boolean */
@@ -42,7 +42,7 @@ class Error implements ErrorInterface
      * @param array|string $error
      * @param object $object
      * @param array $errorParams
-     * @return void
+     * @return Error
      */
     public function addError($error, Object $object, array $errorParams = []): Error
     {
@@ -55,10 +55,11 @@ class Error implements ErrorInterface
 
     /**
      * Dispatched one or more errors if necessary
-     * 
+     *
+     * @param string|null $redirectPath
      * @return ErrorInterface
      */
-    public function dispatchError(?string $redirectPath = null): ErrorInterface
+    public function dispatchError(string|null $redirectPath = null): ErrorInterface
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
@@ -134,7 +135,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * Returns the error whcih matches the error code and returned a formatted array
+     * Returns the error which matches the error code and returned a formatted array
      * to be dispatched
      *
      * @param string $code
@@ -143,8 +144,6 @@ class Error implements ErrorInterface
     public static function display(string $code): array
     {
         $error = Yaml::file('error')[$code];
-        if ($error) {
-            return [$code => $error];
-        }
+        return [$code => $error];
     }
 }

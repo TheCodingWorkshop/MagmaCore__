@@ -34,7 +34,7 @@ class Sortable
     /** @var string */
     protected string $class = 'highlight';
 
-    public function __construct(array $columns = [])
+    public function __construct(array $columns)
     {
         if (empty($columns)) {
             throw new InvalidArgumentException('Invalid argument. Please specify a default columns array.');

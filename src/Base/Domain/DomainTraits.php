@@ -28,17 +28,6 @@ trait DomainTraits
         'password_equal'
     ];
 
-    /**
-     * Unset the csrf token from the data array
-     * @param array $data
-     */
-    public function removeCsrfToken(array $data)
-    {
-        if ($data) {
-            unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
-        }
-
-    }
 
     /**
      * Returns the current template directory path
@@ -217,7 +206,6 @@ trait DomainTraits
                 return NULL;
             }
         }
-        return null;
     }
 
     /**
@@ -440,19 +428,11 @@ trait DomainTraits
         }
     }
 
-    /**
-     * @return string
-     */
     public function getSubmitValue(): string
     {
         return $this->getFileName() . '-' . strtolower($this->controller->thisRouteController());
     }
 
-    /**
-     * @param string $key
-     * @param array $array
-     * @return mixed
-     */
     public function isSet(string $key, array $array): mixed
     {
         return array_key_exists($key, $array) ? $array[$key] : '';
@@ -473,6 +453,9 @@ trait DomainTraits
                 throw new Exception();
             }
             $this->dataRelationship = $closure($this->controller->repository, $this->controller->relationship);
+
+            // var_dump($this->dataRelationship);
+            // die;
 
         }
         return $this;

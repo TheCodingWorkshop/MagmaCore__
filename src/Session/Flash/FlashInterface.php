@@ -28,6 +28,6 @@ interface FlashInterface
      * 
      * @return mixed
      */
-    public function get();
+    public function get(): mixed;
 
 }

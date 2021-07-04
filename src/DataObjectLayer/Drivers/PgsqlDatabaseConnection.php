@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*
  * This file is part of the MagmaCore package.
  *
@@ -39,9 +39,7 @@ class PgsqlDatabaseConnection extends AbstractDatabaseDriver
         $this->environment = $environment;
         $this->pdoDriver = $pdoDriver;
         if (self::PDO_DRIVER !== $this->pdoDriver) {
-            throw new DataLayerInvalidArgumentException(
-                $pdoDriver . ' Invalid database driver pass requires ' . self::PDO_DRIVER . ' driver option to make your connection.'
-            );
+            throw new DataLayerInvalidArgumentException($pdoDriver . ' Invalid database driver pass requires ' . self::PDO_DRIVER . ' driver option to make your connection.');
         }
     }
 
