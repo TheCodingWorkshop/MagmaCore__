@@ -68,19 +68,19 @@ class LogoutAction implements DomainActionLogicInterface
                 if ($controller->formBuilder->csrfValidate()) {
                     /* The logout process */
                     Authorized::logout();
-                    // if ($controller->eventDispatcher) {
-                    //     $controller->eventDispatcher->dispatch(
-                    //         new $eventDispatcher(
-                    //             $method,
-                    //             array(
-                    //                 $controller->authenticator->getAuthUser(),
-                    //                 $additionalContext ? $additionalContext : []
-                    //             ),
-                    //     $controller
-                    //         ),
-                    //         $eventDispatcher::NAME
-                    //     );
-                    // }
+                     if ($controller->eventDispatcher) {
+                         $controller->eventDispatcher->dispatch(
+                             new $eventDispatcher(
+                                 $method,
+                                 array(
+                                     $controller->authenticator->getAuthUser(),
+                                     $additionalContext ? $additionalContext : []
+                                 ),
+                         $controller
+                             ),
+                             $eventDispatcher::NAME
+                         );
+                     }
                 }
             }
         endif;

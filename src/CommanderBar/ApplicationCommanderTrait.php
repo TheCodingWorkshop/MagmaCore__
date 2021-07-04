@@ -117,12 +117,12 @@ trait ApplicationCommanderTrait
      * @return array
      * @throws Exception
      */
-    public function findYml(string $file): array
+    public function findYml(string $key): array
     {
-        if (!file_exists(CONFIG_PATH . '/' . $file . '.yml')) {
+        if (!file_exists(CONFIG_PATH . '/commander.yml')) {
             throw new Exception($file . '.yml does not exist within your config directory. Your commander bar uses this to generate the manager links, plus more.');
         }
-        if ($list = Yaml::file($file)) {
+        if ($list = Yaml::file('commander')[$key]) {
             return ($this->controller->thisRouteAction() === 'index') ? $list['index'] : $list['not_index'];
         }
 

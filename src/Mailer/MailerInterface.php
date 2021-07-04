@@ -112,9 +112,9 @@ interface MailerInterface
      *
      * @param string|null $successMsg
      * @param boolean $saveMail
-     * @return void
+     * @return mixed
      * @throws MailerException
      */
-    public function send(?string $successMsg = null, bool $saveMail = false);
+    public function send(?string $successMsg = null, bool $saveMail = false): mixed;
 
 }

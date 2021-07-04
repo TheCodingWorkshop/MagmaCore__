@@ -74,7 +74,7 @@ class Flash implements FlashInterface
      * 
      * @return mixed
      */
-    public function get(): mixed
+    public function get()
     {
         if ($this->session->has($this->flashKey)) {
             return $this->session->flush($this->flashKey);

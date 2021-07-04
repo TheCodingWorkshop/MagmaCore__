@@ -26,8 +26,7 @@ class RouterFactory
      */
     public function __construct(?string $url = null)
     {
-        if ($url !=null)
-            $this->url = $url;
+        $this->url = $_SERVER['QUERY_STRING'];
     }
 
     /**
@@ -74,7 +73,7 @@ class RouterFactory
         /* Add dynamic routes based on regular expression */
         $this->routerObject->add('{controller}/{action}');
         /* Dispatch the routes */
-        $this->routerObject->dispatch($this->url ? $this->url : $_SERVER['QUERY_STRING']);
+        $this->routerObject->dispatch($this->url);
 
     }
 

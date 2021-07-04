@@ -38,6 +38,10 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
             $this->routeParams = $routeParams;
     }
 
+    /**
+     * @param ContainerInterface $container
+     * @return ContainerInterface
+     */
     public function setContainer(ContainerInterface $container)
     {
         $previous = $this->container;
@@ -45,6 +49,9 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
         return $previous;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedServices(): array
     {
         return [];
@@ -111,6 +118,10 @@ abstract class AbstractBaseController implements ServiceSubscriberInterface, Lis
         return $ID;
     }
 
+    /**
+     * @param Object $data
+     * @return array
+     */
     public function toArray(Object $data)
     {
         return (array)$data;

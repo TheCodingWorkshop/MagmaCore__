@@ -52,6 +52,17 @@ class Utilities
         return $a;
     }
 
+    public function arrayFlatten($array): array
+    {
+        $return = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)){ $return = array_merge($return, $this->arrayFlatten($value));}
+            else {$return[$key] = $value;}
+        }
+        return $return;
+
+    }
+
     /**
      * Convert an index base array to an dimensional array using the keys as the
      * value. Or alternatively combine 2 array for one multidimensional array.

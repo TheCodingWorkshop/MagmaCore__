@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\StringCollection;
 
+use MagmaCore\StringCollection\StringCollectionInterface;
+
 class StringCollection
 {
 

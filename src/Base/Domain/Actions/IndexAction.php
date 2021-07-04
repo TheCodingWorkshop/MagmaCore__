@@ -14,10 +14,11 @@ namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Utility\Yaml;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
@@ -63,21 +64,7 @@ class IndexAction implements DomainActionLogicInterface
         $this->schema = $objectSchema;
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
-        $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
-        $a = [];
-        foreach ($cs as $arg) {
-            $a = $arg;
-        }
-        $this->args = [
-            'records_per_page' => $this->isSet('records_per_page', $a), 
-            'query' => $this->isSet('query', $a), 
-            'filter_by' => unserialize($this->isSet('filter', $a)),
-            'filter_alias' => $this->isSet('alias', $a), 
-            'sort_columns' => unserialize($this->isSet('sortable', $a)), 
-            'additional_conditions' => [], 
-            'selectors' => []
-        ];
-
+        $this->args = $this->getControllerArgs($controller);
         $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
         $this->tableData = $controller->tableGrid;
 

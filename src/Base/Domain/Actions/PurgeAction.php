@@ -59,7 +59,7 @@ class PurgeAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        $action = false;
+
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) {
                 $controller->formBuilder->validateCsrf($controller);
@@ -81,22 +81,22 @@ class PurgeAction implements DomainActionLogicInterface
                         continue;
                     unlink(TEMPLATE_CACHE . '/' .$oldCacheFiles);
                 }
-                 if ($action) {
-                     if ($controller->eventDispatcher) {
-                         $controller->eventDispatcher->dispatch(
-                             new $eventDispatcher(
-                                 $method,
-                                 array_merge(
-                                     [],
-                                     $additionalContext ? $additionalContext : []
-                                 ),
-                                 $controller
-                             ),
-                             $eventDispatcher::NAME
-                         );
-                     }
-                 }
-                $this->domainAction = $action;
+                // if ($action) {
+                //     if ($controller->eventDispatcher) {
+                //         $controller->eventDispatcher->dispatch(
+                //             new $eventDispatcher(
+                //                 $method,
+                //                 array_merge(
+                //                     [],
+                //                     $additionalContext ? $additionalContext : []
+                //                 ),
+                //                 $controller
+                //             ),
+                //             $eventDispatcher::NAME
+                //         );
+                //     }
+                // }
+                //$this->domainAction = $action;
             }
         endif;
         return $this;

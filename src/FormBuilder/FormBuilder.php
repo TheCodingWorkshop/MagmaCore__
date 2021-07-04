@@ -139,7 +139,8 @@ class FormBuilder extends AbstractFormBuilder
      */
     private function processFormFields(Object $objectType) : string
     {
-        $html = $container = $before = $after = $show_label = $element_class =  $new_label = '';
+        //$html = $container = $before = $after = $show_label = $element_class =  $new_label = '';
+        $html = '';
         foreach (self::SUPPORT_INPUT_TYPES as $field) :    
             switch ($objectType->getType()) :
                 case $field :

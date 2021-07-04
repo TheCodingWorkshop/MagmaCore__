@@ -65,9 +65,8 @@ trait SessionTrait
      *
      * @param int $sessionExpiration
      * @param bool $deleteOldSession
-     * @return string
      */
-    public function sessionRegeneration(int $sessionExpiration = 10, bool $deleteOldSession = false): string
+    public function sessionRegeneration(int $sessionExpiration = 10, bool $deleteOldSession = false)
     {
         if (isset($_SESSION['OBSOLETE']) && $_SESSION['OBSOLETE'] == true) {
             return '';

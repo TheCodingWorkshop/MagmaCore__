@@ -12,30 +12,28 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
-use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Base\Domain\DomainActionLogicInterface;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class SettingsAction implements DomainActionLogicInterface
+class ControllerSettingsAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
 
-    /** @var bool */
-    protected bool $isRestFul = false;
     /** @return void - not currently being used */
     public function __construct()
     {
     }
 
     /**
-     * execute logic for adding new items to the database(). Post data is returned as a collection
+     * execute logic for adding new items to the database()
      *
      * @param Object $controller - The controller object implementing this object
      * @param string|null $entityObject
@@ -44,7 +42,7 @@ class SettingsAction implements DomainActionLogicInterface
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return SettingsAction
+     * @return ActivateAction
      */
     public function execute(
         object $controller,
@@ -59,28 +57,29 @@ class SettingsAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        $action = false;
-        
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { 
-                $controller->formBuilder->validateCsrf($controller); 
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                /* data sanitization */
-                $entityCollection = $controller
-                ->controllerRepository
-                ->getEntity()
-                ->wash($formData)
-                ->rinse()
-                ->dry();
 
-                $data = $entityCollection->all();
-                $this->removeCsrfToken($data);
-                $data['controller_name'] = $controller->thisRouteController();
-                $action = $controller->controllerRepository
+        if (isset($controller->formBuilder)) :
+            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
+                $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
+                $formData = $controller->formBuilder->getData();
+                $settingsController = yaml::file('controller')[$this->thisRouteController()];
+                $controllerSettings = [
+                    'controller_name' => $settingsController,
+                    'records_per_page' => $settingsController['records_per_page'],
+                    'visibility' => serialize($controller->getVisibleColumns($columnString)),
+                    'sortable' => serialize($controller->getSortableColumns($columnString)),
+                    'searchable' => NULL,
+                    'query_values' => serialize($settingsController['status_choices']),
+                    'query' => $settingsController['query'],
+                    'filter' => serialize($settingsController['filter_by']),
+                    'alias' => $settingsController['filter_alias']
+                ];
+                $action = $controller->repository
+                    ->getRepo()
                     ->getRepo()
                     ->getEm()
                     ->getCrud()
-                    ->update($data, 'controller_name');
+                    ->create($controllerSettings);
 
                 if ($action) {
                     if ($controller->eventDispatcher) {
@@ -88,7 +87,7 @@ class SettingsAction implements DomainActionLogicInterface
                             new $eventDispatcher(
                                 $method,
                                 array_merge(
-                                    [],
+                                    $controller->repository->getRepo()->validatedDataBag(),
                                     $additionalContext ? $additionalContext : []
                                 ),
                                 $controller
@@ -100,6 +99,7 @@ class SettingsAction implements DomainActionLogicInterface
                 $this->domainAction = $action;
             }
         endif;
+
         return $this;
     }
 }

@@ -11,11 +11,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
-use Exception;
 use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Auth\Model\RememberedLoginModel as RememberedLogin;
 use MagmaCore\Auth\Roles\Roles;
-use MagmaCore\Session\GlobalManager\GlobalManagerException;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Cookie\CookieFacade;
 use App\Model\UserModel;
@@ -49,9 +47,9 @@ class Authorized
      * @param boolean $rememberMe Remember the login if true
      * @return void
      * @throws GlobalManagerException
-     * @throws Exception|Exception
+     * @throws Exception
      */
-    public static function login(Object $userModel, bool $rememberMe)
+    public static function login(Object $userModel, $rememberMe)
     {
         /* Set userID Session here */
         session_regenerate_id(true);
@@ -70,6 +68,7 @@ class Authorized
      * Helper function for getting the current user ID from the active session
      *
      * @return int
+     * @throws GlobalManagerException
      */
     protected static function getCurrentSessionID(): int
     {
@@ -77,12 +76,13 @@ class Authorized
     }
 
     /**
-     * Register the current logged in user to the Session so there info can
+     * Register the current logged in user to the Session so there info can 
      * be accessible globally.
-     * @return mixed
-     * @throws Throwable
+     *
+     * @return object|null
+     * @throws BaseUnexpectedValueException
      */
-    public static function grantedUser(): mixed
+    public static function grantedUser()
     {
         $userSessionID = self::getCurrentSessionID();
         if (isset($userSessionID) && $userSessionID !==0) {
@@ -135,6 +135,7 @@ class Authorized
      * Remember the originally-requested page in the session
      *
      * @return void
+     * @throws GlobalManagerException
      */
     public static function rememberRequestedPage() : void
     {
@@ -146,6 +147,7 @@ class Authorized
      * or default to the homepage
      *
      * @return string
+     * @throws GlobalManagerException
      */
     public static function getReturnToPage() : string
     {

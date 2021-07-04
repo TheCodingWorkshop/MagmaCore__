@@ -21,6 +21,7 @@ trait ModelCastingTrait
     /**
      * two way casting cast a data type back and fourth
      *
+     * @param array $casters
      * @return void
      */
     public function casting(array $casters = [])
@@ -37,6 +38,11 @@ trait ModelCastingTrait
         }
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @throws BaseException
+     */
     private function resolveCast(string $key, mixed $value)
     {
         if (empty($key)) {

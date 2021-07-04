@@ -57,7 +57,7 @@ class Roles implements RolesInterface
      * @param int $roleID
      * @return Roles
      */
-    public function getRolePermissions(int $roleID): Roles
+    public function getRolePermissions(int $roleID)
     {
         // t1 = role_permission [permission_id, role_id]
         // t2 = permission [permission_name, id]
@@ -75,7 +75,7 @@ class Roles implements RolesInterface
         }
     }
 
-    public function getRoles(): array
+    public function getRoles()
     {
         return $this->roles;
     }
@@ -103,7 +103,7 @@ class Roles implements RolesInterface
      * @param string $permission
      * @return bool
      */
-    public function hasPermission(string $permission) : bool
+    public function hasPermission($permission) : bool
     { 
         return isset($this->permissions[$permission]);
     }
@@ -114,9 +114,9 @@ class Roles implements RolesInterface
      * @param string $roleName
      * @return boolean
      */
-    public function hasRole(string $roleName) : bool
+    public function hasRole($roleName) : bool
     { 
-        return ($this->roles[$roleName] ?? false);
+        return (isset($this->roles[$roleName]) ? $this->roles[$roleName] : '');
     }
 
 
