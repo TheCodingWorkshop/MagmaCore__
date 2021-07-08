@@ -86,25 +86,12 @@ class Authorized
     {
         $userSessionID = self::getCurrentSessionID();
         if (isset($userSessionID) && $userSessionID !==0) {
-            $user = (new UserModel())
+            return (new UserModel())
             ->getRepo()
             ->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
             if ($user === null) {
                 throw new BaseUnexpectedValueException('Empty user object returned. Please try again');
             }
-            $priviUser = new Roles();
-            $priviUser->id = $user->id;
-            $priviUser->email = $user->email;
-            $priviUser->firstname = $user->firstname;
-            $priviUser->lastname = $user->lastname;
-            $priviUser->name = "{$user->firstname} {$user->lastname}";
-            $priviUser->role = ["all"];
-            $priviUser->password_hash = $user->password_hash;
-            $priviUser->gravatar = $user->gravatar;
-            $priviUser->status = $user->status;
-
-            $priviUser->initRoles($user->id);
-            return $priviUser;
         } else {
             $user = self::loginFromRemembermeCookie();
             if ($user) {

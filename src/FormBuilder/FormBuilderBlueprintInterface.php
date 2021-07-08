@@ -100,7 +100,9 @@ interface FormBuilderBlueprintInterface
         string $name,
         array $class = [],
         string $id = null,
-        mixed $value = null
+        mixed $value = null,
+        bool $multiple = false,
+
     ): array;
 
     public function multipleCheckbox(

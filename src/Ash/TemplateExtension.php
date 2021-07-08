@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash;
 
+use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Convert;
 use MagmaCore\Base\BaseApplication;
@@ -106,8 +107,12 @@ class TemplateExtension
         } else {
             return $sep . implode('/', $string);
         }
+    }
 
-        
+    public function getRoleFromID(int $userID)
+    {
+        $role = PrivilegedUser::getUser($userID);
+        return $role->getRole();
     }
 
     /**

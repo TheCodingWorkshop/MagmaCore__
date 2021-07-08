@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use Exception;
+use MagmaCore\Ash\TemplateExtension;
 use Throwable;
 use MagmaCore\Error\Error;
 use ParagonIE\AntiCSRF\AntiCSRF;

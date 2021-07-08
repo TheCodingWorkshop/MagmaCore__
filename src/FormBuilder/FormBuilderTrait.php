@@ -59,7 +59,7 @@ trait FormBuilderTrait
                 } else {
                     $selected = '';
                 }
-                $output .= '<option value="' . $key . '"' . $selected . '>' . $choice . '</option>' . "\n";
+                $output .= '<option value="' . $choice . '"' . $selected . '>' . $choice . '</option>' . "\n";
             }
 
             return $output;
@@ -73,7 +73,7 @@ trait FormBuilderTrait
      * @param null $options
      * @return bool|string
      */
-    protected function renderInputOptions(array $attr, $options = null): bool|string
+    protected function renderInputOptions(array $attr, $options = null, mixed $displayLabel = null): bool|string
     {
         if (!is_array($options)) {
             $options = array();
@@ -90,13 +90,17 @@ trait FormBuilderTrait
                     } else {
                         $checked = '';
                     }
-                    $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $key . '" class="' . implode(' ', $attr['class']) . '" value="' . $key . '"' . $checked . '>' . ' ' . $value . "\n<br>";
+                    $val .= '<input type="' . $attr['type'] . '" name="' . $attr['name'] . '" id="' . $attr['id'] . '_' . $value . '" class="' . implode(' ', $attr['class']) . '" value="' . (is_string($value) ? strtolower($value) : $value) . '"' . $checked . '>' . ' ' . (is_int($value) ? $this->autoFigureNameFromInt($value) : $key) . "\n<br>";
 
                 }
             }
             return $val;
         }
         return false;
+    }
+
+    public function autoFigureNameFromInt(mixed $value)
+    {
     }
 
     /**

@@ -33,7 +33,7 @@ interface DataRelationshipInterface
      * @param string $tableRight
      * @return DataRelationshipInterface
      */
-    public function tables(string $tableLeft, string $tableRight): self;
+    public function table(string $tableLeft, ?string $tableRight = null): self;
 
     /**
      * Undocumented function

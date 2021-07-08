@@ -203,15 +203,18 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         string $name,
         array $class = [],
         string $id = null,
-        mixed $size = null
+        mixed $size = null,
+        bool $multiple = false,
     ): array
     {
+
         return [
             SelectType::class => [
                 'name' => $name,
                 'class' => $class,
                 'id' => $id,
-                'size' => $size
+                'size' => $size,
+                'multiple' => $multiple
             ]
         ];
     }
@@ -257,7 +260,7 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
      * @param array $choices
      * @return array
      */
-    public function choices(array $choices, string|null $default = null): array
+    public function choices(array $choices, mixed $default = null): array
     {
         return [
             'choices' => $choices,

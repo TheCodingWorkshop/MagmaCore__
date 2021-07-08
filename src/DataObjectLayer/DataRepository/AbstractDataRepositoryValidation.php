@@ -121,6 +121,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         if ($value) {
             return $value;
         }
+        return false;
     }
 
     public function getCreatedBy(array $cleanData)

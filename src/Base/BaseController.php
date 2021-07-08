@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use JetBrains\PhpStorm\ArrayShape;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
@@ -32,6 +34,7 @@ class BaseController extends AbstractBaseController
 
     use SessionTrait;
     use ControllerCastingTrait;
+    use ControllerPrivilegeTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -57,6 +60,26 @@ class BaseController extends AbstractBaseController
 
         $this->diContainer(Yaml::file('providers'));
         $this->registerSubscribedServices();
+    }
+
+    private function protectedRoutes()
+    {
+        $controllerClass = get_class($this);
+        $reflection = new \ReflectionClass($controllerClass);
+        $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
+        $currentUser = $this->getSession()->get('user_id');
+
+        $privileges = new Roles();
+        if ($privileges) {
+            $privileges->initRoles($currentUser);
+            if ($privileges->hasRole($privileges->getRoleForUser($currentUser))) {
+                if (!$privileges->hasPrivilege()) {
+                    /* redirect if permission is not allowed */
+                }
+            }
+        }
+
+
     }
 
     /**
@@ -161,6 +184,7 @@ class BaseController extends AbstractBaseController
         }
         $templateContext = array_merge(
             ['current_user' => Authorized::grantedUser()],
+            ['privilege_user' => PrivilegedUser::getUser()],
             ['func' => new TemplateExtension($this)],
             ['app' => Yaml::file('app')],
             ['menu' => Yaml::file('menu')],

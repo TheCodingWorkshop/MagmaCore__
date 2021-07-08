@@ -214,7 +214,7 @@ trait DomainTraits
             if (!empty($this->controller->thisRouteID())) {
                 return $this->controller->findOr404();
             } else {
-                return NULL;
+                return $this->controller->repository;
             }
         }
         return null;
@@ -476,5 +476,35 @@ trait DomainTraits
 
         }
         return $this;
+    }
+
+    /**
+     * Get the controller arguments from the default yaml file or is a database controller
+     * settings exists use that.
+     *
+     * @param object $controller
+     * @throws Exception
+     * @return array
+     */
+    public function getControllerArgs(object $controller): array
+    {
+        $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
+        $a = [];
+        foreach ($cs as $arg) {
+            $a = $arg;
+        }
+        if (is_array($a) && empty($a)) {
+            $arg = Yaml::file('controller')[$controller->thisRouteController()];
+        }
+        return [
+            'records_per_page' => $this->isSet('records_per_page', $a) ?: $arg['records_per_page'],
+            'query' => $this->isSet('query', $a) ?: $arg['query'],
+            'filter_by' => unserialize($this->isSet('filter', $a)) ?: $arg['filter_by'],
+            'filter_alias' => $this->isSet('alias', $a) ?: $arg['filter_alias'],
+            'sort_columns' => unserialize($this->isSet('sortable', $a)) ?: $arg['sort_columns'],
+            'additional_conditions' => $arg['additional_conditions'],
+            'selectors' => $arg['selectors'],
+        ];
+
     }
 }

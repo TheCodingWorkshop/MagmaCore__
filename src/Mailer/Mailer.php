@@ -270,6 +270,7 @@ class Mailer implements MailerInterface
         }catch(MailerException $exception) {
             throw $exception;
         }
+        return false;
     }
 
     /**

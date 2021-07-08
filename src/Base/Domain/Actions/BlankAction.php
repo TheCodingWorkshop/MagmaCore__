@@ -17,12 +17,12 @@ use MagmaCore\Base\Domain\DomainTraits;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class NewAction implements DomainActionLogicInterface
+class BlankAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
@@ -65,20 +65,13 @@ class NewAction implements DomainActionLogicInterface
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
                 $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
                 $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                /* data sanitization */
-                $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
-                $action = $controller->repository
-                    ->getRepo()
-                    ->validateRepository($entityCollection, $entityObject)
-                    ->persistAfterValidation();
-
-                if ($action) {
+                if ($formData) {
                     if ($controller->eventDispatcher) {
                         $controller->eventDispatcher->dispatch(
                             new $eventDispatcher(
                                 $method,
                                 array_merge(
-                                    $controller->repository->getRepo()->validatedDataBag(),
+                                    $formData,
                                     $additionalContext ? $additionalContext : []
                                 ),
                                 $controller
@@ -87,9 +80,9 @@ class NewAction implements DomainActionLogicInterface
                         );
                     }
                 }
-                $this->domainAction = $action;
             }
         endif;
         return $this;
     }
 }
+

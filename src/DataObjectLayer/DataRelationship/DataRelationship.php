@@ -14,6 +14,7 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 
 use Exception;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
 
 /**
  * Both tables can have only one record on each side of the relationship.
@@ -22,9 +23,9 @@ use MagmaCore\Base\BaseApplication;
 class DataRelationship implements DataRelationshipInterface
 {
 
-    private object $tableLeft;
+    private object $table;
     private object $tableRight;
-    private object $tablePivot;
+    private object $pivot;
 
     /**
      * Undocumented function
@@ -36,75 +37,59 @@ class DataRelationship implements DataRelationshipInterface
     public function type(string $relationship): self
     {
         if ($relationship) {
-            $relationship1 = BaseApplication::diGet($relationship);
-            if (!$relationship1) {
-                throw new Exception();
+            $relationship = BaseApplication::diGet($relationship);
+            if (!$relationship) {
+                throw new DataRelationshipInvalidArgumentException('');
             }
         }
         return $this;
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $tableLeft
-     * @param string $tableRight
-     * @return DataRelationship
+     * @param string $table
+     * @param string|null $additionalTable
+     * @return $this
      * @throws Exception
      */
-    public function tables(string $tableLeft, string $tableRight): self
+    public function table(string $table, ?string $additionalTable = null): self
     {
-        if (empty($tableLeft) || empty($tableRight)) {
-            throw new Exception();
+        if (empty($table)) {
+            throw new DataRelationshipInvalidArgumentException('Please specify the table.');
         }
-
-        if ($tableLeft) {
-            $this->tableLeft = BaseApplication::diGet($tableLeft);
-            if (!$this->tableLeft) {
-                throw new Exception();
-            }
-            if ($tableRight) {
-                $this->tableRight = BaseApplication::diGet($tableRight);
-                if (!$this->tableRight) {
-                    throw new Exception();
-                }
+        if ($table) {
+            $this->table = BaseApplication::diGet($table);
+            if (!$this->table) {
+                throw new DataRelationshipInvalidArgumentException('');
             }
         }
-
         return $this;
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $tablePivot
-     * @return DataRelationship
+     * @param string $pivot
+     * @return $this
      * @throws Exception
      */
-    public function pivot(string $tablePivot): self
+    public function pivot(string $pivot): self
     {
-        if ($tablePivot) {
-            $this->tablePivot = BaseApplication::diGet($tablePivot);
-            if (!$this->tablePivot) {
-                throw new Exception();
-            }
-        }
-
+        $this->pivot = $this->table($pivot);
         return $this;
     }
 
+    /**
+     * @return object
+     */
     public function getPivot(): object
     {
-        return $this->tablePivot;
+        return $this->pivot;
     }
 
-    public function getLeft(): object
+    /**
+     * @return object
+     */
+    public function getTable(): object
     {
-        return $this->tableLeft;
+        return $this->table;
     }
 
-    public function getRight(): object
-    {
-        return $this->tableRight;
-    }
 }
