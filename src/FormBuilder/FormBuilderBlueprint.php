@@ -260,11 +260,12 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
      * @param array $choices
      * @return array
      */
-    public function choices(array $choices, mixed $default = null): array
+    public function choices(array $choices, mixed $default = null, object $form = null): array
     {
         return [
             'choices' => $choices,
-            'default' => ($default !==null) ? $default : 'pending'
+            'default' => ($default !==null) ? $default : 'pending',
+            'object' => $form
         ];
     }
 

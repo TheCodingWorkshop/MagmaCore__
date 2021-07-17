@@ -12,13 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use Closure;
-use Exception;
+use MagmaCore\Auth\Authorized;
+use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use Exception;
+use Closure;
 
 trait DomainTraits
 {
@@ -52,7 +54,7 @@ trait DomainTraits
     }
 
     /**
-     * Explode the name of the current method by double colon :: and remove the
+     * Explode the name of the current method by double colon :: and remove the 
      * Action suffix from the string. As the method name is the last element within
      * the array the use of array_key_last ensure we are getting the last element.
      *
@@ -193,7 +195,8 @@ trait DomainTraits
             [
                 'form' => $formRendering->createForm(
                     ($formAction !== null) ? $formAction : $this->domainRoute(),
-                    ($data !== null) ? $data : $this->findSomeData()
+                    ($data !== null) ? $data : $this->findSomeData(),
+                    $this->controller
                 )
                 ],
                 $this->getDataRelationship()
@@ -239,8 +242,8 @@ trait DomainTraits
                 ($column !== null) ? $column : $this->controller->column,
                 ($repository !== null) ? $repository : $this->tableRepository,
                 $this->args,
-                /**
-                 * getColumns() is a method located within the BaseModel class
+                /** 
+                 * getColumns() is a method located within the BaseModel class 
                  * and it simple returns an array of columns for the model db table
                  * its takes 1 argument which is schema that built the model. See
                  * the relevant schema located in the App/Schema directory
@@ -315,6 +318,11 @@ trait DomainTraits
     {
         $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
         $this->controller->render($this->fileToRender, $context);
+    }
+
+    public function endWithoutRender(): string
+    {
+        return '';
     }
 
     /**
@@ -478,7 +486,6 @@ trait DomainTraits
         return $this;
     }
 
-<<<<<<< HEAD
     /**
      * Get the controller arguments from the default yaml file or is a database controller
      * settings exists use that.
@@ -487,8 +494,6 @@ trait DomainTraits
      * @throws Exception
      * @return array
      */
-=======
->>>>>>> 12d2722806a2965cc99949f21e809f1e481f4ca6
     public function getControllerArgs(object $controller): array
     {
         $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
@@ -499,24 +504,48 @@ trait DomainTraits
         if (is_array($a) && empty($a)) {
             $arg = Yaml::file('controller')[$controller->thisRouteController()];
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> 12d2722806a2965cc99949f21e809f1e481f4ca6
         return [
             'records_per_page' => $this->isSet('records_per_page', $a) ?: $arg['records_per_page'],
             'query' => $this->isSet('query', $a) ?: $arg['query'],
             'filter_by' => unserialize($this->isSet('filter', $a)) ?: $arg['filter_by'],
             'filter_alias' => $this->isSet('alias', $a) ?: $arg['filter_alias'],
             'sort_columns' => unserialize($this->isSet('sortable', $a)) ?: $arg['sort_columns'],
-<<<<<<< HEAD
             'additional_conditions' => $arg['additional_conditions'],
             'selectors' => $arg['selectors'],
-=======
-            'additional_conditions' => [] ?: $arg['additional_conditions'],
-            'selectors' => [] ?: $arg['selectors'],
->>>>>>> 12d2722806a2965cc99949f21e809f1e481f4ca6
         ];
 
     }
+
+
+    /**
+     * @param object $controller
+     * @param string $permission
+     * @return $this
+     */
+    public function setAccess(object $controller, string $permission): self
+    {
+        $privilege = PrivilegedUser::getUser();
+        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())) {
+            $controller->flashMessage('Access Denied!', $controller->flashWarning());
+            $controller->redirect('/admin/accessDenied/index');
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $data
+     * @return $this
+     */
+    public function simpleData(array $data): self
+    {
+        $this->simpleData = $data;
+        return $this;
+    }
+
+    public function simpleDataSchemaID(string $schemaID): self
+    {
+        $this->simpleDataSchemaID = $schemaID;
+        return $this;
+    }
+
 }

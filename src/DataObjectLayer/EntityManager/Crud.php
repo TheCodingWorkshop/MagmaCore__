@@ -267,9 +267,9 @@ class Crud implements CrudInterface
                 'fetch_all' => $this->dataMapper->results(),
                 default => throw new DataLayerUnexpectedValueException('Please choose a return type for this method ie. "fetch, fetch_all or column."'),
             };
-            if ($data) {
-                return $data;
-            }
+            return $data;
+
         }
+        return false;
     }
 }

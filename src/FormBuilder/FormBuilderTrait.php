@@ -54,12 +54,18 @@ trait FormBuilderTrait
             foreach ($options['choices'] as $key => $choice) {
                 if ($choice == $key && $key != '') {
                     $selected = ' selected';
-                } elseif (isset($options['default']) && $options['default'] != null && $options['default'] == $key) {
+                    $disabled = ' disabled';
+                } elseif (isset($options['default']) && $options['default'] !== null && $options['default'] == $choice) {
                     $selected = ' selected';
+                    $selected = ' disabled';
+                } elseif (is_array($options['default'])) {
+                    $selected = (in_array($choice, $options['default']) ? ' selected' : '');
+                    $disabled = (in_array($choice, $options['default']) ? ' disabled' : '');
                 } else {
                     $selected = '';
+                    $disabled = '';
                 }
-                $output .= '<option value="' . $choice . '"' . $selected . '>' . $choice . '</option>' . "\n";
+                $output .= '<option' . $disabled . ' value="' . $choice . '"' . $selected . '>' . (is_int($choice) ? $this->getNameFromID($choice, $options['object']) : $choice) . '' . $selected . '</option>' . "\n";
             }
 
             return $output;
@@ -166,6 +172,14 @@ trait FormBuilderTrait
         }
         return $v;
     
+    }
+
+    private function getNameFromID(int $id, object $form)
+    {
+        if (isset($form)) {
+            return $form->getModel()->getNameForSelectField($id);
+        }
+
     }
 
 

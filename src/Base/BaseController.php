@@ -62,26 +62,6 @@ class BaseController extends AbstractBaseController
         $this->registerSubscribedServices();
     }
 
-    private function protectedRoutes()
-    {
-        $controllerClass = get_class($this);
-        $reflection = new \ReflectionClass($controllerClass);
-        $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
-        $currentUser = $this->getSession()->get('user_id');
-
-        $privileges = new Roles();
-        if ($privileges) {
-            $privileges->initRoles($currentUser);
-            if ($privileges->hasRole($privileges->getRoleForUser($currentUser))) {
-                if (!$privileges->hasPrivilege()) {
-                    /* redirect if permission is not allowed */
-                }
-            }
-        }
-
-
-    }
-
     /**
      * Magic method called when a non-existent or inaccessible method is
      * called on an object of this class. Used to execute before and after

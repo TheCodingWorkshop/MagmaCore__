@@ -23,6 +23,7 @@ use MagmaCore\Ash\Components\Bootstrap\BsNavigationExtension;
 use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
+use App\Model\PermissionModel;
 
 class TemplateExtension
 {
@@ -182,4 +183,16 @@ class TemplateExtension
             }
         }
     }
+
+    /**
+     * Return the permission ID based on the permission name
+     * @param string $permissionName
+     * @return int
+     */
+    public function getPermissionIDFromName(string $permissionName): int
+    {
+        $permission = (new PermissionModel())->getRepo()->findObjectBy(['permission_name' => $permissionName], ['id']);
+        return $permission->id;
+    }
+
 }

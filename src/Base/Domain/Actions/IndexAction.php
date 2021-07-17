@@ -18,7 +18,7 @@ use MagmaCore\Utility\Yaml;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will
+ * items are sanitize and validated before persisting to database. The class will 
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing

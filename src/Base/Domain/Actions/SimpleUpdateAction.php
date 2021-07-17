@@ -22,17 +22,17 @@ use MagmaCore\Base\Domain\DomainTraits;
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class BlankAction implements DomainActionLogicInterface
+class SimpleUpdateAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
 
     /** @var bool */
     protected bool $isRestFul = false;
+
     /** @return void - not currently being used */
     public function __construct()
-    {
-    }
+    { }
 
     /**
      * execute logic for adding new items to the database(). Post data is returned as a collection
@@ -63,16 +63,33 @@ class BlankAction implements DomainActionLogicInterface
 
         if (isset($controller->formBuilder)) :
             if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
-                //$controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
                 $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                unset($formData[$this->getSubmitValue()]);
-                if ($formData) {
+                $entityCollection = $controller->userRole
+                    ->getEntity()
+                    ->wash($formData)
+                    ->rinse()
+                    ->dry();
+                $data = $entityCollection->all();
+                unset($data[$this->getSubmitValue()]); /* remove the submit from the final array */
+                $action = $controller->userRole
+                    ->getRepo()
+                    ->getEm()
+                    ->getCrud()
+                    ->update(
+                        array_merge(
+                            $data,
+                            $controller->userRoleRepo->getRepoUserIDArray($controller->thisRouteID())
+                        ),
+                        $controller->userRoleRepo->getRepoSchemaID()
+                    );
+
+                if ($action) {
                     if ($controller->eventDispatcher) {
                         $controller->eventDispatcher->dispatch(
                             new $eventDispatcher(
                                 $method,
                                 array_merge(
-                                    $formData,
+                                    $data,
                                     $additionalContext ? $additionalContext : []
                                 ),
                                 $controller
@@ -85,5 +102,8 @@ class BlankAction implements DomainActionLogicInterface
         endif;
         return $this;
     }
+
+
 }
+
 

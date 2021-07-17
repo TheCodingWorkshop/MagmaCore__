@@ -126,8 +126,9 @@ class PrivilegedUser
     {
         $roles = Role::getRolePermissions($roleID);
         foreach ((array)$roles as $role) {
-            return $role;
+           return $role;
         }
     }
+
 
 }

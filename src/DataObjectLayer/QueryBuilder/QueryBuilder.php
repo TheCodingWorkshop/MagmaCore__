@@ -129,13 +129,17 @@ class QueryBuilder extends AbstractQueryBuilder
     {
         if ($this->isQueryTypeValid('delete')) {
             $index = array_keys($this->key['conditions']);
-            $this->sqlQuery = "DELETE FROM {$this->key['table']} WHERE {$index[0]} = :{$index[0]} LIMIT 1";
-            $bulkDelete = array_values($this->key['fields']);
-            if (is_array($bulkDelete) && count($bulkDelete) > 1) {
-                for ($i = 0; $i < count($bulkDelete); $i++) {
-                    $this->sqlQuery = "DELETE FROM {$this->key['table']} WHERE {$index[0]} = :{$index[0]}";
-                }
+            $this->sqlQuery = "DELETE FROM {$this->key['table']} WHERE {$index[0]} = :{$index[0]}";
+            if (isset($this->key['conditions']) && count($this->key['conditions']) > 1) {
+                $this->sqlQuery .= " AND {$index[1]} = :{$index[1]}";
             }
+            $this->sqlQuery .= ' LIMIT 1';
+//            $bulkDelete = array_values($this->key['fields']);
+//            if (is_array($bulkDelete) && count($bulkDelete) > 1) {
+//                for ($i = 0; $i < count($bulkDelete); $i++) {
+//                    $this->sqlQuery = "DELETE FROM {$this->key['table']} WHERE {$index[0]} = :{$index[0]}";
+//                }
+//            }
 
             return $this->sqlQuery;
         }
