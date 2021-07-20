@@ -27,7 +27,7 @@ class UikitPaginationExtension
     public function register(object $controller = null): string
     {
         return '
-        <section class="uk-margin-medium-top uk-padding-small uk-padding-remove-bottom">
+        <section class="uk-padding-small uk-padding-remove-bottom">
             <nav aria-label="Pagination" uk-navbar>
                 <div class="uk-navbar-left" style="margin-top: -15px;">
                 ' . $this->infoPaging($controller) . '

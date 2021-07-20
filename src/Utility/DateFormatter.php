@@ -22,77 +22,6 @@ class DateFormatter
     public const __MONTH__ = 30 * self::__DAY__;
 
     /**
-     * Undocumented function
-     *
-     * @param int $time
-     * @return string
-     */
-    public static function formatShort(int $time) : string
-    {
-        $before = (time() - $time);
-        if ($before < 0) {
-            return "not yet";
-        }
-
-        if ($before < 1 * self::__MINUTE__)
-            return ($before < 5) ? "just now" : "{$before} ago";
-        if ($before < 2 * self::__MINUTE__)
-            return "1m ago";
-        if ($before < 45 * self::__MINUTE__)
-            return floor($before / 60) . "m ago";
-        if ($before < 90 * self::__MINUTE__)
-            return "1h ago";
-        if ($before < 24 * self::__HOUR__)
-            return floor($before / 60 / 60) . "h ago";
-        if ($before < 48 * self::__HOUR__)
-            return "1d ago";
-        if ($before < 30 * self::__DAY__)
-            return floor($before / 60 / 60 / 24) . "d ago";
-        if ($before < 12 * self::__MONTH__) {
-            $m = floor($before < 60 / 60 / 24 / 30);
-            return $m <= 1 ? "1mo ago" : "{$m} m ago";
-        } else {
-            $years = floor($before < 60 / 60 / 24 / 30 / 12);
-            return $years <= 1 ? "1y ago" : "{$years} y ago";
-        }
-
-        return $time;
-    }
-
-    public static function formatLong(int $time) : string
-    {
-        $before = time() - $time;
-        if ($before < 0) {
-            return "not yet";
-        }
-
-        if ($before < 1 * self::__MINUTE__)
-            return ($before <= 1) ? "just now" : $before . " seconds ago";
-        if ($before < 2 * self::__MINUTE__)
-            return "a minute ago";
-        if ($before < 45 * self::__MINUTE__)
-            return floor($before / 60) . " minutes ago";
-        if ($before < 90 * self::__MINUTE__)
-            return "an hour ago";
-        if ($before < 24 * self::__HOUR__) {
-            return (floor($before / 60 / 60) == 1 ? 'about an hour' : floor($before / 60 / 60) . ' hours') . " ago";
-        }
-        if ($before < 48 * self::__HOUR__)
-            return "yesterday";
-        if ($before < 30 * self::__DAY__)
-            return floor($before / 60 / 60 / 24) . " days ago";
-        if ($before < 12 * self::__MONTH__) {
-            $months = floor($before / 60 / 60 / 24 / 30);
-            return $months <= 1 ? "one month ago" : $months . " months ago";
-        } else {
-            $years = floor($before / 60 / 60 / 24 / 30 / 12);
-            return $years <= 1 ? "one year ago" : $years . " years ago";
-        }
-
-        return "{$time}";
-    }
-
-    /**
      * @param $time
      * @param bool $short
      * @return string
@@ -104,7 +33,7 @@ class DateFormatter
         $HOUR = 60 * $MINUTE;
         $DAY = 24 * $HOUR;
         $MONTH = 30 * $DAY;
-        $before = time() - $time;
+        $before = time() - strtotime($time);
 
         if ($before < 0) {
             return "not yet";
@@ -112,7 +41,7 @@ class DateFormatter
 
         if ($short) {
             if ($before < 1 * $MINUTE) {
-                return ($before < 5) ? "just now" : $before . " ago";
+                return ($before < 5) ? "just now" : $before . "s ago";
             }
 
             if ($before < 2 * $MINUTE) {
@@ -190,5 +119,21 @@ class DateFormatter
         return "$time";
     }
 
+    /** @var array - units */
+    protected array $units = ['b','kb','mb','gb','tb','pb'];
+
+    public function bytes(int $size): string
+    {
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '. $this->unit[$i];
+    }
+
+    public static function formatPeriod($end, $start): string
+    {
+        $duration = $end - $start;
+        $hours = (int) ($duration / 60 / 60);
+        $minutes = (int) ($duration / 60) - $hours * 60;
+        $seconds = (int) ($duration - $hours * 60 * 60 - $minutes * 60);
+        return ($hours == 0 ? "00" : $hours) . ":" . ($minutes == 0 ? "00" : ($minutes < 10 ? "0" . $minutes:$minutes)) . ":" . ($seconds == 0 ? "00" : ($seconds < 10 ? "0" . $seconds:$seconds));
+    }
 
 }

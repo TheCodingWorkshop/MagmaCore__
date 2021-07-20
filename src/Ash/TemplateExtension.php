@@ -13,8 +13,9 @@ declare(strict_types=1);
 namespace MagmaCore\Ash;
 
 use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\Utility\Yaml;
-use MagmaCore\Utility\Convert;
+use MagmaCore\Utility\DateFormatter;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Ash\Components\Uikit\UikitNavigationExtension;
@@ -24,12 +25,19 @@ use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
 use App\Model\PermissionModel;
+use App\Model\UserModel;
+use RuntimeException;
+
+if (!class_exists(PermisisonModel::class) && !class_exists(UserModel::class)) {
+    throw new RuntimeException('You are application is missing Permisson and User Models.');
+}
 
 class TemplateExtension
 {
 
     /** @var TemplateTraits - holds common function used across template extensions */
     use TemplateTraits;
+    use DataLayerTrait;
 
     /** @var array */
     protected mixed $js = null;
@@ -71,7 +79,7 @@ class TemplateExtension
      */
     public function formatDate(mixed $time, bool $short = false): string
     {
-        return Convert::timeFormat($time, $short);
+        return DateFormatter::timeFormat($time, $short);
     }
 
     /**
@@ -193,6 +201,49 @@ class TemplateExtension
     {
         $permission = (new PermissionModel())->getRepo()->findObjectBy(['permission_name' => $permissionName], ['id']);
         return $permission->id;
+    }
+
+    /**
+     * @param array $userRoleIDs
+     * @return array
+     */
+    public function getUsersFromRoleID(array $userRoleIDs): array
+    {
+        $results = array_filter($userRoleIDs, fn($userRoleID) => $userRoleID['user_id'], ARRAY_FILTER_USE_BOTH);
+        $users = array_map( fn($id) => (new UserModel())->getRepo()->findBy(['firstname', 'lastname', 'status', 'id'], ['id' => $id['user_id']]), $results);
+        return $this->flattenArray($users);
+
+    }
+
+    /**
+     * @param array $userRoleIDs
+     * @return string
+     */
+    public function getUserOrderedListsFromRoles(array $userRoleIDs): string
+    {
+        $users = $this->getUsersFromRoleID($userRoleIDs);
+        if (is_array($users) && count($users) > 0) {
+            $html = '<ul class="uk-panel uk-panel-scrollable">';
+            foreach ($users as $user) {
+                $html .= '<li>';
+                $html .= '<div class="uk-grid-small" uk-grid>';
+                $html .= '<div class="uk-width-expand" uk-leader>' . $user['firstname'] . ' ' . $user['lastname'] . '</div>';
+                $html .= '<div>';
+                $html .= '<a href="/admin/user/' . $user['id'] . '/edit" class="uk-reset-link" uk-tooltip="Edit ' . $user['firstname'] . '"><ion-icon name="create-outline"></ion-icon></a>';
+                $html .= '<a href="/admin/user/' . $user['id'] . '/privilege" class="uk-reset-link" uk-tooltip="Edit Privilege"><ion-icon name="key-outline"></ion-icon></a>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '</li>';
+            }
+            $html .= '</ul>';
+
+            return $html;
+
+        } else {
+            return '<ion-icon name="help-outline"></ion-icon>';
+        }
+
+
     }
 
 }

@@ -161,7 +161,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
         if ($row) {
             $time = $row[$field];
             //if ($short) {
-                return DateFormatter::timeFormat(strtotime($time), $short);
+                return DateFormatter::timeFormat($time, $short);
             //} else {
                // return DateFormatter::formatLong(strtotime($time));
             //}

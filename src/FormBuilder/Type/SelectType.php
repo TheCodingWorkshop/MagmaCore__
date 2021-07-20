@@ -60,7 +60,7 @@ class SelectType implements FormBuilderTypeInterface
             'name' => '',
             'id' => '',
             'class' => ['uk-select'],
-            'size' => '',
+            'size' => 30,
             'multiple' => false,
             'autocomplete' => 'off'
         ];

@@ -402,4 +402,8 @@ class DataRepository implements DataRepositoryInterface
     {
         return $this->em->getCrud()->countRecords($conditions, $field);
     }
+    public function fetchLastID(): int
+    {
+        return $this->em->getCrud()->lastID();
+    }
 }

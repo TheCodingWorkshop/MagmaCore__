@@ -269,6 +269,12 @@ trait DomainTraits
         return $this;
     }
 
+    public function binLists(array $selectors = [], mixed $newLists = null): self
+    {
+        $this->superContext = array_merge($this->context, ['lists' => $this->controller->repository->getRepo()->findBy($selectors, ['deleted_at' => 1])]);
+        return $this;
+    }
+
     function array_flatten($array) {
         foreach ($array as $arr) {
             return $arr;
