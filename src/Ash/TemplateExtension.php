@@ -149,7 +149,7 @@ class TemplateExtension
      * @param string $name
      * @return mixed
      */
-    public function config(string $name): mixed
+    public function config(string $name)
     {
         if (isset($this->controller->settingsRepository)) {
             return $this->controller->settingsRepository->get($name);
