@@ -25,6 +25,7 @@ use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
 use App\Model\PermissionModel;
+use App\Model\RoleModel;
 use App\Model\UserModel;
 use RuntimeException;
 
@@ -149,7 +150,7 @@ class TemplateExtension
      * @param string $name
      * @return mixed
      */
-    public function config(string $name)
+    public function config(string $name): mixed
     {
         if (isset($this->controller->settingsRepository)) {
             return $this->controller->settingsRepository->get($name);
@@ -216,6 +217,47 @@ class TemplateExtension
     }
 
     /**
+     * @param array $permissionID
+     * @return array
+     */
+    public function getRolesFromPermissionID(array $permissionID): array
+    {
+        $results = array_filter($permissionID, fn($rolePermID) => $rolePermID['role_id'], ARRAY_FILTER_USE_BOTH);
+        $roles = array_map( fn($id) => (new RoleModel())->getRepo()->findBy(['id', 'role_name'], ['id' => $id['role_id']]), $results);
+        return $this->flattenArray($roles);
+
+    }
+
+    /**
+     * @param array $permissionID
+     * @return string
+     */
+    public function getRolesOrderedListFromPermissionID(array $permissionID): string
+    {
+        $roles = $this->getRolesFromPermissionID($permissionID);
+        if (is_array($roles) && count($roles) > 0) {
+            $html = '<ul class="uk-panel uk-panel-scrollable">';
+            foreach ($roles as $role) {
+                $html .= '<li>';
+                $html .= '<div class="uk-grid-small" uk-grid>';
+                $html .= '<div class="uk-width-expand" uk-leader>' . $role['role_name'] . '</div>';
+                $html .= '<div>';
+                $html .= '<a href="/admin/role/' . $role['id'] . '/edit" class="uk-reset-link" uk-tooltip="Edit ' . $role['role_name'] . '"><ion-icon name="create-outline"></ion-icon></a>';
+                $html .= '<a href="/admin/role/' . $role['id'] . '/assigned" class="uk-reset-link" uk-tooltip="Edit Permissions"><ion-icon name="key-outline"></ion-icon></a>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '</li>';
+            }
+            $html .= '</ul>';
+
+            return $html;
+
+        } else {
+            return '<ion-icon name="help-outline"></ion-icon>';
+        }
+    }
+
+    /**
      * @param array $userRoleIDs
      * @return string
      */
@@ -243,7 +285,14 @@ class TemplateExtension
             return '<ion-icon name="help-outline"></ion-icon>';
         }
 
+    }
 
+    public function getAuthorByID(int $id)
+    {
+        $user = (new UserModel())->getRepo()->findObjectBy(['id' => $id], ['firstname', 'lastname']);
+        if ($user) {
+            return sprintf('%s %s', $user->firstname, $user->lastname);
+        }
     }
 
 }

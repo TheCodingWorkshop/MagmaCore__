@@ -19,6 +19,7 @@ use MagmaCore\Session\SessionFacade;
 use MagmaCore\Base\Traits\BootstrapTrait;
 use MagmaCore\Container\ContainerFactory;
 use MagmaCore\Session\GlobalManager\GlobalManager;
+use MagmaCore\Cache\CacheFacade;
 
 abstract class AbstractBaseBootLoader
 {
@@ -136,7 +137,7 @@ abstract class AbstractBaseBootLoader
     }
 
     /**
-     * Get the default session driver defined with the session.yml file
+     * Get the default cache driver defined with the cache.yml file
      *
      * @return string
      */
@@ -162,6 +163,14 @@ abstract class AbstractBaseBootLoader
 
         GLobalManager::set('session_global', $session);
         return $session;
+    }
+
+    public function loadCache()
+    {
+        $cache = (new CacheFacade())->create($this->getCacheIdentifier(), \MagmaCore\Cache\Storage\NativeCacheStorage::class);
+        GLobalManager::set('cache_global', $cache);
+        return $cache;
+
     }
 
     protected function loadRoutes()

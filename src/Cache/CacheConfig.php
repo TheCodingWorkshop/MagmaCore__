@@ -30,7 +30,7 @@ class CacheConfig
         return [
             'use_cache' => true,
             'key' => 'auto',
-            'cache_path' => '/Storage/Cache/',
+            'cache_path' => '/Storage/cache/',
             'cache_expires' => 3600,
             'default_storage' => self::DEFAULT_DRIVER,
             'drivers' => [

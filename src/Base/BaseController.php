@@ -29,6 +29,7 @@ use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
+use MagmaCore\Base\BaseApplication;
 
 class BaseController extends AbstractBaseController
 {
@@ -63,6 +64,11 @@ class BaseController extends AbstractBaseController
         $this->diContainer(Yaml::file('providers'));
         $this->registerSubscribedServices();
         $this->buildControllerMenu($routeParams);
+    }
+
+    public function baseApp()
+    {
+        return new BaseApplication();
     }
 
     /**
@@ -352,6 +358,11 @@ class BaseController extends AbstractBaseController
     public function getSession(): Object
     {
         return SessionTrait::sessionFromGlobal();
+    }
+
+    public function cache()
+    {
+        return $this->baseApp($this)->loadCache();
     }
 
 }

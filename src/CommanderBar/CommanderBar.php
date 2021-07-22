@@ -63,9 +63,9 @@ class CommanderBar implements CommanderBarInterface
 
             $commander .= PHP_EOL;
             $commander .= '<div class="nav-overlay uk-navbar-right">';
-            $commander .= $this->actions();
+            //$commander .= $this->actions();
             $commander .= '</div>';
-            $commander .= $this->commanderOverlaySearch();
+            ///$commander .= $this->commanderOverlaySearch();
             $commander .= PHP_EOL;
 
             $commander .= '</nav>';
@@ -106,7 +106,7 @@ class CommanderBar implements CommanderBarInterface
                 $selectAll = (isset($value['name']) && $value['name'] == 'Select All' ? "onclick='selects()'" : '');
                 $deselectAll = (isset($value['name']) && $value['name'] == 'Deselect All' ? "onclick='deSelect()'" : '');
 
-                $commander .= '<a href="' . ($value['path'] ?? $this->path($key)) . '" class="bulk-action-links" name="bulk-' . (isset($value['name']) ? $value['name'] : 'null') . '" uk-toggle="target: #toggle-custom; cls: highlight">&nbsp;';
+                $commander .= '<a class="bulk-action-links" uk-toggle="target: #toggle-custom; cls: highlight" href="' . ($value['path'] ?? $this->path($key)) . '">&nbsp;';
                 $commander .= '<ion-icon name="' . (isset($value['icon']) ? $value['icon'] : 'help-outline') . '"></ion-icon>';
                 $commander .= (isset($value['name']) ? Stringify::capitalize($value['name']) : '');
                 $commander .= '</a>';
@@ -116,6 +116,9 @@ class CommanderBar implements CommanderBarInterface
             }
             $commander .= '<li class="uk-nav-divider"></li>';
             $commander .= '<li>';
+            //$commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/trash" uk-tooltip="View Trash" class="ion-28">';
+            //$commander .= '<ion-icon name="trash"></ion-icon>';
+            //$commander .= '</a>';
             $commander .= '<div class="uk-margin">';
             $commander .= '<button onclick="selects()" type="button" class="uk-button uk-button-primary uk-button-small uk-margin-small-right">Select</button>';
             $commander .= '<button onclick="deSelect()" type="button" class="uk-button uk-button-secondary uk-button-small">DeSelect</button>';
@@ -131,7 +134,7 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<div class="uk-card">';
         if (isset($this->controller)) {
             if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetManager())) {
-                $commander .= '<h3 class="uk-card-title">Trash Can</h3>';
+                $commander .= '<h3 class="uk-card-title">Change Status</h3>';
                 if (is_array($statusColumns = $this->controller->repository->getColumnStatus()) && count($statusColumns) > 0) {
                     $commander .= '<ul class="uk-nav uk-dropdown-nav">';
                     foreach ($statusColumns as $key => $value) {
@@ -336,7 +339,8 @@ class CommanderBar implements CommanderBarInterface
 
         <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()"><ion-icon size="large" name="close-outline"></ion-icon></a>
 
-    </div>';
+    </div>
+        ';
     }
 
     private function actionButton(): string

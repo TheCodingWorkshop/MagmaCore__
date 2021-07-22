@@ -33,21 +33,16 @@ class CacheFactory
      * @param array $options
      * @return CacheInterface
      */
-    public function create(
-        ?string $cacheIdentifier = null,
-        ?string $storage = null,
-        array $options = []
-    ): CacheInterface {
-        $this->envConfigurations = new CacheEnvironmentConfigurations($cacheIdentifier, __DIR__);
-        $storageObject = new $storage($this->envConfigurations, $options);
+    public function create(?string $cacheIdentifier = null, ?string $storage = null, array $options = []): CacheInterface
+    {
+        $this->envConfigurations = new CacheEnvironmentConfigurations($cacheIdentifier, CACHE_PATH);
+        $storageObject = ($storage !== null) ? new $storage($this->envConfigurations, $options) : new NativeCacheStorage($this->envConfigurations, $options);
         if (!$storageObject instanceof CacheStorageInterface) {
             throw new cacheInvalidArgumentException(
                 '"' . $storage . '" is not a valid cache storage object.',
                 0
             );
         }
-        $defaultStorage = $storageObject != null ? $storageObject : new NativeCacheStorage($this->envConfigurations, $options);
-
-        return new Cache($cacheIdentifier, $defaultStorage, $options);
+        return new Cache($cacheIdentifier, $storageObject, $options);
     }
 }

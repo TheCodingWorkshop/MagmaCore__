@@ -31,6 +31,7 @@ class BaseApplication extends AbstractBaseBootLoader
     protected string|null $routeHandler;
     protected string|null $newRouter;
     protected string|null $theme;
+    protected ?string $newCacheDriver;
 
     /** @return void */
     public function __construct()
@@ -180,13 +181,23 @@ class BaseApplication extends AbstractBaseBootLoader
      * @param array $ymlSCache
      * @return self
      */
-    public function setCache(array $ymlCache = [], string|null $newCacheDriver = null): self
+    public function setCache(array $ymlCache = [], string $newCacheDriver = null): self
     {
         $this->cache = (!empty($ymlCache) ? $ymlCache : (new CacheConfig())->baseConfiguration());
         $this->newCacheDriver = ($newCacheDriver !== null) ? $newCacheDriver : $this->getDefaultCacheDriver();
-
         return $this;
     }
+
+    /**
+     * Returns the cache configuration array
+     *
+     * @return string
+     */
+    public function getCacheIdentifier(): string
+    {
+        return $this->cache['cache_name'] ?? '';
+    }
+
 
     /**
      * Returns the cache configuration array
@@ -213,7 +224,6 @@ class BaseApplication extends AbstractBaseBootLoader
         }
         return $this->newCacheDriver;
     }
-
 
     /**
      * Set the application container providers configuration from the session.yml file.
@@ -327,6 +337,7 @@ class BaseApplication extends AbstractBaseBootLoader
         $this->phpVersion();
         //$this->loadErrorHandlers();
         $this->loadSession();
+        $this->loadCache();
         $this->loadEnvironment();
         $this->loadRoutes();
     }

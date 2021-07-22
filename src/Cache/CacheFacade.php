@@ -28,11 +28,7 @@ class CacheFacade
      * @param array $options
      * @return CacheInterface
      */
-    public function create(
-        ?string $cacheIdentifier = null,
-        ?string $storage = null,
-        array $options = []
-    ): CacheInterface
+    public function create(?string $cacheIdentifier = null, ?string $storage = null, array $options = []): CacheInterface
     {
         return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
     }

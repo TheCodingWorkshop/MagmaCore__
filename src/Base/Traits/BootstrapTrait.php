@@ -28,12 +28,14 @@ trait BootstrapTrait
     {
         if (count($config) > 0) {
             if (array_key_exists('drivers', $config)) {
-                $sess  = $config['drivers']['native_storage'];
-                if ($sess['default'] === true) {
-                    return $sess['class'];
+                $type = $config['default_driver'];
+                $driver = $config['drivers'][$type];
+                if ($driver['default'] === true) {
+                    return $driver['class'];
                 }
             }
         }
+        return false;
     }
 
 

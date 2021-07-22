@@ -13,7 +13,9 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
+use MagmaCore\Cache\Storage\NativeCacheStorage;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Cache\CacheFacade;
 use MagmaCore\Utility\Yaml;
 
 /**
@@ -33,8 +35,12 @@ class IndexAction implements DomainActionLogicInterface
     private ?string $schema;
 
     /** @return void - not currently being used */
-    public function __construct()
+    private $cache;
+
+    /** @return void - not currently being used */
+    public function __construct(CacheFacade $cache)
     {
+        $this->cache = $cache->create('data_repository');
     }
 
     /**
@@ -65,7 +71,15 @@ class IndexAction implements DomainActionLogicInterface
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
         $this->args = $this->getControllerArgs($controller);
-        $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+        $controllerName = $controller->thisRouteController();
+        if ($controller->cache()) {
+            $this->tableRepository = $controller->cache()->set($controllerName .'_index_controller', $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args));
+            if ($controller->cache()->get($controllerName .'_index_controller') !==null) {
+                $this->tableRepository = $controller->cache()->get($controllerName .'_index_controller');
+            } else {
+                $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+            }
+        }
         $this->tableData = $controller->tableGrid;
 
         if ($this->tableData)

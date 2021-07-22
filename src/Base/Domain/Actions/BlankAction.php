@@ -14,6 +14,8 @@ namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use magamCore\Cache\CacheFactory;
+use MagmaCore\Cache\CacheFacade;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -29,9 +31,12 @@ class BlankAction implements DomainActionLogicInterface
 
     /** @var bool */
     protected bool $isRestFul = false;
+    private CacheFacade $cache;
+
     /** @return void - not currently being used */
-    public function __construct()
+    public function __construct(CacheFacade $cache)
     {
+        $this->cache = $cache;
     }
 
     /**
