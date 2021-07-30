@@ -13,9 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use JetBrains\PhpStorm\ArrayShape;
-use MagmaCore\Auth\Roles\PrivilegedUser;
-use MagmaCore\Base\Traits\ControllerMenuTrait;
-use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
@@ -29,15 +27,13 @@ use MagmaCore\Session\Flash\FlashType;
 use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
-use MagmaCore\Base\BaseApplication;
+use MagmaCore\Auth\Roles\PrivilegedUser;
 
 class BaseController extends AbstractBaseController
 {
 
     use SessionTrait;
     use ControllerCastingTrait;
-    //use ControllerPrivilegeTrait;
-    use ControllerMenuTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -63,13 +59,13 @@ class BaseController extends AbstractBaseController
 
         $this->diContainer(Yaml::file('providers'));
         $this->registerSubscribedServices();
-        $this->buildControllerMenu($routeParams);
     }
 
     public function baseApp()
     {
         return new BaseApplication();
     }
+
 
     /**
      * Magic method called when a non-existent or inaccessible method is
@@ -177,7 +173,6 @@ class BaseController extends AbstractBaseController
             ['func' => new TemplateExtension($this)],
             ['app' => Yaml::file('app')],
             ['menu' => Yaml::file('menu')],
-            ['header_nav' => $this->headerNav()],
             ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
         );
 
@@ -187,19 +182,6 @@ class BaseController extends AbstractBaseController
         if ($response) {
             return $response;
         }
-    }
-
-    public function headerNav()
-    {
-        return [
-            'flag' => ['icon' => 'flag-outline', 'path' => '', 'children' => [
-                'en' => ['name' => 'English', 'path' => ''],
-                'es' => ['name' => 'Spanish', 'path' => '']
-            ]],
-            'user' => ['icon' => 'person-outline', 'path' => ''],
-            'setting' => ['icon' => 'settings-outline', 'path' => ''],
-            'logout' => ['icon' => 'log-out-outline', 'path' => '/logout']
-        ];
     }
 
     /**
@@ -364,5 +346,6 @@ class BaseController extends AbstractBaseController
     {
         return $this->baseApp($this)->loadCache();
     }
+
 
 }

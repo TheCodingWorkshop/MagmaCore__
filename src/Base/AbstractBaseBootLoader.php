@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Logger\Logger;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\RouterFactory;
@@ -20,6 +21,7 @@ use MagmaCore\Base\Traits\BootstrapTrait;
 use MagmaCore\Container\ContainerFactory;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Cache\CacheFacade;
+use MagmaCore\Logger\LoggerFactory;
 
 abstract class AbstractBaseBootLoader
 {
@@ -40,7 +42,7 @@ abstract class AbstractBaseBootLoader
     }
 
     /**
-     * Compare PHP version with the core version ensuring the correct version of 
+     * Compare PHP version with the core version ensuring the correct version of
      * PHP and MagmaCore framework is being used at all time in sync.
      *
      * @return void
@@ -89,8 +91,8 @@ abstract class AbstractBaseBootLoader
 
     /**
      * Returns an array of the application set providers which will be loaded
-     * by the dependency container. Which uses PHP Reflection class to 
-     * create objects. With a key property which is defined within the yaml 
+     * by the dependency container. Which uses PHP Reflection class to
+     * create objects. With a key property which is defined within the yaml
      * providers file
      *
      * @return array
@@ -189,6 +191,23 @@ abstract class AbstractBaseBootLoader
         set_exception_handler($this->app()->getErrorHandling()['exception']);
     }
 
+    /**
+     * @return mixed
+     */
+    protected function loadLogger()
+    {
+        return (new LoggerFactory())
+            ->create(
+                $this->app()->getLoggerFile(),
+                $this->app()->getLogger(),
+                $this->app()->getLogMinLevel(),
+                $this->app()->getLoggerOptions()
+            );
+    }
+
+    /**
+     * @throws \MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException
+     */
     public function getTheming()
     {
         (new ThemeBuilder())->create($this->app()->getTheme());

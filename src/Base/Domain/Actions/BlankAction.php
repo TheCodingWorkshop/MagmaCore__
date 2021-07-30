@@ -59,7 +59,7 @@ class BlankAction implements DomainActionLogicInterface
         string $method,
         array $rules = [],
         array $additionalContext = [],
-        ?string $model = null
+        mixed $optional = null
     ): self {
 
         $this->controller = $controller;

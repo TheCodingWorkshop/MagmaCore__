@@ -34,6 +34,14 @@ class Crud implements CrudInterface
     /** @var string */
     protected string $tableSchemaID;
 
+    private string $createQuery;
+    private string $readQuery;
+    private string $joinQuery;
+    private string $updateQuery;
+    private string $deleteQuery;
+    private string $searchQuery;
+    private string $rawQuery;
+
     /**
      * Main constructor
      *
@@ -112,6 +120,7 @@ class Crud implements CrudInterface
 
         $args = ['table' => $this->getSchema(), 'type' => 'join', 'selectors' => $selectors, 'join_to_selectors' => $joinSelectors, 'join_to' => $joinTo, 'join_type' => $joinType, 'conditions' => $conditions, 'params' => $parameters, 'extras' => $extras];
         $query = $this->queryBuilder->buildQuery($args)->joinQuery();
+        $this->joinQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions, $parameters));
         return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->results() : NULL;
     }
@@ -127,6 +136,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'insert', 'fields' => $fields];
         $query = $this->queryBuilder->buildQuery($args)->insertQuery();
+        $this->createQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields));
         return $this->dataMapper->numRows() == 1;
     }
@@ -145,6 +155,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'select', 'selectors' => $selectors, 'conditions' => $conditions, 'params' => $parameters, 'extras' => $optional];
         $query = $this->queryBuilder->buildQuery($args)->selectQuery();
+        $this->readQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions, $parameters));
         return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->results() : array();
     }
@@ -161,6 +172,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'update', 'fields' => $fields, 'primary_key' => $primaryKey];
         $query = $this->queryBuilder->buildQuery($args)->updateQuery();
+        $this->updateQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields));
         return $this->dataMapper->numRows() == 1;
     }
@@ -176,6 +188,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'delete', 'conditions' => $conditions];
         $query = $this->queryBuilder->buildQuery($args)->deleteQuery();
+        $this->deleteQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         return $this->dataMapper->numRows() == 1;
     }
@@ -192,6 +205,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'search', 'selectors' => $selectors, 'conditions' => $conditions];
         $query = $this->queryBuilder->buildQuery($args)->searchQuery();
+        $this->searchQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->results() : array();
     }
@@ -208,6 +222,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'select', 'selectors' => $selectors, 'conditions' => $conditions];
         $query = $this->queryBuilder->buildQuery($args)->selectQuery();
+        $this->getQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->result() : NULL;
     }
@@ -255,6 +270,7 @@ class Crud implements CrudInterface
     {
         $args = ['table' => $this->getSchema(), 'type' => 'raw', 'conditions' => $conditions, 'raw' => $rawQuery];
         $query = $this->queryBuilder->buildQuery($args)->rawQuery();
+        $this->rawQuery = $query;
         $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         if ($this->dataMapper->numRows()) {
             if (!in_array($resultType, ['fetch', 'fetch_all', 'column', 'columns'])) {
@@ -272,4 +288,20 @@ class Crud implements CrudInterface
         }
         return false;
     }
+
+    /**
+     * @param string $type
+     * @return mixed
+     */
+    public function getQueryType(string $type)
+    {
+        $queryTypes = ['createQuery', 'readQuery', 'updateQuery', 'deleteQuery', 'joinQuery', 'searchQuery', 'rawQuery'];
+        if (!empty($type)) {
+            if (in_array($type, $queryTypes, true)) {
+                return $this->$type;
+            }
+        }
+
+    }
+
 }

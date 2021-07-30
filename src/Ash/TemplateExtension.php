@@ -20,6 +20,7 @@ use MagmaCore\Base\BaseApplication;
 use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Ash\Components\Uikit\UikitNavigationExtension;
 use MagmaCore\Ash\Components\Uikit\UikitPaginationExtension;
+use MagmaCore\Ash\Components\Uikit\UikitSimplePaginationExtension;
 use MagmaCore\Ash\Components\Bootstrap\BsNavigationExtension;
 use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
@@ -52,7 +53,7 @@ class TemplateExtension
     private object $controller;
 
     /**
-     * Return an array of all the template extension class with the const extension 
+     * Return an array of all the template extension class with the const extension
      * name as the key which represent the extension logic
      *
      * @return void
@@ -64,6 +65,7 @@ class TemplateExtension
 
             UikitNavigationExtension::NAME => UikitNavigationExtension::class,
             UikitPaginationExtension::NAME => UikitPaginationExtension::class,
+            UikitSimplePaginationExtension::NAME => UikitSimplePaginationExtension::class,
             UikitCommanderBarExtension::NAME => UikitCommanderBarExtension::class,
             UikitFlashMessagesExtension::NAME => UikitFlashMessagesExtension::class,
             BsNavigationExtension::NAME => BsNavigationExtension::class
@@ -83,12 +85,17 @@ class TemplateExtension
         return DateFormatter::timeFormat($time, $short);
     }
 
+    public function altDateFormat(string $format, $datetime)
+    {
+        return date($format, strtotime($datetime));
+    }
+
     /**
-     * Construct the user define path. Path must be specified based on the its 
-     * controller ie. to access the index action within the dashboard controller this 
-     * path must be declared as admin_dashboard_index which will simple return 
-     * /admin/dashboard/index. An exception will be thrown if the current path doesn't 
-     * match the current namespace controller and action 
+     * Construct the user define path. Path must be specified based on the its
+     * controller ie. to access the index action within the dashboard controller this
+     * path must be declared as admin_dashboard_index which will simple return
+     * /admin/dashboard/index. An exception will be thrown if the current path doesn't
+     * match the current namespace controller and action
      *
      * @param string $path
      * @param mixed $token
@@ -99,18 +106,6 @@ class TemplateExtension
         $string = explode('_', $path);
         $sep = '/';
 
-        // if (isset($string[1]) && $string[1] === $this->controller->thisRouteController()) {
-        //     if (isset($string[0]) && $string[0] !== $this->controller->thisRouteNamespace()) {
-        //         throw new LoaderError('Invalid path namespace');
-        //     }
-        //     if (isset($string[1]) && $string[1] !== $this->controller->thisRouteController()) {
-        //         throw new LoaderError('Invalid path controller');
-        //     }
-        //     if (isset($string[2]) && $string[2] !== $this->controller->thisRouteAction()) {
-        //         throw new LoaderError('Invalid path action');
-        //     }
-
-        // }
         if ($token !==null) {
             $newArray = [$string[0], $string[1], $token, $string[2]];
             return $sep . implode('/', array_replace($string, $newArray));
@@ -293,6 +288,39 @@ class TemplateExtension
         if ($user) {
             return sprintf('%s %s', $user->firstname, $user->lastname);
         }
+    }
+
+    public function getLogLevelColor(string $levelName)
+    {
+        if (is_string($levelName) && $levelName !='') {
+            return match($levelName) {
+                'warning', 'alert' => 'warning',
+                'emergency' => 'success',
+                'critical', 'error' => 'danger',
+                'notice', 'info' => 'primary',
+                'debug' => 'secondary'
+            };
+        }
+    }
+
+    /**
+     * @param int $countPending
+     * @param int $countActive
+     * @param object $request
+     */
+    public function togglePendingActiveStatusLabel(int $countPending, int $countActive, $tab, object $request)
+    {
+        //$html = '';
+        if (isset($request)){
+            $status = $request->handler()->query->get('status');
+            if (isset($status) && $status === 'pending') {
+                $html = '<span class="uk-text-small uk-label uk-label-success">' . $tab['data'] . '</span>';
+                /* show the active count and and link back to index */
+            } else {
+                /* show pending count and link back to pending status */
+            }
+        }
+        return $html;
     }
 
 }

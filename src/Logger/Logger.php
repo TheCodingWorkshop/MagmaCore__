@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Logger;
 
+use MagmaCore\Logger\Handler\LoggerHandlerInterface;
 use MagmaCore\Logger\LoggerInterface;
+use Throwable;
 
 class Logger implements LoggerInterface
 {
@@ -66,6 +68,33 @@ class Logger implements LoggerInterface
      * Urgent alert.
      */
     public const EMERGENCY = 600;
+
+    /* @var LoggerHandlerInterface $loggerHandler */
+    private LoggerHandlerInterface $loggerHandler;
+
+    /**
+     * Logger constructor.
+     * @param LoggerHandlerInterface $loggerHandler
+     */
+    public function __construct(LoggerHandlerInterface $loggerHandler)
+    {
+        $this->loggerHandler = $loggerHandler;
+    }
+
+    /**
+     * @param string $message
+     * @param array $context
+     */
+    private function writeLog(string $message, array $context): void
+    {
+        try{
+            $this->loggerHandler->write($message, $context);
+        }catch(Throwable $throw) {
+            throw new LoggerException('An exception was thrown in writing the log to the handler.', 0, $throw);
+        }
+
+    }
+
     /**
      * System is unusable.
      *
@@ -75,6 +104,7 @@ class Logger implements LoggerInterface
      */
     public function emergency($message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -89,6 +119,7 @@ class Logger implements LoggerInterface
      */
     public function alert(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -102,6 +133,7 @@ class Logger implements LoggerInterface
      */
     public function critical(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -114,6 +146,7 @@ class Logger implements LoggerInterface
      */
     public function error(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -128,6 +161,7 @@ class Logger implements LoggerInterface
      */
     public function warning(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -139,6 +173,7 @@ class Logger implements LoggerInterface
      */
     public function notice(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -152,6 +187,7 @@ class Logger implements LoggerInterface
      */
     public function info(string $message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -163,6 +199,7 @@ class Logger implements LoggerInterface
      */
     public function debug($message, array $context = array()): void
     {
+        $this->writeLog($message, $context);
     }
 
     /**

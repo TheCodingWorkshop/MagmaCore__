@@ -256,6 +256,7 @@ class DataRepository implements DataRepositoryInterface
         } catch (Throwable $throwable) {
             throw $throwable;
         }
+        return false;
     }
 
     /**
@@ -281,6 +282,7 @@ class DataRepository implements DataRepositoryInterface
         } catch (Throwable $throwable) {
             throw $throwable;
         }
+        return false;
     }
 
     /**
@@ -406,4 +408,5 @@ class DataRepository implements DataRepositoryInterface
     {
         return $this->em->getCrud()->lastID();
     }
+
 }

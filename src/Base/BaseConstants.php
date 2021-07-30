@@ -33,7 +33,7 @@ final class BaseConstants
         defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
         defined('TEMPLATES') or define('TEMPLATES', $_SERVER['DOCUMENT_ROOT'] . 'App/Templates/');
         defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
-        defined('CACHE_PATH') or define('CACHE_PATH', 'Storage/cache/');
+        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
         defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
         defined('ROOT_URI') or define('ROOT_URI', '');
         defined('RESOURCES') or define('RESOURCES', ROOT_URI);

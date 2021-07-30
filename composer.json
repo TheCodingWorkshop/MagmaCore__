@@ -1,7 +1,12 @@
 {
     "name": "magmacore/magmacore",
     "description": "A Small modular PHP framework Build for web applications",
-    "keywords": ["php", "framework", "magmacore", "lavastudio"],
+    "keywords": [
+        "php",
+        "framework",
+        "magmacore",
+        "lavastudio"
+    ],
     "type": "library",
     "license": "MIT",
     "time": "2020-12-25",
@@ -13,11 +18,13 @@
         "issues": "https://github.com/TheCodingWorkshop/MagmaCore__/issues"
     },
     "homepage": "https://thecodingworkshop.github.io/MagmaCore__/",
-    "authors": [{
-        "name": "TheCodingWorkshop",
-        "email": "riccodingworkshop@gmail.com",
-        "role": "Developer"
-    }],
+    "authors": [
+        {
+            "name": "TheCodingWorkshop",
+            "email": "riccodingworkshop@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "minimum-stability": "beta",
     "require": {
         "ext-mbstring": "*",
@@ -25,17 +32,16 @@
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-curl": "*",
+        "ext-imap": "*",
         "ext-simplexml": "*",
         "symfony/yaml": "^5.2",
-        "twig/twig": "^3.1",
         "symfony/http-foundation": "^5.2",
         "paragonie/anti-csrf": "^2.3",
         "symfony/dotenv": "^5.2",
-        "symfony/asset": "^5.2",
         "flatbase/flatbase": "^0.4.1",
         "symfony/serializer-pack": "^1.0",
-        "phpmailer/phpmailer": "^6.2",
-      "ext-imap": "*"
+        "symfony/console": "^5.3",
+        "phpmailer/phpmailer": "^6.2"
     },
     "autoload": {
         "psr-4": {

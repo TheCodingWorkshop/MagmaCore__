@@ -117,15 +117,11 @@ class Datatable extends AbstractDatatable
                     foreach ($this->dataColumns as $column) {
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
-                            //$this->element .= '<div id="toggle-custom">';
-
-                            
                             if (is_callable($column['formatter'])) {
                                 $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
                             } else {
                                 $this->element .= ($row[$column['db_row']] ?? '');
                             }
-                            //$this->element .= '</div>';
                             $this->element .= '</td>' . "\n";
                         }
                     }
@@ -206,7 +202,7 @@ class Datatable extends AbstractDatatable
         } else {
             $element .= sprintf('<a href="?page=%s">', ($this->currentPage - 1));
         }
-        $element .= '<span>Previous</span></a>' . PHP_EOL;
+        $element .= '<span><ion-icon name="chevron-back-outline"></ion-icon></span></a>' . PHP_EOL;
         $element .= '</li>' . PHP_EOL;
 
         return $element;
@@ -236,7 +232,7 @@ class Datatable extends AbstractDatatable
         } else {
             $element .= sprintf('<a href="?page=%s">', ($this->currentPage + 1));
         }
-        $element .= '<span>Next</span></a>' . PHP_EOL;
+        $element .= '<span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>' . PHP_EOL;
         $element .= '</li>' . PHP_EOL;
 
         return $element;

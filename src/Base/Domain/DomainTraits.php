@@ -12,18 +12,20 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use MagmaCore\Auth\Authorized;
-use MagmaCore\Auth\Roles\PrivilegedUser;
+use Closure;
+use Exception;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use Exception;
-use Closure;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Base\Domain\DomainActionLogTrait;
 
 trait DomainTraits
 {
+
+    use DomainActionLogTrait;
 
     protected array $allowedRules = [
         'password_required',
@@ -54,7 +56,7 @@ trait DomainTraits
     }
 
     /**
-     * Explode the name of the current method by double colon :: and remove the 
+     * Explode the name of the current method by double colon :: and remove the
      * Action suffix from the string. As the method name is the last element within
      * the array the use of array_key_last ensure we are getting the last element.
      *
@@ -198,8 +200,7 @@ trait DomainTraits
                     ($data !== null) ? $data : $this->findSomeData(),
                     $this->controller
                 )
-                ],
-                $this->getDataRelationship()
+            ],
         );
         return $this;
     }
@@ -217,7 +218,7 @@ trait DomainTraits
             if (!empty($this->controller->thisRouteID())) {
                 return $this->controller->findOr404();
             } else {
-                return $this->controller->repository;
+                return NULL;
             }
         }
         return null;
@@ -242,8 +243,8 @@ trait DomainTraits
                 ($column !== null) ? $column : $this->controller->column,
                 ($repository !== null) ? $repository : $this->tableRepository,
                 $this->args,
-                /** 
-                 * getColumns() is a method located within the BaseModel class 
+                /**
+                 * getColumns() is a method located within the BaseModel class
                  * and it simple returns an array of columns for the model db table
                  * its takes 1 argument which is schema that built the model. See
                  * the relevant schema located in the App/Schema directory
@@ -257,6 +258,7 @@ trait DomainTraits
         /* Create data table context which gets pass to the twig rendering template */
         if ($this->tableData) {
             $tableContext = [
+                'query_time' => $this->queryTime,
                 'table' => $table,
                 'pagination' => $this->controller->tableGrid->pagination(),
                 'columns' => $this->controller->tableGrid->getColumns(),
@@ -266,12 +268,6 @@ trait DomainTraits
             ];
         }
         $this->superContext = array_merge($this->context, (!empty($tableData)) ? $tableData : $tableContext);
-        return $this;
-    }
-
-    public function binLists(array $selectors = [], mixed $newLists = null): self
-    {
-        $this->superContext = array_merge($this->context, ['lists' => $this->controller->repository->getRepo()->findBy($selectors, ['deleted_at' => 1])]);
         return $this;
     }
 
@@ -293,24 +289,20 @@ trait DomainTraits
         $this->superContext = array_merge(
             $this->context,
             ['row' => $this->controller->toArray($this->controller->findOr404())],
-            $this->getDataRelationship()
         );
         return $this;
     }
 
-    /**
-     * Render a notification
-     *
-     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
-     */
-    public function notification(): self
+    public function binLists(array $selectors = []): self
     {
+        if (isset($this->controller->repository)) {
+            $lists = $this->controller->repository->getRepo()->findBy($selectors, ['deleted_at' => 1, 'status' => 'trash']);
+            $this->superContext = array_merge(
+                $this->context,
+                ['lists' => $lists]
+            );
+        }
         return $this;
-    }
-
-    private function getDataRelationship(): array
-    {
-        return isset($this->dataRelationship) ? ['relationship' => $this->dataRelationship] : [];
     }
 
     /**
@@ -326,7 +318,7 @@ trait DomainTraits
         $this->controller->render($this->fileToRender, $context);
     }
 
-    public function endWithoutRender(): string
+    public function endAfterExecution(): string
     {
         return '';
     }
@@ -472,34 +464,6 @@ trait DomainTraits
         return array_key_exists($key, $array) ? $array[$key] : '';
     }
 
-    /**
-     * Return a closure with data relating to the current query. simple joining
-     * multiple matching data tables together.
-     *
-     * @param Closure|null $closure
-     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
-     * @throws Exception
-     */
-    public function mergeRelationship(Closure $closure = null): self
-    {
-        if ($closure) {
-            if (!$closure instanceof Closure) {
-                throw new Exception();
-            }
-            $this->dataRelationship = $closure($this->controller->repository, $this->controller->relationship);
-
-        }
-        return $this;
-    }
-
-    /**
-     * Get the controller arguments from the default yaml file or is a database controller
-     * settings exists use that.
-     *
-     * @param object $controller
-     * @throws Exception
-     * @return array
-     */
     public function getControllerArgs(object $controller): array
     {
         $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
@@ -510,18 +474,18 @@ trait DomainTraits
         if (is_array($a) && empty($a)) {
             $arg = Yaml::file('controller')[$controller->thisRouteController()];
         }
+
         return [
             'records_per_page' => $this->isSet('records_per_page', $a) ?: $arg['records_per_page'],
             'query' => $this->isSet('query', $a) ?: $arg['query'],
             'filter_by' => unserialize($this->isSet('filter', $a)) ?: $arg['filter_by'],
             'filter_alias' => $this->isSet('alias', $a) ?: $arg['filter_alias'],
             'sort_columns' => unserialize($this->isSet('sortable', $a)) ?: $arg['sort_columns'],
-            'additional_conditions' => $arg['additional_conditions'],
-            'selectors' => $arg['selectors'],
+            'additional_conditions' => [] ?: $arg['additional_conditions'],
+            'selectors' => [] ?: $arg['selectors'],
         ];
 
     }
-
 
     /**
      * @param object $controller
@@ -535,22 +499,6 @@ trait DomainTraits
             $controller->flashMessage('Access Denied!', $controller->flashWarning());
             $controller->redirect('/admin/accessDenied/index');
         }
-        return $this;
-    }
-
-    /**
-     * @param array $data
-     * @return $this
-     */
-    public function simpleData(array $data): self
-    {
-        $this->simpleData = $data;
-        return $this;
-    }
-
-    public function simpleDataSchemaID(string $schemaID): self
-    {
-        $this->simpleDataSchemaID = $schemaID;
         return $this;
     }
 

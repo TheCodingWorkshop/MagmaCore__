@@ -171,7 +171,7 @@ class BaseModel
     {
         $relationship = BaseApplication::diGet($relationshipType);
         if (!$relationship instanceof DataRelationalInterface) {
-            throw new DataRelationshipInvalidArgumentException(get_class($relationship) . ' does not implement DataRelationalInterface.');
+            throw new DataRelationshipInvalidArgumentException('');
         }
         return $relationship;
     }

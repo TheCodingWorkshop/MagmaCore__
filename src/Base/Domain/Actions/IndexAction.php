@@ -62,12 +62,15 @@ class IndexAction implements DomainActionLogicInterface
         ?string $objectSchema,
         string $method,
         array $rules = [],
-        array $additionalContext = []
+        array $additionalContext = [],
+        mixed $optional = null
     ): self {
 
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+
+        $started = microtime(true);
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
         $this->args = $this->getControllerArgs($controller);
@@ -81,7 +84,12 @@ class IndexAction implements DomainActionLogicInterface
             }
         }
         $this->tableData = $controller->tableGrid;
+        $end = microtime(true);
+        //Calculate the difference in microseconds.
+        $difference = $end - $started;
 
+        //Format the time so that it only shows 10 decimal places.
+        $this->queryTime = number_format($difference, 8);
         if ($this->tableData)
             return $this;
     }

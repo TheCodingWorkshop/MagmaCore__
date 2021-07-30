@@ -54,7 +54,7 @@ class NewAction implements DomainActionLogicInterface
         string $method,
         array $rules = [],
         array $additionalContext = [],
-        ?string $model = null
+        mixed $optional = null
     ): self {
 
         $this->controller = $controller;
@@ -67,6 +67,7 @@ class NewAction implements DomainActionLogicInterface
                 $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
                 /* data sanitization */
                 $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
+
                 $action = $controller->repository
                     ->getRepo()
                     ->validateRepository($entityCollection, $entityObject)

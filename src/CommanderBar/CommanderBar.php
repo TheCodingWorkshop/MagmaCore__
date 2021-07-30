@@ -47,7 +47,7 @@ class CommanderBar implements CommanderBarInterface
             $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
             $commander .= '<nav class="uk-navbar" uk-navbar style="position: relative; z-index: 980; color: white!important;">';
             $commander .= PHP_EOL;
-            $commander .= ' <div class="nav-overlay uk-navbar-left">';
+            $commander .= ' <div class="uk-navbar-left">';
             $commander .= $this->heading();
             $commander .= '<ul class="uk-navbar-nav">';
             $commander .= $this->notifications();
@@ -57,15 +57,15 @@ class CommanderBar implements CommanderBarInterface
             $commander .= '</div>';
             $commander .= PHP_EOL;
 
-            $commander .= '<div class="nav-overlay uk-navbar-center">';
-            $commander .= $this->controller->commander->getGraphs();
+            $commander .= '<div class="uk-navbar-center">';
+            //$commander .= $this->controller->commander->getGraphs();
             $commander .= '</div>';
 
             $commander .= PHP_EOL;
-            $commander .= '<div class="nav-overlay uk-navbar-right">';
+            $commander .= '<div class="uk-navbar-right">';
             //$commander .= $this->actions();
             $commander .= '</div>';
-            ///$commander .= $this->commanderOverlaySearch();
+            //$commander .= $this->commanderOverlaySearch();
             $commander .= PHP_EOL;
 
             $commander .= '</nav>';
@@ -89,8 +89,8 @@ class CommanderBar implements CommanderBarInterface
         $commander .= '<li>';
         $commander .= '<a href="#"><ion-icon size="large" name="home-outline"></ion-icon></a>';
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
-        $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-2" uk-grid>';
-        $commander .= '<div class="uk-width-1-2">';
+        $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';
+        $commander .= '<div class="uk-width-1-3">';
 
         if (is_array($lists = $this->controller->commander->getYml()) && count($lists) > 0) {
             $commander .= '<ul class="uk-nav uk-navbar-dropdown-nav">';
@@ -103,11 +103,7 @@ class CommanderBar implements CommanderBarInterface
                 }
                 $commander .= PHP_EOL;
                 $commander .= '<li>';
-                $selectAll = (isset($value['name']) && $value['name'] == 'Select All' ? "onclick='selects()'" : '');
-                $deselectAll = (isset($value['name']) && $value['name'] == 'Deselect All' ? "onclick='deSelect()'" : '');
-
-                $commander .= '<a class="bulk-action-links" uk-toggle="target: #toggle-custom; cls: highlight" href="' . ($value['path'] ?? $this->path($key)) . '">&nbsp;';
-                $commander .= '<ion-icon name="' . (isset($value['icon']) ? $value['icon'] : 'help-outline') . '"></ion-icon>';
+                $commander .= '<a uk-toggle="target: #toggle-custom; cls: highlight" href="' . ($value['path'] ?? $this->path($key)) . '">';
                 $commander .= (isset($value['name']) ? Stringify::capitalize($value['name']) : '');
                 $commander .= '</a>';
                 $commander .= '</li>';
@@ -116,13 +112,9 @@ class CommanderBar implements CommanderBarInterface
             }
             $commander .= '<li class="uk-nav-divider"></li>';
             $commander .= '<li>';
-            //$commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/trash" uk-tooltip="View Trash" class="ion-28">';
-            //$commander .= '<ion-icon name="trash"></ion-icon>';
-            //$commander .= '</a>';
-            $commander .= '<div class="uk-margin">';
-            $commander .= '<button onclick="selects()" type="button" class="uk-button uk-button-primary uk-button-small uk-margin-small-right">Select</button>';
-            $commander .= '<button onclick="deSelect()" type="button" class="uk-button uk-button-secondary uk-button-small">DeSelect</button>';
-            $commander .= '</div>';
+            $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/index" uk-tooltip="View Trash" class="ion-28">';
+            $commander .= '<ion-icon name="home"></ion-icon>';
+            $commander .= '</a>';
             $commander .= '</li>';
             $commander .= '</ul>';
         }

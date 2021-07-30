@@ -32,6 +32,10 @@ class BaseApplication extends AbstractBaseBootLoader
     protected string|null $newRouter;
     protected string|null $theme;
     protected ?string $newCacheDriver;
+    protected string $handler;
+    protected string $logFile;
+    protected array $logOptions = [];
+    protected string $logMinLevel;
 
     /** @return void */
     public function __construct()
@@ -122,7 +126,7 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * If session yml is set from using the setSession from the application 
+     * If session yml is set from using the setSession from the application
      * bootstrap. Use the user defined session.yml else revert to the core
      * session configuration.
      *
@@ -138,7 +142,7 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * Returns the default session driver from either the core or user defined 
+     * Returns the default session driver from either the core or user defined
      * session configuration. Throws an exception if neither configuration
      * was found
      *
@@ -210,7 +214,7 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * Returns the default cache driver from either the core or user defined 
+     * Returns the default cache driver from either the core or user defined
      * cache configuration. Throws an exception if neither configuration
      * was found
      *
@@ -245,6 +249,51 @@ class BaseApplication extends AbstractBaseBootLoader
     public function getContainerProviders(): array
     {
         return $this->containerProviders;
+    }
+
+    /**
+     * @param string $handler
+     * @return $this
+     */
+    public function setLogger(string $file, string $handler, string $minLevel, array $options): self
+    {
+        $this->handler = $handler;
+        $this->logFile = $file;
+        $this->logOptions = $options;
+        $this->logMinLevel = $minLevel;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogger(): string
+    {
+        return $this->handler;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLoggerFile(): string
+    {
+        return $this->logFile;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLoggerOptions(): array
+    {
+        return $this->logOptions;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogMinLevel(): string
+    {
+        return $this->logMinLevel;
     }
 
     /**
@@ -330,7 +379,7 @@ class BaseApplication extends AbstractBaseBootLoader
     {
         return $this->errorLevel;
     }
-    
+
     public function run(): void
     {
         BaseConstants::load($this->app());
@@ -338,6 +387,7 @@ class BaseApplication extends AbstractBaseBootLoader
         //$this->loadErrorHandlers();
         $this->loadSession();
         $this->loadCache();
+        $this->loadLogger();
         $this->loadEnvironment();
         $this->loadRoutes();
     }

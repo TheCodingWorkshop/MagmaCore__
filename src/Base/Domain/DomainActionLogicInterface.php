@@ -17,6 +17,7 @@ interface DomainActionLogicInterface
      * @param string $method
      * @param array $rules
      * @param array $additionalContext
+     * @param mixed $optional
      * @return self
      */
     public function execute(
@@ -26,7 +27,8 @@ interface DomainActionLogicInterface
         ?string $objectSchema,
         string $method,
         array $rules = [],
-        array $additionalContext = []
+        array $additionalContext = [],
+        mixed $optional = null
     ): self;
     
     /**

@@ -24,18 +24,19 @@ trait BootstrapTrait
      * @param array $config
      * @return mixed
      */
-    private function getDefaultSettings(array $config): mixed
+    private function getDefaultSettings(array $config)
     {
         if (count($config) > 0) {
             if (array_key_exists('drivers', $config)) {
-                $type = $config['default_driver'];
-                $driver = $config['drivers'][$type];
-                if ($driver['default'] === true) {
-                    return $driver['class'];
+                $defaultDriver  = $config['default_driver'];
+                if (array_key_exists($defaultDriver, $config['drivers'])) {
+                    $selectedDriver = $config['drivers'][$defaultDriver];
+                    if ($selectedDriver['default'] === true) {
+                        return $selectedDriver['class'];
+                    }
                 }
             }
         }
-        return false;
     }
 
 

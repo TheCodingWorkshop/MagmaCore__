@@ -17,12 +17,12 @@ use MagmaCore\Base\Domain\DomainTraits;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class SessionExpiredAction implements DomainActionLogicInterface
+class CloneAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
@@ -42,7 +42,7 @@ class SessionExpiredAction implements DomainActionLogicInterface
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return SessionExpiredAction
+     * @return BulkDeleteAction
      */
     public function execute(
         object $controller,
@@ -59,12 +59,26 @@ class SessionExpiredAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
 
-        // if ($this->hasRouteWithID()) {
-        //     if ($this->isRouteIDEqual()) {
-        //         $this->singular = $controller->findOr404();
-        //     }
-        // }
-
+        if (isset($controller->formBuilder)) :
+            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getSubmitValue())) {
+                $formData = $controller->formBuilder->getData();
+                if (is_array($formData) && count($formData) > 1) {
+                    $action = array_map(fn($id) => $controller->repository->getRepo()->findByIdAndDelete(['id' => $id]), $formData['id']);
+                    if ($action) {
+                        if ($controller->eventDispatcher) {
+                            $controller->eventDispatcher->dispatch(
+                                new $eventDispatcher(
+                                    $method,
+                                    ['action' => $action],
+                                    $controller
+                                ),
+                                $eventDispatcher::NAME
+                            );
+                        }
+                    }
+                }
+            }
+        endif;
         return $this;
     }
 }

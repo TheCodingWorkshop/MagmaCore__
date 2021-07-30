@@ -53,7 +53,8 @@ class EditAction implements DomainActionLogicInterface
         ?string $objectSchema,
         string $method,
         array $rules = [],
-        array $additionalContext = []
+        array $additionalContext = [],
+        mixed $optional = null
     ): self {
 
         $this->controller = $controller;
