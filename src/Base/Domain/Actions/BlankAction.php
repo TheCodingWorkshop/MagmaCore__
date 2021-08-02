@@ -31,13 +31,6 @@ class BlankAction implements DomainActionLogicInterface
 
     /** @var bool */
     protected bool $isRestFul = false;
-    private CacheFacade $cache;
-
-    /** @return void - not currently being used */
-    public function __construct(CacheFacade $cache)
-    {
-        $this->cache = $cache;
-    }
 
     /**
      * execute logic for adding new items to the database(). Post data is returned as a collection

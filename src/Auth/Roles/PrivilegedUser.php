@@ -35,6 +35,7 @@ class PrivilegedUser
             $privilegeUser->email = $user->email;
             $privilegeUser->firstname = $user->firstname;
             $privilegeUser->lastname = $user->lastname;
+            $privilegeUser->fullname = $user->firstname . ' ' . $user->lastname;
             $privilegeUser->gravatar = $user->gravatar;
             $privilegeUser->status = $user->status;
             $privilegeUser->initRoles($userID ?: $user->id);
@@ -126,7 +127,7 @@ class PrivilegedUser
     {
         $roles = Role::getRolePermissions($roleID);
         foreach ((array)$roles as $role) {
-           return $role;
+            return $role;
         }
     }
 

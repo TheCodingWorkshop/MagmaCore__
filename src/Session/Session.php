@@ -81,7 +81,7 @@ class Session implements SessionInterface
         $this->ensureSessionKeyIsValid($key);
         try {
             $this->storage->setArraySession($key, $value);
-        } catch (Throwable $throwable) {
+        } catch (Throwable|SessionException $throwable) {
             throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $throwable);
         }
     }
@@ -99,7 +99,7 @@ class Session implements SessionInterface
         try {
             return $this->storage->getSession($key, $default);
         } catch (Throwable $throwable) {
-            throw $throwable;
+            throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $throwable);
         }
     }
 

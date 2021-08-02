@@ -65,7 +65,7 @@ class BsNavigationExtension
      * @param array $value
      * @return string
      */
-    private function childrenBlock(array $children = [], array $value): string
+    private function childrenBlock(array $children = [], array $value = []): string
     {
         $element = '';
         if (count($children) > 0) {

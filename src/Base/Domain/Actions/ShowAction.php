@@ -27,11 +27,6 @@ class ShowAction implements DomainActionLogicInterface
 
     use DomainTraits;
 
-    /** @return void - not currently being used */
-    public function __construct()
-    {
-    }
-
     /**
      * execute logic for adding new items to the database()
      *

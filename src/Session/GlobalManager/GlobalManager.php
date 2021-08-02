@@ -52,7 +52,7 @@ class GlobalManager implements GlobalManagerInterface
     protected static function isGlobalValid(string $name): void
     {
         if (!isset($GLOBALS[$name]) || empty($name)) {
-            throw new GlobalManagerException("Invalid global. Please ensure you've set the global state for " . $name);
+            throw new GlobalManagerException("Invalid global. Please ensure you've set the global state for " . $name . ' And the feature is set to true from your pubic/index.php file.');
         }
     }
 }

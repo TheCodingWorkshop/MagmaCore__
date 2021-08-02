@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
+use MagmaCore\Cache\CacheInterface;
 use MagmaCore\Cache\Storage\NativeCacheStorage;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Cache\CacheFacade;
@@ -35,7 +36,7 @@ class IndexAction implements DomainActionLogicInterface
     private ?string $schema;
 
     /** @return void - not currently being used */
-    private $cache;
+    private CacheInterface $cache;
 
     /** @return void - not currently being used */
     public function __construct(CacheFacade $cache)

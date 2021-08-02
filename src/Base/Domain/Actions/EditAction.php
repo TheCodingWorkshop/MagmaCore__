@@ -29,11 +29,6 @@ class EditAction implements DomainActionLogicInterface
 
     public bool $passwordRequired = false;
 
-    /** @return void - not currently being used */
-    public function __construct()
-    {
-    }
-
     /**
      * execute logic for adding new items to the database()
      *

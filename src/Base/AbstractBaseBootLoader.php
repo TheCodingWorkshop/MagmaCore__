@@ -162,15 +162,19 @@ abstract class AbstractBaseBootLoader
             $this->app()->getSessions()['session_name'],
             $this->app()->getSessionDriver()
         ))->setSession();
+        if ($this->isSessionGlobal() === true) {
+            GlobalManager::set($this->getGlobalSessionKey(), $session);
 
-        GLobalManager::set('session_global', $session);
+        }
         return $session;
     }
 
     public function loadCache()
     {
         $cache = (new CacheFacade())->create($this->getCacheIdentifier(), \MagmaCore\Cache\Storage\NativeCacheStorage::class);
-        GLobalManager::set('cache_global', $cache);
+        if ($this->isCacheGlobal() === true) {
+            GLobalManager::set($this->getGlobalCacheKey(), $cache);
+        }
         return $cache;
 
     }
@@ -220,24 +224,26 @@ abstract class AbstractBaseBootLoader
      */
     public function load(): void
     {
-        defined('DS') or define('DS', DIRECTORY_SEPARATOR);
-        defined('APP_ROOT') or define('APP_ROOT', $this->app()->getPath());
-        defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
-        defined('ASSET_PATH') or define('ASSET_PATH', '/' . PUBLIC_PATH . '/assets');
-        defined('CSS_PATH') or define('CSS_PATH', ASSET_PATH . '/css');
-        defined('JS_PATH') or define('JS_PATH', ASSET_PATH . '/js');
-        defined('IMAGE_PATH') or define('IMAGE_PATH', ASSET_PATH . '/images');
+//        defined('DS') or define('DS', DIRECTORY_SEPARATOR);
+//        defined('APP_ROOT') or define('APP_ROOT', $this->app()->getPath());
+//        defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
+//        defined('ASSET_PATH') or define('ASSET_PATH', '/' . PUBLIC_PATH . '/assets');
+//        defined('CSS_PATH') or define('CSS_PATH', ASSET_PATH . '/css');
+//        defined('JS_PATH') or define('JS_PATH', ASSET_PATH . '/js');
+//        defined('IMAGE_PATH') or define('IMAGE_PATH', ASSET_PATH . '/images');
+//
+//        defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
+//        defined('TEMPLATES') or define('TEMPLATES', $_SERVER['DOCUMENT_ROOT'] . 'App/Templates/');
+//        defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
+//        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
+//        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
+//        defined('ROOT_URI') or define('ROOT_URI', '');
+//        defined('RESOURCES') or define('RESOURCES', ROOT_URI);
+//        defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
+//
+//        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', $_SERVER['DOCUMENT_ROOT'] . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/');
+//        defined('TEMPLATE_ERROR') or define('TEMPLATE_ERROR', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates/');
 
-        defined('TEMPLATE_PATH') or define('TEMPLATE_PATH', APP_ROOT . DS . 'App');
-        defined('TEMPLATES') or define('TEMPLATES', $_SERVER['DOCUMENT_ROOT'] . 'App/Templates/');
-        defined('STORAGE_PATH') or define('STORAGE_PATH', APP_ROOT . DS . 'Storage');
-        defined('CACHE_PATH') or define('CACHE_PATH', STORAGE_PATH . DS);
-        defined('LOG_PATH') or define('LOG_PATH', STORAGE_PATH . DS . 'logs');
-        defined('ROOT_URI') or define('ROOT_URI', '');
-        defined('RESOURCES') or define('RESOURCES', ROOT_URI);
-        defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
-
-        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
     }
 
 }

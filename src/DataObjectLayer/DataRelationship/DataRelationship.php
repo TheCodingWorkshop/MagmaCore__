@@ -15,68 +15,122 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 use Exception;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
+use phpDocumentor\Reflection\Types\Callable_;
 
 /**
  * Both tables can have only one record on each side of the relationship.
  * each primary key value relates to none or only one record in the related table
  */
-class DataRelationship implements DataRelationshipInterface
+class DataRelationship
 {
 
-    private object $table;
-    private object $tableRight;
     private object $pivot;
+    private $callback = null;
+    private ?object $andBelongsToMany = null;
+    private ?object $belongsToMany = null;
+    private ?object $belongsTo = null;
+    private ?object $hasMany = null;
+    private ?object $andBelongsTo = null;
+    private ?object $setMoreRelationship = null;
 
     /**
-     * Undocumented function
-     *
-     * @param string $relationship
-     * @return static
-     * @throws Exception
+     * Return and instance of a model object
+     * @param string $model
+     * @return object
      */
-    public function type(string $relationship): self
+    public function init(string $model): object
     {
-        if ($relationship) {
-            $relationship = BaseApplication::diGet($relationship);
-            if (!$relationship) {
-                throw new DataRelationshipInvalidArgumentException('');
-            }
+        if ($model) {
+            return BaseApplication::diGet($model);
         }
+    }
+    /**
+     * Sets the model object related to this method
+     * @param string $model
+     * @return self
+     */
+    public function belongsToMany(string $model): self
+    {
+        $this->belongsToMany = $this->init($model);
         return $this;
     }
 
     /**
-     * @param string $table
-     * @param string|null $additionalTable
+     * Returns the model object related to the property
+     * @return object
+     */
+    public function getBelongsToMany(): object
+    {
+        return $this->belongsToMany;
+    }
+
+    /**
+     * Sets the model object related to this method
+     * @param string $model
+     * @param callable|null $callback
+     * @return self
+     */
+    public function andBelongsToMany(string $model, ?callable $callback = null): self
+    {
+        if (!is_callable($callback)) {
+            throw new DataRelationshipInvalidArgumentException('');
+        }
+        $this->andBelongsToMany = $this->init($model);
+        $this->callback = $callback($this);
+        return $this;
+    }
+
+    /**
+     * Returns the model object related to the property
+     * @return object
+     */
+    public function getAndBelongsToMany(): object
+    {
+        return $this->andBelongsToMany;
+    }
+
+    /**
+     * @param string $model
      * @return $this
-     * @throws Exception
      */
-    public function table(string $table, ?string $additionalTable = null): self
+    public function belongsTo(string $model): self
     {
-        if (empty($table)) {
-            throw new DataRelationshipInvalidArgumentException('Please specify the table.');
-        }
-        if ($table) {
-            $this->table = BaseApplication::diGet($table);
-            if (!$this->table) {
-                throw new DataRelationshipInvalidArgumentException('');
-            }
-        }
+        $this->belongsTo = $this->init($model);
+        return $this;
+    }
+
+    public function andBelongsTo(string $model): self
+    {
+        $this->andBelongsTo = $this->init($model);
+        return $this;
+    }
+
+    public function getAndsBelongsTo(): object
+    {
+        return $this->andBelongsTo;
+    }
+
+    /**
+     * @return object
+     */
+    public function getBelongsTo(): object
+    {
+        return $this->belongsTo;
+    }
+
+    /**
+     * Sets the pivot model object
+     * @param string $model
+     * @return void
+     */
+    public function pivot(string $model): self
+    {
+        $this->pivot = $this->init($model);
         return $this;
     }
 
     /**
-     * @param string $pivot
-     * @return $this
-     * @throws Exception
-     */
-    public function pivot(string $pivot): self
-    {
-        $this->pivot = $this->table($pivot);
-        return $this;
-    }
-
-    /**
+     * Returns the pivot model object
      * @return object
      */
     public function getPivot(): object
@@ -85,11 +139,55 @@ class DataRelationship implements DataRelationshipInterface
     }
 
     /**
+     * Returns the schema name for the queried model
+     * @param string $property
+     * @return string
+     */
+    public function getSchema(string $property): string
+    {
+        if (!empty($property))
+            return $this->{$property}()->getSchema();
+    }
+
+    /**
+     * Returns the schema id for the queried model
+     * @param string $property
+     * @return string
+     */
+    public function getSchemaID(string $property): string
+    {
+        if (!empty($property))
+            return $this->{$property}()->getSchemaID();
+    }
+
+    /**
+     * Returns the repository for the queried model
+     * @param string $property
      * @return object
      */
-    public function getTable(): object
+    public function getRepo(string $property): object
     {
-        return $this->table;
+        if (!empty($property))
+            return $this->{$property}()->getRepo();
+    }
+
+    public function associate(string $resultType): mixed
+    {
+
+    }
+
+    /**
+     * @param string $relationshipType
+     * @return $this
+     */
+    public function setMoreRelationship(string $relationshipType): self
+    {
+        $relationshipType = BaseApplication::diGet($relationshipType);
+        if (!$relationshipType instanceof DataRelationalInterface) {
+            throw new DataRelationshipInvalidArgumentException('');
+        }
+        $this->setMoreRelationship = $relationshipType;
+        return $this;
     }
 
 }

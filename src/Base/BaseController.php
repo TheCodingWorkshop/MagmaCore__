@@ -95,6 +95,13 @@ class BaseController extends AbstractBaseController
         }
     }
 
+    protected function defineCoreMiddeware(): array
+    {
+        return [
+            'error404' => Erorr404::class
+        ];
+    }
+
     /**
      * Returns an array of middlewares for the current object which will
      * execute before the action is called. Middlewares are also resolved
@@ -106,7 +113,7 @@ class BaseController extends AbstractBaseController
      */
     protected function callBeforeMiddlewares(): array
     {
-        return $this->callBeforeMiddlewares;
+        return array_merge($this->defineCoreMiddeware(), $this->callBeforeMiddlewares);
     }
 
     /**
@@ -340,6 +347,11 @@ class BaseController extends AbstractBaseController
     public function getSession(): Object
     {
         return SessionTrait::sessionFromGlobal();
+    }
+
+    public function getCache()
+    {
+        return $this->cache();
     }
 
     public function cache()

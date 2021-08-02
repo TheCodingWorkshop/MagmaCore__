@@ -12,12 +12,23 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataRelationship\Relationships;
 
+use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryFactory;
+use MagmaCore\DataObjectLayer\DataRelationship\DataRelationship;
+
 /**
  * Both tables can have only one record on each side of the relationship.
  * each primary key value relates to none or only one record in the related table
  */
-class OneToMany
+class OneToMany extends DataRelationship
 {
 
+    public function __construct(ClientRepositoryFactory $clientRepositoryFactory)
+    {
 
+    }
+
+    public function findObjectBy()
+    {
+
+    }
 }

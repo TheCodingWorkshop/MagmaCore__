@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Session;
 
+use MagmaCore\Session\Exception\SessionException;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 
 final class SessionFacade
@@ -55,8 +56,10 @@ final class SessionFacade
      */
     public function setSession(): Object
     {
-        $session = (new SessionFactory())->create($this->sessionIdentifier, $this->storage, $this->sessionEnvironment);
-        GlobalManager::set('session_global', $session);
-        return $session;
+        try {
+            return (new SessionFactory())->create($this->sessionIdentifier, $this->storage, $this->sessionEnvironment);
+        } catch(SessionException $e) {
+            //throw new SessionException($e->getMessage());
+        }
     }
 }

@@ -24,10 +24,6 @@ class ManyToMany extends DataRelationship implements DataRelationalInterface
 
     private string $query = '';
 
-    public function __construct()
-    {
-    }
-
     public function filterSelection(
         string $parentModel,
         array $selectors,

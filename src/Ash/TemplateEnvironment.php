@@ -33,11 +33,7 @@ class TemplateEnvironment
      * @param string $path - name of the template directory
      * @param string|null $rootPath - the path to the template directory
      */
-    public function __construct(
-        protected array $options = [],
-        protected string $path,
-        protected string|null $rootPath = null
-    ) {
+    public function __construct(protected array $options = [], protected ?string $path = null, protected ?string $rootPath = null) {
         $this->rootPath = (null === $rootPath ? getcwd() : $rootPath) . DIRECTORY_SEPARATOR;
         if ($rootPath !== null && false !== ($realPath = realpath($rootPath))) {
             $this->rootPath = $realPath . DIRECTORY_SEPARATOR;
@@ -48,6 +44,7 @@ class TemplateEnvironment
         if ($path) {
             $this->path = $path;
         }
+
     }
 
     /**
@@ -143,6 +140,18 @@ class TemplateEnvironment
     public function view(string $template, array $context = [])
     {
         return (new Template($this))->view($template, $context);
+    }
+
+    /**
+     * Render a view template and provide a http response
+     *
+     * @param string $template
+     * @param array $context
+     * @return void
+     */
+    public function errorView(string $template, array $context = [])
+    {
+        return (new Template($this))->errorView($template, $context);
     }
 
     /**

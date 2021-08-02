@@ -245,7 +245,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
                     $element .= '<li class="uk-active"><a href="#">' . ($status !==null) ? Stringify::capitalize($status) : 'Status Unknown' . '</a></li>';
                     foreach ($items as $key => $item) {
                         $element .= '<li>';
-                        $element .= '<a data-turbo="false" href="'.(isset($item['path']) ? $item['path']:'') . '">';
+                        $element .= '<a data-turbo="true" href="'.(isset($item['path']) ? $item['path']:'') . '">';
                         $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
                         $element .= Stringify::capitalize($item['name']);
                         $element .= '</a>';
@@ -253,7 +253,7 @@ class TwigExtension extends AbstractExtension implements \Twig\Extension\Globals
                         $element .= PHP_EOL;
                     }
                     $element .= '<li class="uk-nav-divider"></li>';
-                    $element .= '<li><a data-turbo="false" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="ion-28"><ion-icon name="trash"></ion-icon></a></li>';
+                    $element .= '<li><a data-turbo="true" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="ion-28"><ion-icon name="trash"></ion-icon></a></li>';
                 $element .= '</ul>';
                 $element .= PHP_EOL;
             $element .= '</div>';

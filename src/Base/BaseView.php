@@ -53,4 +53,38 @@ class BaseView
         return $ash->view($template, $context);
     }
 
+    /**
+     * Get the contents of a view template using the native framework template
+     * engine.
+     *
+     * @param string $template
+     * @param array $context
+     * @return mixed
+     * @throws LoaderError
+     */
+    public function errorTemplateRender(string $template, array $context = [])
+    {
+        static $ash = null;
+        if ($ash === null) {
+            $ash = new TemplateEnvironment(Yaml::file('template'), 'Templates', TEMPLATE_ERROR);
+        }
+
+        return $ash->errorView($template, $context);
+    }
+
+    /**
+     * Render a view template using the framework native template engine
+     *
+     * @param string $template
+     * @param array $context
+     * @return void
+     * @throws LoaderError
+     * @throws FileNotFoundException
+     */
+    public function ashRenderError(string $template, array $context = [])
+    {
+        echo $this->errorTemplateRender($template, $context);
+    }
+
+
 }

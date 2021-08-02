@@ -96,6 +96,7 @@ class Router implements RouterInterface
     {
         $url = $this->removeQueryStringVariables($url);
         if (!$this->match($url)) {
+            http_response_code(404);
             throw new RouterNoRoutesFound("Route " . $url . " does not match any valid route.", 404);
         }
         if (!class_exists($controller = $this->createController())) {

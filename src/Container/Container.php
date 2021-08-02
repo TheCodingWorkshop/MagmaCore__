@@ -119,7 +119,10 @@ class Container implements ContainerInterface, SettableInterface
     {
         $dependencies = [];
         foreach ($parameters as $parameter) {
-            $dependency = $parameter->getClass();
+            //$dependency = $parameter->getClass();
+            $dependency = $parameter->getType() && !$parameter->getType()->isBuiltin()
+                ? new ReflectionClass($parameter->getType()->getName())
+                : null;
             if (is_null($dependency)) {
                 if ($parameter->isDefaultValueAvailable()) {
                     $dependencies[] = $parameter->getDefaultValue();

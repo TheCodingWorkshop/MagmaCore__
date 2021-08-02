@@ -44,4 +44,18 @@ class Template extends AbstractTemplate
         require $fileCache;
     }
 
+    /**
+     * Display the template
+     *
+     * @param string $file
+     * @param array $context
+     */
+    public function errorView(string $file, array $context = [])
+    {
+        $fileCache = $this->cache(ERROR_RESOURCE . $file);
+        extract(array_merge($context, $context), EXTR_SKIP);
+        require $fileCache;
+    }
+
+
 }

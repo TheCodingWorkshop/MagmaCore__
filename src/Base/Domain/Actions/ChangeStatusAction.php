@@ -27,11 +27,6 @@ class ChangeStatusAction implements DomainActionLogicInterface
 
     use DomainTraits;
 
-    /** @return void - not currently being used */
-    public function __construct()
-    {
-    }
-
     /**
      * execute logic for adding new items to the database()
      *
@@ -64,7 +59,8 @@ class ChangeStatusAction implements DomainActionLogicInterface
             if ($controller->formBuilder->canHandleRequest()) {
                 if ($controller->repository->getRepo()->findAndReturn($controller->thisRouteID())->or404() !== $controller->thisRouteID()) {
                     if ($controller->error) {
-                        $controller->error->addError(['Error restoring trash item!'], $controller)->dispatchError($controller->onSelf());
+                        $controller->error->addError(['There was an error performing this action!'], $controller)->dispatchError($controller->onSelf());
+                        /* log the error */
                     }
                 }
                 $action = $controller->repository
@@ -74,6 +70,7 @@ class ChangeStatusAction implements DomainActionLogicInterface
                         $controller->thisRouteID()
                     );
                 if ($action) {
+                    /* log the $action */
                     if ($controller->eventDispatcher) {
                         $controller->eventDispatcher->dispatch(
                             new $eventDispatcher(

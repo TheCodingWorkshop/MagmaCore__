@@ -125,7 +125,7 @@ class IconNavExtension
      * @param string $controller
      * @return string
      */
-    public function determinePath(array $icons, string $key, $row = null, string $controller): string
+    public function determinePath(array $icons, string $key, array $row = [], ?string $controller = null): string
     {
         extract($icons);
         if (isset($key) && $key != '') {

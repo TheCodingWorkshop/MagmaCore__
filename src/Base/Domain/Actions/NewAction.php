@@ -29,10 +29,6 @@ class NewAction implements DomainActionLogicInterface
 
     /** @var bool */
     protected bool $isRestFul = false;
-    /** @return void - not currently being used */
-    public function __construct()
-    {
-    }
 
     /**
      * execute logic for adding new items to the database(). Post data is returned as a collection

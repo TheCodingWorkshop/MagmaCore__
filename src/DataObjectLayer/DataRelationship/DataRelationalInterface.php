@@ -19,5 +19,8 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 interface DataRelationalInterface
 {
 
+//    public function belongsTo();
+//    public function belongsToMany();
+//    public function belongsToOne();
 
 }

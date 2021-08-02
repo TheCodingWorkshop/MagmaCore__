@@ -60,7 +60,7 @@ class Datatable extends AbstractDatatable
      * @param object|null $callingController
      * @return self
      */
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], ?object $callingController): self
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], ?object $callingController = null): self
     {
         $this->dataColumnObject = new $dataColumnString();
         if (!$this->dataColumnObject instanceof DatatableColumnInterface) {

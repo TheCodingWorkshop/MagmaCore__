@@ -21,7 +21,7 @@ abstract class AbstractDatatableColumn implements DatatableColumnInterface
      * @param object|null $callingController
      * @return array
      */
-    abstract public function columns(array $dbColumns, ?object $callingController) : array;
+    abstract public function columns(array $dbColumns, ?object $callingController = null) : array;
 
     /**
      * Checks whether model has defined any status columns and returns true

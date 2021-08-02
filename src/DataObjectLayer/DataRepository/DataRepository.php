@@ -250,7 +250,7 @@ class DataRepository implements DataRepositoryInterface
             if ($result) {
                 $delete = $this->em->getCrud()->delete($conditions);
                 if ($delete) {
-                    return $delete == true;
+                    return $delete;
                 }
             }
         } catch (Throwable $throwable) {
@@ -276,7 +276,7 @@ class DataRepository implements DataRepositoryInterface
                 $params = (!empty($fields)) ? array_merge([$this->em->getCrud()->getSchemaID() => $id], $fields) : $fields;
                 $update = $this->em->getCrud()->update($params, $this->em->getCrud()->getSchemaID());
                 if ($update) {
-                    return true;
+                    return $update;
                 }
             }
         } catch (Throwable $throwable) {
@@ -400,10 +400,21 @@ class DataRepository implements DataRepositoryInterface
         }
     }
 
+    /**
+     * Return the amount of item from the specified argument conditions
+     * @param array $conditions
+     * @param string|null $field
+     * @return mixed
+     */
     public function count(array $conditions = [], ?string $field = 'id')
     {
         return $this->em->getCrud()->countRecords($conditions, $field);
     }
+
+    /**
+     * Get the last inserted ID
+     * @return int
+     */
     public function fetchLastID(): int
     {
         return $this->em->getCrud()->lastID();

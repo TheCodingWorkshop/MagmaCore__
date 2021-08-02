@@ -21,14 +21,6 @@ interface DataRelationshipInterface
     /**
      * Undocumented function
      *
-     * @param string $relationship
-     * @return static
-     */
-    public function type(string $relationship): self;
-
-    /**
-     * Undocumented function
-     *
      * @param string $tableLeft
      * @param string $tableRight
      * @return DataRelationshipInterface

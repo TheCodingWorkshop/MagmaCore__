@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Base\Exception\BaseLengthException;
 use MagmaCore\Cache\CacheConfig;
 use MagmaCore\Base\BaseConstants;
 use MagmaCore\Session\SessionConfig;
@@ -24,8 +25,12 @@ class BaseApplication extends AbstractBaseBootLoader
     protected string|null $appPath;
     protected array $appConfig = [];
     protected array $session;
+    protected bool $isSessionGlobal = false;
+    protected ?string $globalSessionKey = null;
     protected array $cookie = [];
     protected array $cache = [];
+    protected bool $isCacheGlobal = false;
+    protected ?string $globalCacheKey = null;
     protected array $routes = [];
     protected array $containerProviders = [];
     protected string|null $routeHandler;
@@ -115,13 +120,17 @@ class BaseApplication extends AbstractBaseBootLoader
      * load the core session configration class
      *
      * @param array $ymlSession
+     * @param ?string $newSessionDriver
+     * @param bool $isGlobal defaults to false
      * @return self
      * @throws BaseInvalidArgumentException
      */
-    public function setSession(array $ymlSession = [], string|null $newSessionDriver = null): self
+    public function setSession(array $ymlSession = [], string|null $newSessionDriver = null, bool $isGlobal = false, ?string $globalKey = null): self
     {
         $this->session = (!empty($ymlSession) ? $ymlSession : (new SessionConfig())->baseConfiguration());
         $this->newSessionDriver = ($newSessionDriver !== null) ? $newSessionDriver : $this->getDefaultSessionDriver();
+        $this->isSessionGlobal = $isGlobal;
+        $this->globalSessionKey = $globalKey;
         return $this;
     }
 
@@ -158,6 +167,28 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
+     * Turn on global session from public/index.php bootstrap file to make the session
+     * object available globally throughout the application using the GlobalManager object
+     * @return bool
+     */
+    public function isSessionGlobal(): bool
+    {
+        return isset($this->isSessionGlobal) && $this->isSessionGlobal === true ? true : false;
+    }
+
+    /**
+     * @return string
+     * @throws BaseLengthException
+     */
+    public function getGlobalSessionKey(): string
+    {
+        if ($this->globalSessionKey !==null && strlen($this->globalSessionKey) < 3) {
+            throw new BaseLengthException($this->globalSessionKey . ' is invalid this needs to be more than 3 characters long');
+        }
+        return ($this->globalSessionKey !==null) ? $this->globalSessionKey : 'session_global';
+    }
+
+    /**
      * Set the application cookie configuration from the session.yml file.
      *
      * @param array $ymlCookie
@@ -180,15 +211,19 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * Set the application cache configuration from the session.yml file.
-     *
-     * @param array $ymlSCache
-     * @return self
+     * Set the application cache configuration from the session.yml file
+     * @param array $ymlCache
+     * @param string|null $newCacheDriver
+     * @param bool $isGloabl
+     * @param string|null $globalKey
+     * @return $this
      */
-    public function setCache(array $ymlCache = [], string $newCacheDriver = null): self
+    public function setCache(array $ymlCache = [], string $newCacheDriver = null, bool $isGloabl = false, ?string $globalKey = null): self
     {
         $this->cache = (!empty($ymlCache) ? $ymlCache : (new CacheConfig())->baseConfiguration());
         $this->newCacheDriver = ($newCacheDriver !== null) ? $newCacheDriver : $this->getDefaultCacheDriver();
+        $this->isCacheGlobal = $isGloabl;
+        $this->globalCacheKey = $globalKey;
         return $this;
     }
 
@@ -227,6 +262,28 @@ class BaseApplication extends AbstractBaseBootLoader
             throw new BaseInvalidArgumentException('You have no cache configuration. This is required.');
         }
         return $this->newCacheDriver;
+    }
+
+    /**
+     * Turn on global caching from public/index.php bootstrap file to make the cache
+     * object available globally throughout the application using the GlobalManager object
+     * @return bool
+     */
+    public function isCacheGlobal(): bool
+    {
+        return isset($this->isCacheGlobal) && $this->isCacheGlobal === true ? true : false;
+    }
+
+    /**
+     * @return string
+     * @throws BaseLengthException
+     */
+    public function getGlobalCacheKey(): string
+    {
+        if ($this->globalCacheKey !==null && strlen($this->globalCacheKey) < 3) {
+            throw new BaseLengthException($this->globalCacheKey . ' is invalid this needs to be more than 3 characters long');
+        }
+        return ($this->globalCacheKey !==null) ? $this->globalCacheKey : 'cache_global';
     }
 
     /**
@@ -384,7 +441,7 @@ class BaseApplication extends AbstractBaseBootLoader
     {
         BaseConstants::load($this->app());
         $this->phpVersion();
-        //$this->loadErrorHandlers();
+        $this->loadErrorHandlers();
         $this->loadSession();
         $this->loadCache();
         $this->loadLogger();

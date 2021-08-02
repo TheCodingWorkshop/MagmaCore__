@@ -34,7 +34,7 @@ interface DatatableInterface
         array $dataRepository = [],
         array $sortController = [],
         array $dbColumns = [],
-        ?object $callingController) : self;
+        ?object $callingController = null) : self;
 
     /**
      * Generate the data table using the objects and properties pass to

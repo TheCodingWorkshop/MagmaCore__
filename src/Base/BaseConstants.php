@@ -39,6 +39,7 @@ final class BaseConstants
         defined('RESOURCES') or define('RESOURCES', ROOT_URI);
         defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
 
-        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/Templates');
+        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', $_SERVER['DOCUMENT_ROOT'] . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/');
+        defined('TEMPLATE_ERROR') or define('TEMPLATE_ERROR', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/');
     }
 }

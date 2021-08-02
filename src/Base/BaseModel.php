@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use MagmaCore\Base\Contracts\BaseRelationshipInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use MagmaCore\Base\BaseEntity;
@@ -23,6 +24,7 @@ use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
 use MagmaCore\DataObjectLayer\DataRelationship\DataRelationalInterface;
 use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
+use Throwable;
 
 class BaseModel
 {
@@ -79,12 +81,16 @@ class BaseModel
      */
     public function createRepository(string $tableSchema, string $tableSchemaID): void
     {
-        $factory = new DataRepositoryFactory('baseModel', $tableSchema, $tableSchemaID);
-        $this->repository = $factory->create(DataRepository::class);
+        try {
+            $factory = new DataRepositoryFactory('baseModel', $tableSchema, $tableSchemaID);
+            $this->repository = $factory->create(DataRepository::class);
+        } catch(Throwable $throwable) {
+            throw $throwable;
+        }
     }
 
     /**
-     * Throw an exception
+     * Throw an exception if the two required model constants is empty
      *
      * @return void
      */
@@ -135,6 +141,27 @@ class BaseModel
     }
 
     /**
+     * Allows models to retrieve other models. Simple pass in the qualified namespace of the model
+     * we want an object of ie getOtherModel(RoleModel::class)->getRepo() which will give access
+     * to the repository for the other model
+     *
+     * @param string $model
+     * @return BaseModel
+     */
+    public function getOtherModel(string $model): BaseModel
+    {
+        if (!is_string($model)) {
+            throw new BaseInvalidArgumentException('Invalid argument. Ensure you are passing the fully qualified namespace of the other model. ie [ExampleModel::class]');
+        }
+        $modelObject = BaseApplication::diGet($model);
+        if (!$modelObject instanceof self) {
+            throw new BaseInvalidArgumentException($model . ' is an invalid model. As its does not relate to the BaseModel.');
+        }
+        return $modelObject;
+
+    }
+
+    /**
      * Return the name object from within the app namespace. i,e validate.user
      * will instantiate the App\Validate\UserValidate Object. We only call the object
      * on the fly and use it when we want.
@@ -162,18 +189,32 @@ class BaseModel
     }
 
     /**
-     * Allow an association between two tables.
+     * Build relationships between tables
      *
      * @param string $relationshipType
      * @return object
      */
-    public function addRelationship(string $relationshipType): object
+    public function setRelationship(string $relationshipType): object
     {
         $relationship = BaseApplication::diGet($relationshipType);
         if (!$relationship instanceof DataRelationalInterface) {
             throw new DataRelationshipInvalidArgumentException('');
         }
         return $relationship;
+    }
+
+    /**
+     * Returns the associated relationship objects
+     * @param string $relationships
+     * @return object
+     */
+    public function getRelationship(string $relationships): object
+    {
+        $relationshipObject = BaseApplication::diGet($relationships);
+        if (!$relationshipObject instanceof BaseRelationshipInterface) {
+            throw new BaseInvalidArgumentException('');
+        }
+        return $relationshipObject->united();
     }
 
     /**
@@ -209,7 +250,9 @@ class BaseModel
     }
 
     /**
-     * Undocumented function
+     * Allows each model to return a $fillable array of database column names which
+     * must never be null. Each model must define a class property of $fillable which
+     * returns an array of fillable fields
      *
      * @param string $model
      * @return array
@@ -245,14 +288,15 @@ class BaseModel
                 ->getCrud()
                 ->rawQuery('SHOW COLUMNS FROM ' . $props->getSchema(), [], 'columns');
 
+            $reflectionProperty->setAccessible(false);
+
             return $this->dbColumns;
 
-            $reflectionProperty->setAccessible(false);
         }
     }
 
     /**
-     * Undocumented function
+     * Unserialize any serialize data coming from the database
      *
      * @param array $conditions
      * @param mixed $data

@@ -21,6 +21,6 @@ interface DatatableColumnInterface
      * @param object|null $callingController
      * @return array
      */
-    public function columns(array $dbColumns, ?object $callingController) : array;
+    public function columns(array $dbColumns, ?object $callingController = null) : array;
 
 }

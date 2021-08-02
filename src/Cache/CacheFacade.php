@@ -12,13 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Cache;
 
+use MagmaCore\Cache\Exception\CacheException;
+
 class CacheFacade
 {
-
-    /** @return void */
-    public function __construct()
-    {
-    }
 
     /**
      * Undocumented function
@@ -28,8 +25,16 @@ class CacheFacade
      * @param array $options
      * @return CacheInterface
      */
-    public function create(?string $cacheIdentifier = null, ?string $storage = null, array $options = []): CacheInterface
+    public function create(
+        ?string $cacheIdentifier = null,
+        ?string $storage = null,
+        array $options = []
+    ): CacheInterface
     {
-        return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
+        try {
+            return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
+        } catch(CatchException $e) {
+            throw $e->getMessage();
+        }
     }
 }

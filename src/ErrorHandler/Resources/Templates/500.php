@@ -1,8 +1,3 @@
-{% extends 'layout.html.twig' %}
-{% block content_title %}
-	<h1>500 Server Error</h1>
-{% endblock content_title %}
-{% block content %}
 	<div id="notfound">
 		<div class="notfound">
 			<div class="notfound-404">
@@ -13,4 +8,3 @@
 			<a href="/">Go To Homepage</a>
 		</div>
 	</div>
-{% endblock content %}

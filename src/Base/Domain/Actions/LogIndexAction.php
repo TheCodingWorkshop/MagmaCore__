@@ -32,11 +32,6 @@ class LogIndexAction implements DomainActionLogicInterface
     private string $method;
     private ?string $schema;
 
-    /** @return void - not currently being used */
-    public function __construct()
-    {
-    }
-
     /**
      * execute logic for adding new items to the database()
      *

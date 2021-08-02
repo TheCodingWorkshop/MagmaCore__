@@ -102,9 +102,9 @@ trait ControllerTrait
                     throw new BaseBadFunctionCallException($values['class'] . ' Listener class was not found within /App/EventListener');
                 }
                 $listenerObject = BaseApplication::diGet($values['class']);
-                /*if (!$listenerObject instanceof ListenerProviderInterface) {
-                throw new BaseInvalidArgumentException($listenerObject . ' is not a valid Listener Object.');
-            }*/
+                if (!$listenerObject instanceof ListenerProviderInterface) {
+                    throw new BaseInvalidArgumentException($listenerObject . ' is not a valid Listener Object.');
+                }
                 if ($this->eventDispatcher) {
                     if (in_array('name', $values['props'])) {
                         $this->eventDispatcher->addListener($values['props']['name']::NAME, [$listenerObject, $values['props']['event']]);

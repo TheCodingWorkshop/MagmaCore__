@@ -11,6 +11,8 @@ declare (strict_types = 1);
 
 namespace MagmaCore\Ash;
 
+use MagmaCore\Ash\Exception\FileNotFoundException;
+
 abstract class AbstractTemplate implements TemplateInterface
 {
     /** @var array template blocks definitions */
@@ -40,7 +42,7 @@ abstract class AbstractTemplate implements TemplateInterface
     {
         $fileCache = $this->templateEnv->getCacheKey($file);
         if (
-            !$this->templateEnv->getCacheStatus() || 
+            !$this->templateEnv->getCacheStatus() ||
             !file_exists($fileCache) || filemtime($fileCache) < filemtime($file)) {
             $code = $this->fileIncludes($file);
             $code = $this->codeCompiler($code);
@@ -93,6 +95,9 @@ abstract class AbstractTemplate implements TemplateInterface
      */
     public function fileIncludes(string $file): string|array|null
     {
+        if (!file_exists($file)) {
+            throw new FileNotFoundException('Your ' . $file . ' does not exists within the specified directory.');
+        }
         if ($file) {
             $code = file_get_contents($file);
             preg_match_all('/{% ?(extends|include) ?\'?(.*?)\'? ?%}/i', $code, $matches, PREG_SET_ORDER);

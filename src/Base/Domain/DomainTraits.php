@@ -399,7 +399,7 @@ trait DomainTraits
      * @param object $controller
      * @return bool
      */
-    public function enforceRules(array $rules = [], Object $controller): bool
+    public function enforceRules(array $rules = [], ?object $controller = null): bool
     {
         if (sizeof($rules) > 0) {
             foreach ($rules as $rule) {

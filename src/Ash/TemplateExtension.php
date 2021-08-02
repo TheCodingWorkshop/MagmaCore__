@@ -68,7 +68,7 @@ class TemplateExtension
             UikitSimplePaginationExtension::NAME => UikitSimplePaginationExtension::class,
             UikitCommanderBarExtension::NAME => UikitCommanderBarExtension::class,
             UikitFlashMessagesExtension::NAME => UikitFlashMessagesExtension::class,
-            BsNavigationExtension::NAME => BsNavigationExtension::class
+            //BsNavigationExtension::NAME => BsNavigationExtension::class
 
         ];
     }

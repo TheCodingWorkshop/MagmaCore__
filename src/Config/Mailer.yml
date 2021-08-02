@@ -1,8 +1,0 @@
-use_smtp_debug: 0
-use_smtp: true
-smtp_host: 'smtp.mailtrap.io'
-smtp_auth: true
-smtp_username: 'e844ad4fa6b9c5'
-smtp_password: 'eee926b857de8e'
-smtp_port: 2525
-smtp_encryption: 'cram_md5'

@@ -31,13 +31,14 @@ trait EventDispatcherTrait
      * @param string|null $route
      * @return boolean
      */
-    public function onRoute(Object $event, string|null $route = null): bool
+    public function onRoute(Object $event, ?string $route = null): bool
     {
         return $event->getObject()->thisRouteAction() === $route;
     }
 
     /**
-     * Undocumented function
+     * Returns an array of register_route_feedbacks from the events.yml file. This will
+     * help construct the redirect and flash messages for each routes defined.
      *
      * @param Object $event
      * @return array
@@ -70,32 +71,71 @@ trait EventDispatcherTrait
      * $actionRoute from the EventSubscriber class
      *
      * @param Object $event
-     * @param array $routesArray
-     * @param string|null $defaultMessage
-     * @param string|null $actionRoute
      * @param Closure|null $cb
      * @return void
      */
     public function flashingEvent(
         Object $event,
-        array $routesArray = [],
-        ?string $defaultMessage = null,
-        ?string $actionRoute = null,
         Closure $cb = null
     ) {
+
         if (!empty($event->getMethod())) {
+            $routesArray = $this->trailingRoutes($event);
             if (in_array($event->getMethod(), array_keys($routesArray), true)) {
                 $_msg = array_key_exists('msg', $routesArray[$event->getMethod()]);
                 $event->getObject()->flashMessage(($_msg === true) ? $routesArray[$event->getMethod()]['msg'] : $defaultMessage);
                 if (null !== $cb) {
                     call_user_func_array($cb, [$event, $routesArray]);
                 } else {
-                    $_redirect = array_key_exists('redirect', $routesArray[$event->getMethod()]);
-                    $event->getObject()
-                        ->redirect(
-                            ($this->onRoute($event, $actionRoute) ?
-                                '/' . $event->getObject()->getSession()->get('redirect_parameters') : (($_redirect === true) ? $routesArray[$event->getMethod()]['redirect'] : (($actionRoute !==null) ? $actionRoute : $event->getObject()->onSelf())))
-                        );
+                    $event->getObject()->redirect($this->autoRedirect($event));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $event
+     * @return mixed|string|null
+     * @throws Exception
+     */
+    private function autoRedirect($event): string
+    {
+        $redirect = '';
+        $routesArray = $this->trailingRoutes($event);
+        $optionalRedirect = array_key_exists('redirect', $routesArray[$event->getMethod()]);
+        if ($this->onRoute($event, null)) {
+            $redirect = '/' . $event->getObject()->getSession()->get('redirect_parameters');
+        } elseif ($optionalRedirect == true){
+            $redirect = $this->resolveRedirect($routesArray[$event->getMethod()]['redirect'], $event);
+        } else {
+            $redirect = $event->getObject()->onSelf();
+        }
+        return $redirect;
+    }
+
+    /**
+     * Resolve the syntax define for the redirect parameter within the events.yml file
+     * ie. {user.index}
+     *
+     * @param string $redirectString
+     * @param object $event
+     * @return string|null
+     */
+    private function resolveRedirect(string $redirectString, object $event): ?string
+    {
+        if (is_string($redirectString) && str_contains($redirectString, '.')) {
+            $element = explode('.', $redirectString);
+            if (is_array($element) && count($element) > 0) {
+                $controller = $element[0] ?? null;
+                $action = $element[1] ?? null;
+                if ($event->getObject()->thisRouteController() === $controller) {
+                    $namespace = $event->getObject()->thisRouteNamespace() ?? null;
+                    $redirect = "/{$namespace}/{$controller}/{$action}";
+                    if ($redirect) {
+                        return $redirect;
+                    } else {
+                        return null;
+                    }
                 }
             }
         }
