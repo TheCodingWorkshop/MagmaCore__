@@ -14,6 +14,7 @@ namespace MagmaCore\Base;
 
 use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
@@ -58,9 +59,13 @@ class BaseController extends AbstractBaseController
         $this->templateEngine = new BaseView();
 
         $this->diContainer(Yaml::file('providers'));
-        $this->registerSubscribedServices();
+        $this->initEvents();
     }
 
+    /**
+     * Return and instance of the base application class
+     * @return \MagmaCore\Base\BaseApplication
+     */
     public function baseApp()
     {
         return new BaseApplication();
@@ -182,7 +187,9 @@ class BaseController extends AbstractBaseController
             ['menu' => Yaml::file('menu')],
             ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
         );
-
+        if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
+            $this->dispatchEvent(BeforeRenderActionEvent::class);
+        }
         $response = (new ResponseHandler(
             $this->templateEngine->ashRender($template, array_merge($context, $templateContext))
         ))->handler();

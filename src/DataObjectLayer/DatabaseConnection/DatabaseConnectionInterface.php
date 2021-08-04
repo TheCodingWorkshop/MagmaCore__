@@ -14,10 +14,16 @@ namespace MagmaCore\DataObjectLayer\DatabaseConnection;
 interface DatabaseConnectionInterface
 {
 
-    /** */
+    /**
+     * create a database connection
+     * @return mixed
+     */
     public function open();
 
-    /** */
+    /**
+     * Closes a database connection
+     * @return mixed
+     */
     public function close();
 
 }

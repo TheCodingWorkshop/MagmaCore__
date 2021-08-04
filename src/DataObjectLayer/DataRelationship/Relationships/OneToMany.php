@@ -14,6 +14,7 @@ namespace MagmaCore\DataObjectLayer\DataRelationship\Relationships;
 
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryFactory;
 use MagmaCore\DataObjectLayer\DataRelationship\DataRelationship;
+use MagmaCore\DataObjectLayer\DataRelationship\DataLayerClientFacade;
 
 /**
  * Both tables can have only one record on each side of the relationship.
@@ -22,9 +23,8 @@ use MagmaCore\DataObjectLayer\DataRelationship\DataRelationship;
 class OneToMany extends DataRelationship
 {
 
-    public function __construct(ClientRepositoryFactory $clientRepositoryFactory)
+    public function __construct()
     {
-
     }
 
     public function findObjectBy()

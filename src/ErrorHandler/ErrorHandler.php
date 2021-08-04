@@ -128,6 +128,12 @@ class ErrorHandler
         return array_slice(file($filename, $flags), $offset, $length, true);
     }
 
+    /**
+     * @param $errfile
+     * @param $errline
+     * @param $errclass
+     * @return string
+     */
     public static function getSrcCode($errfile, $errline, $errclass)
     {
         $start = max($errline - floor(self::NUM_LINES / 2), 1);

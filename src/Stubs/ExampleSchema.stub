@@ -1,0 +1,70 @@
+<?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+declare(strict_types=1);
+
+namespace {{ namespace }}
+
+use App\Model\{{ modelName }};
+use MagmaCore\DataSchema\DataSchema;
+use MagmaCore\DataSchema\DataSchemaBlueprint;
+use MagmaCore\DataSchema\DataSchemaBuilderInterface;
+
+class {{ class }} implements DataSchemaBuilderInterface
+{
+
+    /** @var object - $schema for chaining the schema together */
+    protected DataSchema $schema;
+
+    /** @var object - provides helper function for quickly adding schema types */
+    protected DataSchemaBlueprint $blueprint;
+    
+    /** @var object - the database model this schema is linked to */
+    protected {{ modelName }} ${{ modelVar }};
+
+    /**
+     * Main constructor class. Any typed hinted dependencies will be autowired. As this 
+     * class can be inserted inside a dependency container
+     *
+     * @param DataSchema $schema
+     * @param DataSchemaBlueprint $blueprint
+     * @param {{ modelName }} ${{ modelVar }}
+     * @return void
+     */
+    public function __construct(DataSchema $schema, DataSchemaBlueprint $blueprint, {{ modelName }} ${{ modelVar }})
+    {
+        $this->schema = $schema;
+        $this->blueprint = $blueprint;
+        $this->{{ modelName }} = ${{ modelVar }};
+    }
+
+    /**
+     * @inheritdoc
+     * @return string
+     */
+    public function createSchema(): string
+    {
+        return $this->schema
+            ->schema()
+            ->table($this->{{ modelVar }})
+            ->row($this->blueprint->autoID())
+            ->row($this->blueprint->int('test_name', 10))
+            ->row($this->blueprint->int('test_description', 10))
+            ->build(function ($schema) {
+                return $schema
+                    ->addPrimaryKey($this->blueprint->getPrimaryKey())
+                    /*
+                        Optional foreign key constraints can be set here. See documentation
+                        for help or chaning on your constraints for your given schema
+                    */
+                    ->setUniqueKey(['test_name'])
+                    ->addKeys();
+            });
+    }
+}

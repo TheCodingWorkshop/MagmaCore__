@@ -11,12 +11,20 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
+use MagmaCore\Base\Exception\BaseRuntimeException;
+use MagmaCore\Base\Exception\BaseUnexpectedValueException;
+use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Exception;
+use function RingCentral\Psr7\str;
 
 class Yaml
 {
+    /* @var array returns a list of protected config filename application config must not use. */
+    private const PROTECTED_CONFIG_FILE_NAMES = [
+        'event',
+    ];
 
     /**
      * Check whether the specified yaml configuration file exists within
@@ -33,7 +41,8 @@ class Yaml
     }
 
     /**
-     * Load a yaml configuration
+     * Load a yaml configuration from either the core config directory or the application
+     * config directory
      *
      * @param string $yamlFile
      * @return void
@@ -41,19 +50,56 @@ class Yaml
      */
     public function getYaml(string $yamlFile)
     {
-        if (defined('CONFIG_PATH')) {
-            foreach (glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') as $file) {
-                $this->isFileExists($file);
-                $parts = parse_url($file);
-                $path = $parts['path'];
-                if (str_contains($path, $yamlFile)) {
-                    return SymfonyYaml::parseFile($file);
-                }
-            }
-    
-        }
+        if (defined('CONFIG_PATH') && defined('CORE_CONFIG_PATH')) {
+            $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') ?? [];
+            $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') ?? [];
+            /* Prevent name collision by throwing an exception */
+            $this->throwExceptionIfNameCollision($appConfigDir);
 
-            
+            try {
+                $mergeDir = array_merge($coreConfigDir, $appConfigDir);
+
+                foreach ($mergeDir as $file) {
+                    $this->isFileExists($file);
+                    $parts = parse_url($file);
+                    $path = $parts['path'];
+                    if (str_contains($path, $yamlFile)) {
+                        return SymfonyYaml::parseFile($file);
+                    }
+                }
+            } catch(\Throwable $throw) {
+            }
+
+        }
+    }
+
+    /**
+     * Prevent name collision if a user create an application config file which is already
+     * being used by the core config. The core config will take the lead in the situation.
+     * This will throw an exception telling the user to rename their config file
+     *
+     * @param array $appConfigDir
+     * @throws BaseRuntimeException
+     * @return void
+     */
+    private function throwExceptionIfNameCollision(array $appConfigDir): void
+    {
+        if (is_array($appConfigDir) && count($appConfigDir) > 0) {
+            foreach ($appConfigDir as $filename) {
+                /* Lets the explode the string by a delimiter */
+               if (str_contains($filename, '\\')) {
+                   $string = explode('\\', $filename);
+                   $element = array_pop($string);
+                   if (str_contains($element, '.yml')) {
+                       $el = explode('.yml', $element);
+                       $final = array_shift($el);
+                       if (in_array($final, self::PROTECTED_CONFIG_FILE_NAMES)) {
+                           throw new BaseRuntimeException("[{$final}] name is a protected core config filename. Please give your config file a different name.");
+                       }
+                   }
+               }
+            }
+        }
     }
 
     /**

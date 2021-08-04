@@ -1,0 +1,28 @@
+make:
+  name: magma:make
+  class: \MagmaCore\Console\Commands\MakeCommand
+  help: help for making controller
+  description: describe the make controller command
+  argument:
+    - stub
+    - name
+  options:
+    - crud
+    - -c
+  stubs:
+    - controller
+    - column
+    - entity
+    - fillable
+    - form
+    - model
+    - repository
+    - schema
+    - validate
+    - commander
+    - event
+    - event-listener
+    - event-subscriber
+    - before-middleware
+    - after-middleware
+    -

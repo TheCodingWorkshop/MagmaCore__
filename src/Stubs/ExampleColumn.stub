@@ -1,0 +1,86 @@
+<?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace {{ namespace }}
+
+use MagmaCore\Datatable\AbstractDatatableColumn;
+
+class {{ class }} extends AbstractDatatableColumn
+{
+
+    public function columns(): array
+    {
+        return [
+            [
+                'db_row' => 'id',
+                'dt_row' => '<input type="checkbox" class="uk-checkbox" id="chkAll" onclick="checkUncheckAll()">',
+                'class' => 'uk-table-shrink',
+                'show_column' => true,
+                'sortable' => false,
+                'formatter' => function ($row) {
+                    return '<input type="checkbox" class="uk-checkbox" id="{{ singularModelName }}-' . $row['id'] . '" name="id" value="' . $row['id'] . '">';
+                }
+            ],
+            [
+                'db_row' => 'name_of_the_database_column', /* column name in database table */
+                'dt_row' => 'name_of_the_table_column', /* Normally the same as DB column */
+                'class' => 'uk-table-expand', /* css class property for table (td) element */
+                'show_column' => true, /* show or hide the table column */
+                'sortable' => true, /* Allow the column to be sortable true or false */
+                'formatter' => function ($row) { /* optional callback to modify the column content */
+                    return $row['example_name'];
+                }
+            ],
+            [
+                'db_row' => 'created_at',
+                'dt_row' => 'Published',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => true,
+                'formatter' => '' /* if closure not  define then db column data will be returned */
+            ],
+            [
+                'db_row' => 'modified_at',
+                'dt_row' => 'Modified',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => true,
+                'formatter' => ''
+            ],
+            [
+                'db_row' => '',
+                'dt_row' => 'Action', /* Display the actions buttons/links for the table row */
+                'class' => '',
+                'show_column' => true,
+                'sortable' => false,
+                'formatter' => function ($row, $twigExt) {
+                    /* the closure functions gives us access to 2 object the database row
+                    define $row and access to our $twigExt component which gives access
+                    to some twig custom functions created by MagmaCore */
+                    return $twigExt->action( /* $twigExt which calls in the action() method */
+                        [
+                            'file-edit' => [],
+                            'trash' => []
+                        ],
+                        $row,
+                        $twigExt,
+                        '{{ singularModelName }}',
+                        false,
+                        'Are You Sure!'
+                    );
+                }
+            ],
+
+        ];
+    }
+
+}

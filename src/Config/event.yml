@@ -1,0 +1,11 @@
+services:
+  subscribers:
+    base_controller_action.subscriber:
+      class: \MagmaCore\Base\EventSubscriber\BeforeControllerActionSubscriber
+    base_render_action.subscriber:
+      class: \MagmaCore\Base\EventSubscriber\BeforeRenderActionSubscriber
+#  listeners:
+#    inertia.listener:
+#      class: \MagmaCore\Inertia\InertiaListener
+#      props:
+#        - { name: "app.event.listener.send_registration_email_listener", event: '' }

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
+use MagmaCore\Base\Exception\BaseRuntimeException;
+use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseApplication;
@@ -19,6 +21,8 @@ use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Base\Events\BeforeRenderActionEvent;
+use MagmaCore\Base\Events\BeforeControllerActionSubscriber;
 
 trait ControllerTrait
 {
@@ -61,13 +65,17 @@ trait ControllerTrait
     }
 
     /**
-     * Register all event subscribers and listeners
+     * Register all application event subscribers and listeners
      *
      * @return void
      */
-    public function registerSubscribedServices(): void
+    public function registerSubscribedServices(array $otherServices = []): void
     {
-        $fileServices = Yaml::file('events');
+        if (is_array($otherServices) && count($otherServices) > 0) {
+            $fileServices = Yaml::file('event');
+        } else {
+            $fileServices = Yaml::file('events');
+        }
         $services = $fileServices ? $fileServices : self::getSubscribedEvents();
         if (is_array($services) && count($services) > 0) {
             foreach ($services as $serviceParams) {
@@ -85,6 +93,16 @@ trait ControllerTrait
                 }
             }
         }
+
+    }
+
+    /**
+     * register all core events and listeners
+     * @throws \Exception
+     */
+    public function registerCoreSubscribedServices()
+    {
+        return $this->registerSubscribedServices(Yaml::file('event'));
     }
 
     /**
@@ -132,6 +150,20 @@ trait ControllerTrait
                     $this->eventDispatcher->addSubscriber($subscriberObject);
                 }
             }
+        }
+    }
+
+    /**
+     * Register all events and listeners within the base controller constructor
+     * @throws \Exception
+     */
+    public function initEvents(): void
+    {
+        try {
+            $this->registerSubscribedServices();
+            $this->registerCoreSubscribedServices();
+        } catch(BaseRuntimeException) {
+
         }
     }
 
@@ -244,5 +276,19 @@ trait ControllerTrait
         }
 
         return false;
+    }
+
+    /**
+     * @param string $event
+     */
+    public function dispatchEvent(string $event)
+    {
+        if (empty($event) || !is_string($event)) {
+            throw new BaseUnexpectedValueException('Please specify the required argument for the method ' . __METHOD__);
+        }
+        $cloneObject = clone $this;
+        if (isset($this->eventDispatcher)) {
+            $this->eventDispatcher->dispatch(new $event(), $event::NAME);
+        }
     }
 }

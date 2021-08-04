@@ -14,8 +14,8 @@ namespace MagmaCore\DataObjectLayer\DataRelationship;
 
 use Exception;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\DataObjectLayer\DataRelationship\DataLayerClientFacade;
 use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
-use phpDocumentor\Reflection\Types\Callable_;
 
 /**
  * Both tables can have only one record on each side of the relationship.
@@ -99,12 +99,19 @@ class DataRelationship
         return $this;
     }
 
+    /**
+     * @param string $model
+     * @return $this
+     */
     public function andBelongsTo(string $model): self
     {
         $this->andBelongsTo = $this->init($model);
         return $this;
     }
 
+    /**
+     * @return object
+     */
     public function getAndsBelongsTo(): object
     {
         return $this->andBelongsTo;
@@ -171,9 +178,12 @@ class DataRelationship
             return $this->{$property}()->getRepo();
     }
 
+    /**
+     * @param string $resultType
+     * @return mixed
+     */
     public function associate(string $resultType): mixed
     {
-
     }
 
     /**
@@ -189,5 +199,20 @@ class DataRelationship
         $this->setMoreRelationship = $relationshipType;
         return $this;
     }
+
+    /**
+     * @param string $identifier
+     * @param string $schema
+     * @param string $schemaID
+     * @return object
+     */
+    public function getClientRepo(string $identifier, string $schema, string $schemaID): object
+    {
+        $clientRepo = new DataLayerClientFacade($identifier, $schema, $schemaID);
+        if ($clientRepo) {
+            return $clientRepo->getClientRepository();
+        }
+    }
+
 
 }

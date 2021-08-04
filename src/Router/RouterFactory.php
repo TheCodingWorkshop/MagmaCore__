@@ -67,7 +67,7 @@ class RouterFactory
                 if (isset($route)) {
                     $this->routerObject->add($route, $params);
                 }
-    
+
             }    
         }
         /* Add dynamic routes based on regular expression */
@@ -75,6 +75,30 @@ class RouterFactory
         /* Dispatch the routes */
         $this->routerObject->dispatch($this->url);
 
+    }
+
+    public function resolveParamNamePrefix($param): array
+    {
+        if (isset($param['name_prefix']) && $param['name_prefix'] !='') {
+            $appendNamespace = array_key_exists('namespace', $param) ? '/' . $param['namespace'] : '/';
+            $prefix = $param['name_prefix'];
+            if (is_string($prefix)) {
+                if (str_contains($prefix, '.')) {
+                    $parts = explode('.', $prefix);
+                    if (isset($parts) && count($parts) > 0) {
+                        $elController = array_shift($parts);
+                        $elAction = array_pop($parts);
+                        $newArray = Array($prefix => $appendNamespace . $elController . '/' . $elAction);
+                        if ($newArray) {
+                            return $newArray;
+                        }
+
+                    }
+                }
+            }
+
+        }
+        return [];
     }
 
 }

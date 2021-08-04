@@ -75,7 +75,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Undocumented function
+     * Create a camel case method name for the controllers
      *
      * @return string
      */
@@ -86,7 +86,9 @@ class Router implements RouterInterface
     }
 
     /**
-     * Undocumented function
+     * Check for validity within the url. If invalid we will throw an exception. if valid
+     * we will then check the requested controller exists if not then throw another
+     * exception. else return the controller as an array
      *
      * @param string $url
      * @return array
@@ -102,11 +104,13 @@ class Router implements RouterInterface
         if (!class_exists($controller = $this->createController())) {
             throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
         }
-
         return [$controller];
     }
 
     /**
+     * Dispatch the request route by calling the controller class matching the controller
+     * parameter from the url
+     *
      * @inheritDoc
      * @throws RouterNoRoutesFound|ReflectionException
      */
@@ -117,7 +121,7 @@ class Router implements RouterInterface
         $action = $this->createAction();
         if (preg_match('/action$/i', $action) == 0) {
             if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
-            $this->resolveControllerActionDependencies($controllerObject, $action);
+                $this->resolveControllerActionDependencies($controllerObject, $action);
             } else {
                 $controllerObject->$action();
             }
@@ -127,7 +131,11 @@ class Router implements RouterInterface
     }
 
     /**
-     * Undocumented function
+     * Using the reflection api to resolve controller methods. Meaning we can pass multiple arguments to
+     * an action method. argument variables which reflects the dependencies within the providers.yml
+     * file.
+     *
+     * This feature is turned off by default from the app.yml file
      *
      * @param object $controllerObject
      * @param string $newAction
@@ -149,12 +157,12 @@ class Router implements RouterInterface
                     $dependencies[] = $param->getDefaultValue();
                 }
             }
+            $reflectionMethod->setAccessible(false);
             return $reflectionMethod->invokeArgs(
                 $controllerObject,
                 $dependencies
             );
         }
-        $reflectionMethod->setAccessible(false);
     }
 
     /**
@@ -182,6 +190,7 @@ class Router implements RouterInterface
     }
 
     /**
+     * return an array of the route parameters
      * @inheritDoc
      * @return array
      */
@@ -191,6 +200,7 @@ class Router implements RouterInterface
     }
 
     /**
+     * return an array of routes
      * @inheritdoc
      * @return array
      */
