@@ -131,4 +131,15 @@ class Stringify
         return preg_replace('/[^A-Za-z0-9-]+/', '-', $str);
     }
 
+    public static function endsWith(mixed $haystack, mixed $needle)
+    {
+//        $length = strlen($needle);
+//        if (!$length) {
+//            return true;
+//        }
+//        return substr_compare($haystack, $needle, -$length) === 0;
+        return str_ends_with($haystack, $needle);
+
+    }
+
 }

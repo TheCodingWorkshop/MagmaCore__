@@ -77,4 +77,5 @@ class Utilities
         $newOptions = array_combine(str_replace(' ', '_', $options), $options);
         return array_change_key_case($newOptions);
     }
+
 }

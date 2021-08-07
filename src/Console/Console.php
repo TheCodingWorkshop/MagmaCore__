@@ -89,13 +89,10 @@ class Console implements ConsoleInterface
             $arguments,
             $options) = $this->getCommandsValue();
         try {
-            $initClass = new \MagmaCore\Console\Commands\MakeCommand();
-            if ($initClass instanceof ConsoleCommand) {
-                return new FactoryCommandLoader([
-                    'magma:make' => function () use($initClass) { return $initClass; }
-                ]);
-
-            }
+            return new FactoryCommandLoader([
+                'magma:make' => function () { return new \MagmaCore\Console\Commands\MakeCommand(); },
+                'magma:make:migration' => function () { return new \MagmaCore\Console\Commands\MakeMigration(); }
+            ]);
         } catch(BaseLogicException) {
 
         }

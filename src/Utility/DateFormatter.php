@@ -35,7 +35,7 @@ class DateFormatter
         }
 
         if ($before < 1 * self::__MINUTE__)
-            return ($before < 5) ? "just now" : "{$before} ago";
+            return ($before < 5) ? "just now" : "{$before}s ago";
         if ($before < 2 * self::__MINUTE__)
             return "1m ago";
         if ($before < 45 * self::__MINUTE__)
@@ -112,7 +112,7 @@ class DateFormatter
 
         if ($short) {
             if ($before < 1 * $MINUTE) {
-                return ($before < 5) ? "just now" : $before . " ago";
+                return ($before < 5) ? "just now" : $before . "s ago";
             }
 
             if ($before < 2 * $MINUTE) {

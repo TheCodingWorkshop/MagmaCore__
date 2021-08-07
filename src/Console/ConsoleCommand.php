@@ -57,8 +57,7 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
         try {
             $this->setArguments();
             $this->setOptions();
-        } catch(BaseLogicException) {
-
+        } catch(BaseLogicException|BaseInvalidArgumentException) {
         }
     }
 
@@ -109,10 +108,9 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
      * @param string $string
      * @return string
      */
-    protected function terminalInfo(string $string): string
+    protected function terminalInfo(string $string): mixed
     {
-        if ($string)
-            return $this->output->writeIn('<info>' . $string . '</info>');
+        return $this->output->writeln('<info>' . $string . '</info>');
     }
 
     /**
@@ -120,10 +118,9 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
      * @param string $string
      * @return string
      */
-    protected function terminalComment(string $string): string
+    protected function terminalComment(string $string): mixed
     {
-        if ($string)
-            return $this->output->writeIn('<comment>' . $string . '</comment>');
+        return $this->output->writeln('<comment>' . $string . '</comment>');
     }
 
     /**
@@ -131,10 +128,9 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
      * @param string $string
      * @return string
      */
-    protected function terminalQuestion(string $string): string
+    protected function terminalQuestion(string $string): mixed
     {
-        if ($string)
-            return $this->output->writeIn('<question>' . $string . '</question>');
+        return $this->output->writeln('<question>' . $string . '</question>');
     }
 
     /**
@@ -142,10 +138,9 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
      * @param string $string
      * @return string
      */
-    protected function terminalError(string $string): string
+    protected function terminalError(string $string): mixed
     {
-        if ($string)
-            return $this->output->writeIn('<error>' . $string . '</error>');
+        return $this->output->writeln('<error>' . $string . '</error>');
     }
 
     /**
@@ -180,7 +175,7 @@ abstract class ConsoleCommand extends Command implements ConsoleCommandInterface
                     'none' => $this->addOption($option[0], $option[1], InputOption::VALUE_NONE, $option[3]),
                     'required' => $this->addOption($option[0], $option[1], InputOption::VALUE_REQUIRED, $option[3]),
                     'optional' => $this->addOption($option[0], $option[1], InputOption::VALUE_OPTIONAL, $option[3]),
-                    'array' => $this->addOption($option[0], $option[1], InputOption::VALUE_NONE, $option[3]),
+                    'array' => $this->addOption($option[0], $option[1], InputOption::VALUE_IS_ARRAY, $option[3]),
                     'negatable' => $this->addOption($option[0], $option[1], InputOption::VALUE_NEGATABLE, $option[3]),
                     default => throw new BaseInvalidArgumentException('Invalid input argument passed')
                 };

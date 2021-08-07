@@ -17,7 +17,7 @@ use MagmaCore\Datatable\AbstractDatatableColumn;
 class {{ class }} extends AbstractDatatableColumn
 {
 
-    public function columns(): array
+    public function columns(array $dbColumns = [], object|null $callingController = null): array
     {
         return [
             [
@@ -73,7 +73,7 @@ class {{ class }} extends AbstractDatatableColumn
                         ],
                         $row,
                         $twigExt,
-                        '{{ singularModelName }}',
+                        '{{ table_name }}',
                         false,
                         'Are You Sure!'
                     );

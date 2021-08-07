@@ -156,6 +156,9 @@ trait MigrationTrait
         );
     }
 
+    /**
+     * @param $file
+     */
     public function isFile($file)
     {
         if ($file === '.' || $file === '..') {

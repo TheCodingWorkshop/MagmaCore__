@@ -51,7 +51,7 @@ class {{ class }} extends FillableSchema implements FillableSchemaInterface
             ->fill($fillable->faker()->email)
             ->bind(function ($fillable) {
                 return $fillable
-                    ->on($fillable->getModel()->getFillables(UserModel::class))
+                    ->on($fillable->getModel()->getFillables({{ modelName }}::class))
                     ->push();
             });
 
