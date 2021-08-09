@@ -61,8 +61,6 @@ class TemplateEnvironment
     }
 
     /**
-     * Undocumented function
-     *
      * @return string
      */
     public function getPath(): string

@@ -13,14 +13,39 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Components\Uikit;
 
 use Exception;
+use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\DataObjectLayer\DataLayerClientFacade;
 
 class UikitNavigationExtension
 {
 
     /** @var string */
     public const NAME = 'uikit_navigation';
+    private object $repo;
+
+    public function __construct()
+    {
+        $this->repo = (new DataLayerClientFacade(
+            'system_menu',
+            'menu',
+            'id'))->getClientRepository();
+    }
+
+    /**
+     * @param string $controller
+     * @param string $permission
+     * @return bool
+     */
+    public function hideMenuIfNoPermission($controller, $permission): bool
+    {
+        $privilege = PrivilegedUser::getUser();
+        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @param object|null $controller
@@ -29,45 +54,51 @@ class UikitNavigationExtension
      */
     public function register(object $controller = null): string
     {
-        $element = $activeOpen = '';
+        $routeController = $controller->thisRouteController();
+        $element = $active = '';
         if (isset($controller)) {
-            if (is_array($items = Yaml::file('menu')) && count($items) > 0) {
+            //$query = 'SELECT * FROM menus JOIN menu_item ON menus.id = menu_item.item_original_id';
+            $query = 'SELECT * FROM menus';
+            $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
+            if (is_array($data) && count($data) > 0) {
                 $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav>';
-                foreach ($items as $key => $item) {
+                $element .= '<li class="uk-nav-header">Actions</li>';
+                $element .= '<hr>';
+                foreach ($data as $key => $item) {
+
+                    $childQuery = 'SELECT * FROM menu_item WHERE item_original_id = ' . $item['id'];
+                    $children = $this->repo->getClientCrud()->rawQuery($childQuery, [], 'fetch_all');
+
                     if ($item) {
-
-                        if (isset($item['header']) && $item['header'] !== '') {
-                            $element .= '<li class="uk-nav-header">' . $item['header'] . '</li>';
-                            $element .= PHP_EOL;
-                        }
-
-                        $isParent = (isset($item['children']) && count($item['children']) > 0);
-                        if ($controller->thisRouteController() === strtolower($item['name'])) {
-                            $activeOpen = ' ';
-                        }
-
-                        $element .= '<li class="' . ($isParent ? 'uk-parent' . $activeOpen : '') . '">';
+                        $isParent = (isset($children) && count($children) > 0);
+                        $active = ($routeController === $item['menu_name'] && $routeController !=='dashboard') ? 'uk-open' : '';
+                        $element .= '<li class="' . ($isParent ? 'uk-parent' . $active : '') . '">';
                         $element .= '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
-                        $element .= Stringify::capitalize(($item['name'] ?? 'Unknown'));
+                        $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));
                         $element .= '</a>';
-                        if (isset($item['children']) && count($item['children']) > 0) {
-                            $element .= '<ul class="uk-nav-sub">';
-                            foreach ($item['children'] as $child) {
-                                $element .= '<li>';
-                                $element .= '<a href="' . ($child['path'] ?? '') . '">';
-                                $element .= Stringify::capitalize($child['name'] ?? 'Unknown Child');
-                                $element .= '</a>';
-                                $element .= '</li>';
+                        if ($isParent) {
+                            $element .= '<ul class="uk-nav-sub uk-navbar-primary">';
+                            foreach ($children as $child) {
+                                if ($child['item_usable'] === 1) {
+                                    //if ($this->hideMenuIfNoPermission($controller, 'can_view')) {
+                                        $element .= '<li>';
+                                            $element .= '<a href="' . ($child['item_url'] ?? '') . '">';
+                                            $element .= str_replace(
+                                                ['Index', 'New', 'Log'],
+                                                ['View', 'Add New', 'View Log'],
+                                                Stringify::capitalize($child['item_label'] ?? 'Unknown Child'));
+                                            $element .= '</a>';
+                                        $element .= '</li>';
+                                    //}
+                                }
                             }
-                            $element .= '</ul>';
+                            $element .= '</ul>' . PHP_EOL;
                         }
-                        $element .= '
-
-                        ';
-                        $element .= '</li>';
-                        $element .= PHP_EOL;
+                        $element .= '</li>' . PHP_EOL;
                     }
                 }
+                $element .= '<li class="uk-nav-header">System</li>';
+
                 $element .= '</ul>';
                 $element .= PHP_EOL;
             }

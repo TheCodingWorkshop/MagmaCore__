@@ -15,6 +15,8 @@ namespace MagmaCore\Base;
 use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
+use MagmaCore\Base\Traits\ControllerMenuTrait;
+use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
@@ -35,6 +37,8 @@ class BaseController extends AbstractBaseController
 
     use SessionTrait;
     use ControllerCastingTrait;
+    use ControllerPrivilegeTrait;
+    use ControllerMenuTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -60,6 +64,7 @@ class BaseController extends AbstractBaseController
 
         $this->diContainer(Yaml::file('providers'));
         $this->initEvents();
+        $this->buildControllerMenu($routeParams);
     }
 
     /**

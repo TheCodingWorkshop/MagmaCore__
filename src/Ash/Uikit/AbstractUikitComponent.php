@@ -10,15 +10,16 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Ash;
+namespace MagmaCore\Ash\Uikit;
 
-interface ComponentBuilderInterface
+abstract class AbstractUikitComponent implements UikitComponentInterface
 {
 
-    /**
-     * @param mixed $items
-     * @return string
-     */
-    public function component(mixed $items): string;
+    public function __construct()
+    {}
+
+    public function register()
+    {}
 
 }
+

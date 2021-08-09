@@ -46,6 +46,16 @@ class Flash implements FlashInterface
     }
 
     /**
+     * @param object $session
+     * @return self
+     */
+    public function getSessionObject(object $session): self
+    {
+        $this->session = $session;
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      * 
      * @param string $message

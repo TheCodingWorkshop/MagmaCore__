@@ -19,6 +19,7 @@ use MagmaCore\EventDispatcher\EventSubscriberInterface;
 class BeforeControllerActionSubscriber implements EventSubscriberInterface
 {
 
+
     /**
      * Subscribe multiple listeners to listen for the BeforeControllerActionEvent. This will fire
      * each time a new controller is called. Listeners can then perform

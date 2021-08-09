@@ -10,20 +10,13 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Ash\Uikit;
+namespace MagmaCore\Auth\Entity;
 
-class UikitComponent implements UikitComponentInterface
+use MagmaCore\Base\BaseEntity;
+
+/** @todo try and access the schema object to fetch the database column dynamically */
+class MenuItemEntity extends BaseEntity
 {
-
-    public function __construct()
-    {
-
-    }
-
-    public function register()
-    {
-
-    }
-
 }
+
 

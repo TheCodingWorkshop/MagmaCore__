@@ -10,15 +10,12 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Ash;
+namespace MagmaCore\Auth\Entity;
 
-interface ComponentBuilderInterface
+use MagmaCore\Base\BaseEntity;
+
+/** @todo try and access the schema object to fetch the database column dynamically */
+class MenuEntity extends BaseEntity
 {
-
-    /**
-     * @param mixed $items
-     * @return string
-     */
-    public function component(mixed $items): string;
-
 }
+

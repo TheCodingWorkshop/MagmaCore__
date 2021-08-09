@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Events;
 
-use MagmaCore\EventDispatcher\Event;
+use MagmaCore\Base\BaseActionEvent;
 
-class BeforeControllerActionEvent extends Event
+class BeforeControllerActionEvent extends BaseActionEvent
 {
 
     public const NAME = 'magmacore.base.event_before_controller_action_event';

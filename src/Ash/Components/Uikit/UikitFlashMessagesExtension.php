@@ -20,6 +20,14 @@ class UikitFlashMessagesExtension
     public const NAME = 'uikit_flash_message';
 
     /**
+     * @param Flash $flash
+     */
+    public function __construct(Flash $flash)
+    {
+        $this->flash = $flash;
+    }
+
+    /**
      * Get the session flash messages on the fly.
      *
      * @param object|null $controller - the current controller object
@@ -28,7 +36,7 @@ class UikitFlashMessagesExtension
     public function register(object $controller = null): bool|string
     {
         $html = '';
-        $messages = (new Flash($controller->getSession()))->get();
+        $messages = $this->flash->getSessionObject($controller->getSession())->get();
         if (is_array($messages) && count($messages) > 0) {
             foreach ($messages as $message) {
                 extract($message);

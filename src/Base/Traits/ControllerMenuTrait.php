@@ -14,8 +14,14 @@ namespace MagmaCore\Base\Traits;
 
 use MagmaCore\Auth\Model\MenuItemModel;
 use MagmaCore\Auth\Model\MenuModel;
+use MagmaCore\Base\Events\EventLogger;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
+use MagmaCore\System\Event\SystemActionEvent;
+use MagmaCore\System\EventTrait\SystemEventTrait;
+use MagmaCore\Utility\ClientIP;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\Utility\Utilities;
+use MagmaCore\Utility\Yaml;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionException;
@@ -25,6 +31,8 @@ trait ControllerMenuTrait
 {
 
     use DataLayerTrait;
+    use BaseReflectionTrait;
+    use SystemEventTrait;
 
     private $usables = [
         'index' => 'View All',
@@ -74,18 +82,6 @@ trait ControllerMenuTrait
     }
 
     /**
-     * Get a reflection of the pass in class
-     * @param $className
-     * @return ReflectionClass
-     * @throws ReflectionException
-     */
-    public function getReflection($className)
-    {
-        return new ReflectionClass($className);
-
-    }
-
-    /**
      * Automatically build a parent menu and parent menu items when a controller is requested.
      * This process only happens once. ie. It will not rebuild an already build menu and menu items.
      *
@@ -96,22 +92,30 @@ trait ControllerMenuTrait
     public function buildControllerMenu(array $routeParams): bool
     {
         if (count($routeParams)) {
-            $controllerMenu = $this->getControllerMenu(['menu_name' => $routeParams['controller']]);
-            if (!isset($controllerMenu)) {
-                $fields = [
-                    'menu_name' => $routeParams['controller'],
-                    'menu_description' => $routeParams['controller'] . ' parent menu item.',
-                    'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
-                ];
-                $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);
-                if ($new) {
-                    $lastMenuID = $this->getMenu()->getRepo()->fetchLastID();
-                    $this->hasMenuItems($routeParams, $lastMenuID);
-                    /**
-                     * @todo add event listener
-                     * to listen if menu item was created if not then can recreate them
-                     */
-                    return true;
+            $disallowedControllers = Yaml::file('app')['disallowed_controllers'];
+            if (!in_array($routeParams['controller'], $disallowedControllers)) {
+                $controllerMenu = $this->getControllerMenu(['menu_name' => $routeParams['controller']]);
+                if (!isset($controllerMenu)) {
+                    $fields = [
+                        'menu_name' => $routeParams['controller'],
+                        'menu_description' => $routeParams['controller'] . ' parent menu item.',
+                        'menu_order' => null,
+                        'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
+                    ];
+                    $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);
+                    if ($new) {
+                        $lastMenuID = $this->getMenu()->getRepo()->fetchLastID();
+                        $this->hasMenuItems($routeParams, $lastMenuID);
+
+                        /* log Event data */
+                        $context = ['menu' => $fields, 'last_id' => $lastMenuID, 'status' => $new];
+                        $browser = get_browser(null, true);
+                        $eventContext = [EventLogger::SYSTEM, EventLogger::INFORMATION, $this->getSession()->get('user_id'), __METHOD__, SystemActionEvent::NAME, serialize($context), serialize($browser), ClientIP::getClientIp()];
+                        $this->logSystemEvent(__METHOD__, $eventContext, $this);
+                        /* end */
+
+                        return true;
+                    }
                 }
             }
         }
@@ -134,9 +138,9 @@ trait ControllerMenuTrait
         if (isset($parentMenu->menu_name) && $parentMenu->menu_name !==null ) {
             $controllerName = Stringify::studlyCaps($parentMenu->menu_name . 'Controller');
             $namespace = (isset($routeParams['namespace']) ? '\App\Controller\Admin\\' . $controllerName : '\App\Controller\\' . $controllerName);
-            $reflectionClass = $this->getReflection($namespace);
+            $reflectionClass = $this->reflection($namespace ?? null);
             /* We only want the protected methods */
-            $hasMethods = $reflectionClass->getMethods(ReflectionMethod::IS_PROTECTED);
+            $hasMethods = $this->reflection($namespace)->methods(ReflectionMethod::IS_PROTECTED);
             if (is_array($hasMethods) && count($hasMethods) > 0) {
                 return $this->buildMenuItems($routeParams, $hasMethods, $parentMenu);
             }
@@ -170,7 +174,7 @@ trait ControllerMenuTrait
                         'item_label' => $itemName[0],
                         'item_type' => 'child_of_' . $routeParams['controller'],
                         'item_url' => $this->buildItemUrl($itemName[0], $routeParams),
-                        'item_order' => ++$count,
+                        'item_order' => $count + $count,
                         'item_usable' => $this->getUsableMenuItems($itemName[0], $routeParams)
                     ];
 

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
@@ -37,6 +38,7 @@ class Datatable extends AbstractDatatable
     private mixed $tdClass;
     private mixed $tableColumn;
     private mixed $tableOrder;
+    private object $request;
 
     /**
      * Undocumented function
@@ -58,17 +60,22 @@ class Datatable extends AbstractDatatable
      * @param array $sortController
      * @param array $dbColumns
      * @param object|null $callingController
+     * @param object|null $request
      * @return self
      */
-    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], ?object $callingController = null): self
+    public function create(string $dataColumnString, array $dataRepository = [], array $sortController = [], array $dbColumns = [], ?object $callingController = null, ?object $request = null): self
     {
-        $this->dataColumnObject = new $dataColumnString();
+        //$this->dataColumnObject = new $dataColumnString();
+        $this->dataColumnObject = BaseApplication::diGet($dataColumnString);
         if (!$this->dataColumnObject instanceof DatatableColumnInterface) {
             throw new DatatableUnexpectedValueException($dataColumnString . ' is not a valid data column object.');
         }
         $this->dataColumns = $this->dataColumnObject->columns($dbColumns, $callingController);
         $this->sortController = $sortController;
         $this->getRepositoryParts($dataRepository);
+        if ($request)
+            $this->request = $request;
+
         return $this;
     }
 
@@ -100,10 +107,7 @@ class Datatable extends AbstractDatatable
     public function table(): null|string
     {
         extract($this->attr, EXTR_SKIP);
-        $status = (new RequestHandler())
-            ->handler()
-            ->query
-            ->getAlnum($this->sortController['query']);
+        $status = $this->request->handler()->query->getAlnum($this->sortController['query']);
 
         $before = $after = '';
         $this->element .= $before;

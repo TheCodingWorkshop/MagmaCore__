@@ -21,6 +21,7 @@ use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
+use MagmaCore\Auth\Authorized;
 
 trait DomainTraits
 {
@@ -233,7 +234,7 @@ trait DomainTraits
      * @param object|null $column = null
      * @param object|null $repository
      * @param array $tableData
-     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
+     * @return self
      */
     public function table(array $tableParams = [], object|null $column = null, object|null $repository = null, array $tableData = []): self
     {
@@ -250,7 +251,8 @@ trait DomainTraits
                  * the relevant schema located in the App/Schema directory
                  * */
                 $this->controller->repository->getColumns($this->schema),
-                $this->controller
+                $this->controller,
+                $this->controller->request
             )
             ->setAttr($tableParams)
             ->table();
@@ -282,7 +284,7 @@ trait DomainTraits
      * which chains the singular() method would be able to access the data
      * using the variable (row) within the rendered twig template.
      *
-     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
+     * @return self
      */
     public function singular(): self
     {
@@ -393,7 +395,9 @@ trait DomainTraits
     }
 
     /**
-     * Undocumented function
+     * Allow passing an array of rules within the rule arguemnt within the execute() method. These
+     * rule can ensure certain actions are met before performing other actions.
+     * for example ensuring a user enters their password before updating their account on the frontend
      *
      * @param array $rules
      * @param object $controller
@@ -464,6 +468,11 @@ trait DomainTraits
         return array_key_exists($key, $array) ? $array[$key] : '';
     }
 
+    /**
+     * @param object $controller
+     * @return array
+     * @throws Exception
+     */
     public function getControllerArgs(object $controller): array
     {
         $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
