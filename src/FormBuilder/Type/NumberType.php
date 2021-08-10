@@ -43,10 +43,11 @@ class NumberType extends InputType implements FormExtensionTypeInterface
     public function configureOptions(array $extensionOptions = []): void
     {
         $this->defaults = [
+            'value' => '',
             'list' => '',
             'min' => '1',
-            'max' => '10',
-            'step' => '2',
+            'max' => '100',
+            'step' => '1',
             'placeholder' => '',
             'readonly' => false
         ];

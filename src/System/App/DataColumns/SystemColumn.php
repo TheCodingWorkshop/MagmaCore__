@@ -138,7 +138,7 @@ class SystemColumn extends AbstractDatatableColumn
                 'db_row' => 'created_at',
                 'dt_row' => 'Logged',
                 'class' => '',
-                'show_column' => false,
+                'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
                 'formatter' => function ($row, $twigExt) {
@@ -151,7 +151,7 @@ class SystemColumn extends AbstractDatatableColumn
                 'db_row' => '',
                 'dt_row' => 'Action',
                 'class' => '',
-                'show_column' => false,
+                'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
                 'formatter' => function ($row, $twigExt) {

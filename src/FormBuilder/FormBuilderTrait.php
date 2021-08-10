@@ -67,7 +67,6 @@ trait FormBuilderTrait
                 }
                 $output .= '<option' . $disabled . ' value="' . $choice . '"' . $selected . '>' . (is_int($choice) ? $this->getNameFromID($choice, $options['object']) : $choice) . '' . $selected . '</option>' . "\n";
             }
-
             return $output;
         }
 
@@ -157,7 +156,7 @@ trait FormBuilderTrait
     {
         foreach (array_keys($fields) as $index) {
             if (!in_array($index, array_keys($extensionOptions), true)) {
-                throw new FormBuilderOutOfBoundsException("One or more key " . $index . " is not a valid key for the object type $extensionObjectName");
+                throw new FormBuilderOutOfBoundsException("One or more key [" . $index . "] is not a valid key for the object type $extensionObjectName");
             }
         }
     }

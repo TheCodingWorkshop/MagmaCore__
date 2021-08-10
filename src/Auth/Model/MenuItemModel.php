@@ -46,5 +46,15 @@ class MenuItemModel extends AbstractBaseModel
         return [];
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getNameForSelectField($id): mixed
+    {
+        $name = $this->getRepo()->findObjectBy(['id' => $id], ['item_label']);
+        return $name->item_label;
+    }
+
 }
 

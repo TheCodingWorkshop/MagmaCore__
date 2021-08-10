@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
+use MagmaCore\FormBuilder\Type\NumberType;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
@@ -55,15 +56,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param string $name
-     * @param array $class
-     * @param mixed $value
-     * @param string|null $placeholder
-     * @return array
-     */
     public function text(
         string $name,
         array $class = [],
@@ -82,14 +74,24 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
 
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param string $name
-     * @param mixed $value
-     * @param array $class
-     * @return array
-     */
+    public function number(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        bool $disabled = false,
+        string|null $placeholder = null
+    ): array {
+        return [
+            NumberType::class => [
+                array_merge(
+                    $this->args($name, $class, $value, $placeholder),
+                    ['disabled' => $disabled]
+                )
+            ]
+        ];
+
+    }
+
     public function hidden(
         string $name,
         mixed $value = null,
@@ -167,14 +169,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
     
-    /**
-     * Undocumented function
-     *
-     * @param string $name
-     * @param array $class
-     * @param mixed $value = null
-     * @return void
-     */
     public function radio(string $name, array $class = [], mixed $value = null): array
     {
         return [
@@ -220,14 +214,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
     }
 
 
-    /**
-     * Undocumented function
-     *
-     * @param string $name
-     * @param array $class
-     * @param mixed $value
-     * @return array
-     */
     public function multipleCheckbox(
         string $name,
         array $class = [],
@@ -254,12 +240,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param array $choices
-     * @return array
-     */
     public function choices(array $choices, mixed $default = null, object $form = null): array
     {
         return [
@@ -269,16 +249,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param boolean $inlineFlipIcon
-     * @param string $inlineIcon
-     * @param boolean $showLabel
-     * @param string $newLabel
-     * @param boolean $wrapper
-     * @return array
-     */
     public function settings(
         bool $inlineFlipIcon = false,
         ?string $inlineIcon = null,
