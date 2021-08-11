@@ -74,4 +74,5 @@ trait ControllerCastingTrait
         if (empty($value))
             return null;
     }
+
 }

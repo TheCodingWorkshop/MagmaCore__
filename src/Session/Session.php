@@ -45,14 +45,16 @@ class Session implements SessionInterface
         $this->storage = $storage;
     }
 
+    /**
+     * Return the storage object
+     * @return SessionStorageInterface|null
+     */
     public function getStorage(): ?SessionStorageInterface
     {
         return $this->storage;
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @param mixed $value
      * @return void
@@ -69,8 +71,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @param mixed $value
      * @return void
@@ -87,8 +87,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @param mixed|null $default
      * @return void
@@ -104,8 +102,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @return boolean
      * @throws SessionException|Throwable
@@ -122,8 +118,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @return void
      */
     public function invalidate(): void
@@ -132,8 +126,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @param [type] $value
      * @return mixed
@@ -150,8 +142,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @inheritdoc
-     *
      * @param string $key
      * @return boolean
      * @throws SessionInvalidArgumentException
