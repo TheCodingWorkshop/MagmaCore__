@@ -62,10 +62,11 @@ class Error implements ErrorInterface
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
-            foreach ($this->errors as $code => $error) {
-                if (is_string($code)) {
-                    $this->errorCode = $code;
-                    $this->object->flashMessage($error, $this->object->flashWarning());
+            foreach ($this->errors as $error) {
+                $keys = array_keys($error);
+                foreach ($error as $err) {
+                    $this->errorCode = $keys[0];
+                    $this->object->flashMessage($err, $this->object->flashWarning());
                     $this->object->redirect(($redirectPath !== null) ? $redirectPath : $this->object->onSelf());
                 }
             }

@@ -29,7 +29,7 @@
 
 <body>
 <section>
-    <div class="uk-container uk-container-small">
+    <div class="uk-container uk-container-small uk-light uk-background-secondary uk-margin-medium-top uk-margin-medium-bottom uk-padding">
         <article class="uk-article">
             <?php
             $errfile = $exception->getFile();
@@ -41,11 +41,11 @@
             $errType = get_class($exception);
             ?>
 
-            <h1 class="uk-article-title"><span uk-icon="icon: warning; ratio: 3.5"></span> Fatal Error</h1>
+            <h1 class="uk-article-title"><span uk-icon="icon: warning; ratio: 3.5"></span> Application Error</h1>
             <p class="ion-21">The application encountered the following error below.</p>
 
             <h2 class="uk-heading-line"><span>Error Details</span></h2>
-            <ul class="uk-list uk-list-striped uk-list-collapse">
+            <ul class="uk-list uk-list-collapse">
                 <li><strong>Uncaught Exception:</strong> <span class="uk-text-danger uk-text-bolder"><?php echo $errType ?? null; ?></span></li>
                 <li><strong>Code:</strong> <span class="uk-text-danger uk-text-bolder"><?php echo $errcode ?? null; ?></span></li>
                 <li><strong>File:</strong> <span class="uk-text-danger uk-text-bolder"><?php echo $errfile ?? null; ?></span></li>
@@ -63,16 +63,15 @@
                 <li><a class="uk-text-capitalize uk-text-bolder" href="#">StackTrace <span>(<?php echo count($errTrace) > 0 ? count($errTrace) : 0; ?>)</span></a></li>
                 <li><a class="uk-text-capitalize uk-text-bolder" href="#"><?php echo $errType ?? null; ?></a></li>
                 <li><a class="uk-text-capitalize uk-text-bolder" href="#">Debug Backtrace <span>(<?php echo count($errDebugBacktrace) > 0 ? count($errDebugBacktrace) : 0; ?>)</span></a></li>
-
             </ul>
 
-            <ul class="uk-switcher uk-margin uk-overflow-auto uk-height-medium">
+            <ul class="uk-switcher uk-margin">
                 <li>
-                    <pre class="uk-text-bolder"><?php echo "\n" . $exception->getTraceAsString(); ?></pre>
+                    <pre class="uk-text-bolder uk-dark uk-background-muted"><?php echo "\n" . $exception->getTraceAsString(); ?></pre>
                     <a class="uk-text-bolder" href="#" onClick="window.history.go(-1)">Go Back</a>
                 </li>
                 <li>
-                    <pre>
+                    <pre class="uk-dark uk-background-muted">
                        <?php
                        $out = '';
                        foreach($stacktrace as $strace) {
@@ -86,13 +85,12 @@
 
                 </li>
                 <li>
-                    <pre>
+                    <pre class="uk-text-bolder uk-dark uk-background-muted">
                     <?php
                     echo debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                     ?>
                     </pre>
                 </li>
-                <li></li>
             </ul>
         </article>
     </div>

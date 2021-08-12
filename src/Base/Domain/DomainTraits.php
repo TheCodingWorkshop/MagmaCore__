@@ -14,6 +14,7 @@ namespace MagmaCore\Base\Domain;
 
 use Closure;
 use Exception;
+use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
@@ -176,8 +177,12 @@ trait DomainTraits
      */
     public function with(array $context = []): self
     {
-        $this->context = array_merge(['this' => $this->controller], $context);
-        return $this;
+        try {
+            $this->context = array_merge(['this' => $this->controller], $context);
+            return $this;
+        } catch(Exception $e) {
+            //echo 'Message: ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine();
+        }
     }
 
     /**
@@ -204,6 +209,7 @@ trait DomainTraits
             ],
         );
         return $this;
+
     }
 
     /**
@@ -238,18 +244,11 @@ trait DomainTraits
      */
     public function table(array $tableParams = [], object|null $column = null, object|null $repository = null, array $tableData = []): self
     {
-        /* Create the table object and pass the dataColumn and repository object */
         $table = $this->tableData
             ->create(
                 ($column !== null) ? $column : $this->controller->column,
                 ($repository !== null) ? $repository : $this->tableRepository,
                 $this->args,
-                /**
-                 * getColumns() is a method located within the BaseModel class
-                 * and it simple returns an array of columns for the model db table
-                 * its takes 1 argument which is schema that built the model. See
-                 * the relevant schema located in the App/Schema directory
-                 * */
                 $this->controller->repository->getColumns($this->schema),
                 $this->controller,
                 $this->controller->request
@@ -257,7 +256,6 @@ trait DomainTraits
             ->setAttr($tableParams)
             ->table();
 
-        /* Create data table context which gets pass to the twig rendering template */
         if ($this->tableData) {
             $tableContext = [
                 'query_time' => $this->queryTime,
@@ -271,6 +269,7 @@ trait DomainTraits
         }
         $this->superContext = array_merge($this->context, (!empty($tableData)) ? $tableData : $tableContext);
         return $this;
+
     }
 
     function array_flatten($array) {

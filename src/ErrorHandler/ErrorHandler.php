@@ -25,6 +25,17 @@ class ErrorHandler
     private const NUM_LINES = 10;
     private static $trace = [];
 
+    public function __construct()
+    {
+        register_shutdown_function(function(){
+            $error = error_get_last();
+            if($error){
+                throw new ErrorException($error['message'], -1, $error['type'], $error['file'], $error['line']);
+            }
+        });
+
+    }
+
     /**
      * @return mixed
      * @throws \Exception
@@ -43,15 +54,10 @@ class ErrorHandler
      */
     public static function errorHandle($errno, $errstr, $errfile, $errline)
     {
-        if (error_reporting() !==0) {
-            throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+        if (error_reporting() & $errno) {
+            return;
         }
-        register_shutdown_function(function(){
-            $error = error_get_last();
-            if($error){
-                throw new ErrorException($error['message'], -1, $error['type'], $error['file'], $error['line']);
-            }
-        });
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 
     }
 

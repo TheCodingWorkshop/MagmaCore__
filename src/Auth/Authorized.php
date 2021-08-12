@@ -85,13 +85,8 @@ class Authorized
     public static function grantedUser()
     {
         $userSessionID = self::getCurrentSessionID();
-        if (isset($userSessionID) && $userSessionID !==0) {
-            return (new UserModel())
-                ->getRepo()
-                ->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
-            if ($user === null) {
-                throw new BaseUnexpectedValueException('Empty user object returned. Please try again');
-            }
+        if (isset($userSessionID)) {
+            return (new UserModel())->getRepo()->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
         } else {
             $user = self::loginFromRemembermeCookie();
             if ($user) {

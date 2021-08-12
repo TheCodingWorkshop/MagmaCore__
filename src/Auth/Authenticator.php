@@ -37,10 +37,13 @@ class Authenticator
     public function authenticate(string $email, string $passqwordHash): ?object
     {
         $this->repository = (new UserModel());
+
+        /* check for validation errors */
         $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
+
         if (empty($this->errors)) {
             $this->user = $this->repository->getRepo()->findObjectBy(['email' => $email]);
-            if ($this->user && $this->user->status == 'active') {
+            if ($this->user && $this->user->status === 'active') {
                 $this->action = true;
                 if (password_verify($passqwordHash, $this->user->password_hash)) {
                     $this->action = true;
@@ -64,10 +67,11 @@ class Authenticator
      * @param string|null $password
      * @return object
      */
-    public function getValidatedUser(object $object, string|null $email = null, string|null $password = null): object
+    public function getValidatedUser(object $object, string|null $email = null, string|null $password = null): ?object
     {
         $this->object = $object;
         $req = $object->request->handler();
+
         $this->validatedUser = $this->authenticate(
             ($email !== null) ? $req->get($email) : $req->get('email'),
             ($password !== null) ? $req->get($password) : $req->get('password_hash'),
@@ -78,7 +82,7 @@ class Authenticator
                 $object->error->addError($this->getErrors(), $object)->dispatchError();
             }
         }
-        return $this->validatedUser;
+        return $this->validatedUser ?? null;
     }
 
     public function getAuthUser(): array
@@ -161,16 +165,15 @@ class Authenticator
                         $this->email = $value;
                         break;
                     case 'password_hash':
+                        $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash', 'user_failed_logins', 'user_last_failed_login']);
                         if (empty($value)) {
                             $this->errors = Error::display('err_password_require');
                         }
-                        $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash', 'user_failed_logins', 'user_last_failed_login']);
-
                         if (($user->user_failed_logins >= 3) && ($user->user_last_failed_login > (time() - 30))) {
                             $this->errors = Error::display('err_password_force');
-                        } else if (!password_verify($value, $user->password_hash)) {
-                            $this->forceDetected($this->email);
-                            $this->errors = Error::display('err_invalid_credentials');
+                        }
+                        if (!password_verify($value, $user->password_hash)) {
+                            $this->errors[] = Error::display('err_invalid_credentials');
                         }
                         break;
                     default:

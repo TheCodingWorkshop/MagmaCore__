@@ -60,9 +60,6 @@ class LoginAction implements DomainActionLogicInterface
                 if ($controller->formBuilder->csrfValidate()) {
                     if ($controller->authenticator->getValidatedUser($controller)) {
                         $controller->authenticator->getLogin();
-                        if ($controller->error) {
-                            $controller->error->addError($controller->authenticator->getErrors(), $controller)->dispatchError();
-                        }
                         if ($controller->authenticator->getAction() === true) {
                             if ($controller->eventDispatcher) {
                                 $controller->eventDispatcher->dispatch(
