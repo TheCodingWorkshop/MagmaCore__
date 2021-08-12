@@ -167,6 +167,51 @@ class BaseController extends AbstractBaseController
             });
     }
 
+    /**
+     * Template context which relies on the application owning a user and permission
+     * model before providing any data to the rendered template
+     * 
+     * @return array
+     */
+    private function templateModelContext(): array
+    {
+        if (!class_exists(\App\Model\UserModel::class) || !class_exists(\App\Model\PermissionModel::class)) {
+            return array();
+        }
+        return array_merge(
+            ['current_user' => Authorized::grantedUser()],
+            ['privilege_user' => PrivilegedUser::getUser()],
+            ['func' => new TemplateExtension($this)],
+        );
+    }
+
+    /**
+     * Return some global context to all rendered templates
+     * 
+     * @return array
+     */
+    private function templateGlobalContext(): array
+    {
+        return array_merge(
+            ['app' => Yaml::file('app')],
+            ['menu' => Yaml::file('menu')],
+            ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
+        );
+    }
+
+    /**
+     * Rendered template exception
+     * @return void
+     */
+    private function throwViewException(): void
+    {
+        if (null === $this->templateEngine) {
+            throw new BaseLogicException(
+                'You can not use the render method if the build in template engine is not available.'
+            );
+        }
+
+    }
 
     /**
      * Render a template response using Twig templating engine
@@ -179,18 +224,10 @@ class BaseController extends AbstractBaseController
      */
     public function view(string $template, array $context = [])
     {
-        if (null === $this->templateEngine) {
-            throw new BaseLogicException(
-                'You can not use the render method if the build in template engine is not available.'
-            );
-        }
+        $this->throwViewException();
         $templateContext = array_merge(
-            ['current_user' => Authorized::grantedUser()],
-            ['privilege_user' => PrivilegedUser::getUser()],
-            ['func' => new TemplateExtension($this)],
-            ['app' => Yaml::file('app')],
-            ['menu' => Yaml::file('menu')],
-            ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
+            $this->templateGlobalContext(), 
+            $this->templateModelContext()
         );
         if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
             $this->dispatchEvent(BeforeRenderActionEvent::class);
@@ -366,6 +403,9 @@ class BaseController extends AbstractBaseController
         return $this->cache();
     }
 
+    /**
+     * Return the cache object
+     */
     public function cache()
     {
         return $this->baseApp($this)->loadCache();

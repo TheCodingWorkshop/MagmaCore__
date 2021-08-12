@@ -76,22 +76,24 @@ trait ControllerTrait
         } else {
             $fileServices = Yaml::file('events');
         }
-        $services = $fileServices ? $fileServices : self::getSubscribedEvents();
-        if (is_array($services) && count($services) > 0) {
-            foreach ($services as $serviceParams) {
-                foreach ($serviceParams as $key => $params) {
-                    if (isset($key) && is_string($key) && $key !== '') {
-                        switch ($key) {
-                            case 'listeners':
-                                $this->resolveListeners($params);
-                                break;
-                            case 'subscribers':
-                                $this->resolveSubscribers($params);
-                                break;
+        if (!empty($fileServices)) {
+            $services = $fileServices ? $fileServices : self::getSubscribedEvents();
+            if (is_array($services) && count($services) > 0) {
+                foreach ($services as $serviceParams) {
+                    foreach ($serviceParams as $key => $params) {
+                        if (isset($key) && is_string($key) && $key !== '') {
+                            switch ($key) {
+                                case 'listeners':
+                                    $this->resolveListeners($params);
+                                    break;
+                                case 'subscribers':
+                                    $this->resolveSubscribers($params);
+                                    break;
+                            }
                         }
                     }
                 }
-            }
+            }    
         }
 
     }
