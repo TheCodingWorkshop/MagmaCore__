@@ -78,18 +78,15 @@ class ControllerSettingsAction implements DomainActionLogicInterface
                     ->create($controllerSettings);
 
                 if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    $controller->repository->getRepo()->validatedDataBag(),
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
+                    if ($action) {
+                        $this->dispatchSingleActionEvent(
+                            $controller,
+                            $eventDispatcher,
+                            $method,
+                            $controller->repository->getRepo()->validatedDataBag(),
+                            $additionalContext
                         );
+
                     }
                 }
                 $this->domainAction = $action;

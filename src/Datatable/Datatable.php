@@ -206,6 +206,7 @@ class Datatable extends AbstractDatatable
         } else {
             $element .= sprintf('<a href="?page=%s">', ($this->currentPage - 1));
         }
+        //$element .= '<span><ion-icon name="caret-back-outline"></ion-icon></span>';
         $element .= '<span><ion-icon name="chevron-back-outline"></ion-icon></span></a>' . PHP_EOL;
         $element .= '</li>' . PHP_EOL;
 
@@ -237,6 +238,7 @@ class Datatable extends AbstractDatatable
             $element .= sprintf('<a href="?page=%s">', ($this->currentPage + 1));
         }
         $element .= '<span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>' . PHP_EOL;
+        //$element .= '<span><ion-icon name="caret-forward-outline"></ion-icon></span>';
         $element .= '</li>' . PHP_EOL;
 
         return $element;

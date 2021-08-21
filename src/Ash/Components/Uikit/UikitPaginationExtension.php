@@ -32,6 +32,7 @@ class UikitPaginationExtension
                 <div class="uk-navbar-left" style="margin-top: -15px;">
                 </div>
                 <div class="uk-navbar-right">
+                <small class="uk-margin-large-right">Rows per page 10 <span class="uk-margin-top uk-margin-left"><ion-icon name="caret-down-outline"></ion-icon></span></small>
                 <small>' . $this->infoPaging($controller) . '</small>
                     <ul class="uk-pagination">
                     ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '

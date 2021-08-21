@@ -54,34 +54,21 @@ class ChangeStatusAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest()) {
-                if ($controller->repository->getRepo()->findAndReturn($controller->thisRouteID())->or404() !== $controller->thisRouteID()) {
-                    if ($controller->error) {
-                        $controller->error->addError(['There was an error performing this action!'], $controller)->dispatchError($controller->onSelf());
-                        /* log the error */
-                    }
-                }
-                $action = $controller->repository
-                    ->getRepo()
-                    ->findByIdAndUpdate(
-                        (isset($optional) ? $optional : null),
-                        $controller->thisRouteID()
-                    );
-                if ($action) {
-                    /* log the $action */
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                ['action' => $action], /* Mostly true on success or false on failure */
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
-                        );
-                    }
-                }
+        if (isset($formBuilder) && $formBuilder?->canHandleRequest()) :
+            $action = $controller->repository
+                ->getRepo()
+                ->findByIdAndUpdate((isset($optional) ? $optional : null), $controller->thisRouteID());
+            if ($action) {
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    ['action' => $action],
+                    $additionalContext
+                );
+
             }
         endif;
         return $this;

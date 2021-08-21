@@ -58,26 +58,22 @@ class LogoutAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getFileName() . '-' . strtolower($controller->thisRouteController()))) {
-                if ($controller->formBuilder->csrfValidate()) {
-                    /* The logout process */
-                    Authorized::logout();
-                     if ($controller->eventDispatcher) {
-                         $controller->eventDispatcher->dispatch(
-                             new $eventDispatcher(
-                                 $method,
-                                 array(
-                                     $controller->authenticator->getAuthUser(),
-                                     $additionalContext ? $additionalContext : []
-                                 ),
-                         $controller
-                             ),
-                             $eventDispatcher::NAME
-                         );
-                     }
-                }
+        if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
+
+            if ($controller->formBuilder->csrfValidate()) {
+                /* The logout process */
+                Authorized::logout();
+
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    $controller->authenticator->getAuthUser(), /* @todo no context after session cleared,*/
+                    $additionalContext
+                );
+
             }
         endif;
 

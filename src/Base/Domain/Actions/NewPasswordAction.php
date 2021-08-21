@@ -53,32 +53,27 @@ class NewPasswordAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getFileName() . '-' . strtolower($controller->thisRouteController()))) {
-                if ($controller->formBuilder->csrfValidate()) {
-                    $formData = $controller->formBuilder->getData();
-                    $entityCollection = $controller->entity->wash($formData)->rinse()->dry();
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+            if ($formBuilder?->csrfValidate()) {
 
-                    if ($controller->repository->emailExists($entityCollection['email'])) {
-                        $controller->repository->findByUser($entityCollection['email'])->sendUserResetPassword();
-                        if ($controller->eventDispatcher) {
-                            $controller->eventDispatcher->dispatch(
-                                new $eventDispatcher(
-                                    $method,
-                                    array_merge(
-                                        [], /* can return the user object as an array */
-                                        $additionalContext ? $additionalContext : []
-                                    ),
-                                    $controller
-                                ),
-                                $eventDispatcher::NAME
-                            );
-                        }
-                    } else {
-                        if ($controller->error) {
-                            $controller->error->addError(['invalid' => 'Your email address could not be found!'], $controller)->dispatchError($controller->onSelf());
-                        }
+                $entityCollection = $controller?->entity->wash($this->isAjaxOrNormal())->rinse()->dry();
+
+                if ($controller->repository->emailExists($entityCollection['email'])) {
+                    $controller->repository->findByUser($entityCollection['email'])->sendUserResetPassword();
+                    if ($action) {
+                        $this->dispatchSingleActionEvent(
+                            $controller,
+                            $eventDispatcher,
+                            $method,
+                            [],
+                            $additionalContext
+                        );
+                    }
+                } else {
+                    if ($controller->error) {
+                        $controller->error->addError(['invalid' => 'Your email address could not be found!'], $controller)->dispatchError($controller->onSelf());
                     }
                 }
             }

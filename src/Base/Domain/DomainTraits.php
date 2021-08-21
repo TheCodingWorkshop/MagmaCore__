@@ -510,4 +510,75 @@ trait DomainTraits
         return $this;
     }
 
+    
+    /**
+     * @param object $controller
+     * @param string $eventDispatcher
+     * @param string $method
+     * @param array $context
+     * @param array $additionalContext
+     * @return void
+     */
+    public function dispatchSingleActionEvent(object $controller, string $eventDispatcher, string $method, array $context = [], array $additionalContext = []): void
+    {
+        if ($controller->eventDispatcher) {
+            $controller->eventDispatcher->dispatch(
+                new $eventDispatcher(
+                    $method,
+                    array(
+                        $context,
+                        $additionalContext ? $additionalContext : []
+                    ),
+                    $controller
+                ),
+                $eventDispatcher::NAME
+            );
+        }
+
+    }
+
+    public function isAjaxOrNormal(): mixed
+    {
+        return ($this->isRestFul === true) ?
+            $this->controller->formBuilder->getJson() :
+            $this->controller->formBuilder->getData();
+    }
+
+    /**
+     * Return the array argument if the value is indeed an array and the it has atleast 1 element
+     * for iteration.
+     *
+     * @return array|false
+     */
+    public function isArrayGood(array $array, int $count = 0): array|false
+    {
+        if (is_array($array) && count($array) > $count) {
+            return $array;
+        }
+        return false;
+    }
+
+    public function removeCsrfTokens(array $data, string $field): void
+    {
+        if ($data) {
+            unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
+            unset($data[$this->getSubmitValue()]);
+        }
+
+    }
+
+    /**
+     * Clear a directory of its files
+     * @param string $directory
+     */
+    public function clear(string $directory): void
+    {
+        foreach (scandir($directory) as $oldCacheFiles) {
+            if ($oldCacheFiles == '.' || $oldCacheFiles == '..')
+                continue;
+            unlink($directory . '/' .$oldCacheFiles);
+        }
+
+    }
+
 }

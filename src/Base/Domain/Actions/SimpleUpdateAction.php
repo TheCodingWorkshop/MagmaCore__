@@ -56,10 +56,9 @@ class SimpleUpdateAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
                 $entityCollection = $controller->userRole
                     ->getEntity()
                     ->wash($formData)
@@ -94,7 +93,6 @@ class SimpleUpdateAction implements DomainActionLogicInterface
                         );
                     }
                 }
-            }
         endif;
         return $this;
     }

@@ -56,45 +56,38 @@ class ConfigAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { 
-                $controller->formBuilder->validateCsrf($controller); 
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                /* data sanitization */
-                $entityCollection = $controller
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+
+            $entityCollection = $controller
                 ->repository
                 ->getEntity()
-                ->wash($formData)
+                ->wash($this->isAjaxOrNormal())
                 ->rinse()
                 ->dry();
 
-                $data = $entityCollection->all();
-                if ($data) {
-                    unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
-                    unset($data[$this->getSubmitValue()]);
-                }
-                foreach ($data as $key => $value) {
-                    $action = $controller->settingsRepository->set($key, $value);
-                }
-
-                if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    [],
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
-                        );
-                    }
-                }
-                $this->domainAction = $action;
+            $data = $entityCollection->all();
+            $this->removeCsrfToken($data, $this->getSubmitValue());
+//            if ($data) {
+//                unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
+//                unset($data[$this->getSubmitValue()]);
+//            }
+            foreach ($data as $key => $value) {
+                $action = $controller->settingsRepository->set($key, $value);
             }
+
+            if ($action) {
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    [],
+                    $additionalContext
+                );
+
+            }
+            $this->domainAction = $action;
         endif;
         return $this;
     }

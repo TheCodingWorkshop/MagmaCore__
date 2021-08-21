@@ -71,7 +71,7 @@ class IndexAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
 
-        $started = microtime(true);
+        $started = MICROTIME_START;
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
         $this->args = $this->getControllerArgs($controller);
@@ -85,7 +85,7 @@ class IndexAction implements DomainActionLogicInterface
             }
         }
         $this->tableData = $controller->tableGrid;
-        $end = microtime(true);
+        $end = MICROTIME_END;
         //Calculate the difference in microseconds.
         $difference = $end - $started;
 

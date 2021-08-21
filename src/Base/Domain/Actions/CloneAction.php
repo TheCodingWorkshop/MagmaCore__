@@ -53,26 +53,24 @@ class CloneAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getSubmitValue())) {
+        if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
+
                 $formData = $controller->formBuilder->getData();
-                if (is_array($formData) && count($formData) > 1) {
+                if ($this->isArrayGood($formData, 1)) {
                     $action = array_map(fn($id) => $controller->repository->getRepo()->findByIdAndDelete(['id' => $id]), $formData['id']);
                     if ($action) {
-                        if ($controller->eventDispatcher) {
-                            $controller->eventDispatcher->dispatch(
-                                new $eventDispatcher(
-                                    $method,
-                                    ['action' => $action],
-                                    $controller
-                                ),
-                                $eventDispatcher::NAME
-                            );
-                        }
+                        $this->dispatchSingleActionEvent(
+                            $controller,
+                            $eventDispatcher,
+                            $method,
+                            ['action' => $action],
+                            $additionalContext
+                        );
+
                     }
                 }
-            }
         endif;
         return $this;
     }

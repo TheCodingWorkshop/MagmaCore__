@@ -57,18 +57,16 @@ class SettingsAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
         $action = false;
+        $formBuilder = $controller->formBuilder;
         
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { 
-                $controller->formBuilder->validateCsrf($controller); 
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                /* data sanitization */
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+            if ($formBuilder?->csrfValidate()) {
                 $entityCollection = $controller
-                ->controllerRepository
-                ->getEntity()
-                ->wash($formData)
-                ->rinse()
-                ->dry();
+                    ->controllerRepository
+                    ->getEntity()
+                    ->wash($this->isAjaxOrNormal())
+                    ->rinse()
+                    ->dry();
 
                 $data = $entityCollection->all();
                 $this->removeCsrfToken($data);
@@ -80,21 +78,20 @@ class SettingsAction implements DomainActionLogicInterface
                     ->update($data, 'controller_name');
 
                 if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    [],
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
+                    if ($action) {
+                        $this->dispatchSingleActionEvent(
+                            $controller,
+                            $eventDispatcher,
+                            $method,
+                            [],
+                            $additionalContext
                         );
+
                     }
+
                 }
                 $this->domainAction = $action;
+
             }
         endif;
         return $this;

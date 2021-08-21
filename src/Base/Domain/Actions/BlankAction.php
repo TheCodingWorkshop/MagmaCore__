@@ -58,27 +58,19 @@ class BlankAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
-                //$controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                unset($formData[$this->getSubmitValue()]);
-                if ($formData) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    $formData,
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
-                        );
-                    }
-                }
+        if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
+            $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
+            unset($formData[$this->getSubmitValue()]);
+            if ($formData) {
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    $formData,
+                    $additionalContext
+                );
             }
         endif;
         return $this;

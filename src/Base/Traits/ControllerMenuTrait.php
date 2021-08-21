@@ -83,7 +83,8 @@ trait ControllerMenuTrait
 
     /**
      * Automatically build a parent menu and parent menu items when a controller is requested.
-     * This process only happens once. ie. It will not rebuild an already build menu and menu items.
+     * This process only happens once. ie. It will not rebuild an already build menu and 
+     * menu items.
      *
      * @param array $routeParams
      * @return bool
@@ -100,6 +101,7 @@ trait ControllerMenuTrait
                         'menu_name' => $routeParams['controller'],
                         'menu_description' => $routeParams['controller'] . ' parent menu item.',
                         'menu_order' => null,
+                        'menu_break_point' => null,
                         'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
                     ];
                     $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);

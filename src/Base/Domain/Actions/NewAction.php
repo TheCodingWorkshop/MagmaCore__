@@ -56,36 +56,31 @@ class NewAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) { /* return true if form  is valid */
-                $controller->formBuilder->validateCsrf($controller); /* Checks for csrf validation token */
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
-                /* data sanitization */
-                $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
 
+            if ($formBuilder?->csrfValidate()) {
+                $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
                 $action = $controller->repository
                     ->getRepo()
                     ->validateRepository($entityCollection, $entityObject)
                     ->persistAfterValidation();
 
                 if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    $controller->repository->getRepo()->validatedDataBag(),
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
-                        );
-                    }
+                    $this->dispatchSingleActionEvent(
+                        $controller,
+                        $eventDispatcher,
+                        $method,
+                        $controller->repository->getRepo()->validatedDataBag(),
+                        $additionalContext
+                    );
+
                 }
                 $this->domainAction = $action;
+
             }
+
         endif;
         return $this;
     }

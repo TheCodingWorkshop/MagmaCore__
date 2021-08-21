@@ -56,27 +56,22 @@ class ActivateAction implements DomainActionLogicInterface
 
         $token = $controller->thisRouteToken();
         if ($token) {
-            $repository = $controller->repository->findByActivationToken($token);
+            $repository = $controller?->repository->findByActivationToken($token);
             if ($repository) {
-                $action = $controller->repository->validateActivation($repository)->activate();
+                $action = $controller?->repository?->validateActivation($repository)->activate();
                 if (is_bool($action) && $action !== true) {
                     if ($controller->error) {
                         $controller->error->addError($controller->repository->getErrors(), $controller)->dispatchError();
                     }
                 }
-                if ($controller->eventDispatcher) {
-                    $controller->eventDispatcher->dispatch(
-                        new $eventDispatcher(
-                            $method,
-                            array_merge(
-                                ['action' => $action],
-                                $additionalContext ? $additionalContext : []
-                            ),
-                            $controller
-                        ),
-                        $eventDispatcher::NAME
-                    );
-                }
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    ['action' => $action],
+                    $additionalContext
+                );
+
             }
         }
 

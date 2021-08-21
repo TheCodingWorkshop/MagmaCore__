@@ -55,37 +55,33 @@ class EditAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
         
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getSubmitValue())) {
-                if ($controller->formBuilder->csrfValidate()) {
-                    $this->enforceRules($rules, $controller);
-                    $formData = $controller->formBuilder->getData();
-                    $entityCollection = $controller->repository->getEntity()->wash($formData)->rinse()->dry();
-                    $action = $controller->repository->getRepo()
-                        ->validateRepository(
-                            $entityCollection,
-                            $entityObject,
-                            $controller->repository
-                                ->getRepo()
-                                ->findAndReturn($controller->thisRouteID())
-                                ->or404()
-                        )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
-                    if ($action) {
-                        if ($controller->eventDispatcher) {
-                            $controller->eventDispatcher->dispatch(
-                                new $eventDispatcher(
-                                    $method,
-                                    array_merge(
-                                        $controller->repository->getRepo()->validatedDataBag(),
-                                        $additionalContext ? $additionalContext : []
-                                    ),
-                                    $controller
-                                ),
-                                $eventDispatcher::NAME
-                            );
-                        }
-                    }
+        if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
+            if ($formBuilder?->csrfValidate()) {
+
+                $this->enforceRules($rules, $controller);
+                $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
+
+                $action = $controller->repository->getRepo()
+                    ->validateRepository(
+                        $entityCollection,
+                        $entityObject,
+                        $controller->repository
+                            ->getRepo()
+                            ->findAndReturn($controller->thisRouteID())
+                            ->or404()
+                    )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
+
+                if ($action) {
+                    $this->dispatchSingleActionEvent(
+                        $controller,
+                        $eventDispatcher,
+                        $method,
+                        $controller->repository->getRepo()->validatedDataBag(),
+                        $additionalContext
+                    );
+
                 }
             }
         endif;

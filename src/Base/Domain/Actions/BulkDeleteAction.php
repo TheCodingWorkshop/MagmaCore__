@@ -53,25 +53,24 @@ class BulkDeleteAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest() && $controller->formBuilder->isSubmittable($this->getSubmitValue())) {
-                $formData = $controller->formBuilder->getData();
-                if (is_array($formData) && count($formData) > 1) {
-                    $action = array_map(fn($id) => $controller->repository->getRepo()->findByIdAndDelete(['id' => $id]), $formData['id']);
-                    if ($action) {
-                        if ($controller->eventDispatcher) {
-                            $controller->eventDispatcher->dispatch(
-                                new $eventDispatcher(
-                                    $method,
-                                    ['action' => $action],
-                                    $controller
-                                ),
-                                $eventDispatcher::NAME
-                            );
-                        }
-                    }
-                } 
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+
+            $formData = $this->isAjaxOrNormal();
+
+            if ($this->isArrayGood($formData)) {
+                $action = array_map(fn($id) => $controller?->repository->getRepo()->findByIdAndDelete(['id' => $id]), $formData['id']);
+                if ($action) {
+                    $this->dispatchSingleActionEvent(
+                        $controller,
+                        $eventDispatcher,
+                        $method,
+                        ['action' => $action],
+                        $additionalContext
+                    );
+                }
+
             }
         endif;
         return $this;

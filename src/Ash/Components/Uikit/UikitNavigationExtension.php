@@ -96,8 +96,12 @@ class UikitNavigationExtension
                         }
                         $element .= '</li>' . PHP_EOL;
                     }
+
+                     if (isset($item['menu_break_point']) && $item['menu_break_point'] !==null){
+                        $element .= '<li class="uk-nav-header">' . $item['menu_break_point'] ?? null . '</li>';
+                        continue;
+                    }
                 }
-                $element .= '<li class="uk-nav-header">System</li>';
 
                 $element .= '</ul>';
                 $element .= PHP_EOL;

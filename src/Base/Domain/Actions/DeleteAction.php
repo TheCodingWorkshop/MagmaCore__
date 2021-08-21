@@ -53,28 +53,27 @@ class DeleteAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->canHandleRequest()) {
-                if ($controller->repository->getRepo()->findAndReturn($controller->thisRouteID())->or404() !== $controller->thisRouteID()) {
-                    if ($controller->error) {
-                        $controller->error->addError(['Error deleting!'], $controller)->dispatchError($controller->onSelf());
-                    }
-                }
-                $action = $controller->repository->getRepo()->findByIdAndDelete([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
+        if (isset($formBuilder) && $formBuilder?->canHandleRequest()) :
+
+                $action = $controller->repository
+                    ?->getRepo()
+                    ?->findByIdAndDelete([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
+
                 if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                ['action' => $action],
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
+                    if ($action) {
+                        $this->dispatchSingleActionEvent(
+                            $controller,
+                            $eventDispatcher,
+                            $method,
+                            ['action' => $action],
+                            $additionalContext
                         );
+
                     }
+
                 }
-            }
         endif;
         return $this;
     }

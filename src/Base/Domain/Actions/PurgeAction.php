@@ -56,44 +56,23 @@ class PurgeAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $formBuilder = $controller->formBuilder;
 
-        if (isset($controller->formBuilder)) :
-            if ($controller->formBuilder->isFormValid($this->getSubmitValue())) {
-                $controller->formBuilder->validateCsrf($controller);
-                $formData = ($this->isRestFul === true) ? $controller->formBuilder->getJson() : $controller->formBuilder->getData();
+        if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
+            if ($controller->formBuilder->csrfValidate()) {
                 /* data sanitization */
                 $entityCollection = $controller
                     ->controllerRepository
                     ->getEntity()
-                    ->wash($formData)
+                    ->wash($this->isAjaxOrNormal())
                     ->rinse()
                     ->dry();
 
-                $data = $entityCollection->all();
-                if ($data) {
-                    unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['purge-setting']);
+                if ($data = $entityCollection->all()) {
+                    $this->removeCsrfToken($data, $this->getSubmitValue());
+                    //unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['purge-setting']);
                 }
-                foreach (scandir(TEMPLATE_CACHE) as $oldCacheFiles) {
-                    if ($oldCacheFiles == '.' || $oldCacheFiles == '..')
-                        continue;
-                    unlink(TEMPLATE_CACHE . '/' .$oldCacheFiles);
-                }
-                // if ($action) {
-                //     if ($controller->eventDispatcher) {
-                //         $controller->eventDispatcher->dispatch(
-                //             new $eventDispatcher(
-                //                 $method,
-                //                 array_merge(
-                //                     [],
-                //                     $additionalContext ? $additionalContext : []
-                //                 ),
-                //                 $controller
-                //             ),
-                //             $eventDispatcher::NAME
-                //         );
-                //     }
-                // }
-                //$this->domainAction = $action;
+                $this->clear(TEMPLATE_CACHE);
             }
         endif;
         return $this;
