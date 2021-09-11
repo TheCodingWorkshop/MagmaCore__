@@ -6,8 +6,5 @@ services:
       class: \MagmaCore\Base\EventSubscriber\BeforeRenderActionSubscriber
     system_action_event:
       class: \MagmaCore\System\Subscriber\SystemActionSubscriber
-#  listeners:
-#    inertia.listener:
-#      class: \MagmaCore\Inertia\InertiaListener
-#      props:
-#        - { name: "app.event.listener.send_registration_email_listener", event: '' }
+    controllerSettings.subscriber:
+      class: \MagmaCore\Settings\EventSubscriber\ControllerSettingActionSubscriber

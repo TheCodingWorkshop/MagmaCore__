@@ -32,6 +32,7 @@ class UikitSimplePaginationExtension
         $name = $controller->thisRouteController();
         $name = Stringify::pluralize($name);
         $name = Stringify::capitalize($name);
+        // style="z-index: 980;" uk-sticky="offset: 80; bottom: #top; cls-active: uk-card uk-card-body uk-card-default; animation: uk-animation-slide-top"
         return '
         <section>
             <nav aria-label="Pagination" uk-navbar>
@@ -106,6 +107,12 @@ class UikitSimplePaginationExtension
         return sprintf('%s - %s of %s', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
     }
 
+    /**
+     * Return an array of searchable column defined within the DataColumns class
+     *
+     * @param object $controller
+     * @return void
+     */
     private function getSearchableColumns(object $controller)
     {
         $searchables = $controller->getSearchableColumns(UserColumn::class);

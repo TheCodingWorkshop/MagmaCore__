@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Settings;
 
-use App\Model\SettingModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Settings\Model\SettingModel;
 
 class Settings
 {

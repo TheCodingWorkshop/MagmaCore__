@@ -47,7 +47,7 @@ trait ApplicationCommanderTrait
      */
     public function getStatusColumn(object $controller): string
     {
-        $queryColumn = $controller->controllerRepository->getRepo()->findObjectBy(
+        $queryColumn = $controller->controllerSettings->getRepo()->findObjectBy(
             ['controller_name' => $this->getName($controller)],
             ['query']
         );

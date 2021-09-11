@@ -45,10 +45,10 @@ trait TemplateTraits
                             $jsFile = $this->resolvePath($file['src']);
                         }
                         if ($jsFile) {
-                            //$minifier = new Minify\CSS($jsFile);
-                            $script = '<script>';
-                            $script .= ' src="' . $jsFile . '"';
-                            $script .= isset($file['reload']) && $$file['reload'] === true ? ' data-turbo-track="reload"' : '';
+                            //$minifier = new Minify\CSS($jsFile);                            
+                            // $script = '<script>';
+                            // $script .= ' src="' . $jsFile . '"';
+                            // $script .= isset($file['reload']) && $$file['reload'] === true ? ' data-turbo-track="reload"' : '';
                             echo '<script src="' . $jsFile . '" data-turbo-track="reload"></script>' . "\n";
                         }
                     }

@@ -232,7 +232,7 @@ class CommanderBar implements CommanderBarInterface
 //            ->createForm(
 //                "/admin/{$this->controller->thisRouteController()}/index",
 //                $this->controller
-//                    ->controllerRepository
+//                    ->controllerSettings
 //                    ->getRepo()
 //                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
 //                $this->controller

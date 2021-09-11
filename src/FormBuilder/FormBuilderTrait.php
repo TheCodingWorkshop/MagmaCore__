@@ -53,11 +53,11 @@ trait FormBuilderTrait
         if (is_array($options) && count($options) > 0) {
             foreach ($options['choices'] as $key => $choice) {
                 if ($choice == $key && $key != '') {
-                    $selected = ' selected';
-                    $disabled = ' disabled';
+                    // $selected = ' selected';
+                    // $disabled = ' disabled';
                 } elseif (isset($options['default']) && $options['default'] !== null && $options['default'] == $choice) {
                     $selected = ' selected';
-                    $selected = ' disabled';
+                    $disabled = ' disabled';
                 } elseif (is_array($options['default'])) {
                     $selected = (in_array($choice, $options['default']) ? ' selected' : '');
                     $disabled = (in_array($choice, $options['default']) ? ' disabled' : '');
