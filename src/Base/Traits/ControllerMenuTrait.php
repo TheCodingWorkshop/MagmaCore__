@@ -33,6 +33,7 @@ trait ControllerMenuTrait
     use DataLayerTrait;
     use BaseReflectionTrait;
     use SystemEventTrait;
+    use ControllerTrait;
 
     private $usables = [
         'index' => 'View All',
@@ -115,7 +116,10 @@ trait ControllerMenuTrait
                         $eventContext = [EventLogger::SYSTEM, EventLogger::INFORMATION, $this->getSession()->get('user_id'), __METHOD__, SystemActionEvent::NAME, serialize($context), serialize($browser), ClientIP::getClientIp()];
                         $this->logSystemEvent(__METHOD__, $eventContext, $this);
                         /* end */
-
+                        $columnString = '\App\DataColumns\\' . ucwords($routeParams['controller'] . 'Column');
+                        // if (class_exists($columnString)) {
+                        //     $this->initializeControllerSettings($routeParams['controller'], $columnString, $lastMenuID);
+                        // }
                         return true;
                     }
                 }

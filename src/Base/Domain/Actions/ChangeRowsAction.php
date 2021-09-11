@@ -17,21 +17,18 @@ use MagmaCore\Base\Domain\DomainTraits;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class ConfigAction implements DomainActionLogicInterface
+class ChangeRowsAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
 
-    /** @var bool */
-    protected bool $isRestFul = false;
-
     /**
-     * execute logic for adding new items to the database(). Post data is returned as a collection
+     * execute logic for adding new items to the database()
      *
      * @param Object $controller - The controller object implementing this object
      * @param string|null $entityObject
@@ -40,7 +37,8 @@ class ConfigAction implements DomainActionLogicInterface
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return ConfigAction
+     * $param mixed $optional - an optional parameter that accepts any datatype pass to it
+     * @return DeleteAction
      */
     public function execute(
         object $controller,
@@ -58,36 +56,25 @@ class ConfigAction implements DomainActionLogicInterface
         $this->schema = $objectSchema;
         $formBuilder = $controller->formBuilder;
 
-        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
-            $entityCollection = $controller
-                ->repository
-                ->getEntity()
-                ->wash($this->isAjaxOrNormal())
-                ->rinse()
-                ->dry();
-
-            $data = $entityCollection->all();
-            $this->removeCsrfToken($data, $this->getSubmitValue());
-//            if ($data) {
-//                unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
-//                unset($data[$this->getSubmitValue()]);
-//            }
-            foreach ($data as $key => $value) {
-                $action = $controller->settingsRepository->set($key, $value);
-            }
+        if (isset($formBuilder) && $formBuilder?->canHandleRequest()) :
+            $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
+        $formData = $entityCollection->all();
+        $action = $controller->controllerSettings->getRepo()->getEm()->getCrud()
+                ->update(['records_per_page' => (int)$formData['records_per_page'], 'controller_name' => (string)$formData['controller_name']], 'controller_name');
 
             if ($action) {
                 $this->dispatchSingleActionEvent(
                     $controller,
                     $eventDispatcher,
                     $method,
-                    [],
+                    ['action' => $action, 'controller_name' => $formData['controller_name']],
                     $additionalContext
                 );
 
             }
-            $this->domainAction = $action;
         endif;
         return $this;
     }
 }
+
+

@@ -227,52 +227,49 @@ trait ControllerTrait
     }
 
     /**
-     * Initialize each participating controller with controller settings data 
+     * Method is called from ControllerMenuTrait (buildVontrollerMenu) method and will only execute if
+     * controller menu isn't already initialize
+     *
+     * Initialize each participating controller with controller settings data
      * which is stored and retrive from the database. All controller have options
      * which can adjust the current listing pages ie. change how much data is return
-     * within the data table. or change the search term or even enable advance 
+     * within the data table. or change the search term or even enable advance
      * pagination.
      *
-     * @param string|null $controller - the participating controller object
+     * @param string $controller - the participating controller object
      * @param string $columns - the matching *Column class as a qualified namespace
      * @return boolean
      */
-    public function initializeControllerSettings(?string $controller = null, string $columnString): bool
+    public function initializeControllerSettings(string $controller, string $columnString, $menu_id): bool
     {
         if (is_array($controllers = Yaml::file('controller'))) {
             foreach ($controllers as $key => $setting) {
-                if ($this->thisRouteAction() !== 'index') {
-                    continue;
-                }
-                if (!in_array($controller, array_keys($controllers))) {
-                    throw new BaseException('Cannot initialize settings for ' . Stringify::capitalize($key) . 'Controller. Please ensure your controller.yml is referencing specific the controller name. As the array key without the controller suffix');
-                }
-                $find = $this->controllerSettingsModel
-                    ->getRepo()
-                    ->findObjectBy(['controller_name' => $key]);
+                if ($key === $controller) {
+                    $find = $this->controllerSettings->getRepo()->findObjectBy(['controller_name' => $key]);
+                    if (!is_null($find) && $key === trim($find->controller_name)) {
+                        continue;
+                    }
+                    $controllerSettings = [
+                        'controller_menu_id' => $menu_id,
+                        'controller_name' => $key,
+                        'records_per_page' => 1, /* set to 1 by default as will inherit the global value if the value is below 5 */
+                        'visibility' => serialize($this->getVisibleColumns($columnString)),
+                        'sortable' => serialize($this->getSortableColumns($columnString)),
+                        'searchable' => NULL,
+                        'query_values' => serialize($setting['status_choices']),
+                        'query' => $setting['query'],
+                        'filter' => serialize($setting['filter_by']),
+                        'alias' => $setting['filter_alias']
+                    ];
+                    $action = $this->controllerSettings
+                        ->getRepo()
+                        ->getEm()
+                        ->getCrud()
+                        ->create($controllerSettings);
+                    if ($action) {
+                        return $action;
+                    }
 
-
-                if (!is_null($find) && $key === trim($find->controller_name)) {
-                    continue;
-                }
-                $controllerSettings = [
-                    'controller_name' => $key,
-                    'records_per_page' => $setting['records_per_page'],
-                    'visibility' => serialize($this->getVisibleColumns($columnString)),
-                    'sortable' => serialize($this->getSortableColumns($columnString)),
-                    'searchable' => NULL,
-                    'query_values' => serialize($setting['status_choices']),
-                    'query' => $setting['query'],
-                    'filter' => serialize($setting['filter_by']),
-                    'alias' => $setting['filter_alias']
-                ];
-                $action = $this->controllerSettingsModel
-                    ->getRepo()
-                    ->getEm()
-                    ->getCrud()
-                    ->create($controllerSettings);
-                if ($action) {
-                    return $action;
                 }
             }
         }

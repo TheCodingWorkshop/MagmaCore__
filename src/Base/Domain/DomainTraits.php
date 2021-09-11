@@ -474,7 +474,7 @@ trait DomainTraits
      */
     public function getControllerArgs(object $controller): array
     {
-        $cs = $controller->controllerRepository->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
+        $cs = $controller->controllerSettings->getRepo()->findOneBy(['controller_name' => $controller->thisRouteController()]);
         $a = [];
         foreach ($cs as $arg) {
             $a = $arg;
@@ -484,13 +484,13 @@ trait DomainTraits
         }
 
         return [
-            'records_per_page' => $this->isSet('records_per_page', $a) ?: $arg['records_per_page'],
-            'query' => $this->isSet('query', $a) ?: $arg['query'],
-            'filter_by' => unserialize($this->isSet('filter', $a)) ?: $arg['filter_by'],
-            'filter_alias' => $this->isSet('alias', $a) ?: $arg['filter_alias'],
-            'sort_columns' => unserialize($this->isSet('sortable', $a)) ?: $arg['sort_columns'],
-            'additional_conditions' => [] ?: $arg['additional_conditions'],
-            'selectors' => [] ?: $arg['selectors'],
+            'records_per_page' => $this->isSet('records_per_page', $a) ? $this->isSet('records_per_page', $a): $arg['records_per_page'],
+            'query' => $this->isSet('query', $a) ? $this->isSet('query', $a) : $arg['query'],
+            'filter_by' => $this->isSet('filter', $a) ? unserialize($this->isSet('filter', $a)) : $arg['filter_by'],
+            'filter_alias' => $this->isSet('alias', $a) ? $this->isSet('alias', $a) : $arg['filter_alias'],
+            'sort_columns' => $this->isSet('sortable', $a) ? unserialize($this->isSet('sortable', $a)) : $arg['sort_columns'],
+            'additional_conditions' => $this->isSet('additional_conditions', $arg) ? $arg['additional_conditions'] : [],
+            'selectors' => $this->isSet('selectors', $arg) ? $arg['selectors'] : [],
         ];
 
     }

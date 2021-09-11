@@ -62,7 +62,7 @@ class PurgeAction implements DomainActionLogicInterface
             if ($controller->formBuilder->csrfValidate()) {
                 /* data sanitization */
                 $entityCollection = $controller
-                    ->controllerRepository
+                    ->controllerSettings
                     ->getEntity()
                     ->wash($this->isAjaxOrNormal())
                     ->rinse()
