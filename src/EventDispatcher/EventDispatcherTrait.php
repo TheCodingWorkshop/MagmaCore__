@@ -139,5 +139,15 @@ trait EventDispatcherTrait
                 }
             }
         }
+        return null;
+    }
+
+    public function flattenContext(array $context): array
+    {
+        if (is_array($context)) {
+            foreach ($context as $con) {
+                return $con;
+            }
+        }
     }
 }
