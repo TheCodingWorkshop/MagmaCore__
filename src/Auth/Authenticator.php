@@ -12,13 +12,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
-use App\Model\UserModel;
-use MagmaCore\Error\Error;
+use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\Sanitizer;
 use MagmaCore\Utility\Validator;
+use MagmaCore\Utility\UtilityTrait;
+use MagmaCore\Error\Error;
 
 class Authenticator
 {
+
+    use UtilityTrait;
 
     /** @var array $errors */
     protected array $errors = [];
@@ -34,18 +37,19 @@ class Authenticator
      * @param string $password
      * @return object|null
      */
-    public function authenticate(string $email, string $passqwordHash): ?object
+    public function authenticate(string $email, string $password): ?object
     {
+
         $this->repository = (new UserModel());
 
         /* check for validation errors */
-        $this->validate(['email' => $email, 'password_hash' => $passqwordHash]);
+        $this->validate(['email' => $email, 'password_hash' => $password]);
 
         if (empty($this->errors)) {
             $this->user = $this->repository->getRepo()->findObjectBy(['email' => $email]);
             if ($this->user && $this->user->status === 'active') {
                 $this->action = true;
-                if (password_verify($passqwordHash, $this->user->password_hash)) {
+                if (password_verify($password, $this->user->password_hash)) {            
                     $this->action = true;
                     if ($this->user->user_failed_logins !==0) {
                         $this->forceReset();
@@ -71,7 +75,6 @@ class Authenticator
     {
         $this->object = $object;
         $req = $object->request->handler();
-
         $this->validatedUser = $this->authenticate(
             ($email !== null) ? $req->get($email) : $req->get('email'),
             ($password !== null) ? $req->get($password) : $req->get('password_hash'),
@@ -85,6 +88,11 @@ class Authenticator
         return $this->validatedUser ?? null;
     }
 
+    /**
+     * Return the validated user object
+     *
+     * @return array
+     */
     public function getAuthUser(): array
     {
         return (array)$this->validatedUser;
@@ -138,7 +146,6 @@ class Authenticator
             );
     }
 
-
     /**
      * Validate the user login credentials. Ensure the email is valid and exists
      * and checks the password validates against user stored password. We are also
@@ -157,27 +164,32 @@ class Authenticator
                 switch ($key) {
                     case 'email':
                         if (!Validator::email($value)) {
-                            $this->errors = Error::display('err_invalid_email');
+                            $this->errors[] = Error::display('err_invalid_email');
                         }
                         if (!$this->repository->emailExists($value, null)) {
-                            $this->errors = Error::display('err_invalid_account');
+                            $this->errors[] = Error::display('err_invalid_account');
                         }
                         $this->email = $value;
                         break;
                     case 'password_hash':
+                        
                         $user = $this->repository->getRepo()->findObjectBy(['email' => $this->email], ['password_hash', 'user_failed_logins', 'user_last_failed_login']);
+
                         if (empty($value)) {
-                            $this->errors = Error::display('err_password_require');
+                            $this->errors[] = Error::display('err_password_require');
                         }
-                        if (($user->user_failed_logins >= 3) && ($user->user_last_failed_login > (time() - 30))) {
-                            $this->errors = Error::display('err_password_force');
+
+                        if (($user->user_failed_logins >= (int)$this->security('login_attempts')) && ($user->user_last_failed_login > (time() - (int)$this->security('login_timeout')))) {
+                            $this->errors[] = Error::display('err_password_force');
                         }
+
+                        
                         if (!password_verify($value, $user->password_hash)) {
                             $this->errors[] = Error::display('err_invalid_credentials');
                         }
                         break;
                     default:
-                        $this->errors = Error::display('err_invalid_user');
+                        $this->errors[] = Error::display('err_invalid_user');
                         break;
                 }
             }

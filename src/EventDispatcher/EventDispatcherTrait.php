@@ -46,11 +46,31 @@ trait EventDispatcherTrait
      */
     public function trailingRoutes(Object $event) : array
     {
-        return Yaml::file('events')
+
+        // $feedbacks = Yaml::file('events');
+        // foreach ($feedbacks as $key => $value) {
+        //     if (isset($key) && $key === 'services') {
+        //         foreach ($value['subscribers'] as $param => $options) {
+        //             if (isset($param)) {
+        //                 $parts = explode('.', $param);
+        //                 if (isset($parts[0])) {
+        //                     //if ($parts[0] === $event->getObject()->thisRouteController()) {
+        //                         var_dump($param);
+        //                         die;
+        //                    // }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        $feedback = Yaml::file('events')
             ['services']
                 ['subscribers']
-                    [strtolower($event->getObject()->thisRouteController() . '.subscriber')]  
+                    [strtolower($event->getObject()->thisRouteController() . '.subscriber')]
                         ['register_route_feedback'];
+
+        if (isset($feedback))
+            return $feedback;
     }
 
     /**

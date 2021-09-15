@@ -25,9 +25,9 @@ use MagmaCore\Ash\Components\Bootstrap\BsNavigationExtension;
 use MagmaCore\Ash\Components\Uikit\UikitCommanderBarExtension;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
-use App\Model\PermissionModel;
-use App\Model\RoleModel;
-use App\Model\UserModel;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
+use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\UserManager\UserModel;
 use RuntimeException;
 
 if (!class_exists(PermisisonModel::class) && !class_exists(UserModel::class)) {

@@ -73,7 +73,7 @@ class ResetPasswordAction implements DomainActionLogicInterface
                         $controller,
                         $eventDispatcher,
                         $method,
-                        ['action' => $action],
+                        ['action' => $action, $controller->toArray($repository)],
                         $additionalContext
                     );
 

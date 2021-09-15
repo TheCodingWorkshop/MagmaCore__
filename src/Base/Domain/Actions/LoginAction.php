@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
-use App\Model\UserModel;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Components\Uikit;
 
 use MagmaCore\Utility\Stringify;
-use App\DataColumns\UserColumn;
+use MagmaCore\UserManager\UserColumn;
 
 class UikitSimplePaginationExtension
 {

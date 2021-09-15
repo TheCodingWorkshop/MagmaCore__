@@ -171,7 +171,7 @@ class BaseModel
      * @throws InvalidArgumentException
      * @throws ReflectionException
      */
-    public function get(string $objectName)
+    public function get(string $objectName, string $optionalNamespace = null)
     {
         if (empty($objectName)) {
             throw new \InvalidArgumentException('Please provide the name of your object');
@@ -181,10 +181,19 @@ class BaseModel
         }
         // As we are expecting the object name using dot notations we need to convert it
         if (is_string($objectName)) {
-            $objectName = 'app.' . $objectName;
-            $objectName = ucwords(str_replace('.', '\\', $objectName));
+           
+            if ($optionalNamespace !==null) {
+                $pieces = explode('.', $objectName);
+                $name = isset($pieces[1]) ? $pieces[1] : '';
+                $modelName = ucwords($optionalNamespace . $name);
+        
+            } else {
+                $objectName = 'app.' . $objectName;
+                $modelName = ucwords(str_replace('.', '\\', $objectName));
 
-            return BaseApplication::diGet($objectName);
+            }
+
+            return BaseApplication::diGet($modelName);
         }
     }
 
@@ -321,6 +330,11 @@ class BaseModel
             }
         }
             
+    }
+
+    public function getController()
+    {
+        
     }
 
 }

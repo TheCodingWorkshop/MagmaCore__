@@ -17,7 +17,6 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Exception;
-use function RingCentral\Psr7\str;
 
 class Yaml
 {
@@ -51,14 +50,13 @@ class Yaml
     public function getYaml(string $yamlFile)
     {
         if (defined('CONFIG_PATH') && defined('CORE_CONFIG_PATH')) {
-            $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') ?? [];
-            $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml') ?? [];
+            $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
+            $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
             /* Prevent name collision by throwing an exception */
             $this->throwExceptionIfNameCollision($appConfigDir);
 
             try {
                 $mergeDir = array_merge($coreConfigDir, $appConfigDir);
-
                 foreach ($mergeDir as $file) {
                     $this->isFileExists($file);
                     $parts = parse_url($file);
@@ -113,5 +111,6 @@ class Yaml
     {
         return (array)(new Yaml())->getYaml($yamlFile);
     }
+
 
 }

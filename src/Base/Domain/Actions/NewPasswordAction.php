@@ -14,7 +14,7 @@ namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
-
+use MagmaCore\Error\Error;
 /**
  * Class which handles the domain logic when adding a new item to the database
  * items are sanitize and validated before persisting to database. The class will 
@@ -49,7 +49,8 @@ class NewPasswordAction implements DomainActionLogicInterface
         array $additionalContext = [],
         mixed $optional = null
     ): self {
-
+        
+        $error = [];
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
@@ -59,21 +60,17 @@ class NewPasswordAction implements DomainActionLogicInterface
             if ($formBuilder?->csrfValidate()) {
 
                 $entityCollection = $controller?->entity->wash($this->isAjaxOrNormal())->rinse()->dry();
-
                 if ($controller->repository->emailExists($entityCollection['email'])) {
-                    $controller->repository->findByUser($entityCollection['email'])->sendUserResetPassword();
-                    if ($action) {
-                        $this->dispatchSingleActionEvent(
-                            $controller,
-                            $eventDispatcher,
-                            $method,
-                            [],
-                            $additionalContext
-                        );
-                    }
+                    $this->dispatchSingleActionEvent(
+                        $controller,
+                        $eventDispatcher,
+                        $method,
+                        [$controller->repository->findByUser($entityCollection['email'])],
+                        $additionalContext
+                    );
                 } else {
                     if ($controller->error) {
-                        $controller->error->addError(['invalid' => 'Your email address could not be found!'], $controller)->dispatchError($controller->onSelf());
+                        $controller->error->addError([Error::display('err_invalid_user')], $controller)->dispatchError($controller->onSelf());
                     }
                 }
             }

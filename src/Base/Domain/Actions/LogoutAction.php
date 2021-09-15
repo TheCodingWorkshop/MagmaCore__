@@ -63,7 +63,6 @@ class LogoutAction implements DomainActionLogicInterface
         if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
 
             if ($controller->formBuilder->csrfValidate()) {
-                /* The logout process */
                 Authorized::logout();
 
                 $this->dispatchSingleActionEvent(
@@ -73,6 +72,7 @@ class LogoutAction implements DomainActionLogicInterface
                     $controller->authenticator->getAuthUser(), /* @todo no context after session cleared,*/
                     $additionalContext
                 );
+
 
             }
         endif;

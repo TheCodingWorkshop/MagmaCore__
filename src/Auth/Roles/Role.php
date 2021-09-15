@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Roles;
 
-use App\Model\RolePermissionModel;
+use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 
 class Role
 {

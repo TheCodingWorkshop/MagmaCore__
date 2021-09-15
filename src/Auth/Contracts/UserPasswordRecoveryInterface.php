@@ -15,7 +15,7 @@ interface UserPasswordRecoveryInterface
 { 
 
     public function findByUser(string $email) : self;
-    public function sendUserResetPassword() : self;
+    public function sendUserResetPassword(object $controller) : bool;
     public function resetPassword(int $userID) : ?array;
     public function findByPasswordResetToken(string $tokenHash = null) : ?Object;
     public function reset() : bool;

@@ -31,6 +31,8 @@ use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
 use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\UserManager\UserModel;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 
 class BaseController extends AbstractBaseController
 {
@@ -175,7 +177,7 @@ class BaseController extends AbstractBaseController
      */
     private function templateModelContext(): array
     {
-        if (!class_exists(\App\Model\UserModel::class) || !class_exists(\App\Model\PermissionModel::class)) {
+        if (!class_exists(UserModel::class) || !class_exists(PermissionModel::class)) {
             return array();
         }
         return array_merge(

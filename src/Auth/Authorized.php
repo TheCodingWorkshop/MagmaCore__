@@ -16,7 +16,7 @@ use MagmaCore\Auth\Model\RememberedLoginModel as RememberedLogin;
 use MagmaCore\Auth\Roles\Roles;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Cookie\CookieFacade;
-use App\Model\UserModel;
+use MagmaCore\UserManager\UserModel;
 use Throwable;
 
 /**

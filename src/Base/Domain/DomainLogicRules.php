@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use App\Entity\UserEntity;
+//use App\Entity\UserEntity;
+use MagmaCore\UserManager\UserEntity;
 use MagmaCore\Error\Error;
 
 if (!class_exists(UserEntity::class)) {

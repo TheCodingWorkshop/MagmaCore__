@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
-use App\Controller\Admin\UserController;
-use App\Model\PermissionModel;
+// use App\Controller\Admin\UserController;
+// use App\Model\PermissionModel;
+use MagmaCore\UserManager\UserController;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\BaseModel;
