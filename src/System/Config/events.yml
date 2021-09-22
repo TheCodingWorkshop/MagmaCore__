@@ -1,0 +1,141 @@
+services:
+  subscribers:
+    user.subscriber:
+      class: \MagmaCore\UserManager\EventSubscriber\UserActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\UserController::newAction:
+          msg: New user added!
+        MagmaCore\UserManager\UserController::editAction:
+          msg: Changes saved!
+        MagmaCore\UserManager\UserController::deleteAction:
+          msg: User deleted successfully!
+          redirect: user.index
+        MagmaCore\UserManager\UserController::bulkAction:
+          msg: Bulk action successful!
+          redirect: user.index
+        MagmaCore\UserManager\UserController::trashAction:
+          msg: Account is in located within the trash!
+          redirect: user.index
+        MagmaCore\UserManager\UserController::trashRestoreAction:
+          msg: Account restored from trash!
+          redirect: user.index
+        MagmaCore\UserManager\UserController::lockAction:
+          msg: User account is now locked
+          redirect: user.index
+        MagmaCore\UserManager\UserController::unlockAction:
+          msg: User account is is now unlocked
+          redirect: user.index
+        MagmaCore\UserManager\UserController::activeAction:
+          msg: User account is now active
+          redirect: user.index
+        MagmaCore\UserManager\UserController::bulkDeleteAction:
+          msg: Multiple items deleted successfully.
+          redirect: user.index
+        MagmaCore\UserManager\UserController::bulkCloneAction:
+          msg: Multiple items cloned successfully.
+          redirect: user.index
+        App\Controller\RegistrationController::registerAction:
+          msg: Your account was created!
+
+    role.subscriber:
+      class: \MagmaCore\UserManager\Rbac\Role\EventSubscriber\RoleActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Rbac\Role\RoleController::newAction:
+          msg: New Role Added!
+        MagmaCore\UserManager\Rbac\Role\RoleController::editAction:
+          msg: Role updated!
+        MagmaCore\UserManager\Rbac\Role\RoleController::deleteAction:
+          msg: Role Deleted!
+          redirect: role.index
+        MagmaCore\UserManager\Rbac\Role\RoleController::assignedAction:
+          msg: New permission successfully assigned to role.
+
+    role_permission_assigned.subscriber:
+      class: \MagmaCore\UserManager\Rbac\EventSubscriber\RolePermissionAssignedActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Rbac\Role\RoleController::assignedAction:
+          msg: Changes Saved
+
+    permission.subscriber:
+      class: \MagmaCore\UserManager\Rbac\Permission\EventSubscriber\PermissionActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::newAction:
+          msg: New permission added!
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::editAction:
+          msg: Permission updated!
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::deleteAction:
+          msg: Permission deleted!
+          redirect: permission.index
+
+    userRole.subscriber:
+      class: \MagmaCore\UserManager\EventSubscriber\UserRoleActionSubscriber
+
+    security.subscriber:
+      class: \MagmaCore\UserManager\Security\EventSubscriber\LoginActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Security\SecurityController::indexAction:
+          msg: Welcome back!
+
+    logout.subscriber:
+      class: \MagmaCore\UserManager\Security\EventSubscriber\LogoutActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Security\LogoutController::logoutAction:
+          msg: You've successfully logged out!
+
+    password.subscriber:
+      class: \MagmaCore\UserManager\PasswordRecovery\EventSubscriber\PasswordActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\PasswordRecovery\PasswordController::forgotAction:
+          msg: Your request was successful. Please check your email address for reset link!
+        MagmaCore\UserManager\PasswordRecovery\PasswordController::resetAction:
+          msg: Password reset successfully.
+
+    activation.subscriber:
+      class: \MagmaCore\UserManager\Activation\EventSubscriber\ActivationActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Activation\ActivationController::activateAction:
+          msg: You're now activated
+
+    registration.subscriber:
+      class: \MagmaCore\UserManager\Registration\EventSubscriber\RegistrationActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Registration\RegistrationController::registerAction:
+          msg: You're now registered
+
+    setting.subscriber:
+      class: \MagmaCore\Settings\EventSubscriber\SettingActionSubscriber
+      register_route_feedback:
+       MagmaCore\Settings\SettingController::indexAction:
+          msg: Changes Saved
+
+    menu.subscriber:
+      class: \MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber
+      register_route_feedback:
+        MagmaCore\PanelMenu\MenuController::editAction:
+          msg: Changes Saved
+
+    ########################## CORE SYSTEM EVENTS ##########################
+    base_controller_action.subscriber:
+      class: \MagmaCore\Base\EventSubscriber\BeforeControllerActionSubscriber
+    base_render_action.subscriber:
+      class: \MagmaCore\Base\EventSubscriber\BeforeRenderActionSubscriber
+    system_action_event:
+      class: \MagmaCore\System\Subscriber\SystemActionSubscriber
+    controllerSettings.subscriber:
+      class: \MagmaCore\Settings\EventSubscriber\ControllerSettingActionSubscriber
+
+    # base_bulk_action.subscriber:
+    #   class: \MagmaCore\Base\EventSubscriber\BulkActionSubscriber
+    #   register_route_feedback:
+    #     MagmaCore\UserManager\UserController::bulkDeleteAction:
+    #       msg: Multiple items deleted successfully.
+    #       redirect: user.index
+    #     MagmaCore\UserManager\UserController::bulkCloneAction:
+    #       msg: Multiple items cloned successfully.
+    #       redirect: user.index
+
+#  listeners:
+#    inertia.listener:
+#      class: \MagmaCore\Inertia\InertiaListener
+#      props:
+#        - { name: "app.event.listener.send_registration_email_listener", event: '' }

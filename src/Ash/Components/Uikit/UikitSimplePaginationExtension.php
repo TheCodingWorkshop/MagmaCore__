@@ -43,11 +43,13 @@ class UikitSimplePaginationExtension
                 <span></span>
                 </button></li>
                 <li><a href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
-                <li class="uk-disabled"><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-trash" id="bulk_trash" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
-                <li class="uk-disabled"><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-copy" id="bulk_copy" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button></li>
-                <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="notification" id="notification" uk-tooltip="Notification"><span class="ion-28"><ion-icon name="notifications-outline"></ion-icon></span></button></li>
+                
+                <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
 
-                <li><a href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
+                <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button>
+                </li>
+
+                <li><a class="uk-badge uk-link-reset uk-light" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
                  <li>
                      <div class="uk-search">
                      <a href="" class="uk-search-icon-flip" uk-search-icon></a>

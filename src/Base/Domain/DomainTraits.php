@@ -205,7 +205,7 @@ trait DomainTraits
                     ($formAction !== null) ? $formAction : $this->domainRoute(),
                     ($data !== null) ? $data : $this->findSomeData(),
                     $this->controller
-                )
+                ),
             ],
         );
         return $this;
@@ -316,7 +316,7 @@ trait DomainTraits
     public function end(string|null $type = null): void
     {
         $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
-        $this->controller->render($this->fileToRender, $context);
+        $this->controller->view($this->fileToRender, $context);
     }
 
     public function endAfterExecution(): string
@@ -580,5 +580,15 @@ trait DomainTraits
         }
 
     }
+
+    public function flattenArray(array $context): array
+    {
+        if (is_array($context)) {
+            foreach ($context as $con) {
+                return $con;
+            }
+        }
+    }
+
 
 }

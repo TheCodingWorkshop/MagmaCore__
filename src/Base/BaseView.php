@@ -31,7 +31,7 @@ class BaseView
      */
     public function ashRender(string $template, array $context = [])
     {
-        echo $this->templateRender($template, $context);
+        return $this->templateRender($template, $context);
     }
 
     /**
@@ -83,7 +83,7 @@ class BaseView
      */
     public function ashRenderError(string $template, array $context = [])
     {
-        echo $this->errorTemplateRender($template, $context);
+        return $this->errorTemplateRender($template, $context);
     }
 
 

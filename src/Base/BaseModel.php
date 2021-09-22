@@ -332,9 +332,4 @@ class BaseModel
             
     }
 
-    public function getController()
-    {
-        
-    }
-
 }

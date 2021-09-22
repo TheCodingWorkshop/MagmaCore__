@@ -34,6 +34,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'edit',
         'show',
         'log',
+        'bulk',
         'trash',
         'hard-delete',
         'privilege',
@@ -42,8 +43,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences'];
-    private array $noManager = ['trash', 'new'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk'];
+    private array $noManager = ['trash', 'new', 'bulk'];
     private array $noAction = ['trash'];
     private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences'];
 
@@ -90,6 +91,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'firstname'),
             'privilege' => 'Edit Privilege',
             'show' => "Viewing " . $suffix,
+            'bulk' => (isset($_POST['bulk-delete']) ? 'Bulk Delete' : 'Bulk Cloning'),
             'trash' => 'Trash Listings',
             'log' => Stringify::capitalize($controller->thisRouteController()) . ' Log',
             'hard-delete' => "Deleting " . $suffix,

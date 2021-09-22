@@ -58,6 +58,7 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     public function __construct()
     {
         parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, UserEntity::class);
+        
     }
 
     /**
@@ -68,6 +69,33 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     public function guardedID(): array
     {
         return [];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    public function getClonableKeys(): array
+    {
+        return ['firstname', 'lastname', 'email'];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    public function getUncloneableKeys(): array
+    {
+        return ['id', 'activation_token', 'created_at'];
+    }
+
+    public function unsetCloneKeys(array $cloneArray)
+    {
+        if ($cloneArray) {
+
+        }
     }
 
     /**

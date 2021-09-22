@@ -41,5 +41,8 @@ class Access
     public const CAN_MANAGE_GROUP = 'can_manage_group';
     public const CAN_ASSIGN = 'can_assign';
 
+    public const CAN_BULK_DELETE_USER = 'can_bulk_delete';
+    public const CAN_BULK_CLONE_USER = 'can_bulk_clone';
+
 
 }

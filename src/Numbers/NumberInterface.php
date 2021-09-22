@@ -15,12 +15,14 @@ namespace MagmaCore\Numbers;
 interface NumberInterface
 {
 
-    public function addNumber(mixed $num);
-    public function number();
-    public function addition(mixed $num = null);
-    public function subtraction(mixed $num = null);
-    public function division(mixed $num = null);
-    public function multiplication(mixed $num = null);
-    public function percentage(mixed $percentage);
-    public function fraction();
+    public function addNum(mixed $num);
+    public function num();
+    public function add(mixed $num = null);
+    public function sub(mixed $num = null);
+    public function divi(mixed $num = null);
+    public function times(mixed $num = null);
+    public function perc(mixed $percentage);
+    public function frac();
+    public function format(float $number, int $decimal = 2, ?string $sep = '.');
+    public function numeric();
 }

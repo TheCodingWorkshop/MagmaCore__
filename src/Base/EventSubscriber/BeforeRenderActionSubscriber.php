@@ -33,9 +33,5 @@ class BeforeRenderActionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function test(BeforeRenderActionEvent $event)
-    {
-    }
-
 
 }

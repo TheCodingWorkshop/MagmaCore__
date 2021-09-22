@@ -14,7 +14,7 @@ namespace MagmaCore\Numbers;
 
 use MagmaCore\Numbers\NumberInterface;
 
-class Number implements NumberInterface
+class Number
 {
 
     /**

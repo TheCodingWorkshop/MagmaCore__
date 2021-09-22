@@ -27,6 +27,7 @@ class Authenticator
     protected array $errors = [];
     /** @var bool $action */
     protected bool $action = false;
+    protected bool $bruteForce = false;
     private $validatedUser;
 
     /**
@@ -44,19 +45,19 @@ class Authenticator
 
         /* check for validation errors */
         $this->validate(['email' => $email, 'password_hash' => $password]);
-
+        $this->user = $this->repository->getRepo()->findObjectBy(['email' => $email]);
         if (empty($this->errors)) {
-            $this->user = $this->repository->getRepo()->findObjectBy(['email' => $email]);
             if ($this->user && $this->user->status === 'active') {
-                $this->action = true;
                 if (password_verify($password, $this->user->password_hash)) {            
                     $this->action = true;
                     if ($this->user->user_failed_logins !==0) {
                         $this->forceReset();
                     }
                     return $this->user;
-                }
+                } 
             }
+        } else {
+            $this->forceDetected($this->user->email);
         }
         return null;
         
@@ -125,7 +126,7 @@ class Authenticator
 
     public function forceDetected(string $email)
     {
-        $this->repository->getRepo()
+        return $this->repository->getRepo()
             ->getEm()
             ->getCrud()
             ->rawQuery(
@@ -137,7 +138,7 @@ class Authenticator
     public function forceReset()
     {
         // reset the failed login counter for that user
-        $this->repository->getRepo()
+        return $this->repository->getRepo()
             ->getEm()
             ->getCrud()
             ->rawQuery(
@@ -168,6 +169,7 @@ class Authenticator
                         }
                         if (!$this->repository->emailExists($value, null)) {
                             $this->errors[] = Error::display('err_invalid_account');
+                            $this->bruteForce = true;
                         }
                         $this->email = $value;
                         break;
@@ -177,15 +179,17 @@ class Authenticator
 
                         if (empty($value)) {
                             $this->errors[] = Error::display('err_password_require');
+                            $this->bruteForce = true;
                         }
 
                         if (($user->user_failed_logins >= (int)$this->security('login_attempts')) && ($user->user_last_failed_login > (time() - (int)$this->security('login_timeout')))) {
                             $this->errors[] = Error::display('err_password_force');
+                            $this->bruteForce = true;
                         }
-
                         
                         if (!password_verify($value, $user->password_hash)) {
                             $this->errors[] = Error::display('err_invalid_credentials');
+                            $this->bruteForce = true;
                         }
                         break;
                     default:
@@ -205,6 +209,11 @@ class Authenticator
     public function getErrors(): array
     {
         return $this->errors;
+    }
+
+    public function getBruteForceAction()
+    {
+        return $this->bruteForce;
     }
 
     /**

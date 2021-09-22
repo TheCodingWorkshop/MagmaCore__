@@ -188,6 +188,16 @@ class TemplateExtension
         }
     }
 
+    public function getItemNameByID(int $id): object
+    {
+        if (!empty($id)) {
+            $id = (int)$id;
+            $this->itemName = (new UserModel())->getRepo()->findObjectBy(['id' => $id]);
+            return $this->itemName;
+        }
+    }
+
+
     /**
      * Return the permission ID based on the permission name
      * @param string $permissionName

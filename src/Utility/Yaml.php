@@ -16,13 +16,14 @@ use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
+use Throwable;
 use Exception;
 
 class Yaml
 {
     /* @var array returns a list of protected config filename application config must not use. */
     private const PROTECTED_CONFIG_FILE_NAMES = [
-        'event',
+        'events',
     ];
 
     /**
@@ -39,6 +40,37 @@ class Yaml
             throw new Exception($filename . ' does not exists');
     }
 
+    private function getAppConfigs(): array
+    {
+        if (defined('CONFIG_PATH')) {
+            $appConfig = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
+            if (count($appConfig)) {
+                return $appConfig;
+            }
+        }
+    }
+
+    public function _getYaml(string $ymlFile)
+    {
+        if (defined('CORE_CONFIG_PATH')) {
+            $coreConfig = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
+            $appConfig = $this->getAppConfigs();
+            $this->throwExceptionIfNameCollision($appConfig);
+            try {
+                $combineDirs = array_merge($coreConfig, $appConfig);
+                foreach ($combineDirs as $file) {
+                    $this->isFileExists($file);
+                    if (str_contains($file, $ymlFile)) {
+                        return SymfonyYaml::parseFile($file);
+                    }
+                    
+                }
+            }catch(Throwable $throw) {
+
+            }
+        }
+    }
+
     /**
      * Load a yaml configuration from either the core config directory or the application
      * config directory
@@ -49,26 +81,28 @@ class Yaml
      */
     public function getYaml(string $yamlFile)
     {
-        if (defined('CONFIG_PATH') && defined('CORE_CONFIG_PATH')) {
-            $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
-            $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
-            /* Prevent name collision by throwing an exception */
-            $this->throwExceptionIfNameCollision($appConfigDir);
+        return $this->_getYaml($yamlFile);
+        // die;
+        // if (defined('CONFIG_PATH') && defined('CORE_CONFIG_PATH')) {
+        //     $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
+        //     $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
+        //     /* Prevent name collision by throwing an exception */
+        //     $this->throwExceptionIfNameCollision($appConfigDir);
 
-            try {
-                $mergeDir = array_merge($coreConfigDir, $appConfigDir);
-                foreach ($mergeDir as $file) {
-                    $this->isFileExists($file);
-                    $parts = parse_url($file);
-                    $path = $parts['path'];
-                    if (str_contains($path, $yamlFile)) {
-                        return SymfonyYaml::parseFile($file);
-                    }
-                }
-            } catch(\Throwable $throw) {
-            }
+        //     try {
+        //         $mergeDir = array_merge($coreConfigDir, $appConfigDir);
+        //         foreach ($mergeDir as $file) {
+        //             $this->isFileExists($file);
+        //             $parts = parse_url($file);
+        //             $path = $parts['path'];
+        //             if (str_contains($path, $yamlFile)) {
+        //                 return SymfonyYaml::parseFile($file);
+        //             }
+        //         }
+        //     } catch(\Throwable $throw) {
+        //     }
 
-        }
+        // }
     }
 
     /**

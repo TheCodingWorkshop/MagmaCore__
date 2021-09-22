@@ -7,15 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 declare(strict_types=1);
 
 namespace MagmaCore\UserManager;
 
-use App\Controller\Admin\AdminController;
+use App\Forms\Admin\User\SettingsForm;
+use App\Forms\Admin\User\BulkDeleteForm;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Event\UserRoleActionEvent;
-use App\Forms\Admin\User\SettingsForm;
 use MagmaCore\UserManager\Forms\Admin\UserForm;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
@@ -37,11 +36,13 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\Access;
+use MagmaCore\Base\Events\BulkActionEvent;
+
 use JetBrains\PhpStorm\NoReturn;
 use Exception;
 
 #[BaseProtectedRoutes]
-class UserController extends AdminController
+class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait;
@@ -85,6 +86,7 @@ class UserController extends AdminController
                 'userLogRepo' => UserLogModel::class,
                 'userFillable' => UserFillable::class,
                 'userRelationship' => UserRelationship::class,
+                'bulkDeleteForm' => BulkDeleteForm::class
 
             ]
         );
@@ -112,7 +114,6 @@ class UserController extends AdminController
      * all sub controller class as a default landing point when a request is
      * made.
      */
-    #[BaseProtectedRoutes('test', 42)]
     protected function indexAction()
     {
 
@@ -265,29 +266,53 @@ class UserController extends AdminController
      */
     protected function bulkAction()
     {
-//        if (array_key_exists('id', $this->request->handler()->request->get('bulk-trash'))) {
-//            var_dump(true);
-//            die;
-//        }
-            //var_dump($this->request->handler()->request->get('id'));
-//        $this->bulkDeleteAction
-//            ->setAccess($this, 'can_bulk_delete')
-//            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__);
+        foreach (['bulk-delete', 'bulk-clone'] as $action) {
+            if (array_key_exists($action, $this->formBuilder->getData())) {
+                $id = $this->repository->getSchemaID();
+                $this->showBulkAction
+                    ->setAccess($this, Access::CAN_BULK_DELETE_USER)
+                    ->execute($this, NULL, NULL, NULL, __METHOD__)
+                    ->render()
+                    ->with(
+                        [
+                            'selected' => $this->formBuilder->getData()[$id],
+                            'action' => $action
+                        ]
+                    )
+                    ->form($this->bulkDeleteForm)
+                    ->end();
+            }    
+        }
+    }
+
+    /**
+     * The bulk delete action request. is responsible for deleting multiple record from
+     * the database. This method is not a submittable method hence why this check has
+     * been omitted. This a simple click based action. which is triggered within the
+     * datatable. An event will be dispatch by this action
+     */
+    protected function bulkDeleteAction()
+    {
+        if (array_key_exists('bulkDelete-user', $this->formBuilder->getData())) {
+            $this->bulkDeleteAction
+                ->setAccess($this, Access::CAN_BULK_DELETE_USER)
+                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
+                ->endAfterExecution();
+        }
     }
 
     /**
      * Clone a user account and append a unique index to prevent email unique key
      * collision
      */
-    protected function cloneAction()
+    protected function bulkCloneAction()
     {
-        $this->newAction
-            ->setAccess($this, Access::CAN_CLONE)
-            ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__)
-            ->render()
-            ->with()
-            ->singular()
-            ->end();
+        if (array_key_exists('bulkClone-user', $this->formBuilder->getData())) {
+            $this->bulkCloneAction
+                ->setAccess($this, Access::CAN_BULK_CLONE_USER)
+                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
+                ->endAfterExecution();
+        }
     }
 
     /**
@@ -422,7 +447,7 @@ class UserController extends AdminController
             ->setAccess($this, Access::CAN_LOG)
             ->execute($this, NULL, NULL, UserSchema::class, __METHOD__)
             ->render()
-            ->with()
+            ->with([])
             ->table()
             ->end();
     }

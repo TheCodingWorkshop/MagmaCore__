@@ -1,0 +1,60 @@
+{
+    "src": "MagmaCore",
+    "namespace": "UserManager",
+    "type": "Component",
+    "description": "Complete User management system including full user crud, registration, login, activation, validation and role based access control integrated",
+    "structure": {
+        "Activation": {
+            "Event": {
+                "ActivationActionEvent": "magmacore-usermanager.activation.event.activation_action_event"
+            },
+            "EventSubcriber": {"ActivationActionSubscriber": "file"},
+            "Templates": {},
+            "ActivationController": "file",
+            "ActivationRepository": "file"
+        },
+        "Controller": {"UserRoleController": "file"},
+        "DataColumn": {"UserLogColumn": "file"},
+        "Entity": {
+            "UserLogEntity": "file",
+            "UserMetaEntity": "file",
+            "UserNoteEntity": "file",
+            "UserPreferenceEntity": "file",
+            "UserRoleEntity": "file"
+        },
+        "Event": {
+            "UserActionEvent": "file",
+            "UserRoleActionEvent": "file"
+        },
+        "EventSubscriber": {
+            "UserActionSubscriber": "magmacore.usermanager.event.user_action_event",
+            "UserRoleActionSubscriber": "magmacore.usermanager.event.user_role_action_event"
+        },
+        "Forms": {
+            "Admin": {},
+            "Client": {}
+        },
+        "Middleware": {
+            "Before": {},
+            "After": {}
+        },
+        "Model": {},
+        "PasswoedRecovery": {},
+        "Rbac": {},
+        "Registration": {},
+        "Repository": {},
+        "Schema": {},
+        "Security": {},
+        "Templates": {},
+        "Validate": {},
+        "UserColumn": "file",
+        "UserCommander": "file",
+        "UserController": "file",
+        "UserEntity": "file",
+        "UserFillable": "file",
+        "UserModel": "file",
+        "UserRelationship": "file",
+        "UserSchema": "file",
+        "UserValidate": "file"
+    }
+}

@@ -19,7 +19,6 @@ use MagmaCore\EventDispatcher\EventSubscriberInterface;
 class BeforeControllerActionSubscriber implements EventSubscriberInterface
 {
 
-
     /**
      * Subscribe multiple listeners to listen for the BeforeControllerActionEvent. This will fire
      * each time a new controller is called. Listeners can then perform
@@ -30,9 +29,15 @@ class BeforeControllerActionSubscriber implements EventSubscriberInterface
     #[ArrayShape([BeforeControllerActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
     {
         return [
-//            BeforeControllerActionEvent::NAME => [
-//            ]
+           BeforeControllerActionEvent::NAME => [
+               ['isError']
+           ]
         ];
+    }
+
+    public function isError(BeforeControllerActionEvent $event)
+    {
+        //var_dump($event->getObject()->response->handler());
     }
 
 

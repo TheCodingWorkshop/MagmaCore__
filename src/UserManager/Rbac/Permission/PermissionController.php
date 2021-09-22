@@ -18,7 +18,7 @@ use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Access;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
-class PermissionController extends \App\Controller\Admin\AdminController
+class PermissionController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     /**

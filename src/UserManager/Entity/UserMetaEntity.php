@@ -15,5 +15,4 @@ namespace MagmaCore\UserManager\Entity;
 use MagmaCore\Base\BaseEntity;
 
 class UserMetaEntity extends BaseEntity
-{
-}
+{}

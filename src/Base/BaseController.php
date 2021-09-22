@@ -15,6 +15,7 @@ namespace MagmaCore\Base;
 use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
+use MagmaCore\Base\Events\BeforeControllerActionEvent;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
 use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Utility\Yaml;
@@ -33,6 +34,8 @@ use MagmaCore\Base\Traits\ControllerCastingTrait;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
+use MagmaCore\Base\Exception\BadMethodCallException;
+use Exception;
 
 class BaseController extends AbstractBaseController
 {
@@ -95,15 +98,23 @@ class BaseController extends AbstractBaseController
         if (is_string($name) && $name !== '') {
             $method = $name . 'Action';
             if (method_exists($this, $method)) {
+                if ($this->eventDispatcher->hasListeners(BeforeControllerActionEvent::NAME)) {
+                    $this->dispatchEvent(
+                        BeforeControllerActionEvent::class, 
+                        $name, 
+                        $this->routeParams, 
+                        $this
+                    );
+                }        
                 if ($this->before() !== false) {
                     call_user_func_array([$this, $method], $argument);
                     $this->after();
                 }
             } else {
-                throw new \BadMethodCallException("Method {$method} does not exists.");
+                throw new BadMethodCallException("Method {$method} does not exists.");
             }
         } else {
-            throw new \Exception();
+            throw new Exception;
         }
     }
 
@@ -234,11 +245,15 @@ class BaseController extends AbstractBaseController
         if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
             $this->dispatchEvent(BeforeRenderActionEvent::class);
         }
-        $response = (new ResponseHandler(
-            $this->templateEngine->ashRender($template, array_merge($context, $templateContext))
-        ))->handler();
-        if ($response) {
-            return $response;
+        $response = $this->response->handler();
+        $request = $this->request->handler();
+        $response->setCharset('ISO-8859-1');
+        $response->headers->set('Content-Type', 'text/plain');
+        $response->setStatusCode($response::HTTP_OK);
+        $response->setContent($this->templateEngine->ashRender($template, array_merge($context, $templateContext)));
+        if ($response->isNotModified($request)) {
+            $response->prepare($request);
+            $response->send();
         }
     }
 

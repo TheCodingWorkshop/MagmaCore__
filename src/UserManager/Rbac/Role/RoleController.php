@@ -28,7 +28,7 @@ use MagmaCore\Base\Access;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
-class RoleController extends \App\Controller\Admin\AdminController
+class RoleController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait;

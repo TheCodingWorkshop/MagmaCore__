@@ -220,9 +220,8 @@ class UserActionSubscriber implements EventSubscriberInterface
             if ($event) {
                 $user = $this->flattenContext($event->getContext());
                 if (is_array($user) && count($user) > 0 && !empty($user['role_id'])) {
-                    $userRole = new UserRoleModel();
-                    if ($userRole) {
-                        $push = $userRole->getRepo()
+                    if ($this->userRole) {
+                        $push = $this->userRole->getRepo()
                             ->getEm()
                             ->getCrud()
                             ->create(['user_id' => $user['last_id'], 'role_id' => $user['role_id']]);
@@ -286,6 +285,26 @@ class UserActionSubscriber implements EventSubscriberInterface
             }
         }
         return false;
+    }
+
+    public function assignedRoleToClones()
+    {
+        // if ($this->onRoute($event, 'bulk-clone')) {
+        //     if ($event) {
+        //         $user = $this->flattenContext($event->getContext());
+        //         if (is_array($user) && count($user) > 0 && !empty($user['role_id'])) {
+        //             if ($this->userRole) {
+        //                 $push = $this->userRole->getRepo()
+        //                     ->getEm()
+        //                     ->getCrud()
+        //                     ->create(['user_id' => $user['last_id'], 'role_id' => $user['role_id']]);
+        //                 return (bool)$push;
+        //             }
+        //         }
+        //     }
+        // }
+        // return false;
+
     }
 
 }

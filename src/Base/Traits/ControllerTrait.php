@@ -65,29 +65,48 @@ trait ControllerTrait
     }
 
     /**
+     * Return only the parameter array of the extended event configurations
+     *
+     * @return array
+     */
+    private function getExtendedEventServiceParams(): array
+    {
+        $_params = [];
+        $extendedEvents = Yaml::file('extend_events');
+        if (is_array($extendedEvents) && count($extendedEvents) > 0) {
+            foreach ($extendedEvents as $events) {
+                foreach ($events as $key => $param) {
+                    if (is_array($param)) {
+                        $_params = $param;
+                    }
+                }
+            }
+        }
+        return $_params;
+    }
+
+    /**
      * Register all application event subscribers and listeners
      *
      * @return void
      */
     public function registerSubscribedServices(array $otherServices = []): void
     {
-        if (is_array($otherServices) && count($otherServices) > 0) {
-            $fileServices = Yaml::file('event');
-        } else {
-            $fileServices = Yaml::file('events');
-        }
+        $extendedEventsParams = $this->getExtendedEventServiceParams();
+        $fileServices = Yaml::file('events');
         if (!empty($fileServices)) {
             $services = $fileServices ? $fileServices : self::getSubscribedEvents();
             if (is_array($services) && count($services) > 0) {
                 foreach ($services as $serviceParams) {
                     foreach ($serviceParams as $key => $params) {
+                        $extendedParams = array_merge($params, $extendedEventsParams ?? []);
                         if (isset($key) && is_string($key) && $key !== '') {
                             switch ($key) {
                                 case 'listeners':
-                                    $this->resolveListeners($params);
+                                    $this->resolveListeners($extendedParams);
                                     break;
                                 case 'subscribers':
-                                    $this->resolveSubscribers($params);
+                                    $this->resolveSubscribers($extendedParams);
                                     break;
                             }
                         }
@@ -96,15 +115,6 @@ trait ControllerTrait
             }    
         }
 
-    }
-
-    /**
-     * register all core events and listeners
-     * @throws \Exception
-     */
-    public function registerCoreSubscribedServices()
-    {
-        return $this->registerSubscribedServices(Yaml::file('event'));
     }
 
     /**
@@ -163,7 +173,6 @@ trait ControllerTrait
     {
         try {
             $this->registerSubscribedServices();
-            $this->registerCoreSubscribedServices();
         } catch(BaseRuntimeException) {
 
         }
@@ -280,14 +289,17 @@ trait ControllerTrait
     /**
      * @param string $event
      */
-    public function dispatchEvent(string $event)
+    public function dispatchEvent(string $event, string $method, array $context = [], object $controller)
     {
         if (empty($event) || !is_string($event)) {
             throw new BaseUnexpectedValueException('Please specify the required argument for the method ' . __METHOD__);
         }
         $cloneObject = clone $this;
         if (isset($this->eventDispatcher)) {
-            $this->eventDispatcher->dispatch(new $event(), $event::NAME);
+            $this->eventDispatcher->dispatch(
+                new $event($method, $context, $controller), 
+                $event::NAME
+            );
         }
     }
 }
