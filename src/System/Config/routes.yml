@@ -1,0 +1,55 @@
+# Specifies the directory which contains non dynamic routes . ie the routes which
+# are defined within this config file
+# App/Templates/client/**
+# Note client is the default directory
+client_dir: client
+# The main directory which holds all our .twig template files. This directory
+# should have the sub-directory 'client' defined above
+template_dir: Templates
+
+"":
+  controller: home
+  action: index
+
+login:
+  controller: security
+  action: index
+
+logout:
+  controller: logout
+  action: logout
+
+register:
+  controller: registration
+  action: register
+
+password/reset/{token:[\da-f]+}:
+  controller: password
+  action: reset
+
+activation/activate/{token:[\da-f]+}:
+  controller: activation
+  action: activate
+
+profile/{controller}/{action}:
+  namespace: profile
+
+profile/{controller}/{id:[\da-f]+}/{action}:
+  namespace: profile
+
+admin/{controller}/{action}:
+  namespace: Admin
+
+admin/{controller}/{id:[\da-f]+}/{action}:
+  namespace: Admin
+
+api/{controller}/{action}:
+  namespace: API
+
+api/{controller}/{id:[\da-f]+}/{action}:
+  namespace: API
+
+installer/{controller}/{action}:
+  namespace: Installer
+  controller: install
+  action: index

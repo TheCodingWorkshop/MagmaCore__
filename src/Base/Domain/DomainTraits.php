@@ -581,6 +581,28 @@ trait DomainTraits
 
     }
 
+    /**
+     * Returns a modified clone array modifying the selected elements within the item object
+     * which was return by concatinating the a clone string to create a clone but unique item 
+     * which will be re-inserted within the database.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function resolvedCloning(string $value): string
+    {
+        $suffix = '-clone';
+        if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
+            $ex = explode('@', $value); /* explode the argument by the @ symbol */
+            if (is_array($ex)) {
+                /* safely get the first and last index of the array */
+                return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
+            }
+        } else {
+            return $value . $suffix;
+        }
+    }
+
     public function flattenArray(array $context): array
     {
         if (is_array($context)) {
@@ -589,6 +611,5 @@ trait DomainTraits
             }
         }
     }
-
 
 }

@@ -32,6 +32,7 @@ use MagmaCore\Base\Domain\Actions\EditAction;
 use MagmaCore\Base\Domain\Actions\IndexAction;
 use MagmaCore\Base\Domain\Actions\LogIndexAction;
 use MagmaCore\Base\Domain\Actions\NewAction;
+use MagmaCore\Base\Domain\Actions\CloneAction;
 use MagmaCore\Base\Domain\Actions\SettingsAction;
 use MagmaCore\Base\Domain\Actions\ShowAction;
 use MagmaCore\Base\Domain\Actions\ShowBulkAction;
@@ -85,6 +86,7 @@ class AdminController extends BaseController
                 'bulkCloneAction' => BulkCloneAction::class,
                 'showBulkAction' => ShowBulkAction::class,
                 'indexAction' => IndexAction::class,
+                'cloneAction' => CloneAction::class,
                 'logIndexAction' => LogIndexAction::class,
                 'showAction' => ShowAction::class,
                 'changeStatusAction' => ChangeStatusAction::class,

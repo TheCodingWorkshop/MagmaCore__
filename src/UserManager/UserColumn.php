@@ -54,7 +54,7 @@ class UserColumn extends AbstractDatatableColumn
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<div>' . $this->displayStatus($callingController, $row) . '</div>';
-                    $html .= '<div><a uk-tooltip="' . $privilege->getRole() . '" href=""><ion-icon name="person-outline"></ion-icon></a></div>';
+                    $html .= '<div><a uk-tooltip="' . (!$privilege->getRole() ? 'No Role Assigned' : $privilege->getRole()) . '" href=""><ion-icon name="' . (!$privilege->getRole() ? 'alert-outline' : 'person-outline') . '"></ion-icon></a></div>';
                     $html .= '<div></div>';
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';

@@ -57,6 +57,7 @@ class DataLayerFactory
         if ($dataMapper) {
             /* build the query builder factory object */
             $queryBuilderFactory = new QueryBuilderFactory();
+            /* todo we will need to have a QueryBuilderDriverFactory::class which loads the relevant query based on the database driver selected */
             $queryBuilder = $queryBuilderFactory->create(QueryBuilder::class);
             if ($queryBuilder) {
                 /* build the entity manager factory object */

@@ -34,6 +34,9 @@ services:
         MagmaCore\UserManager\UserController::bulkCloneAction:
           msg: Multiple items cloned successfully.
           redirect: user.index
+        MagmaCore\UserManager\UserController::cloneAction:
+          msg: Item cloned successfully.
+          redirect: user.index
         App\Controller\RegistrationController::registerAction:
           msg: Your account was created!
 

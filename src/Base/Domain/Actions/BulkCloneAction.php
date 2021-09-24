@@ -56,16 +56,22 @@ class BulkCloneAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
             $formData = $this->isAjaxOrNormal();
-            $newClone = [];
+            $schemaID = $controller->repository->getSchemaID();
+            $_newClone = [];
+
             if ($this->isArrayGood($formData)) {
                 unset($formData[$this->getSubmitValue()]);
                 $suffix = '-clone';
                 $action = '';
-                foreach (array_map('intval', $formData['id']) as $itemID) {
+
+                foreach (array_map('intval', $formData[$schemaID]) as $itemID) {
                     if ($itemID !==null) {
                         $itemObject = $controller->repository
                         ->getRepo()
-                        ->findObjectBy(['id' => $itemID], ['firstname', 'lastname', 'email']);
+                        ->findObjectBy(
+                            [$schemaID => $itemID], 
+                            $controller->repository->getClonableKeys()
+                        );
                         $itemObjectToArray = $controller->toArray($itemObject);
 
                         /* new clone modified firstname, lastname and email strings */
@@ -74,7 +80,10 @@ class BulkCloneAction implements DomainActionLogicInterface
                             $itemObjectToArray
                         );
 
-                        $baseArray = $controller->repository->getRepo()->findOneBy(['id' => $itemID]);
+                        $baseArray = $controller->repository
+                        ->getRepo()
+                        ->findOneBy([$schemaID => $itemID]);
+
                         /* merge the modifiedArray with the baseArray overriding any key from the baseArray */
                         $newCloneArray = array_map(
                             fn($array) => array_merge($array, $modifiedArray), 
@@ -82,17 +91,14 @@ class BulkCloneAction implements DomainActionLogicInterface
                         );
                         $newClone = $this->flattenArray($newCloneArray);
                         /* We want the id to auto incremented so we will remove the id key from the array */
-                        unset($newClone['id']);
-                        unset($newClone['created_at']); // We want the date change to now
-                        $newClone['activation_token'] = NULL;
-                        $newClone['password_reset_hash'] = NULL;
-                        
+                        $_newClone = $controller->repository->unsetCloneKeys($newClone);
+
                         /* Now lets imsert the clone data within the database */
                         $action = $controller->repository
                         ->getRepo()
                         ->getEm()
                         ->getCrud()
-                        ->create($newClone);
+                        ->create($_newClone);
                                 
                     }
                 }
@@ -102,7 +108,7 @@ class BulkCloneAction implements DomainActionLogicInterface
                         $controller,
                         $eventDispatcher,
                         $method,
-                        ['action' => $action, 'new_clone' => $newClone],
+                        ['action' => $action, 'new_clone' => $_newClone],
                         $additionalContext
                     );
 
@@ -113,25 +119,4 @@ class BulkCloneAction implements DomainActionLogicInterface
         return $this;
     }    
 
-    /**
-     * Returns a modified clone array modifying the selected elements within the item object
-     * which was return by concatinating the a clone string to create a clone but unique item 
-     * which will be re-inserted within the database.
-     *
-     * @param string $value
-     * @return string
-     */
-    private function resolvedCloning(string $value): string
-    {
-        $suffix = '-clone';
-        if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
-            $ex = explode('@', $value); /* explode the argument by the @ symbol */
-            if (is_array($ex)) {
-                /* safely get the first and last index of the array */
-                return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
-            }
-        } else {
-            return $value . $suffix;
-        }
-    }
 }

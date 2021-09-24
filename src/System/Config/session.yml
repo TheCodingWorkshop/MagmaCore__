@@ -1,0 +1,22 @@
+session_name: "LavaStudio"
+idle_time: 600 # 10min idle
+lifetime: 3600 #session expires in 10min if left idle
+path: /
+domain: "localhost"
+secure: false
+httponly: true
+gc_maxlifetime: "1800"
+gc_probability: "1000"
+gc_divisor: "1"
+use_cookies: "1"
+globalized: false
+default_driver: native_storage
+drivers:
+  native_storage:
+    class: \MagmaCore\Session\Storage\NativeSessionStorage
+    default: true
+  array_storage:
+    class: \MagmaCore\Session\Storage\ArraySessionStorage
+    default: false
+  pdo_storage:
+    class: \MagmaCore\Session\Storage\PdoSessionStorage

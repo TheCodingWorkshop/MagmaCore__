@@ -55,22 +55,56 @@ class CloneAction implements DomainActionLogicInterface
         $this->schema = $objectSchema;
         $formBuilder = $controller->formBuilder;
 
-        if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
+        if (isset($formBuilder) && $formBuilder?->canHandleRequest()) :
 
-                $formData = $controller->formBuilder->getData();
-                if ($this->isArrayGood($formData, 1)) {
-                    $action = array_map(fn($id) => $controller->repository->getRepo()->findByIdAndDelete(['id' => $id]), $formData['id']);
-                    if ($action) {
-                        $this->dispatchSingleActionEvent(
-                            $controller,
-                            $eventDispatcher,
-                            $method,
-                            ['action' => $action],
-                            $additionalContext
-                        );
+            $schemaID = $controller->repository->getSchemaID();
+            $_newClone = [];
 
-                    }
-                }
+            $itemObject = $controller->repository
+            ->getRepo()
+            ->findObjectBy(
+                [$schemaID => $controller->thisRouteID()], 
+                $controller->repository->getClonableKeys()
+            );
+            $itemObjectToArray = $controller->toArray($itemObject);
+
+            /* new clone modified firstname, lastname and email strings */
+            $modifiedArray = array_map(
+                fn($item) => $this->resolvedCloning($item),
+                $itemObjectToArray
+            );
+
+            $baseArray = $controller->repository
+            ->getRepo()
+            ->findOneBy([$schemaID => $controller->thisRouteID()]);
+
+            /* merge the modifiedArray with the baseArray overriding any key from the baseArray */
+            $newCloneArray = array_map(
+                fn($array) => array_merge($array, $modifiedArray), 
+                $baseArray
+            );
+
+            $newClone = $this->flattenArray($newCloneArray);
+            /* We want the id to auto incremented so we will remove the id key from the array */
+            $_newClone = $controller->repository->unsetCloneKeys($newClone);
+            /* Now lets imsert the clone data within the database */
+
+            $action = $controller->repository
+            ->getRepo()
+            ->getEm()
+            ->getCrud()
+            ->create($_newClone);
+
+            if ($action) {
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    ['action' => $action, 'single_clone' => $_newClone],
+                    $additionalContext
+                );
+
+            }
         endif;
         return $this;
     }

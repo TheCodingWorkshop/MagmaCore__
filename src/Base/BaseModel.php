@@ -44,6 +44,11 @@ class BaseModel
     protected array $dbColumns = [];
     /** @var array $fillable - returns a array of columns which cannot be null */
     protected array $fillable = [];
+
+    protected array $nullableClone = [];
+    protected array $unsettableClone = [];
+    protected array $cloneableKeys = [];
+
     /** @var array */
     protected const ALLOWED_CASTING_TYPES = ['array_json'];
 
@@ -331,5 +336,35 @@ class BaseModel
         }
             
     }
+
+    /**
+     * Unset the database column which is not cloneable
+     *
+     * @param array $cloneArray
+     * @return void
+     */
+    public function unsetCloneKeys(array $cloneArray)
+    {
+        if (is_array($this->unsettableClone) && count($this->unsettableClone) > 0) {
+            foreach ($this->unsettableClone as $unsettable) {
+                unset($cloneArray[$unsettable]);
+            }
+        }
+        return $cloneArray;
+    }
+
+    /**
+     * returns an array of database column which should be unique when cloning
+     *
+     * @return array
+     */
+    public function getClonableKeys(): array
+    {
+        if (is_array($this->cloneableKeys) && count($this->cloneableKeys) > 0) {
+            return $this->cloneableKeys;
+        }
+    }
+
+
 
 }

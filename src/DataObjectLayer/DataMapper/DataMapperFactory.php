@@ -19,15 +19,6 @@ class DataMapperFactory
 {
 
     /**
-     * Main constructor class
-     * 
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Creates the data mapper object and inject the dependency for this object. We are also
      * creating the DatabaseConnection Object and injecting the environment object. Which will
      * expose the environment methods with the database connection class.

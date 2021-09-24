@@ -47,6 +47,10 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     protected ?string $validatedHashPassword;
     protected ?object $tokenRepository;
 
+    /** @var array - bulk action array properties */
+    protected array $unsettableClone = ['id', 'created_at', 'activation_token', 'password_reset_hash'];
+    protected array $cloneableKeys = ['firstname', 'lastname', 'email'];
+
     /**
      * Main constructor class which passes the relevant information to the
      * base model parent constructor. This allows the repository to fetch the
@@ -69,33 +73,6 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     public function guardedID(): array
     {
         return [];
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return array
-     */
-    public function getClonableKeys(): array
-    {
-        return ['firstname', 'lastname', 'email'];
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return array
-     */
-    public function getUncloneableKeys(): array
-    {
-        return ['id', 'activation_token', 'created_at'];
-    }
-
-    public function unsetCloneKeys(array $cloneArray)
-    {
-        if ($cloneArray) {
-
-        }
     }
 
     /**

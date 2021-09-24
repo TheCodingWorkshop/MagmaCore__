@@ -1,0 +1,209 @@
+# APPLICATION CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+app:
+  app_name: LavaStudio
+  core_name: Magma
+  app_version: 1.0.0
+  core_version: 1.0.0
+  app_email: magmacore@lavastudio.co.uk
+  app_author: Ricardo Miller
+
+# GENERAL SETTINGS CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+settings:
+  default_charset: UTF-8
+  default_locale: en
+  default_timezone: Europe/London
+  favicon: ""
+  apple_icon: ""
+  secret_key: ""
+  googleAnalytics: UA-XXXXX-Y
+
+# SESSION CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+session:
+  session_name: "LavaStudio"
+  idle_time: 600 # 10min idle
+  lifetime: 3600 #session expires in 10min if left idle
+  path: /
+  domain: "localhost"
+  secure: false
+  httponly: true
+  gc_maxlifetime: "1800"
+  gc_probability: "1000"
+  gc_divisor: "1"
+  use_cookies: "1"
+  globalized: false
+  default_driver: native_storage
+  drivers:
+    native_storage:
+      class: \MagmaCore\Session\Storage\NativeSessionStorage
+      default: true
+    array_storage:
+      class: \MagmaCore\Session\Storage\ArraySessionStorage
+      default: false
+    pdo_storage:
+      class: \MagmaCore\Session\Storage\PdoSessionStorage
+
+# CACHE CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+cache:
+  cache_name: system_cache
+  use_cache: true
+  storage: file
+  key: auto
+  cache_path: /Storage/cache/
+  cache_expires: 3600
+  default_driver: native_storage
+  drivers:
+    native_storage:
+      class: \MagmaCore\Cache\Storage\NativeCacheStorage
+      default: true
+    array_storage:
+      class: \MagmaCore\Cache\Storage\ArrayCacheStorage
+      default: false
+    pdo_storage:
+      class: \MagmaCore\Cache\Storage\PdoCacheStorage
+      default: false
+
+
+# SYSTEM CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+system:
+  use_resolvable_action: false
+  use_session: true
+  use_cookie: true
+  logger:
+    use_logger: true
+    log:
+      - warnings
+      - errors
+      - critical
+      - exceptions
+    log_path: /Storage/Logs/
+  use_translations: true
+  use_csrf: true
+  use_honeypot: true
+  use_hash_cost_factor: 10
+  use_auto_password: false,
+  use_auth: true
+  activation_token_expiration: 3600
+  default_status: "pending"
+  super_role:
+    props:
+      { name: Super, id: 1, description: Roles which contains all priviledges }
+  default_role:
+    props:
+      {
+        name: Subscriber,
+        id: 2,
+        description: Role which allows basic user access,
+      }
+
+# GRAVATAR CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+gravatar:
+  rating: R
+  size: 200
+  default: mystery #monsterid, identicon, wavatar, blank, default, mystery
+
+# SECURITY CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+security:
+  password_pattern: '(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}'
+  url_pattern: "https?://.+"
+  search_pattern: "[^'\x22]+"
+  email_pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
+  tel_pattern: "[0-9]{3}-[0-9]{3}-[0-9]{4}"
+  random_pass_char: 9
+  login_timeout: 30 # This is the period of time the user will be kicked out for
+  login_attempts: 3 # 3 incorrect attempts will time the user out for a set period of time
+  hash_cost_factor:
+    cost: 10
+  encript_password: true # password are hash by default. Set to false for the opposit behaviour
+  password_algo:
+    default: PASSWORD_DEFAULT
+    bcrypt: PASSWORD_BCRYPT
+    argon2i: PASSWORD_ARGON2I
+    argon2id: PASSWORD_ARGON2ID] # other options are [default, bcrypt, argon2i and argon2iD]
+
+# DATABASE CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+database:
+  default_driver: "mysql"
+  drivers:
+    mysql:
+      class: \MagmaCore\DataObjectLayer\Drivers\MysqlDatabaseConnection
+    pgsql:
+      class: \MagmaCore\DataObjectLayer\Drivers\PgsqlDatabaseConnection
+    sqlite:
+      class: \MagmaCore\DataObjectLayer\Drivers\SqliteDatabaseConnection
+
+# Application debugging. Set the production when the application is ready for production. This is an
+# important step as not doing so will expose sensitive information to your frontend users.
+debug_error:
+  mode: dev
+
+# Custom error handling Which displays a much more descriptive and friendly error within development
+# environment. When set to production use the log_path to specify where the exceptions should be
+# logged. for later use
+error_handler:
+  error: \MagmaCore\ErrorHandler\ErrorHandler::errorHandle
+  exception: \MagmaCore\ErrorHandler\ErrorHandler::exceptionHandle
+  log_path: ""
+
+logger_handler:
+  file: \MagmaCore\Logger\Handler\NativeLoggerHandler
+  array: \MagmaCore\Logger\Handler\ArrayLoggerHandler
+  database: \MagmaCore\Logger\Handler\PdoLoggerHandler
+  console: \MagmaCore\Logger\Handler\ConsoleLoggerHandler
+  echo: \MagmaCore\Logger\Handler\EchoLoggerHandler
+
+
+# Disallowed controllers prevent the any controller in the array list from being inserted into the database
+# this primarily governs the admin panel control menu. As not all controller class is suited to have a
+# menu item. If you want a particular controller to not be accessible from the admin menu. You will need to
+# list it in the array below
+disallowed_controllers:
+  - home
+  - security
+  - password
+  - activation
+  - registration
+  - profile
+  - account
+  - install
+  - accessDenied
+  - admin
+  - event
+  - notification
+  - userRole
+  - logout
+
+# TEMPLATES CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+activation:
+  title: Activate Your Account!
+  message: Thanks for registering on LavaStudio. Please click the activation button below to activate your account in order to access your profile page.
+  call_to_action: Activate Now
+
+password_recovery:
+  title: Password Reset Requested
+  message: You've requested to reset your password. Please click the link below to reset your password. However if you didn't make this request please click here. Password reset will expire in 30min.
+  call_to_action: Reset Password!
+
+token_expired:
+  title: Token Expired
+  message: Its seem the requested token has expired. Possible reasons could be.
+  reasons:
+    - The token was already use to reset the password
+    - The token has pass the expiration time.

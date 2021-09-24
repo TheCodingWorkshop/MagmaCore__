@@ -63,6 +63,10 @@ abstract class AbstractDatatable implements DatatableInterface
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param $value
+     */
     protected function validAttributes(string $key, $value) : void
     {
         if (empty($key)) {

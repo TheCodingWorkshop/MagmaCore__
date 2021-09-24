@@ -246,6 +246,14 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 
     }
 
+    protected function cloneAction()
+    {
+        $this->cloneAction
+            ->setAccess($this, Access::CAN_CLONE)
+            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
+    }
+
     protected function hardDeleteAction()
     {
         $this->showAction

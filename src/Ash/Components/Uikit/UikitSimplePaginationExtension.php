@@ -49,7 +49,7 @@ class UikitSimplePaginationExtension
                 <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button>
                 </li>
 
-                <li><a class="uk-badge uk-link-reset uk-light" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
+                <li><a class="uk-link-reset" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
                  <li>
                      <div class="uk-search">
                      <a href="" class="uk-search-icon-flip" uk-search-icon></a>

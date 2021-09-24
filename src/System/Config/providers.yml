@@ -1,0 +1,26 @@
+request:
+  \MagmaCore\Http\RequestHandler
+response:
+  \MagmaCore\Http\ResponseHandler
+formBuilder:
+  \MagmaCore\FormBuilder\FormBuilder
+eventDispatcher:
+  \MagmaCore\EventDispatcher\EventDispatcher
+error:
+  \MagmaCore\Error\Error
+tableGrid:
+  \MagmaCore\Datatable\Datatable
+collection:
+  \MagmaCore\Collection\Collection
+#number:
+#  \MagmaCore\Collections\Number\NumberCollection
+global:
+  \MagmaCore\Session\GlobalManager\GlobalManager
+flatDb:
+  \MagmaCore\DataObjectLayer\FileStorageRepository\FileStorage
+FlatRepository:
+  \MagmaCore\DataObjectLayer\FileStorageRepository\FileStorageRepository
+controllerSettings:
+  \MagmaCore\Settings\Model\ControllerSettingModel
+settings:
+  \MagmaCore\Settings\Settings
