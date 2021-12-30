@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\EventSubscriber;
 
-use JetBrains\PhpStorm\ArrayShape;
-use MagmaCore\EventDispatcher\Event;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 
@@ -26,7 +24,7 @@ class BeforeControllerActionSubscriber implements EventSubscriberInterface
      * @return array
      */
 
-    #[ArrayShape([BeforeControllerActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
            BeforeControllerActionEvent::NAME => [

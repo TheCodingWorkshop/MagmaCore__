@@ -17,7 +17,6 @@ use MagmaCore\DataObjectLayer\DataRepository\AbstractDataRepositoryValidation;
 use MagmaCore\Utility\ClientIP;
 use MagmaCore\Utility\GravatarGenerator;
 use MagmaCore\Utility\HashGenerator;
-use MagmaCore\Utility\PasswordEncoder;
 use MagmaCore\Utility\RandomCharGenerator;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\UtilityTrait;
@@ -59,20 +58,6 @@ class UserValidate extends AbstractDataRepositoryValidation
     }
 
     /**
-     * Return the security options from the app config file
-     *
-     * @param string $key
-     * @return mixed
-     */
-    private function appSecurity(string $key): mixed
-    {
-        $app = Yaml::file('app');
-        if ($app) {
-            return $app['security']['password_algo'];
-        }
-    }
-
-    /**
      * @inheritdoc
      * @param Collection $entityCollection
      * @param object|null $dataRepository - the repository for the entity
@@ -83,7 +68,7 @@ class UserValidate extends AbstractDataRepositoryValidation
     {
         $newCleanData = [];
         $this->validate($entityCollection, $dataRepository);
-        $dataCollection = $this->mergeWithFields($entityCollection->all());
+        $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         if (null !== $dataCollection) {
             $email = $this->isSet('email', $dataCollection, $dataRepository);
             list($tokenHash, $activationHash) = (new HashGenerator())->hash();
@@ -91,13 +76,14 @@ class UserValidate extends AbstractDataRepositoryValidation
                 'firstname' => $this->isSet('firstname', $dataCollection, $dataRepository),
                 'lastname' => $this->isSet('lastname', $dataCollection, $dataRepository),
                 'email' => $email,
-                'password_hash' => $this->userPassword($dataCollection),
+                'password_hash' => $this->userPassword($dataCollection, 'password_hash', $this->randomPassword),
                 'activation_token' => $tokenHash,
                 'status' => $this->isSet('status', $dataCollection, $dataRepository) ?? Yaml::file('app')['system']['default_status'],
                 'created_byid' => $this->getCreator($dataCollection) ?? 0,
                 'gravatar' => GravatarGenerator::setGravatar($email),
                 'remote_addr' => ClientIP::getClientIp()
             ];
+
             /* Settings additional data which will get merge with the dataBag */
             $this->dataBag['activation_hash'] = $activationHash;
 
@@ -128,28 +114,6 @@ class UserValidate extends AbstractDataRepositoryValidation
         ];
     }
 
-    /**
-     * A user is required to type their password when creating an account on the
-     * frontend of the application. However when admin is creating a user from the
-     * admin panel. A password will be automatically generated instead and send along
-     * with the user activation token via their registered email address. Either way the
-     * password will be encoded before pass the database handler
-     *
-     * @param array $dataCollection
-     * @return string
-     */
-    public function userPassword(array $dataCollection): string
-    {
-        $userPassword = '';
-        $userPassword = $this->isSet('client_password_hash', $dataCollection);
-        $encodedPassword = password_hash(
-            (isset($userPassword) ? $userPassword : $this->randomPassword), 
-            constant($this->appSecurity('password_algo')['default']), 
-            $this->appSecurity('hash_cost_factor')
-        );
-        if ($encodedPassword)
-            return $encodedPassword;
-    }
 
     /**
      * @inheritdoc
@@ -194,10 +158,11 @@ class UserValidate extends AbstractDataRepositoryValidation
      */
     public function validate(Collection $entityCollection, ?object $dataRepository = null): void
     {
+
         $this->doValidation(
             $entityCollection,
             $dataRepository,
-            function ($key, $value, $entityCollection, $dataRepository) {
+            function ($key) {
                 if ($rules = $this->rules) {
                     return match ($key) {
                         'password_hash', 'client_password_hash' => $rules->addRule("required"),

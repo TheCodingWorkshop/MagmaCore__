@@ -108,9 +108,9 @@ class BaseModel
 
     /**
      * Returns the current repository
-     * @return Object
+     * @return object
      */
-    public function getRepo()
+    public function getRepo(): object
     {
         return $this->repository;
     }
@@ -358,11 +358,12 @@ class BaseModel
      *
      * @return array
      */
-    public function getClonableKeys(): array
+    public function getClonableKeys(): ?array
     {
         if (is_array($this->cloneableKeys) && count($this->cloneableKeys) > 0) {
             return $this->cloneableKeys;
         }
+        return null;
     }
 
 

@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use Closure;
 use Exception;
-use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
@@ -22,7 +20,6 @@ use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
-use MagmaCore\Auth\Authorized;
 
 trait DomainTraits
 {

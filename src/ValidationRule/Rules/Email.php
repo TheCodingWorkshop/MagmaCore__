@@ -18,11 +18,18 @@ use MagmaCore\ValidationRule\ValidationRuleMethods;
 class Email extends ValidationRuleMethods
 {
 
-    public function email(object $controller, object $validationClass)
+    /**
+     * Returns an error if the email field is invalid
+     *
+     * @param object $controller
+     * @param object $validationClass
+     * @return void
+     */
+    public function email(object $controller, object $validationClass): void
     {
         if (isset($validationClass->key)) {
             if (filter_var($validationClass->value, FILTER_VALIDATE_EMAIL) === false) {
-                $this->getError(Error::display('err_invalid_email'), $controller, $validationClass);
+                $this->getError(array_values(Error::display('err_invalid_email'))[0], $controller, $validationClass);
             }
         }
     }

@@ -16,7 +16,6 @@ use MagmaCore\Base\BaseApplication;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
-use MagmaCore\Http\RequestHandler;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
@@ -24,7 +23,7 @@ class Datatable extends AbstractDatatable
 {
 
     protected string $element = '';
-    protected object $tb;
+    protected ?object $tb = null;
 
     private int|false $currentPage = false;
     private int|false $totalPages = false;
@@ -46,7 +45,7 @@ class Datatable extends AbstractDatatable
      * @param ThemeBuilder $themeBuilder
      * @throws ThemeBuilderInvalidArgumentException
      */
-    public function __construct(ThemeBuilder $themeBuilder)
+    public function __construct(?ThemeBuilder $themeBuilder = null)
     {
         $this->tb = $themeBuilder->create(Uikit::class);
         parent::__construct();
@@ -104,6 +103,9 @@ class Datatable extends AbstractDatatable
         return $this->tableColumn;
     }
 
+    /**
+     * @return string|null
+     */
     public function table(): null|string
     {
         extract($this->attr, EXTR_SKIP);
@@ -141,6 +143,11 @@ class Datatable extends AbstractDatatable
         return $this->element;
     }
 
+    /**
+     * @param string $status
+     * @param bool $inFoot
+     * @return string
+     */
     protected function tableGridElements(string $status, bool $inFoot = false): string
     {
         $element = sprintf('<%s>', ($inFoot) ? 'tfoot' : 'thead');

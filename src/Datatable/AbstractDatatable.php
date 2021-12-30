@@ -48,6 +48,10 @@ abstract class AbstractDatatable implements DatatableInterface
         }
     }
 
+    /**
+     * @param array $attributes
+     * @return $this
+     */
     public function setAttr($attributes = []) : self
     {
         if (is_array($attributes) && count($attributes) > 0) {

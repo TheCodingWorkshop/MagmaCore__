@@ -21,6 +21,24 @@ settings:
   secret_key: ""
   googleAnalytics: UA-XXXXX-Y
 
+# THEME BUILDER CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+theme_builder:
+  libraries:
+    uikit:
+      class: \MagmaCore\Themes\Library\Uikit\Uikit
+      default: true
+      version: 1.0
+    bootstrap:
+      class: \MagmaCore\Themes\Library\Bootstrap\Bootstrap
+      default: false
+      version: 1.0
+    tailwind:
+      class: \MagmaCore\Themes\Library\Tailwind
+      default: false
+      version: 1.0
+
 # SESSION CONFIGURATIONS
 #=============================================================================
 #=============================================================================

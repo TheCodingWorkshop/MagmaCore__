@@ -47,27 +47,12 @@ trait EventDispatcherTrait
     public function trailingRoutes(Object $event) : array
     {
 
-        // $feedbacks = Yaml::file('events');
-        // foreach ($feedbacks as $key => $value) {
-        //     if (isset($key) && $key === 'services') {
-        //         foreach ($value['subscribers'] as $param => $options) {
-        //             if (isset($param)) {
-        //                 $parts = explode('.', $param);
-        //                 if (isset($parts[0])) {
-        //                     //if ($parts[0] === $event->getObject()->thisRouteController()) {
-        //                         var_dump($param);
-        //                         die;
-        //                    // }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
         $feedback = Yaml::file('events')
             ['services']
                 ['subscribers']
                     [strtolower($event->getObject()->thisRouteController() . '.subscriber')]
                         ['register_route_feedback'];
+
 
         if (isset($feedback))
             return $feedback;
@@ -103,7 +88,7 @@ trait EventDispatcherTrait
             $routesArray = $this->trailingRoutes($event);
             if (in_array($event->getMethod(), array_keys($routesArray), true)) {
                 $_msg = array_key_exists('msg', $routesArray[$event->getMethod()]);
-                $event->getObject()->flashMessage(($_msg === true) ? $routesArray[$event->getMethod()]['msg'] : $defaultMessage);
+                $event->getObject()->flashMessage(($_msg === true) ? $routesArray[$event->getMethod()]['msg'] : ''); /* render a default message */
                 if (null !== $cb) {
                     call_user_func_array($cb, [$event, $routesArray]);
                 } else {
@@ -162,7 +147,7 @@ trait EventDispatcherTrait
         return null;
     }
 
-    public function flattenContext(array $context): array
+    public function flattenContext(array $context): array|string
     {
         if (is_array($context)) {
             foreach ($context as $con) {

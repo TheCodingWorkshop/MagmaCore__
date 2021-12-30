@@ -76,14 +76,17 @@ class IndexAction implements DomainActionLogicInterface
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
         $this->args = $this->getControllerArgs($controller);
         $controllerName = $controller->thisRouteController();
-        if ($controller->cache()) {
-            $this->tableRepository = $controller->cache()->set($controllerName .'_index_controller', $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args));
-            if ($controller->cache()->get($controllerName .'_index_controller') !==null) {
-                $this->tableRepository = $controller->cache()->get($controllerName .'_index_controller');
-            } else {
-                $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
-            }
-        }
+        /* Was just rewriting the cache file on each reload. */
+//        if ($controller->cache()) {
+//            $this->tableRepository = $controller->cache()->set($controllerName .'_index_controller', $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args));
+//            if ($controller->cache()->get($controllerName .'_index_controller') !==null) {
+//                $this->tableRepository = $controller->cache()->get($controllerName .'_index_controller');
+//            } else {
+//                $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+//            }
+//        }
+        $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+
         $this->tableData = $controller->tableGrid;
         $end = MICROTIME_END;
         //Calculate the difference in microseconds.

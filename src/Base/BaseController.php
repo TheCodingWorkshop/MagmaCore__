@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
@@ -23,18 +22,16 @@ use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Base\BaseRedirect;
 use MagmaCore\Session\Flash\Flash;
-use MagmaCore\Http\ResponseHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Ash\TemplateExtension;
 use MagmaCore\Middleware\Middleware;
 use MagmaCore\Session\Flash\FlashType;
-use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
-use MagmaCore\Base\Exception\BadMethodCallException;
+use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use Exception;
 
 class BaseController extends AbstractBaseController
@@ -111,7 +108,7 @@ class BaseController extends AbstractBaseController
                     $this->after();
                 }
             } else {
-                throw new BadMethodCallException("Method {$method} does not exists.");
+                throw new BaseBadMethodCallException("Method {$method} does not exists.");
             }
         } else {
             throw new Exception;
@@ -408,9 +405,9 @@ class BaseController extends AbstractBaseController
      * Returns the session object for use throughout any controller. Can be used 
      * to called any of the methods defined with the session class
      *
-     * @return Object
+     * @return object
      */
-    public function getSession(): Object
+    public function getSession(): object
     {
         return SessionTrait::sessionFromGlobal();
     }
@@ -423,7 +420,7 @@ class BaseController extends AbstractBaseController
     /**
      * Return the cache object
      */
-    public function cache()
+    public function cache(): object
     {
         return $this->baseApp($this)->loadCache();
     }

@@ -40,12 +40,12 @@ class Template extends AbstractTemplate
     public function view(string $file, array $context = [])
     {
         $fileCache = $this->cache(TEMPLATES . $file);
-        extract(array_merge($context, $context), EXTR_SKIP);
+        extract($context, EXTR_SKIP);
         require $fileCache;
     }
 
     /**
-     * Display the template
+     * Display the template from the error resource directory
      *
      * @param string $file
      * @param array $context
@@ -53,7 +53,7 @@ class Template extends AbstractTemplate
     public function errorView(string $file, array $context = [])
     {
         $fileCache = $this->cache(ERROR_RESOURCE . $file);
-        extract(array_merge($context, $context), EXTR_SKIP);
+        extract($context, EXTR_SKIP);
         require $fileCache;
     }
 

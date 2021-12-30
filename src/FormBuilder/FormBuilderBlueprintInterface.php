@@ -117,7 +117,7 @@ interface FormBuilderBlueprintInterface
      * @param array $choices
      * @return array
      */
-    public function choices(array $choices, string|null $default = null, object $form = null): array;
+    public function choices(array $choices, string|int $default = null, object $form = null): array;
 
     /**
      * Undocumented function

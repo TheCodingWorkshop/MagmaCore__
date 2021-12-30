@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace MagmaCore\ValidationRule;
 
 use MagmaCore\Utility\Stringify;
+use MagmaCore\ValidationRule\Exception\ValidationBadMethodCallException;
+use MagmaCore\ValidationRule\Exception\ValidationInvalidArgumentException;
 
 class ValidationRule implements ValidationRuleInterface
 {
@@ -27,7 +29,8 @@ class ValidationRule implements ValidationRuleInterface
         'object',
         'required',
         'unique',
-        'equal'
+        'equal',
+        'email'
     ];
     private ValidationRuleMethods $validationRuleFuncs;
     private mixed $rule;
@@ -43,7 +46,7 @@ class ValidationRule implements ValidationRuleInterface
     }
 
     /**
-     * Undocumented function
+     * Add a validation to resolve
      *
      * @param mixed $rule
      * @return void
@@ -134,7 +137,7 @@ class ValidationRule implements ValidationRuleInterface
      * @param string $delimiter
      * @return array
      */
-    public function exploder(string $values, string $delimiter = ':'): array
+    private function exploder(string $values, string $delimiter = ':'): array
     {
         return explode($delimiter, $values);
     }

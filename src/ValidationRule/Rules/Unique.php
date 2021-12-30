@@ -27,7 +27,7 @@ class Unique extends ValidationRuleMethods
             if ($result) {
                 $ignoreID = (!empty($controller->thisRouteID()) ? $controller->thisRouteID() : null);
                 if ($result->id == $ignoreID) {
-                    $this->getError(Error::display('err_data_exists'), $controller, $validationClass);
+                    $this->getError(array_values(Error::display('err_data_exists'))[0], $controller, $validationClass);
                 }
             }
         }

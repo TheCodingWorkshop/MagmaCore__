@@ -22,7 +22,7 @@ class isString extends ValidationRuleMethods
     {
         if (isset($validationClass->key)) {
             if (!is_string($validationClass->value)) {
-                $this->getError(Error::display('err_invalid_string'), $controller, $validationClass);
+                $this->getError(array_values(Error::display('err_invalid_string'))[0], $controller, $validationClass);
             }
         }
     }

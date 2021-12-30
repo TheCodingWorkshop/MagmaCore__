@@ -41,6 +41,7 @@ class BaseApplication extends AbstractBaseBootLoader
     protected string $logFile;
     protected array $logOptions = [];
     protected string $logMinLevel;
+    protected array $themeBuilderOptions = [];
 
     /** @return void */
     public function __construct()
@@ -437,6 +438,48 @@ class BaseApplication extends AbstractBaseBootLoader
         return $this->errorLevel;
     }
 
+    /**
+     * Pass the thene builder option
+     *
+     * @param array $themeBuilderOptions
+     * @return void
+     */
+    public function setThemeBuilder(array $themeBuilderOptions = []): self
+    {
+        //if (count($this->themeBuilderOptions) > 0) {
+            $this->themeBuilderOptions = $themeBuilderOptions;
+        //}
+        return $this;
+    }
+
+    /**
+     * Returns the theme builder options array from the yaml file
+     *
+     * @return array
+     */
+    public function getThemeBuilderOptions(): array
+    {
+        return $this->themeBuilderOptions;
+    }
+
+    /**
+     * Return the default theme builder library
+     *
+     * @return string
+     */
+    public function getDefaultThemeBuilder(): ?string
+    {
+        if (count($this->themeBuilderOptions) > 0) {
+            foreach ($this->themeBuilderOptions['libraries'] as $key => $value) {
+                if (array_key_exists('default', $value)) {
+                    if ($value['default'] === true) {
+                        return $value['class'];
+                    }
+                }
+            }
+        }
+    }
+
     public function run(): void
     {
         BaseConstants::load($this->app());
@@ -446,6 +489,7 @@ class BaseApplication extends AbstractBaseBootLoader
         $this->loadCache();
         $this->loadLogger();
         $this->loadEnvironment();
+        //$this->loadThemeBuilder();
         $this->loadRoutes();
     }
 }

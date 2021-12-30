@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Auth\Roles\PrivilegedUser;
-use MagmaCore\Base\Domain\DomainTraits;
 
-#[Attribute(\Attribute::TARGET_CLASS)]
 class BaseProtectedRoutes
 {
 

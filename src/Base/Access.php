@@ -12,11 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Utility\Yaml;
-use MagmaCore\Ash\Error\LoaderError;
-use MagmaCore\Ash\TemplateEnvironment;
-use MagmaCore\Ash\Exception\FileNotFoundException;
-
 class Access
 {
 

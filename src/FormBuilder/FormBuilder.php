@@ -21,6 +21,7 @@ use MagmaCore\Session\SessionTrait;
 use MagmaCore\FormBuilder\Traits\FormalizerTrait;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
+use MagmaCore\Http\Request;
 
 class FormBuilder extends AbstractFormBuilder
 {

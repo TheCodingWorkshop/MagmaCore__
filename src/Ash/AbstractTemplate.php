@@ -41,8 +41,7 @@ abstract class AbstractTemplate implements TemplateInterface
     public function cache(string $file): mixed
     {
         $fileCache = $this->templateEnv->getCacheKey($file);
-        if (
-            !$this->templateEnv->getCacheStatus() ||
+        if (!$this->templateEnv->getCacheStatus() ||
             !file_exists($fileCache) || filemtime($fileCache) < filemtime($file)) {
             $code = $this->fileIncludes($file);
             $code = $this->codeCompiler($code);
@@ -175,7 +174,7 @@ abstract class AbstractTemplate implements TemplateInterface
     }
 
     /**
-     * Undocumented function
+     * Allow content to be wrap in some special {block} syntax
      *
      * @param mixed $code
      * @return void
@@ -198,7 +197,7 @@ abstract class AbstractTemplate implements TemplateInterface
     }
 
     /**
-     * Undocumented function
+     * Yield/Generate the content for which to display
      *
      * @param mixed $code
      * @return array|string|null

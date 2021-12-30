@@ -108,8 +108,19 @@ services:
     setting.subscriber:
       class: \MagmaCore\Settings\EventSubscriber\SettingActionSubscriber
       register_route_feedback:
-       MagmaCore\Settings\SettingController::indexAction:
+        MagmaCore\Settings\SettingController::indexAction:
           msg: Changes Saved
+    
+    account.subscriber:
+      class: \App\EventSubscriber\UserProfileActionSubscriber
+      register_route_feedback:
+        App\Controller\Profile\AccountController::nameAction:
+          msg: Your name was changed successfully!
+        App\Controller\Profile\AccountController::emailAction:
+          msg: Your email was changed successfully!
+        App\Controller\Profile\AccountController::passwordAction:
+          msg: Your password was changed successfully!
+
 
     menu.subscriber:
       class: \MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber

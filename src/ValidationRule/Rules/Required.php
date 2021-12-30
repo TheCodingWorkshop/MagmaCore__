@@ -18,12 +18,18 @@ use MagmaCore\ValidationRule\ValidationRuleMethods;
 class Required extends ValidationRuleMethods
 {
 
-    public function required(object $controller, object $validationClass)
+    /**
+     * Returns an error if one or more field is empty.
+     *
+     * @param object $controller
+     * @param object $validationClass
+     * @return void
+     */
+    public function required(object $controller, object $validationClass): void
     {
         if (isset($validationClass->key)) {
-            //if (strlen($validatedClass->value) === 0) {}
-            if (empty($validationClass->key) || $validationClass->value === '') {
-                $this->getError(Error::display('err_field_require'), $controller, $validationClass);
+            if ($validationClass->value === '') {
+                $this->getError(array_values(Error::display('err_field_require'))[0], $controller, $validationClass);
             }
         }
     }

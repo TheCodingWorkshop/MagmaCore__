@@ -15,6 +15,11 @@ namespace MagmaCore\Base;
 final class BaseConstants
 {
 
+    /** Path the vendor src directory */
+    private static string $vendorPath = 'vendor/magmacore/magmacore/src/';
+    /* Path the error handler resource files */
+    private static string $erorrResource = 'ErrorHandler/Resources/';
+
     /**
      * Defined common constants which are commonly used throughout the framework
      *
@@ -22,6 +27,7 @@ final class BaseConstants
      */
     public static function load($app): void
     {
+        
         defined('DS') or define('DS', DIRECTORY_SEPARATOR);
         defined('APP_ROOT') or define('APP_ROOT', ROOT_PATH);
         defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
@@ -39,7 +45,19 @@ final class BaseConstants
         defined('RESOURCES') or define('RESOURCES', ROOT_URI);
         defined('UPLOAD_PATH') or define("UPLOAD_PATH", $_SERVER['DOCUMENT_ROOT'] . DS . "uploads/");
 
-        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', $_SERVER['DOCUMENT_ROOT'] . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/');
-        defined('TEMPLATE_ERROR') or define('TEMPLATE_ERROR', APP_ROOT . DS . 'vendor/magmacore/magmacore/src/ErrorHandler/Resources/');
+        defined('ERROR_RESOURCE') or define('ERROR_RESOURCE', $_SERVER['DOCUMENT_ROOT'] . self::$vendorPath . self::$erorrResource);
+        defined('TEMPLATE_ERROR') or define('TEMPLATE_ERROR', APP_ROOT . DS . self::$vendorPath . self::$erorrResource);
+        defined('MAGMACORE') or define('MAGMACORE', $_SERVER['DOCUMENT_ROOT'] . self::$vendorPath);
+
+    }
+
+    /**
+     * Return the vendor directory source path
+     *
+     * @return string
+     */
+    public static function getVendorSrcDir(): string
+    {
+        return self::$vendorPath;
     }
 }

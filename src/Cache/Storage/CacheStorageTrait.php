@@ -110,7 +110,7 @@ trait CacheStorageTrait
             } catch (Exception) {
             }
             if ($result !== false) {
-                clearstatcache(true, $cacheEntryPathAndFilename);
+                //clearstatcache(true, $cacheEntryPathAndFilename);
                 return true;
             }
             usleep(rand(10, 500));

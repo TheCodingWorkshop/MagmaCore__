@@ -13,17 +13,19 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Logger\Logger;
+use MagmaCore\Cache\CacheFacade;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Base\BaseApplication;
+use MagmaCore\Logger\LoggerFactory;
 use MagmaCore\Router\RouterFactory;
 use MagmaCore\Session\SessionFacade;
 use MagmaCore\Base\Traits\BootstrapTrait;
 use MagmaCore\Container\ContainerFactory;
+use MagmaCore\Themes\ThemeBuilderFactory;
 use MagmaCore\Session\GlobalManager\GlobalManager;
-use MagmaCore\Cache\CacheFacade;
-use MagmaCore\Logger\LoggerFactory;
+use MagmaCore\Utility\Singleton;
 
-abstract class AbstractBaseBootLoader
+abstract class AbstractBaseBootLoader extends Singleton
 {
 
     use BootstrapTrait;
@@ -162,8 +164,8 @@ abstract class AbstractBaseBootLoader
             $this->app()->getSessions()['session_name'],
             $this->app()->getSessionDriver()
         ))->setSession();
-        if ($this->isSessionGlobal() === true) {
-            GlobalManager::set($this->getGlobalSessionKey(), $session);
+        if ($this->application->isSessionGlobal() === true) {
+            GlobalManager::set($this->application->getGlobalSessionKey(), $session);
 
         }
         return $session;
@@ -171,9 +173,9 @@ abstract class AbstractBaseBootLoader
 
     public function loadCache()
     {
-        $cache = (new CacheFacade())->create($this->getCacheIdentifier(), \MagmaCore\Cache\Storage\NativeCacheStorage::class);
-        if ($this->isCacheGlobal() === true) {
-            GLobalManager::set($this->getGlobalCacheKey(), $cache);
+        $cache = (new CacheFacade())->create($this->application->getCacheIdentifier(), \MagmaCore\Cache\Storage\NativeCacheStorage::class);
+        if ($this->application->isCacheGlobal() === true) {
+            GLobalManager::set($this->application->getGlobalCacheKey(), $cache);
         }
         return $cache;
 
@@ -210,12 +212,21 @@ abstract class AbstractBaseBootLoader
     }
 
     /**
-     * @throws \MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException
+     * Load the themeBuilder component
+     *
+     * @return ThemeBuilder
      */
-    public function getTheming()
+    protected function loadThemeBuilder(): ThemeBuilder
     {
-        (new ThemeBuilder())->create($this->app()->getTheme());
+        $themeFactory = new ThemeBuilderFactory();
+        $themeOptions = $this->application->getThemeBuilderOptions();
+        $themeDefault = $this->application->getDefaultThemeBuilder();
+        $themeBuilder = $themeFactory->create($themeDefault, $themeOptions);
+        if ($themeBuilder)
+            return $themeBuilder;
+
     }
+
 
 
 }

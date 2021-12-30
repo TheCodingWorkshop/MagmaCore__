@@ -73,7 +73,7 @@ class BaseEntity
      *
      * @return object
      */
-    public function dry(): object
+    public function dry(): Collection
     {
         foreach ($this->cleanData as $key => $value) {
             $this->$key = $value;

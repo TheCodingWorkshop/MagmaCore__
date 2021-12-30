@@ -167,6 +167,7 @@ class Crud implements CrudInterface
      * @param string $primaryKey
      * @return boolean
      * @throws DataLayerException
+     *
      */
     public function update(array $fields, string $primaryKey): bool
     {

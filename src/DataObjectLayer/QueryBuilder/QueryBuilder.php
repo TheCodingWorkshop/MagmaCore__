@@ -57,6 +57,9 @@ class QueryBuilder extends AbstractQueryBuilder
                 $this->sqlQuery = "SELECT {$this->key['aggregate']}({$this->key['aggregate_field']}) FROM {$this->key['table']}";
             } else {
                 $this->sqlQuery = "SELECT {$selectors} FROM {$this->key['table']}";
+                // if (array_key_exists('extras', $this->key)) {
+                //     $this->sqlQuery .= $this->orderByQuery();
+                // }
             }
             $this->sqlQuery = $this->hasConditions();
             return $this->sqlQuery;

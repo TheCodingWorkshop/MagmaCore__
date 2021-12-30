@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth;
 
-use MagmaCore\UserManager\UserModel;
+use MagmaCore\Error\Error;
 use MagmaCore\Utility\Sanitizer;
 use MagmaCore\Utility\Validator;
 use MagmaCore\Utility\UtilityTrait;
-use MagmaCore\Error\Error;
+use MagmaCore\UserManager\UserModel;
+use MagmaCore\Base\Exception\BaseException;
 
 class Authenticator
 {
@@ -31,17 +32,33 @@ class Authenticator
     private $validatedUser;
 
     /**
+     * Get the framework UserModel. We are also checking that the class exists. else it 
+     * will throw an exception
+     *
+     * @return UserModel|null
+     */
+    private function getUserModel(): ?UserModel
+    {
+        if (!class_exists(UserModel::class)) {
+            throw new BaseException(UserModel::class . ' class does not exists. This class is required for this component');
+        } else {
+            return (new UserModel());
+        }
+
+    }
+
+    /**
      * Authenticate the user by their email and password and only if their account 
      * status is active
      * 
      * @param string $email
      * @param string $password
+     * @param string|null $userModel
      * @return object|null
      */
     public function authenticate(string $email, string $password): ?object
     {
-
-        $this->repository = (new UserModel());
+        $this->repository = $this->getUserModel();
 
         /* check for validation errors */
         $this->validate(['email' => $email, 'password_hash' => $password]);
@@ -78,8 +95,7 @@ class Authenticator
         $req = $object->request->handler();
         $this->validatedUser = $this->authenticate(
             ($email !== null) ? $req->get($email) : $req->get('email'),
-            ($password !== null) ? $req->get($password) : $req->get('password_hash'),
-            $this->object
+            ($password !== null) ? $req->get($password) : $req->get('password_hash')
         );
         if (!$this->validatedUser) {
             if ($object->error) {
@@ -110,6 +126,7 @@ class Authenticator
         if ($remember) {
             return $remember;
         }
+        return false;
     }
 
     /**
@@ -171,6 +188,10 @@ class Authenticator
                             $this->errors[] = Error::display('err_invalid_account');
                             $this->bruteForce = true;
                         }
+
+                        if (!$this->repository->accountActive($value)) {
+                            $this->errors[] = Error::display('err_account_not_active');
+                        }
                         $this->email = $value;
                         break;
                     case 'password_hash':
@@ -187,9 +208,10 @@ class Authenticator
                             $this->bruteForce = true;
                         }
                         
-                        if (!password_verify($value, $user->password_hash)) {
-                            $this->errors[] = Error::display('err_invalid_credentials');
-                            $this->bruteForce = true;
+                        if (isset($user->password_hash)) {
+                            if (!password_verify($value, $user->password_hash)) {
+                                $this->errors[] = Error::display('err_invalid_credentials');
+                            }    
                         }
                         break;
                     default:

@@ -77,8 +77,8 @@ class UserForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 'new-password',
                 false,
                 false,
-                true,
-                'Auto Generated'),
+                false,
+                ''),
                 null,
                 $this->blueprint->settings(false, null, true, 'Password', false, null, 'Leaving this field blank will auto generate a random password')
             )

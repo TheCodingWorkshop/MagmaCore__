@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use Closure;
-use JetBrains\PhpStorm\Pure;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Collection\Collection;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
 {
@@ -54,7 +54,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
         }
     }
 
-    #[Pure] public function getCreator($dataCollection)
+    public function getCreator($dataCollection)
     {
         return $this->setDefaultValue($dataCollection, 'created_byid', $_SESSION['user_id'] ?? 0);
     }
@@ -67,7 +67,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param array $cleanData
      * @return array
      */
-    #[Pure] public function getCsrf(array $cleanData): array
+    public function getCsrf(array $cleanData): array
     {
         $csrf = [
             '_CSRF_INDEX' => $cleanData['_CSRF_INDEX'],
@@ -180,13 +180,15 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
 
     public function dovalidation(Collection $entityCollection, ?object $dataRepository, Closure $callback)
     {
-        if (null !== $entityCollection) {
+       if (null !== $entityCollection) {
             if (is_object($entityCollection) && $entityCollection->count() > 0) {
                 foreach ($entityCollection as $this->key => $this->value) :
                     if (isset($this->key) && $this->key != '') :
                         if (!$callback instanceof Closure) {
-                            throw new BaseInvalidArgumentException('');
+                            throw new BaseInvalidArgumentException($callback . ' is not an instance of a closure.');
                         }
+
+                        return $callback($this->key);
                     endif;
                 endforeach;
             }
@@ -194,5 +196,44 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
 
     }
 
+    /**
+     * Return the security options from the app config file
+     *
+     * @param string $key
+     * @return mixed
+     */
+    private function appSecurity(string $key): mixed
+    {
+        $app = Yaml::file('app');
+        if ($app) {
+            return $app['security']['password_algo'];
+        }
+    }
+
+
+    /**
+     * A user is required to type their password when creating an account on the
+     * frontend of the application. However when admin is creating a user from the
+     * admin panel. A password will be automatically generated instead and send along
+     * with the user activation token via their registered email address. Either way the
+     * password will be encoded before pass the database handler
+     *
+     * @param array $dataCollection
+     * @param string $field - the field the data is coming from
+     * @param string|null $randomPassword
+     * @return string
+     */
+    public function userPassword(array $dataCollection, string $field = 'client_password_hash', ?string $randomPassword = null): string
+    {
+        $userPassword = '';
+        $userPassword = $this->isSet($field, $dataCollection);
+        $encodedPassword = password_hash(
+            ($userPassword ? $userPassword : $randomPassword), 
+            constant($this->appSecurity('password_algo')['default']), 
+            $this->appSecurity('hash_cost_factor')
+        );
+        if ($encodedPassword)
+            return $encodedPassword;
+    }
 
 }

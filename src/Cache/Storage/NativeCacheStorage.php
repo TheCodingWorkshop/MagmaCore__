@@ -116,6 +116,6 @@ class NativeCacheStorage extends AbstractCacheStorage
      * @inheritDoc
      */
     public function collectGarbage(): void
-    {
-    }
+    {}
+
 }

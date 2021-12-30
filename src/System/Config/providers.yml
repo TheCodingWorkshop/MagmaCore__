@@ -12,8 +12,6 @@ tableGrid:
   \MagmaCore\Datatable\Datatable
 collection:
   \MagmaCore\Collection\Collection
-#number:
-#  \MagmaCore\Collections\Number\NumberCollection
 global:
   \MagmaCore\Session\GlobalManager\GlobalManager
 flatDb:

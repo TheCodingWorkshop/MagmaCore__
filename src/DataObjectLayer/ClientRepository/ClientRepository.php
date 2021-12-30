@@ -41,7 +41,7 @@ class ClientRepository implements ClientRepositoryInterface
      * @inheritdoc
      *
      * @param array $fields
-     * @param string|null $primaryKey
+     * @param string|null $primaryKey - If this parameter is used then the update query will execute
      * @return boolean
      * @throws Throwable
      */

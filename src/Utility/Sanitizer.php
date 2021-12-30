@@ -67,4 +67,9 @@ class Sanitizer
         return [];
     }
 
+    public function test()
+    {
+        return 'your are now accessing ' . __METHOD__ . ' in ' . __CLASS__;
+    }
+
 }

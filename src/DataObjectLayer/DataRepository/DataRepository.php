@@ -420,4 +420,16 @@ class DataRepository implements DataRepositoryInterface
         return $this->em->getCrud()->lastID();
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param integer $quantity
+     * @param string $orderBy
+     * @return void
+     */
+    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id')
+    {
+        
+    }
+
 }

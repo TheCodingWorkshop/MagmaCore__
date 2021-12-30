@@ -11,9 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\EventSubscriber;
 
-use JetBrains\PhpStorm\ArrayShape;
-use MagmaCore\Base\Events\BulkActionEvent;
-use MagmaCore\EventDispatcher\Event;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 
 class BulkActionSubscriber implements EventSubscriberInterface
@@ -26,7 +23,7 @@ class BulkActionSubscriber implements EventSubscriberInterface
      * @return array
      */
 
-    #[ArrayShape([BulkActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             //BeforeRenderActionEvent::NAME => []

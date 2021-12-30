@@ -31,7 +31,7 @@ class Password extends ValidationRuleMethods
             if (preg_match('/.*[a-z]+.*/i', $validationClass->value) == 0) {
                 $error = Error::display('err_password_letter');
             }
-            $this->getError($error, $controller, $validationClass);
+            $this->getError(array_values($error[0]), $controller, $validationClass);
         }
     }
 }

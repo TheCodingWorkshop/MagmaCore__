@@ -32,7 +32,7 @@ class EditAction implements DomainActionLogicInterface
     /**
      * execute logic for adding new items to the database()
      *
-     * @param Object $controller - The controller object implementing this object
+     * @param object $controller - The controller object implementing this object
      * @param string|null $entityObject
      * @param string|null $eventDispatcher - the eventDispatcher for the current object
      * @param string|null $objectSchema
@@ -55,12 +55,14 @@ class EditAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+
         $formBuilder = $controller->formBuilder;
-        
         if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
             if ($formBuilder?->csrfValidate()) {
-
+                
+                /* enforce any set rules */
                 $this->enforceRules($rules, $controller);
+
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
 
                 $action = $controller->repository->getRepo()
