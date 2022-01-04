@@ -43,7 +43,7 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => true,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
@@ -73,7 +73,7 @@ class PermissionColumn extends AbstractDatatableColumn
 //                'show_column' => true,
 //                'sortable' => true,
 //                'searchable' => true,
-//                'formatter' => function ($row, $twigExt) {
+//                'formatter' => function ($row, $tempExt) {
 //                    return $row['permission_group'] ?? 'None';
 //                }
 //            ],
@@ -84,8 +84,8 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    $html = $twigExt->tableDateFormat($row, "created_at");
+                'formatter' => function ($row, $tempExt) {
+                    $html = $tempExt->tableDateFormat($row, "created_at");
                     $html .= '<div><small>By Admin</small></div>';
                     return $html;
                 }
@@ -97,10 +97,10 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        $html .= $twigExt->tableDateFormat($row, "modified_at");
+                        $html .= $tempExt->tableDateFormat($row, "modified_at");
                         $html .= '<div><small>By Admin</small></div>';
                     } else {
                         $html .= '<small>Never!</small>';
@@ -115,14 +115,14 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
                             'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
                             'trash' => ['tooltip' => 'Trash', 'icon' => 'ion-ios-trash']
                         ],
                         $row,
-                        $twigExt,
+                        $tempExt,
                         'permission',
                         false,
                         'Are You Sure!',

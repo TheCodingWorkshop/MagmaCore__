@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\Twig\Extensions;
+namespace MagmaCore\Ash\Extensions\Modules;
 
 class NavBarExtension
 {

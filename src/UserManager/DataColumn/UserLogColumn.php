@@ -82,8 +82,8 @@ class UserLogColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->tableDateFormat($row, "created_at", true);
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->tableDateFormat($row, "created_at", true);
                     //$html .= '<br/><small>' . $row['firstname'] . '</small>';
                    //return $html;
                 }
@@ -95,13 +95,13 @@ class UserLogColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
                             'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
                         ],
                         $row,
-                        $twigExt,
+                        $tempExt,
                         'userLog',
                         false,
                         'Are You Sure!',

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
+use MagmaCore\Ash\Extensions\TemplateExtension;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 use MagmaCore\Themes\Uikit\Uikit;
@@ -124,7 +125,9 @@ class Datatable extends AbstractDatatable
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
                             if (is_callable($column['formatter'])) {
-                                $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
+                                $this->element .= call_user_func_array(
+                                    $column['formatter'],
+                                    [$row, (new TemplateExtension())]);
                             } else {
                                 $this->element .= ($row[$column['db_row']] ?? '');
                             }

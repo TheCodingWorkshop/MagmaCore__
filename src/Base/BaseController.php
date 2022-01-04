@@ -78,6 +78,11 @@ class BaseController extends AbstractBaseController
         return new BaseApplication();
     }
 
+    public function getRouteParams(): array
+    {
+        return $this->routeParams;
+    }
+
 
     /**
      * Magic method called when a non-existent or inaccessible method is

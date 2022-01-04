@@ -316,6 +316,16 @@ trait DomainTraits
         $this->controller->view($this->fileToRender, $context);
     }
 
+    public function endWithApiEndpoint()
+    {
+        $this->isRestFul = true;
+        $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
+        if (is_bool($this->domainAction) && $this->domainAction === true) {
+            echo $this->controller->apiResponse->response(['data' => $context]);
+        }
+
+    }
+
     public function endAfterExecution(): string
     {
         return '';

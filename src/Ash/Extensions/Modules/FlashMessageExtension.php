@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace MagmaCore\Twig\Extensions;
+namespace MagmaCore\Ash\Extensions\Modules;
 
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Session\Flash\Flash;

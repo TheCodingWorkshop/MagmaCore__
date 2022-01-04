@@ -10,9 +10,9 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Twig\Extensions;
+namespace MagmaCore\Ash\Extensions\Modules;
 
-use MagmaCore\Twig\Extensions\IconNavExtension;
+use MagmaCore\Ash\Extensions\Modules\IconNavExtension;
 
 class ColumnActionExtension
 {

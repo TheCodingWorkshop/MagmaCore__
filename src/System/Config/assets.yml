@@ -146,47 +146,47 @@ scripts:
     location: header
     enable: true
     cdn: false
-  react:
-    src: "https://unpkg.com/react@17/umd/react.development.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: javascript
-    location: header
-    enable: false
-    cdn: true
-  react_dom:
-    src: "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: javascript
-    location: header
-    enable: false
-    cdn: true
-  react_babel:
-    src: "https://unpkg.com/babel-standalone@6/babel.min.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: javascript
-    location: header
-    enable: false
-    cdn: true
-
-  reach_commander:
-    src: "/public/assets/js/uikit/react_commander.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: babel
-    location: footer
-    enable: false
-    cdn: false
-  react_datatable:
-    src: "/public/assets/js/react/react_datatable.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: babel
-    location: footer
-    enable: false
-    cdn: false
+#  react:
+#    src: "https://unpkg.com/react@17/umd/react.development.js"
+#    integrity: ""
+#    crossorigin: "anonymous"
+#    type: javascript
+#    location: footer
+#    enable: true
+#    cdn: true
+#  react_dom:
+#    src: "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+#    integrity: ""
+#    crossorigin: "anonymous"
+#    type: javascript
+#    location: footer
+#    enable: true
+#    cdn: true
+#  react_babel:
+#    src: "https://unpkg.com/babel-standalone@6/babel.min.js"
+#    integrity: ""
+#    crossorigin: "anonymous"
+#    type: javascript
+#    location: true
+#    enable: false
+#    cdn: true
+#
+#  reach_commander:
+#    src: "/public/assets/js/uikit/react_commander.js"
+#    integrity: ""
+#    crossorigin: "anonymous"
+#    type: babel
+#    location: footer
+#    enable: false
+#    cdn: false
+#  react_datatable:
+#    src: "/public/assets/js/react/react_datatable.js"
+#    integrity: ""
+#    crossorigin: "anonymous"
+#    type: babel
+#    location: footer
+#    enable: false
+#    cdn: false
 
   canvas:
     src: "https://canvasjs.com/assets/script/jquery.canvasjs.min.js"
@@ -196,6 +196,16 @@ scripts:
     location: header
     enable: true
     cdn: true
+
+#  react_button:
+#    src: "/public/assets/js/react/react_button.js"
+#    integrity: ""
+#    crossorigin: ""
+#    type: javascript
+#    location: footer
+#    enable: true
+#    cdn: false
+
   # chart:
   #   src: "/public/assets/js/uikit/charts.js"
   #   integrity: ""

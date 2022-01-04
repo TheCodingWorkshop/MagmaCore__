@@ -271,7 +271,7 @@ class BaseModel
      * @param string $model
      * @return array
      */
-    public function getFillables(string $model): array
+    public function getFillables(?string $model = null): array
     {
         if (!$this->fillable) {
             throw new BaseInvalidArgumentException('No fillable array set for your entity class ' . $model);

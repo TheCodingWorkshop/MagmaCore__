@@ -114,7 +114,7 @@ class RegistrationActionSubscriber implements EventSubscriberInterface
         $link = $event->getObject()->getSiteUrl(self::ACTIVATION_PATH . '/' . $user['activation_hash']);
         $html = '<div>';
         $html .= '<h1>' . Yaml::file('app')['activation']['title'] . '</h1>';
-        $html .= isset($user['random_pass']) ? '<p><strong>Temporary Password: </strong>' . $user['random_pass'] . '</p>' : '';
+        $html .= !empty($user['random_pass']) ? '<p><strong>Temporary Password: </strong>' . $user['random_pass'] . '</p>' : '';
         $html .= Yaml::file('app')['activation']['message'];
         $html .= '<a href="' . $link . '">' . Yaml::file('app')['activation']['call_to_action'] . '</a>';
         $html .= '</div>';

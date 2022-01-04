@@ -28,6 +28,12 @@ class RoleModel extends AbstractBaseModel
     protected const TABLESCHEMAID = 'id';
      /**/
     public const COLUMN_STATUS = [];
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [
+        'role_name',
+        'role_description',
+        'created_byid',
+    ];
 
     /**
      * Main constructor class which passes the relevant information to the

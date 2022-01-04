@@ -15,6 +15,7 @@ use Closure;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Collection\Collection;
+use MagmaCore\Utility\RandomCharGenerator;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
 Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidationInterface
@@ -188,7 +189,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
                             throw new BaseInvalidArgumentException($callback . ' is not an instance of a closure.');
                         }
 
-                        return $callback($this->key);
+                        return $callback($this->key, $this->value, $entityCollection, $dataRepository);
                     endif;
                 endforeach;
             }
@@ -219,21 +220,35 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * password will be encoded before pass the database handler
      *
      * @param array $dataCollection
-     * @param string $field - the field the data is coming from
-     * @param string|null $randomPassword
      * @return string
      */
-    public function userPassword(array $dataCollection, string $field = 'client_password_hash', ?string $randomPassword = null): string
+    public function userPassword(array $dataCollection): array
     {
         $userPassword = '';
-        $userPassword = $this->isSet($field, $dataCollection);
-        $encodedPassword = password_hash(
-            ($userPassword ? $userPassword : $randomPassword), 
-            constant($this->appSecurity('password_algo')['default']), 
-            $this->appSecurity('hash_cost_factor')
-        );
+        $randomPassword = RandomCharGenerator::generate();
+
+        if (array_key_exists('client_password_hash', $dataCollection)) {
+            $userPassword = $this->isSet('client_password_hash', $dataCollection);
+            $encodedPassword = password_hash(
+                $userPassword,
+                constant($this->appSecurity('password_algo')['default']),
+                $this->appSecurity('hash_cost_factor')
+            );
+        }
+        if (array_key_exists('password_hash', $dataCollection)) {
+            $userPassword = $this->isSet('password_hash', $dataCollection);
+            $encodedPassword = password_hash(
+                empty($userPassword) || $userPassword === '' ? $randomPassword : $userPassword,
+                constant($this->appSecurity('password_algo')['default']),
+                $this->appSecurity('hash_cost_factor')
+            );
+        }
+
         if ($encodedPassword)
-            return $encodedPassword;
+            return [
+                $encodedPassword,
+                array_key_exists('password_hash', $dataCollection) ? $randomPassword : ''
+            ];
     }
 
 }

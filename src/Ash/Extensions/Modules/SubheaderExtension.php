@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Twig\Extensions;
+namespace MagmaCore\Ash\Extensions\Modules;
 
-use MagmaCore\Twig\Extensions\IconNavExtension;
-use MagmaCore\Twig\Extensions\SearchBoxExtension;
+use MMagmaCore\Ash\Extensions\Modules\IconNavExtension;
+use MagmaCore\Ash\Extensions\Modules\SearchBoxExtension;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Utility\Breadcrumbs;
 use Closure;

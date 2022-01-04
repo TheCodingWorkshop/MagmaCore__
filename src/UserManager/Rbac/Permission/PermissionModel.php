@@ -22,6 +22,12 @@ class PermissionModel extends AbstractBaseModel
     /** @var string */
     protected const TABLESCHEMAID = 'id';
     public const COLUMN_STATUS = [];
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [
+        'permission_name',
+        'permission_description',
+        'created_byid',
+    ];
 
 
     /**

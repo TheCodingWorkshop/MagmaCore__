@@ -17,10 +17,10 @@ use MagmaCore\DataObjectLayer\DataRepository\AbstractDataRepositoryValidation;
 use MagmaCore\Utility\ClientIP;
 use MagmaCore\Utility\GravatarGenerator;
 use MagmaCore\Utility\HashGenerator;
-use MagmaCore\Utility\RandomCharGenerator;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\ValidationRule\ValidationRule;
+use MagmaCore\Utility\RandomCharGenerator;
 use Exception;
 
 class UserValidate extends AbstractDataRepositoryValidation
@@ -72,11 +72,12 @@ class UserValidate extends AbstractDataRepositoryValidation
         if (null !== $dataCollection) {
             $email = $this->isSet('email', $dataCollection, $dataRepository);
             list($tokenHash, $activationHash) = (new HashGenerator())->hash();
+            list($encodedPassword, $randomPassword) = $this->userPassword($dataCollection);
             $newCleanData = [
                 'firstname' => $this->isSet('firstname', $dataCollection, $dataRepository),
                 'lastname' => $this->isSet('lastname', $dataCollection, $dataRepository),
                 'email' => $email,
-                'password_hash' => $this->userPassword($dataCollection, 'password_hash', $this->randomPassword),
+                'password_hash' => $encodedPassword,
                 'activation_token' => $tokenHash,
                 'status' => $this->isSet('status', $dataCollection, $dataRepository) ?? Yaml::file('app')['system']['default_status'],
                 'created_byid' => $this->getCreator($dataCollection) ?? 0,
@@ -108,7 +109,7 @@ class UserValidate extends AbstractDataRepositoryValidation
             $this->validatedDataBag(
                 array_merge(
                     $newCleanData,
-                    ['random_pass' => $this->randomPassword]
+                    ['random_pass' => $randomPassword]
                 )
             )
         ];
@@ -162,7 +163,7 @@ class UserValidate extends AbstractDataRepositoryValidation
         $this->doValidation(
             $entityCollection,
             $dataRepository,
-            function ($key) {
+            function ($key, $value, $entityCollection, $dataRepository) {
                 if ($rules = $this->rules) {
                     return match ($key) {
                         'password_hash', 'client_password_hash' => $rules->addRule("required"),

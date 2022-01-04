@@ -100,8 +100,8 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    $html = $twigExt->tableDateFormat($row, "created_at", true);
+                'formatter' => function ($row, $tempExt) {
+                    $html = $tempExt->tableDateFormat($row, "created_at", true);
                     $html .= '<br/><small>' . $row['firstname'] . '</small>';
                     return $html;
                 }
@@ -113,11 +113,11 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        //$html .= "$twig->getUserById($row[$row_name]);"
-                        $html .= $twigExt->tableDateFormat($row, "modified_at", true);
+                        //$html .= "$tempExt->getUserById($row[$row_name]);"
+                        $html .= $tempExt->tableDateFormat($row, "modified_at", true);
                         $html .= '<div><small>By Admin</small></div>';
                     } else {
                         $html .= '<small>Never!</small>';
@@ -141,7 +141,7 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     return '<span class="ion-location ion-24" uk-tooltip="' . $row["remote_addr"] . '"></span>';
                 }
             ],
@@ -152,13 +152,13 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
                             'more' => [
                                 'icon' => 'ion-more',
-                                'callback' => function ($row, $twigExt) {
-                                    return $twigExt->getDropdown(
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
                                         $this->itemsDropdown($row),
                                         $this->getDropdownStatus($row),
                                         $row,
@@ -168,7 +168,7 @@ class UserColumn extends AbstractDatatableColumn
                             ],
                         ],
                         $row,
-                        $twigExt,
+                        $tempExt,
                         'user',
                         false,
                         'Are You Sure!',
