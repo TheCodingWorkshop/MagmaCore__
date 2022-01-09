@@ -24,12 +24,39 @@ DB_PREFIX=__magmaCore__ - a prefix which gets append to your database table name
 DB_PORT=3306 - defaults database port
 ```
 
-## Composer Check
-Note MagmaCoreStarter requires the MagmaCore__ framework as its dependency. Ensure all dependency  is present within your composer.json file.
+## Installation
+The main package can be installed using composer from your terminal.
 
 ```console
-composer require magmacore/magmacore
-composer require phpunit/phpunit
-composer require phpmailer/phpmailer
-composer require symfony/console
+composer require magmacore/magmacore-starter
+```
+
+## Getting Started
+There's 2 .htaccess file the first one located within the main root directory. Which takes the incoming request which routes this to the **public/index.php file. This index.php file handles the initialization of the application. This file is also used to load all the main component within the framework i.e session, cache, routing, error-handling etc...
+
+Your basic index file should look like below.
+
+```console
+require_once 'include.php';
+
+use MagmaCore\Utility\Yaml;
+use MagmaCore\Logger\LogLevel;
+use MagmaCore\Base\BaseApplication;
+
+try {
+    BaseApplication::getInstance()
+        ->setPath(ROOT_PATH)
+        ->setConfig(Yaml::file('app'))
+        ->setErrorHandler(Yaml::file('app')['error_handler'], E_ALL)
+        ->setSession(Yaml::file('app')['session'], null, true)
+        ->setCookie([])
+        ->setCache(Yaml::file('app')['cache'], null, true)
+        ->setRoutes(Yaml::file('routes'))
+        ->setLogger(LOG_PATH, Yaml::file('app')['logger_handler']['file'], LogLevel::DEBUG, [])
+        ->setContainerProviders(Yaml::file('providers'))
+        ->run();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+
 ```
