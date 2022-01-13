@@ -21,6 +21,8 @@ class UserColumn extends AbstractDatatableColumn
 
     use DataColumnTrait;
 
+    private string $controller = 'user';
+
     /**
      * @param array $dbColumns
      * @param object|null $callingController
@@ -159,17 +161,17 @@ class UserColumn extends AbstractDatatableColumn
                                 'icon' => 'ion-more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
-                                        $this->itemsDropdown($row),
+                                        $this->itemsDropdown($row, $this->controller),
                                         $this->getDropdownStatus($row),
                                         $row,
-                                        'user'
+                                        $this->controller
                                     );
                                 }
                             ],
                         ],
                         $row,
                         $tempExt,
-                        'user',
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['firstname']}</strong> account."
@@ -179,6 +181,32 @@ class UserColumn extends AbstractDatatableColumn
 
         ];
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @param string $controller
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'privilege' => ['name' => 'Edit Privilege', 'icon' => 'key-outline'],
+            'preferences' => ['name' => 'Edit Preferences', 'icon' => 'options-outline'],
+            'show' => ['name' => 'show', 'icon' => 'eye-outline'],
+            'clone' => ['name' => 'clone', 'icon' => 'copy-outline'],
+            'lock' => ['name' => 'lock account', 'icon' => 'lock-closed-outline'],
+            'trash' => ['name' => 'trash account', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
 
 
 }

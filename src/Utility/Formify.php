@@ -20,26 +20,22 @@ class Formify
     }
 
     /**
-     * Undocumented function
-     *
      * @param [type] $checked
      * @param [type] $current
      * @return string
      */
-    public function isChecked($checked, $current): string
+    public static function isChecked($checked, $current): string
     {   
         if ($checked == $current)
             return ' checked="checked"';
     }
 
     /**
-     * Undocumented function
-     *
      * @param $selected
      * @param $current
      * @return bool|string
      */
-    public function isSelected($selected, $current): bool|string
+    public static function isSelected($selected, $current): bool|string
     {
         if ($selected == $current)
             return ' selected="selected"';

@@ -12,10 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Permission;
 
+use MagmaCore\Datatable\DataColumnTrait;
 use MagmaCore\Datatable\AbstractDatatableColumn;
 
 class PermissionColumn extends AbstractDatatableColumn
 {
+
+    use DataColumnTrait;
+
+    private string $controller = 'permission';
 
     /**
      * @param array $dbColumns
@@ -118,12 +123,21 @@ class PermissionColumn extends AbstractDatatableColumn
                 'formatter' => function ($row, $tempExt) {
                     return $tempExt->action(
                         [
-                            'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
-                            'trash' => ['tooltip' => 'Trash', 'icon' => 'ion-ios-trash']
+                            'more' => [
+                                'icon' => 'ion-more',
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
+                                        '',
+                                        $row,
+                                        $this->controller
+                                    );
+                                }
+                            ],
                         ],
                         $row,
                         $tempExt,
-                        'permission',
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['permission_name']}</strong> role."
@@ -133,4 +147,24 @@ class PermissionColumn extends AbstractDatatableColumn
 
         ];
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'delete' => ['name' => 'trash permission', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
 }

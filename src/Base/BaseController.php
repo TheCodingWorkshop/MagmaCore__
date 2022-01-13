@@ -58,7 +58,7 @@ class BaseController extends AbstractBaseController
      *
      * @param array $routeParams
      */
-    public function __construct(array $routeParams)
+    public function __construct(array $routeParams, array $menuItems = [])
     {
         parent::__construct($routeParams);
         $this->routeParams = $routeParams;
@@ -67,6 +67,7 @@ class BaseController extends AbstractBaseController
         $this->diContainer(Yaml::file('providers'));
         $this->initEvents();
         $this->buildControllerMenu($routeParams);
+
     }
 
     /**
@@ -82,7 +83,6 @@ class BaseController extends AbstractBaseController
     {
         return $this->routeParams;
     }
-
 
     /**
      * Magic method called when a non-existent or inaccessible method is

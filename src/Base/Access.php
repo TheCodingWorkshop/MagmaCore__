@@ -38,6 +38,7 @@ class Access
 
     public const CAN_BULK_DELETE_USER = 'can_bulk_delete';
     public const CAN_BULK_CLONE_USER = 'can_bulk_clone';
+    public const CAN_EDIT_OWN_ACCOUNT = 'can_edit_own_account';
 
 
 }

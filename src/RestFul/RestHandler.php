@@ -72,7 +72,7 @@ class RestHandler extends RestResponse
         }
     }
 
-    private function htmlEncodedData(array $data): ?string
+    public function htmlEncodedData(array $data): ?string
     {
         if ($data !==null) {
             $html = "<table border=\"1\">";
@@ -92,7 +92,7 @@ class RestHandler extends RestResponse
         return null;
     }
 
-    private function xmlEncodedData(array $data): bool|string|null
+    public function xmlEncodedData(array $data): bool|string|null
     {
         if ($data !==null) {
             $xml = new \SimpleXMLElement('<?xml version="1.0"?><mobile></mobile>');

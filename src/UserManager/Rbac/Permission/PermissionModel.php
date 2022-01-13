@@ -64,8 +64,7 @@ class PermissionModel extends AbstractBaseModel
 
     public function getNameForSelectField($id)
     {
-        $name = $this->getRepo()->findObjectBy(['id' => $id], ['permission_name']);
-        return $name->permission_name;
+        return $this->getSelectedNameField($id, 'permission_name');
     }
 
 }

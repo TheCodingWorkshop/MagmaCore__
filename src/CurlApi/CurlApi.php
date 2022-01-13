@@ -57,7 +57,7 @@ class CurlApi implements CurlApiInterface
             throw new CurlException('No resource endpoint was passed. Please specify your API endpoint.');
         }
         $this->path = $path;
-        $this->data = $data;
+        $this->data = $data ?? NULL;
         $this->headers = (count($headers) > 0 ? array_merge($this->headers, $headers) : $this->headers);
         /* initialize a curl session */
         $this->ch = curl_init();
@@ -111,9 +111,14 @@ class CurlApi implements CurlApiInterface
         }
     }
 
-    public function exec()
+    /**
+     * @param $response
+     * @return mixed
+     */
+    public function exec($response = null): mixed
     {
-        return json_decode($this->response, true);
+        $encode = $response !==null ? json_encode($response) : $this->response;
+        return json_decode($encode, true);
     }
 
     public function create(): self
@@ -125,7 +130,7 @@ class CurlApi implements CurlApiInterface
 
     public function read(): self
     {
-        (new CurlRead($this))
+        (new CurlRead())
             ->endpointRead($this->ch, $this->path, $this->data ?? null, $this->headers ?? []);
         return $this;
     }

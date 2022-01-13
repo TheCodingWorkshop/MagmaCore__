@@ -12,12 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\Drivers;
 
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseConnectionInterface;
 use PDO;
 
-interface DatabaseDriverInterface extends DatabaseConnectionInterface
+interface DatabaseDriverInterface
 {
 
     public function open(): PDO;
     public function close();
+    
 }

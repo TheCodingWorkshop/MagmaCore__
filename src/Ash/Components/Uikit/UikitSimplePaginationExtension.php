@@ -42,7 +42,7 @@ class UikitSimplePaginationExtension
                 <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
                 <span></span>
                 </button></li>
-                <li><a href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
+                <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
                 
                 <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
 

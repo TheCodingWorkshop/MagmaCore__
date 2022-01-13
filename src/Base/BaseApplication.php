@@ -42,6 +42,8 @@ class BaseApplication extends AbstractBaseBootLoader
     protected array $logOptions = [];
     protected string $logMinLevel;
     protected array $themeBuilderOptions = [];
+    protected array$errorHandling = [];
+    protected ?int $errorLevel = null;
 
     /** @return void */
     public function __construct()
@@ -213,6 +215,7 @@ class BaseApplication extends AbstractBaseBootLoader
 
     /**
      * Set the application cache configuration from the session.yml file
+     * 
      * @param array $ymlCache
      * @param string|null $newCacheDriver
      * @param bool $isGloabl
@@ -358,7 +361,7 @@ class BaseApplication extends AbstractBaseBootLoader
      * Set the application routes configuration from the session.yml file.
      *
      * @param array $ymlRoutes
-     * @param string|null $routeHandler
+     * @param string|null $routeHandler - Can be Request object
      * @param string|null $newRouter - accepts the fully qualified namespace of new router class
      * @return self
      */
@@ -410,13 +413,13 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * Undocumented function
+     * Define the framework error handling
      *
      * @param string $errorClass
-     * @param mixed $level
+     * @param int $level
      * @return self
      */
-    public function setErrorHandler(array $errorHandling, mixed $level = null): self
+    public function setErrorHandler(array $errorHandling, ?int $level = null): self
     {
         $this->errorHandling = $errorHandling;
         $this->errorLevel = $level;
@@ -424,18 +427,25 @@ class BaseApplication extends AbstractBaseBootLoader
     }
 
     /**
-     * Undocumented function
+     * Load the error handling configurations from the relevant yaml file
      *
-     * @return array
+     * @return array or throw exception
+     * @throws BaseInvalidArgumentException
      */
-    public function getErrorHandling(): array
+    public function getErrorHandling(): ?array
     {
-        return $this->errorHandling;
+        if (count($this->errorHandling) > 0) {
+            return $this->errorHandling;
+        }
+        throw new BaseInvalidArgumentException('Error loading the error handling configurations. Please check your method argument.');
     }
 
-    public function getErrorHandlerLevel(): mixed
+    public function getErrorHandlerLevel(): int
     {
-        return $this->errorLevel;
+        if ($this->errorLevel !== null) {
+            return $this->errorLevel;
+        }
+        throw new BaseInvalidArgumentException('Error figuring out the error_level defined within the  error_handler. Ensure this is defined within the second argument within the setErrorHandler method.');
     }
 
     /**

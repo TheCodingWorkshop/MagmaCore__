@@ -12,10 +12,9 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
-//use App\Event\ControllerSettingsActionEvent;
-//use App\Forms\Admin\Controller\ControllerSettingsForm;
-//use App\Model\ControllerSettingsModel;
-
+use MagmaCore\Administrator\ControllerSettingsForm;
+use MagmaCore\Administrator\ControllerSettingsModel;
+use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Middleware\Before\LoginRequired;
@@ -46,7 +45,6 @@ use MagmaCore\Session\SessionTrait;
 use MagmaCore\Settings\Entity\ControllerSettingEntity;
 use MagmaCore\Settings\Event\ControllerSettingActionEvent;
 use MagmaCore\Administrator\Middleware\Before\IntegrityConstraints;
-use JetBrains\PhpStorm\ArrayShape;
 
 class AdminController extends BaseController
 {
@@ -94,6 +92,8 @@ class AdminController extends BaseController
                 'settingsAction' => SettingsAction::class,
                 'apiResponse' => RestHandler::class,
                 'changeRowsAction' => ChangeRowsAction::class,
+                'controllerSettingsForm' => ControllerSettingsForm::class,
+                'controllerRepository' => ControllerSettingsModel::class
             ]
         );
 
@@ -115,7 +115,7 @@ class AdminController extends BaseController
             'AdminAuthentication' => AdminAuthentication::class,
             'AuthorizedIsNull' => AuthorizedIsNull::class,
             'SessionExpires' => SessionExpires::class,
-            'IntegrityConstraints' => IntegrityConstraints::class
+            //'IntegrityConstraints' => IntegrityConstraints::class
         ];
     }
 

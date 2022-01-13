@@ -38,15 +38,16 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'trash',
         'hard-delete',
         'privilege',
-        'preferences'
+        'preferences',
+        'personal'
     ];
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk'];
-    private array $noManager = ['trash', 'new', 'bulk'];
-    private array $noAction = ['trash'];
-    private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal'];
+    private array $noManager = ['trash', 'new', 'bulk', 'personal'];
+    private array $noAction = ['trash', 'personal'];
+    private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences', 'personal'];
 
     private object $controller;
 
@@ -97,6 +98,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'hard-delete' => "Deleting " . $suffix,
             'preferences' => $suffix . " Preferences",
             'privileges' => $suffix . " Privileges",
+            'personal' => $suffix . " Personal Space",
             default => "Unknown"
         };
     }

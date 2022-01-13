@@ -12,20 +12,18 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
-use MagmaCore\Auth\Model\MenuItemModel;
-use MagmaCore\Auth\Model\MenuModel;
-use MagmaCore\Base\Events\EventLogger;
-use MagmaCore\DataObjectLayer\DataLayerTrait;
-use MagmaCore\System\Event\SystemActionEvent;
-use MagmaCore\System\EventTrait\SystemEventTrait;
-use MagmaCore\Utility\ClientIP;
-use MagmaCore\Utility\Stringify;
-use MagmaCore\Utility\Utilities;
-use MagmaCore\Utility\Yaml;
-use ReflectionClass;
 use ReflectionMethod;
 use ReflectionException;
-use Exception;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\ClientIP;
+use MagmaCore\Utility\Stringify;
+use MagmaCore\Auth\Model\MenuModel;
+use MagmaCore\Base\Events\EventLogger;
+use MagmaCore\Auth\Model\MenuItemModel;
+use MagmaCore\DataObjectLayer\DataLayerTrait;
+use MagmaCore\System\Event\SystemActionEvent;
+use MagmaCore\Base\Traits\BaseReflectionTrait;
+use MagmaCore\System\EventTrait\SystemEventTrait;
 
 trait ControllerMenuTrait
 {
@@ -35,7 +33,7 @@ trait ControllerMenuTrait
     use SystemEventTrait;
     use ControllerTrait;
 
-    private $usables = [
+    private array $usables = [
         'index' => 'View All',
         'new' => 'Add New',
         'log' => 'Logs',
@@ -103,6 +101,7 @@ trait ControllerMenuTrait
                         'menu_description' => $routeParams['controller'] . ' parent menu item.',
                         'menu_order' => null,
                         'menu_break_point' => null,
+                        'menu_icon' => 'alert',
                         'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
                     ];
                     $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);

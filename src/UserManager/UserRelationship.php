@@ -14,8 +14,6 @@ namespace MagmaCore\UserManager;
 
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
-use MagmaCore\UserManager\Model\UserRoleModel;
-use MagmaCore\DataObjectLayer\DataRelationship\Relationships\ManyToMany;
 use MagmaCore\DataObjectLayer\DataRelationship\Relationships\OneToMany;
 use MagmaCore\Base\Contracts\BaseRelationshipInterface;
 

@@ -12,10 +12,8 @@ declare(strict_types=1);
 namespace MagmaCore\UserManager\Rbac\Model;
 
 use MagmaCore\UserManager\Rbac\Entity\RolePermissionEntity;
-use MagmaCore\UserManager\Rbac\Schema\RolePermissionSchema;
 use MagmaCore\Base\AbstractBaseModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\DataObjectLayer\DataRelationship\Relationships\ManyToMany;
 
 class RolePermissionModel extends AbstractBaseModel
 {

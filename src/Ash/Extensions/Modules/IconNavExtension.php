@@ -58,7 +58,7 @@ class IconNavExtension
                     if ($key == self::TRASH_KEY) // automatically set trash color to red
                         $class = self::TRASH_CLASS;
                 } else {
-                    $path = $this->determinePath($_icon, $key, null, $controller);
+                    $path = $this->determinePath($_icon, $key, [], $controller);
                 }
                 $newIcon = (isset($icon)) ? $icon : $key;
                 $newRatio = (isset($ratio) ? $ratio : '21');
@@ -66,7 +66,7 @@ class IconNavExtension
                 $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : 'Unknown');
                 
                 $html .=  "\n" . sprintf(
-                    '<li><a data-turbo="false" href="%s"%s%s%s>%s</a>',
+                    '<li><a href="%s"%s%s%s>%s</a>',
  
                     ($path ? $path : $toggleID),
                     (isset($tooltip) ? ' uk-tooltip="' . $tooltip . '"' : ' uk-tooptip="' . $key . '"'),
@@ -131,6 +131,7 @@ class IconNavExtension
         if (isset($key) && $key != '') {
             switch ($key):
                 case 'trash':
+                case 'delete' :
                     $target = "#delete-modal-{$controller}-{$row['id']}";
                     break;
                 case 'edit_modal':

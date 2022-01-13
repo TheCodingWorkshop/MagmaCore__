@@ -41,12 +41,12 @@ trait DataColumnTrait
      * @param string|null $path
      * @return string
      */
-    private function adminPath(array $row, ?string $path = null): string
+    private function adminPath(array $row, string $controller, ?string $path = null): string
     {
         if ($path !== null) {
-            return "/admin/user/{$row['id']}/{$path}";
+            return "/admin/{$controller}/{$row['id']}/{$path}";
         } else {
-            return "/admin/user/index";
+            return "/admin/{$controller}/index";
         }
     }
 
@@ -93,30 +93,6 @@ trait DataColumnTrait
                 }
             }
         });
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param array $row
-     * @return array
-     */
-    private function itemsDropdown(array $row): array
-    {
-        $items = [
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'privilege' => ['name' => 'Edit Privilege', 'icon' => 'key-outline'],
-            'preferences' => ['name' => 'Edit Preferences', 'icon' => 'options-outline'],
-            'show' => ['name' => 'show', 'icon' => 'eye-outline'],
-            'clone' => ['name' => 'clone', 'icon' => 'copy-outline'],
-            'lock' => ['name' => 'lock account', 'icon' => 'lock-closed-outline'],
-            'trash' => ['name' => 'trash account', 'icon' => 'trash-bin-outline']
-        ];
-        return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $key)], $value),
-            array_keys($items),
-            $items
-        );
     }
 
 }

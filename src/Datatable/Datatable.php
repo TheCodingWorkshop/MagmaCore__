@@ -179,7 +179,7 @@ class Datatable extends AbstractDatatable
     {
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
-            $element .= '<a class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
+            $element .= '<a data-turbo="true" class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
 
             $element .= $column['dt_row'];
 
@@ -214,7 +214,7 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage - 1)
             );
         } else {
-            $element .= sprintf('<a href="?page=%s">', ($this->currentPage - 1));
+            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage - 1));
         }
         //$element .= '<span><ion-icon name="caret-back-outline"></ion-icon></span>';
         $element .= '<span><ion-icon name="chevron-back-outline"></ion-icon></span></a>' . PHP_EOL;
@@ -245,7 +245,7 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage + 1)
             );
         } else {
-            $element .= sprintf('<a href="?page=%s">', ($this->currentPage + 1));
+            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage + 1));
         }
         $element .= '<span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>' . PHP_EOL;
         //$element .= '<span><ion-icon name="caret-forward-outline"></ion-icon></span>';

@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Logger\Logger;
 use MagmaCore\Cache\CacheFacade;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Base\BaseApplication;

@@ -1,19 +1,20 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace MagmaCore\Blank;
 
-use MagmaCore\Base\BaseApplication;
 use MagmaCore\Bundler\BundlerTrait;
 use MagmaCore\Collection\Collection;
 use MagmaCore\Collection\CollectionInterface;
 use MagmaCore\Contracts\FactoryInterface;
 use MagmaCore\Contracts\ConfigurationInterface;
-use MagmaCore\Contracts\Exception\ConfigurationInvalidArgumentException;
-use MagmaCore\Contracts\Concrete\Configuration;
-use MagmaCore\Blank\Drivers\NativeBlankDriver;
-use MagmaCore\Blank\Drivers\BlankDriverInterface;
-use MagmaCore\Blank\Exception\BlankDriverInvalidArgumentException;
-use MagmaCore\Session\GlobalManager\GlobalManager;
 
 class BlankFactory implements FactoryInterface
 {

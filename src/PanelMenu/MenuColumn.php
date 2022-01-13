@@ -13,9 +13,14 @@ declare(strict_types=1);
 namespace MagmaCore\PanelMenu;
 
 use MagmaCore\Datatable\AbstractDatatableColumn;
+use MagmaCore\Datatable\DataColumnTrait;
 
 class MenuColumn extends AbstractDatatableColumn
 {
+
+    use DataColumnTrait;
+
+    private string $controller = 'menu';
 
     /**
      * @param array $dbColumns
@@ -78,6 +83,29 @@ class MenuColumn extends AbstractDatatableColumn
                 }
             ],
             [
+                'db_row' => 'menu_order',
+                'dt_row' => 'Order',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => true,
+                'searchable' => true,
+                'formatter' => function ($row, $tempExt) {
+                    return $row['menu_order'] ?? 0;
+                }
+            ],
+            [
+                'db_row' => 'menu_icon',
+                'dt_row' => 'Icon',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => false,
+                'searchable' => false,
+                'formatter' => function ($row, $tempExt) {
+                    return '<ion-icon name="' . $row['menu_icon'] . '"></ion-icon>';
+                }
+            ],
+
+            [
                 'db_row' => 'created_at',
                 'dt_row' => 'Published',
                 'class' => '',
@@ -118,11 +146,21 @@ class MenuColumn extends AbstractDatatableColumn
                 'formatter' => function ($row, $tempExt) {
                     return $tempExt->action(
                         [
-                            'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
+                            'more' => [
+                                'icon' => 'ion-more',
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
+                                        '',
+                                        $row,
+                                        $this->controller
+                                    );
+                                }
+                            ],
                         ],
                         $row,
                         $tempExt,
-                        'menu',
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['menu_name']}</strong> role."
@@ -132,5 +170,25 @@ class MenuColumn extends AbstractDatatableColumn
 
         ];
     }
+
+        /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'trash' => ['name' => 'trash menu', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
 }
 

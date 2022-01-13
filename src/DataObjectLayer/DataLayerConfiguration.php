@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer;
 
-use JetBrains\PhpStorm\Pure;
-
 final class DataLayerConfiguration
 {
 
@@ -43,7 +41,7 @@ final class DataLayerConfiguration
      * 
      * @return array
      */
-    #[Pure] public function baseConfiguration(): array
+    public function baseConfiguration(): array
     {
         if (is_array($this->dataLayerConfiguration) && ($this->dataLayerConfiguration !== null) && count($this->dataLayerConfiguration) > 0) {
             return $this->dataLayerConfiguration;

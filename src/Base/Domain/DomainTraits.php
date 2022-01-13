@@ -20,6 +20,7 @@ use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
+use MagmaCore\Base\Access;
 
 trait DomainTraits
 {
@@ -510,13 +511,30 @@ trait DomainTraits
     public function setAccess(object $controller, string $permission): self
     {
         $privilege = PrivilegedUser::getUser();
-        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())) {
+        $this->privilege = $privilege;
+        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())){
             $controller->flashMessage('Access Denied!', $controller->flashWarning());
             $controller->redirect('/admin/accessDenied/index');
         }
         return $this;
     }
 
+    public function setOwnerAccess(object $controller)
+    {
+        $privilege = PrivilegedUser::getUser();
+        $userSessionID = (int)$controller->getSession()->get('user_id');
+        if ($userSessionID === 1) {
+            $routeID = (int)$controller->thisRouteID() !==null ? $controller->thisRouteID() : null;
+            if ($userSessionID === $routeID && $privilege->hasPrivilege(ACCESS::CAN_EDIT_OWN_ACCOUNT)) {
+                return $this;
+            } else {
+                /* Might not be doing anything */
+                $this->setAccess($controller, ACCESS::CAN_EDIT_OWN_ACCOUNT);
+            }
+    
+        }
+        return $this;
+    }
     
     /**
      * @param object $controller

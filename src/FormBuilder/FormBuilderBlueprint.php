@@ -56,6 +56,22 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
 
+    private function subArg(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        string $onclick = null
+    ): array {
+        return [
+            'name' => $name,
+            'class' => $class,
+            'value' => ($value !== null) ? $value : '',
+            'onclick' => $onclick
+
+        ];
+    }
+
+
     public function text(
         string $name,
         array $class = [],
@@ -231,11 +247,12 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
     public function submit(
         string $name,
         array $class = [],
-        mixed $value = null
+        mixed $value = null,
+        ?string $onclick = null
     ): array {
         return [
             SubmitType::class => [
-                $this->arg($name, $class, $value)
+                $this->subArg($name, $class, $value, $onclick)
             ]
         ];
     }

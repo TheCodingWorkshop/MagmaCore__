@@ -3,10 +3,10 @@ stylesheets:
     href: "https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css"
     enable: true
     cdn: true
-  summernote:
-    href: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
-    enable: false
-    cdn: true
+  # summernote:
+  #   href: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+  #   enable: false
+  #   cdn: true
   ionicons:
     href: "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
     enable: true
@@ -31,17 +31,16 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: false
+    enable: true
     cdn: true
-  stimulus:
-    src: "https://unpkg.com/stimulus/dist/stimulus.umd.js"
-    integrity: ""
-    crossorigin: ""
-    type: javascript
-    location: header
-    enable: false
-    cdn: true
-
+  # stimulus:
+  #   src: "https://unpkg.com/stimulus/dist/stimulus.umd.js"
+  #   integrity: ""
+  #   crossorigin: ""
+  #   type: javascript
+  #   location: header
+  #   enable: false
+  #   cdn: true
   jquery:
     src: "https://code.jquery.com/jquery-3.4.1.min.js"
     integrity: "sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -66,14 +65,14 @@ scripts:
     location: header
     enable: true
     cdn: true
-  summernote:
-    src: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"
-    integrity: ""
-    crossorigin: ""
-    type: javascript
-    location: header
-    enable: false
-    cdn: true
+  # summernote:
+  #   src: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"
+  #   integrity: ""
+  #   crossorigin: ""
+  #   type: javascript
+  #   location: header
+  #   enable: false
+  #   cdn: true
   sidebar:
     src: "/public/assets/js/uikit/sidebar.js"
     integrity: ""
@@ -82,14 +81,14 @@ scripts:
     location: header
     enable: true
     cdn: false
-  sparks:
-    src: "/public/assets/js/uikit/sparks.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: javascript
-    location: footer
-    enable: true
-    cdn: false
+  # sparks:
+  #   src: "/public/assets/js/uikit/sparks.js"
+  #   integrity: ""
+  #   crossorigin: "anonymous"
+  #   type: javascript
+  #   location: footer
+  #   enable: true
+  #   cdn: false
   filters:
     src: "/public/assets/js/uikit/filters.js"
     integrity: ""
@@ -138,14 +137,14 @@ scripts:
     location: header
     enable: true
     cdn: true
-  sparkline:
-    src: "/public/assets/js/uikit/sparkline.js"
-    integrity: ""
-    crossorigin: "anonymous"
-    type: javascript
-    location: header
-    enable: true
-    cdn: false
+  # sparkline:
+  #   src: "/public/assets/js/uikit/sparkline.js"
+  #   integrity: ""
+  #   crossorigin: "anonymous"
+  #   type: javascript
+  #   location: header
+  #   enable: true
+  #   cdn: false
 #  react:
 #    src: "https://unpkg.com/react@17/umd/react.development.js"
 #    integrity: ""
@@ -188,14 +187,14 @@ scripts:
 #    enable: false
 #    cdn: false
 
-  canvas:
-    src: "https://canvasjs.com/assets/script/jquery.canvasjs.min.js"
-    integrity: "sha256-UGwvyUFH6Qqn0PSyQVw4q3vIX0wV1miKTracNJzAWPc="
-    crossorigin: "anonymous"
-    type: javascript
-    location: header
-    enable: true
-    cdn: true
+  # canvas:
+  #   src: "https://canvasjs.com/assets/script/jquery.canvasjs.min.js"
+  #   integrity: "sha256-UGwvyUFH6Qqn0PSyQVw4q3vIX0wV1miKTracNJzAWPc="
+  #   crossorigin: "anonymous"
+  #   type: javascript
+  #   location: header
+  #   enable: true
+  #   cdn: true
 
 #  react_button:
 #    src: "/public/assets/js/react/react_button.js"

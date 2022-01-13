@@ -11,13 +11,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\Router;
 
+use MagmaCore\Http\Request;
+use MagmaCore\Router\RouterInterface;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+
 class RouterFactory
 {
 
     /** @var Object - Router Object */
     protected Object $routerObject;
     /** @var string|null */
-    protected ?string $url;
+    protected mixed $url;
+
+    protected ?object $request = null;
 
     /**
      * Router factory constructor
@@ -26,20 +32,26 @@ class RouterFactory
      */
     public function __construct(?string $url = null)
     {
-        $this->url = $_SERVER['QUERY_STRING'];
+        $this->request = new Request();
+        $this->url = $this->request->get()->getPath();
+    }
+
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
      * Undocumented function
      *
      * @param string|null $routerString
-     * @return \MagmaCore\Router\RouterInterface
+     * @return RouterInterface
      */
     public function create(?string $routerString = null) : RouterInterface
     {
         $this->routerObject = ($routerString !=null) ? new $routerString() : new Router();
         if (!$this->routerObject instanceof RouterInterface) {
-            throw new \InvalidArgumentException();
+            throw new BaseInvalidArgumentException('Invalid router object');
         }
 
         return $this->routerObject;
@@ -54,7 +66,7 @@ class RouterFactory
     public function buildRoutes(array $definedRoutes = [])
     {
         if (empty($definedRoutes)) {
-            throw new \InvalidArgumentException('No routes defined');
+            throw new BaseInvalidArgumentException('No routes defined');
         }
         $params = [];
         if (count($definedRoutes) > 0) {

@@ -12,22 +12,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Extensions;
 
-use Exception;
-use MagmaCore\Auth\Authorized;
-use MagmaCore\Utility\Singleton;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Base\BaseController;
 
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Utility\DateFormatter;
 
-use MagmaCore\Auth\Model\PermissionModel;
 use MagmaCore\Ash\Extensions\Modules\NavBarExtension;
 use MagmaCore\Ash\Extensions\Modules\IconNavExtension;
 use MagmaCore\Ash\Extensions\Modules\SearchBoxExtension;
 use MagmaCore\Ash\Extensions\Modules\SubheaderExtension;
 use MagmaCore\Ash\Extensions\Modules\ColumnActionExtension;
-use MagmaCore\Ash\Extensions\Modules\FlashMessageExtension;
 
 class TemplateExtension
 {

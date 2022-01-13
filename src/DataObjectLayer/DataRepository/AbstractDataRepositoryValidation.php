@@ -222,7 +222,7 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
      * @param array $dataCollection
      * @return string
      */
-    public function userPassword(array $dataCollection): array
+    public function userPassword(array $dataCollection): ?array
     {
         $userPassword = '';
         $randomPassword = RandomCharGenerator::generate();
@@ -244,11 +244,13 @@ Abstract class AbstractDataRepositoryValidation implements DataRepositoryValidat
             );
         }
 
-        if ($encodedPassword)
+        if ($encodedPassword) {
             return [
                 $encodedPassword,
                 array_key_exists('password_hash', $dataCollection) ? $randomPassword : ''
             ];
+        }
+        return null;
     }
 
 }

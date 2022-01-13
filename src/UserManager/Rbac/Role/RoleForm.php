@@ -53,7 +53,8 @@ class RoleForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 $this->blueprint->submit(
                     $this->hasValue('id') ? 'edit-role' : 'new-role',
                     ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
-                    'Save'
+                    'Save',
+                   // "UIkit.notification({message: '<span uk-icon=\'icon: check\'></span> Saving...', status: 'success', timeout: 3000})"
                 ),
                 null,
                 $this->blueprint->settings(false, null, false, null, true)
