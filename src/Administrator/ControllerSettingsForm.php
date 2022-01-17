@@ -53,10 +53,12 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                 $this->blueprint->text(
                     'records_per_page',
                     ['uk-form-width-small', 'uk-form-small', 'uk-form-blank', 'border-bottom'],
-                    $this->hasValue('records_per_page')
+                    $this->hasValue('records_per_page'),
+                    false,
+                    'Records Per page'
                 ),
                 null,
-                $this->blueprint->settings(false, null, false)
+                $this->blueprint->settings(false, null, false, '', true)
             )
             ->add(
                 $this->blueprint->text(
@@ -67,7 +69,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Query'
                 ),
                 null,
-                $this->blueprint->settings(false, null, false)
+                $this->blueprint->settings(false, null, false, '', true)
             )
             ->add(
                 $this->blueprint->text(
@@ -78,20 +80,8 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Filter Alias'
                 ),
                 null,
-                $this->blueprint->settings(false, null, false)
+                $this->blueprint->settings(false, null, false, '', true)
             )
-//            ->add(
-//                $this->blueprint->radio(
-//                    'searchable',
-//                    ['uk-radio'],
-//                    $this->hasValue('searchable'),
-//                ),
-//                $this->blueprint->choices(
-//                    array_reverse($searchable = $controller->getSearchableColumns($callingController->column)),
-//                    $searchable['1']
-//                ),
-//                $this->blueprint->settings(false, null, true)
-//            )
             ->add(
                 $this->blueprint->submit(
                     'settings-' . $callingController->thisRouteController() . '',

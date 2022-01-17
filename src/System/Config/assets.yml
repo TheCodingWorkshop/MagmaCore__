@@ -3,10 +3,10 @@ stylesheets:
     href: "https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css"
     enable: true
     cdn: true
-  # summernote:
-  #   href: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
-  #   enable: false
-  #   cdn: true
+  summernote:
+    href: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+    enable: false
+    cdn: true
   ionicons:
     href: "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
     enable: true
@@ -65,14 +65,14 @@ scripts:
     location: header
     enable: true
     cdn: true
-  # summernote:
-  #   src: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"
-  #   integrity: ""
-  #   crossorigin: ""
-  #   type: javascript
-  #   location: header
-  #   enable: false
-  #   cdn: true
+  summernote:
+    src: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"
+    integrity: ""
+    crossorigin: ""
+    type: javascript
+    location: header
+    enable: false
+    cdn: true
   sidebar:
     src: "/public/assets/js/uikit/sidebar.js"
     integrity: ""

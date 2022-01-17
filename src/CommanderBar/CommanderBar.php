@@ -110,7 +110,7 @@ class CommanderBar implements CommanderBarInterface
     {
         $commanderSessionIcon = $this->controller->getSession()->get('commander_icon');
         $hasIcon = isset($commanderSessionIcon) ? $commanderSessionIcon : 'help';
-        $commander = '<span class="ion-32 uk-text-emphasis"><ion-icon name="' . $hasIcon . '-outline"></ion-icon></span>';
+        $commander = '<span style="margin-top: 15px;" class="ion-32 uk-text-emphasis"><ion-icon name="' . $hasIcon . '-outline"></ion-icon></span>';
         $commander .= '<a class="uk-navbar-item uk-logo uk-text-emphasis" href="#">' .$this->controller->commander->getHeaderBuild($this->controller) . '</a>';
         $commander .= PHP_EOL;
 

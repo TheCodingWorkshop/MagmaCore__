@@ -218,4 +218,5 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
         }
         return false;
     }
+
 }

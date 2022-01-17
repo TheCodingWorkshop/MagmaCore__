@@ -68,25 +68,17 @@ class ConfigAction implements DomainActionLogicInterface
 
             $data = $entityCollection->all();
             $this->removeCsrfToken($data, $this->getSubmitValue());
-//            if ($data) {
-//                unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
-//                unset($data[$this->getSubmitValue()]);
-//            }
             foreach ($data as $key => $value) {
-                $action = $controller->settingsRepository->set($key, $value);
+                $controller->settingsRepository->set($key, $value);
             }
 
-            if ($action) {
-                $this->dispatchSingleActionEvent(
-                    $controller,
-                    $eventDispatcher,
-                    $method,
-                    [],
-                    $additionalContext
-                );
-
-            }
-            $this->domainAction = $action;
+            $this->dispatchSingleActionEvent(
+                $controller,
+                $eventDispatcher,
+                $method,
+                ['data' => $data],
+                $additionalContext
+            );
         endif;
         return $this;
     }

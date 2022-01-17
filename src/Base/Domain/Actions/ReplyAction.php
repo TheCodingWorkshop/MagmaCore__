@@ -22,25 +22,24 @@ use MagmaCore\Base\Domain\DomainTraits;
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class NewAction implements DomainActionLogicInterface
+class ReplyAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
 
-    /** @var bool */
-    protected bool $isRestFul = false;
+    public bool $passwordRequired = false;
 
     /**
-     * execute logic for adding new items to the database(). Post data is returned as a collection
+     * execute logic for adding new items to the database()
      *
-     * @param Object $controller - The controller object implementing this object
+     * @param object $controller - The controller object implementing this object
      * @param string|null $entityObject
      * @param string|null $eventDispatcher - the eventDispatcher for the current object
      * @param string|null $objectSchema
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return NewAction
+     * @return EditAction
      */
     public function execute(
         object $controller,
@@ -56,17 +55,25 @@ class NewAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+
         $formBuilder = $controller->formBuilder;
-
-        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
-
+        if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
             if ($formBuilder?->csrfValidate()) {
+                
+                /* enforce any set rules */
+                $this->enforceRules($rules, $controller);
+
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
 
-                $action = $controller->repository
-                    ->getRepo()
-                    ->validateRepository($entityCollection, $entityObject, null, $controller)
-                    ->persistAfterValidation();
+                $action = $controller->repository->getRepo()
+                    ->validateRepository(
+                        $entityCollection,
+                        $entityObject,
+                        $controller->repository
+                            ->getRepo()
+                            ->findAndReturn($controller->thisRouteID())
+                            ->or404()
+                    )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
 
                 if ($action) {
                     $this->dispatchSingleActionEvent(
@@ -78,10 +85,7 @@ class NewAction implements DomainActionLogicInterface
                     );
 
                 }
-                $this->domainAction = $action;
-
             }
-
         endif;
         return $this;
     }

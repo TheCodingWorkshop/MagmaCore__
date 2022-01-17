@@ -61,7 +61,8 @@ class UikitNavigationExtension
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {
                 $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav>';
-                $element .= '<li class="uk-nav-header">Actions</li>';
+                $element .= '<li class="uk-nav-header">Manage
+                </li>';
                 $element .= '<hr>';
                 foreach ($data as $key => $item) {
                     
@@ -77,7 +78,7 @@ class UikitNavigationExtension
                         $element .= '<li class="' . ($isParent ? 'uk-parent' . $active : '') . '">';
                         
                         $element .= '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
-                        $element .=  '<ion-icon class="ion-24" name="' . $item['menu_icon'] . '"></ion-icon>&nbsp;';
+                        //$element .=  '<span style="margin-bottom: 15px;" class="uk-margin-small-right"><ion-icon class="ion-24" name="' . $item['menu_icon'] . '"></ion-icon></span>';
                         $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));
                         $element .= '</a>';
                         if ($isParent) {

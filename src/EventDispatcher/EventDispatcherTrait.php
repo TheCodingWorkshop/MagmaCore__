@@ -52,8 +52,6 @@ trait EventDispatcherTrait
                 ['subscribers']
                     [strtolower($event->getObject()->thisRouteController() . '.subscriber')]
                         ['register_route_feedback'];
-
-
         if (isset($feedback))
             return $feedback;
     }

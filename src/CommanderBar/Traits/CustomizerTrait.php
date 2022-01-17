@@ -92,7 +92,7 @@ trait CustomizerTrait
         return $this->controller
         ->controllerSettingsForm
         ->createForm(
-            "/admin/{$this->controller->thisRouteController()}/index",
+            "/admin/{$this->controller->thisRouteController()}/settings",
             $this->controller->controllerRepository,
             $this->controller
         );

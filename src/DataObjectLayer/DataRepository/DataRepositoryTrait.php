@@ -44,11 +44,12 @@ trait DataRepositoryTrait
      *
      * @param Collection $entityCollection
      * @param string $entityObject - use to create the validation object namespace
-     * @param Object|null $dataRepository
+     * @param object|null $dataRepository
+     * @param object|null $controller - the controller representing this repository
      * @return DataRepositoryTrait|DataRepository
      * @throws DataLayerException
      */
-    public function validateRepository(Collection $entityCollection, string $entityObject, ?Object $dataRepository = null) : self
+    public function validateRepository(Collection $entityCollection, string $entityObject, ?Object $dataRepository = null, ?object $controller = null) : self
     {
         if (is_string($entityObject) && !empty($entityObject)) {
             switch ($entityObject) :
@@ -61,7 +62,7 @@ trait DataRepositoryTrait
                         }
                         list(
                             $this->cleanData, 
-                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCollection, $dataRepository);
+                            $this->validatedDataBag) = $newValidationObject->validateBeforePersist($entityCollection, $dataRepository, $controller);
                         $this->validationErrors = $newValidationObject->getErrors();
                             
                     }

@@ -56,12 +56,6 @@ class UikitSimplePaginationExtension
                      <input type="search" class="uk-search-input uk-search-large uk-form-blank uk-border-bottom" onkeyup="tableFilter()" id="table_filter" placeholder="Filter ' . $name . '..." />
                      </div>
                  </li>
-                 <li>
-                    <a href="#" uk-tooltip="Filter ' . $name . '"><span class="ion-28"><ion-icon name="filter-outline"></ion-icon></span></a>
-                    ' . $this->getSearchableColumns($controller) . '
-                 </li>
-                 <li>
-                </li>
                 </ul>
                 </div>
                 <div class="uk-navbar-right">
@@ -73,6 +67,12 @@ class UikitSimplePaginationExtension
             </nav>
         </section>
         ' . PHP_EOL;
+
+    //     <li>
+    //     <a href="#" uk-tooltip="Filter ' . $name . '"><span class="ion-28"><ion-icon name="filter-outline"></ion-icon></span></a>
+    //     ' . $this->getSearchableColumns($controller) . '
+    //  </li>
+
     }
 
     /**
@@ -117,7 +117,7 @@ class UikitSimplePaginationExtension
      */
     private function getSearchableColumns(object $controller)
     {
-        $searchables = $controller->getSearchableColumns(UserColumn::class);
+        $searchables = $controller->getSearchableColumns($controller->column);
         if (is_array($searchables) && count($searchables) > 0) {
             $html = '<div uk-dropdown="mode: click">';
                 $html .= '<ul class="uk-nav uk-nav-dropdown">';
@@ -125,7 +125,7 @@ class UikitSimplePaginationExtension
                     $html .= '<li>';
                     $html .= '<label for="filter-' . $searchable . '">';
                     $html .= '<input type="radio" name="filter" id="filter-' . $searchable . '" value="' . $searchable . '" class="uk-radio" />';
-                    $html .= ' ' . ucwords($searchable);
+                    $html .= ' ' . str_replace('_', ' ', ucwords($searchable));
                     $html .= '</label>';
                     $html .= '</li>';
                 }

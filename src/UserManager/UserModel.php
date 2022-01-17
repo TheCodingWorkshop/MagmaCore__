@@ -166,4 +166,24 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
         return $this->getRelationship(RoleRelationship::class);
     }
 
+    /**
+     * Return the user object based on the passed parameter
+     *
+     * @param integer $userID
+     * @return object|null
+     */
+    public function getUser(int $userID): ?object
+    {
+        if (empty($userID) || $userID === 0) {
+            throw new BaseInvalidArgumentException('Please add a valid user id');
+        }
+
+        $user = $this->getRepo()->findObjectBy(['id' => $userID]);
+        if ($user) {
+            return $user;
+        }
+
+        return null;
+    }
+
 }

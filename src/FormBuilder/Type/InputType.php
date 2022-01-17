@@ -188,6 +188,16 @@ class InputType implements FormBuilderTypeInterface
             case 'radio' :
                 return sprintf("%s", $this->filtering());
                 break;
+            case 'file' :
+                return sprintf(
+                    '<div class="js-upload" uk-form-custom>
+                    <input type="file" multiple>
+                    <button %s type="button" tabindex="-1">%s</button>
+                </div>', 
+                $this->filtering(),
+                $this->options
+                );
+                break;
             case 'checkbox' :
                 return sprintf("\n<input %s>&nbsp;%s\n", $this->filtering(), ($this->settings['checkbox_label'] !='' ? $this->settings['checkbox_label'] : ''));
                 break;

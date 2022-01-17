@@ -14,6 +14,7 @@ namespace MagmaCore\Administrator\Controller;
 
 use MagmaCore\Administrator\ControllerSettingsForm;
 use MagmaCore\Administrator\ControllerSettingsModel;
+use MagmaCore\Administrator\ControllerSettingsEntity;
 use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
@@ -184,5 +185,16 @@ class AdminController extends BaseController
             ->endAfterExecution();
     }
 
+    protected function settingsAction()
+    {
+        $this->editAction
+            ->execute(
+                $this, 
+                ControllerSettingsEntity::class, 
+                ControllerSettingsActionEvent::class, 
+                NULL, 
+                __METHOD__
+            );
+    }
 
 }
