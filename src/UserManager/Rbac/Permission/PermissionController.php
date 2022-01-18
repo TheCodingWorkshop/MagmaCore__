@@ -12,14 +12,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Permission;
 
+use MagmaCore\Base\Events\BulkActionEvent;
+use MagmaCore\UserManager\BulkActionTrait;
 use MagmaCore\UserManager\Rbac\Permission\Event\PermissionActionEvent;
 use MagmaCore\UserManager\Rbac\Permission\PermissionForm;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Access;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\UserManager\Rbac\Role\Event\RoleActionEvent;
 
 class PermissionController extends \MagmaCore\Administrator\Controller\AdminController
 {
+
+    use BulkActionTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -134,8 +139,5 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__);
     }
 
-    protected function bulkAction()
-    {
-    }
 
 }

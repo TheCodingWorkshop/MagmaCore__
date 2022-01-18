@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\Base\EventSubscriber;
 
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\Base\Event\BulkActionEvent;
 
 class BulkActionSubscriber implements EventSubscriberInterface
 {
@@ -26,9 +27,12 @@ class BulkActionSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            //BeforeRenderActionEvent::NAME => []
+            BulkActionEvent::NAME => [
+                []
+            ]
         ];
     }
+
 
 
 }

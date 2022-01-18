@@ -46,6 +46,7 @@ use MagmaCore\Session\SessionTrait;
 use MagmaCore\Settings\Entity\ControllerSettingEntity;
 use MagmaCore\Settings\Event\ControllerSettingActionEvent;
 use MagmaCore\Administrator\Middleware\Before\IntegrityConstraints;
+use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 
 class AdminController extends BaseController
 {
@@ -94,7 +95,9 @@ class AdminController extends BaseController
                 'apiResponse' => RestHandler::class,
                 'changeRowsAction' => ChangeRowsAction::class,
                 'controllerSettingsForm' => ControllerSettingsForm::class,
-                'controllerRepository' => ControllerSettingsModel::class
+                'controllerRepository' => ControllerSettingsModel::class,
+                'bulkDeleteForm' => BulkDeleteForm::class
+
             ]
         );
 

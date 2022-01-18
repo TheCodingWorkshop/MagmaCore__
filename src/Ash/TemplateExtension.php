@@ -28,6 +28,7 @@ use MagmaCore\Ash\Components\Uikit\UikitFlashMessagesExtension;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\UserModel;
+use MagmaCore\Setting\SettingModel;
 use RuntimeException;
 
 if (!class_exists(PermisisonModel::class) && !class_exists(UserModel::class)) {
@@ -145,11 +146,12 @@ class TemplateExtension
      * @param string $name
      * @return mixed
      */
-    public function config(string $name): mixed
+    public function config(string $name): ?string
     {
-        if (isset($this->controller->settingsRepository)) {
-            return $this->controller->settingsRepository->get($name);
+        if (isset($this->controller->settings)) {
+            return $this->controller->settings->get($name);
         }
+        return null;
     }
 
     /**
@@ -192,7 +194,7 @@ class TemplateExtension
     {
         if (!empty($id)) {
             $id = (int)$id;
-            $this->itemName = (new UserModel())->getRepo()->findObjectBy(['id' => $id]);
+            $this->itemName = $this->controller->repository->getRepo()->findObjectBy(['id' => $id]);
             return $this->itemName;
         }
     }

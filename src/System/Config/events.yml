@@ -110,6 +110,8 @@ services:
       register_route_feedback:
         MagmaCore\Settings\SettingController::purgeAction:
           msg: Changes Saved
+        MagmaCore\Settings\SettingController::generalAction:
+          msg: Changes Saved
 
     account.subscriber:
       class: \App\EventSubscriber\UserProfileActionSubscriber

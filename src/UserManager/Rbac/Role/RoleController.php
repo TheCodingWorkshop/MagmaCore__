@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Role;
 
+use MagmaCore\Base\Events\BulkActionEvent;
+use MagmaCore\UserManager\BulkActionTrait;
+use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Rbac\Entity\RolePermissionEntity;
 use MagmaCore\UserManager\Rbac\Role\Event\RoleActionEvent;
 use MagmaCore\UserManager\Rbac\Form\RoleAssignedForm;
@@ -32,6 +35,7 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait;
+    use BulkActionTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base

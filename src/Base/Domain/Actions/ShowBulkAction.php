@@ -54,7 +54,11 @@ class ShowBulkAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
 
-        if (array_key_exists($controller->repository->getSchemaID(), $controller->formBuilder->getData())) {
+        $formBuilder = $controller->formBuilder;
+        if (!array_key_exists($controller->repository->getSchemaID(), $formBuilder->getData())) {
+            $controller->flashMessage('Items must be selected in order to perform this action. No items have been changed.', $controller->flashWarning());
+            $redirectPath = '/admin/' . $controller->thisRouteController() . '/index';
+            $controller->redirect($redirectPath);
         }
 
         return $this;
