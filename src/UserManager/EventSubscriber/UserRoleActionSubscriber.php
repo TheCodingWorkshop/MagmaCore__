@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\EventSubscriber;
 
+use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Event\UserRoleActionEvent;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
@@ -31,6 +32,7 @@ class UserRoleActionSubscriber implements EventSubscriberInterface
 
     /** @var int - we want this to execute last so it doesn't interrupt other process */
     private const FLASH_MESSAGE_PRIORITY = -1000;
+    private const PRIVILEGE = 'privilege';
 
     private UserRoleModel $userRole;
     private TemporaryRoleModel $tempRoleModel;
@@ -58,9 +60,10 @@ class UserRoleActionSubscriber implements EventSubscriberInterface
     {
         return [
             UserRoleActionEvent::NAME => [
+                ['UpdateUserRole'],
                 ['flashUserEvent', self::FLASH_MESSAGE_PRIORITY],
-                ['createTemporaryRole'],
-                ['addExpirationTemporaryRole']
+//                ['createTemporaryRole'],
+//                ['addExpirationTemporaryRole']
             ]
         ];
     }
@@ -86,6 +89,38 @@ class UserRoleActionSubscriber implements EventSubscriberInterface
             $event->getObject()->redirect('/admin/user/' . $event->getObject()->thisRouteID() . '/privilege');
         }
     }
+
+    /**
+     * Update the user role within the user_role table. The process works by first checking if the user_id of the
+     * user uis already assigned a role. It will then delete that record and insert a new one.
+     *
+     * @param UserRoleActionEvent $event
+     * @return bool
+     */
+    public function UpdateUserRole(UserRoleActionEvent $event): bool
+    {
+        if ($this->onRoute($event, SELF::PRIVILEGE)) {
+            if ($event) {
+                $user = $this->flattenContext($event->getContext());
+                if (array_key_exists('role_id', $user)) {
+                    $findExisting = $this->userRole->getRepo()->findAll();
+                    if (count($findExisting) > 0) {
+                        /* Delete the eixtsing role before adding the new one */
+                        $truncate = $this->userRole->getRepo()->getEm()->getCrud()->delete(['user_id' => $user['user_id']]);
+                        if ($truncate) {
+                            return $this->addRole($user);
+                        }
+
+                    }
+                    /* update role is no role exists for this user. This will only execute if the above count() is less than 0 */
+                    return $this->addRole($user);
+
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * @param UserRoleActionEvent $event
@@ -136,6 +171,20 @@ class UserRoleActionSubscriber implements EventSubscriberInterface
         }
         return false;
 
+    }
+
+    /**
+     * @param array|string $user
+     * @return bool
+     */
+    public function addRole(array|string $user): bool
+    {
+        $update = $this->userRole
+            ->getRepo()
+            ->getEm()
+            ->getCrud()
+            ->create(['role_id' => $user['role_id'], 'user_id' => $user['user_id']]);
+        return (bool)$update;
     }
 
 }

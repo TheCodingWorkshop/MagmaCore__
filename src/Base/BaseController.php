@@ -52,6 +52,7 @@ class BaseController extends AbstractBaseController
     protected array $callBeforeMiddlewares = [];
     /** @var array */
     protected array $callAfterMiddlewares = [];
+    protected array $controllerContext = [];
 
     /**
      * Main class constructor
@@ -215,6 +216,25 @@ class BaseController extends AbstractBaseController
     }
 
     /**
+     * Allow all routes within a controller to access a central define set of template context variable. Which uses
+     * teh system session to store the current controller and validate that only the context set in a specific
+     * wont be accessible from another controller routes
+     *
+     * controller global set in userController wont be accessible in roleController
+     *
+     * @return array
+     */
+    protected function controllerViewGlobals(): array
+    {
+        $currentController = $this->getSession()->set('controller', $this->routeParams['controller']);
+        if ($this->thisRouteController() === $currentController) {
+            return $this->controllerContext;
+        }
+        return array();
+
+    }
+
+    /**
      * Rendered template exception
      * @return void
      */
@@ -252,7 +272,7 @@ class BaseController extends AbstractBaseController
         $response->setCharset('ISO-8859-1');
         $response->headers->set('Content-Type', 'text/plain');
         $response->setStatusCode($response::HTTP_OK);
-        $response->setContent($this->templateEngine->ashRender($template, array_merge($context, $templateContext)));
+        $response->setContent($this->templateEngine->ashRender($template, array_merge($context, $templateContext, $this->controllerViewGlobals())));
         if ($response->isNotModified($request)) {
             $response->prepare($request);
             $response->send();

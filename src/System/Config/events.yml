@@ -142,6 +142,12 @@ services:
         App\Controller\Admin\MessageController::newAction:
           msg: Message Sent
 
+    search.subscriber:
+      class: \App\EventSubscriber\SearchActionSubscriber
+#      register_route_feedback:
+#        App\Controller\Admin\SearchController::starredAction:
+#          msg: Changes Saved
+
 
     ########################## CORE SYSTEM EVENTS ##########################
     base_controller_action.subscriber:

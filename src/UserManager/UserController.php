@@ -222,7 +222,13 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->setOwnerAccess($this)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], ['user_id' => $this->thisRouteID()])
             ->render()
-            ->with(['user' => $this->toArray($this->findOr404())])
+            ->with(
+                [
+                    'user' => $this->toArray($this->findOr404()),
+                    'check_icon' => '<li><ion-icon name="checkmark-outline"></ion-icon></li>',
+                    'close_icon' => '<ion-icon name="close-outline"></ion-icon>'
+                ]
+            )
             ->form($this->formUser)
             ->end();
     }
@@ -419,6 +425,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $userRoleID = $this->flattenArray($this->userRole->getRepo()->findBy(['role_id'], ['user_id' => $this->thisRouteID()]));
         /* additional data we are dispatching on this route to our event dispatcher */
         $eventDispatchData = ['user_id' => $this->thisRouteID(), 'prev_role_id' => $userRoleID[0]];
+
         $this->simpleUpdateAction
             ->setAccess($this, Access::CAN_EDIT_PRIVILEGE)
             ->execute($this, UserRoleEntity::class, UserRoleActionEvent::class, NULL, __METHOD__, [], $eventDispatchData)

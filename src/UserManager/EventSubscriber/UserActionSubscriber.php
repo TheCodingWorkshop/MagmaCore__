@@ -91,7 +91,7 @@ class UserActionSubscriber implements EventSubscriberInterface
                 ['flashUserEvent', self::FLASH_MESSAGE_PRIORITY],
                 ['assignedUserRole'],
                 ['sendActivationEmail'],
-                ['updateUserRole'],
+                //['updateUserRole'],
                 ['createUserLog'],
                 ['updateStatusIfStatusIsTrash', -900]
             ]
@@ -234,28 +234,28 @@ class UserActionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Update the user role.
+     * Add the user role when creating a new user from the backend.
      * @param UserActionEvent $event
      * @return bool
      */
-    public function updateUserRole(UserActionEvent $event): bool
-    {
-        if ($this->onRoute($event, self::EDIT_ACTION)) {
-            if ($event) {
-                $user = $this->flattenContext($event->getContext());
-                if (array_key_exists('role_id', $user)) {
-                    $roleID = $user['role_id'];
-                    $update = $this->userRole
-                        ->getRepo()
-                        ->getEm()
-                        ->getCrud()
-                        ->update(['role_id' => $roleID, 'user_id' => $event->getObject()->thisRouteID()], 'user_id');
-                    return (bool)$update;
-                }
-            }
-        }
-        return false;
-    }
+//    public function updateUserRole(UserActionEvent $event): bool
+//    {
+//        if ($this->onRoute($event, self::EDIT_ACTION)) {
+//            if ($event) {
+//                $user = $this->flattenContext($event->getContext());
+//                if (array_key_exists('role_id', $user)) {
+//                    $roleID = $user['role_id'];
+//                    $update = $this->userRole
+//                        ->getRepo()
+//                        ->getEm()
+//                        ->getCrud()
+//                        ->update(['role_id' => $roleID, 'user_id' => $event->getObject()->thisRouteID()], 'user_id');
+//                    return (bool)$update;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * When a new user account is created and the status is set to trash for whatever reason

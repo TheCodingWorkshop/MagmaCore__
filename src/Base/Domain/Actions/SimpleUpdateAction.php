@@ -65,34 +65,25 @@ class SimpleUpdateAction implements DomainActionLogicInterface
                     ->rinse()
                     ->dry();
                 $data = $entityCollection->all();
-                unset($data[$this->getSubmitValue()]); /* remove the submit from the final array */
-                $action = $controller->userRole
+
+            unset($data[$this->getSubmitValue()]); /* remove the submit from the final array */
+                $controller->userRole
                     ->getRepo()
                     ->getEm()
                     ->getCrud()
                     ->update(
-                        array_merge(
-                            $data,
-                            $controller->userRoleRepo->getRepoUserIDArray($controller->thisRouteID())
-                        ),
+                        array_merge($data, $controller->userRoleRepo->getRepoUserIDArray($controller->thisRouteID())),
                         $controller->userRoleRepo->getRepoSchemaID()
                     );
+                    $this->dispatchSingleActionEvent(
+                        $controller,
+                        $eventDispatcher,
+                        $method,
+                        array_merge($data, $additionalContext ? $additionalContext : []),
+                        $additionalContext
+                    );
 
-                if ($action) {
-                    if ($controller->eventDispatcher) {
-                        $controller->eventDispatcher->dispatch(
-                            new $eventDispatcher(
-                                $method,
-                                array_merge(
-                                    $data,
-                                    $additionalContext ? $additionalContext : []
-                                ),
-                                $controller
-                            ),
-                            $eventDispatcher::NAME
-                        );
-                    }
-                }
+
         endif;
         return $this;
     }

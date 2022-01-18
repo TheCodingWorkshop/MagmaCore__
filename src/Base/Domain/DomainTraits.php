@@ -531,11 +531,11 @@ trait DomainTraits
                 /* Might not be doing anything */
                 $this->setAccess($controller, ACCESS::CAN_EDIT_OWN_ACCOUNT);
             }
-    
+
         }
         return $this;
     }
-    
+
     /**
      * @param object $controller
      * @param string $eventDispatcher
@@ -608,7 +608,7 @@ trait DomainTraits
 
     /**
      * Returns a modified clone array modifying the selected elements within the item object
-     * which was return by concatinating the a clone string to create a clone but unique item 
+     * which was return by concatinating the a clone string to create a clone but unique item
      * which will be re-inserted within the database.
      *
      * @param string $value
