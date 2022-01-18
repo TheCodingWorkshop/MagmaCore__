@@ -33,46 +33,65 @@ class UikitSimplePaginationExtension
         $name = Stringify::pluralize($name);
         $name = Stringify::capitalize($name);
         // style="z-index: 980;" uk-sticky="offset: 80; bottom: #top; cls-active: uk-card uk-card-body uk-card-default; animation: uk-animation-slide-top"
-        return '
-        <section>
-            <nav aria-label="Pagination" uk-navbar>
-                <div class="uk-navbar-left">
-                <ul class="uk-iconnav">
-                <li><button uk-tooltip="Select All" type="button" class="uk-button uk-button-small uk-button-default">
-                <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
-                <span></span>
-                </button></li>
-                <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
-                
-                <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+        $html = '<section>';
+            $html .= '<nav aria-label="Pagination" uk-navbar>';
+                $html .= '<div class="uk-navbar-left">';
+                $html .= $this->navContentLeft($controller, $name);
+                $html .= '</div>';
+                $html .= '<div class="uk-navbar-center">';
+                $html .= $this->navContentCentre($controller);
+                $html .= '</div>';
+                $html .= '<div class="uk-navbar-right">';
+                $html .= $this->navContentRight($controller);
+                $html .= '</div>';
+            $html .= '</nav>';
+        $html .= '</section>';
 
-                <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button>
-                </li>
-
-                <li><a class="uk-link-reset" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
-                 <li>
-                     <div class="uk-search">
-                     <a href="" class="uk-search-icon-flip" uk-search-icon></a>
-                     <input type="search" class="uk-search-input uk-search-large uk-form-blank uk-border-bottom" onkeyup="tableFilter()" id="table_filter" placeholder="Filter ' . $name . '..." />
-                     </div>
-                 </li>
-                </ul>
-                </div>
-                <div class="uk-navbar-right">
-                    <small>' . $this->infoPaging($controller) . '</small>
-                    <ul class="uk-pagination">
-                    ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
-                    </ul>
-                </div>
-            </nav>
-        </section>
-        ' . PHP_EOL;
+        return $html;
 
     //     <li>
     //     <a href="#" uk-tooltip="Filter ' . $name . '"><span class="ion-28"><ion-icon name="filter-outline"></ion-icon></span></a>
     //     ' . $this->getSearchableColumns($controller) . '
     //  </li>
 
+    }
+
+    private function navContentLeft($controller, $name)
+    {
+        return '
+        <ul class="uk-iconnav">
+        <li><button uk-tooltip="Select All" type="button" class="uk-button uk-button-small uk-button-default">
+        <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
+        <span></span>
+        </button></li>
+        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
+        
+        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+
+        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button>
+        </li>
+
+        <li><a class="uk-link-reset" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
+        </ul>
+
+        ';
+    }
+
+    private function navContentRight(object $controller)
+    {
+        return '
+        <small>' . $this->infoPaging($controller) . '</small>
+        <ul class="uk-pagination">
+        ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
+        </ul>
+        ';
+    }
+
+    private function navContentCentre()
+    {
+        return '
+        filter|search
+        ';
     }
 
     /**
