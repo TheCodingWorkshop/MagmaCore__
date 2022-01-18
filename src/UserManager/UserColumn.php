@@ -12,13 +12,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager;
 
-use Exception;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Datatable\AbstractDatatableColumn;
-use MagmaCore\Utility\Stringify;
+use MagmaCore\Datatable\DataColumnTrait;
 
 class UserColumn extends AbstractDatatableColumn
 {
+
+    use DataColumnTrait;
+
+    private string $controller = 'user';
 
     /**
      * @param array $dbColumns
@@ -99,8 +102,8 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    $html = $twigExt->tableDateFormat($row, "created_at", true);
+                'formatter' => function ($row, $tempExt) {
+                    $html = $tempExt->tableDateFormat($row, "created_at", true);
                     $html .= '<br/><small>' . $row['firstname'] . '</small>';
                     return $html;
                 }
@@ -112,11 +115,11 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        //$html .= "$twig->getUserById($row[$row_name]);"
-                        $html .= $twigExt->tableDateFormat($row, "modified_at", true);
+                        //$html .= "$tempExt->getUserById($row[$row_name]);"
+                        $html .= $tempExt->tableDateFormat($row, "modified_at", true);
                         $html .= '<div><small>By Admin</small></div>';
                     } else {
                         $html .= '<small>Never!</small>';
@@ -140,7 +143,7 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     return '<span class="ion-location ion-24" uk-tooltip="' . $row["remote_addr"] . '"></span>';
                 }
             ],
@@ -151,24 +154,24 @@ class UserColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
                             'more' => [
                                 'icon' => 'ion-more',
-                                'callback' => function ($row, $twigExt) {
-                                    return $twigExt->getDropdown(
-                                        $this->itemsDropdown($row),
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
                                         $this->getDropdownStatus($row),
                                         $row,
-                                        'user'
+                                        $this->controller
                                     );
                                 }
                             ],
                         ],
                         $row,
-                        $twigExt,
-                        'user',
+                        $tempExt,
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['firstname']}</strong> account."
@@ -180,28 +183,13 @@ class UserColumn extends AbstractDatatableColumn
     }
 
     /**
-     * @param array $row
-     * @return string
-     */
-    private function getDropdownStatus(array $row): string
-    {
-        $stat = '';
-        if ($row['status'] === 'pending') {
-            $stat = 'Not Activated';
-        } elseif ($row['status'] === 'active') {
-            $stat = 'account active';
-        }
-
-        return $stat;
-    }
-
-    /**
      * Undocumented function
      *
      * @param array $row
+     * @param string $controller
      * @return array
      */
-    private function itemsDropdown(array $row): array
+    private function itemsDropdown(array $row, string $controller): array
     {
         $items = [
             'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
@@ -213,71 +201,12 @@ class UserColumn extends AbstractDatatableColumn
             'trash' => ['name' => 'trash account', 'icon' => 'trash-bin-outline']
         ];
         return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $key)], $value),
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
             array_keys($items),
             $items
         );
     }
 
-    /**
-     * Return the generated path for the the current routes array defined
-     *
-     * @param array $row
-     * @param string|null $path
-     * @return string
-     */
-    private function adminPath(array $row, ?string $path = null): string
-    {
-        if ($path !== null) {
-            return "/admin/user/{$row['id']}/{$path}";
-        } else {
-            return "/admin/user/index";
-        }
-    }
 
-    /**
-     * @param array $row
-     */
-    private function getRole(array $row)
-    {}
-
-    /**
-     * Return icon representation of the various column status
-     *
-     * @param object $controller
-     * @param array $row
-     * @return string
-     * @throws Exception
-     */
-    public function displayStatus(object $controller, array $row): string
-    {
-        return $this->getStatusValues($controller, callback: function ($key, $value) use ($row) {
-            if (!in_array($row[$key], $value)) {
-                throw new Exception($row[$key] . ' is not a value specified within your model.');
-            }
-            $colors = ['warning', 'success', 'danger', 'secondary', ''];
-            $count = 0;
-            foreach ($value as $k => $val) {
-                $ret = '';
-                switch ($row[$key]) {
-                    case $val:
-                        $icon = '';
-                        $icon = match ($val) {
-                            'pending' => 'alert-circle-outline',
-                            'active' => 'checkmark-outline',
-                            'trash' => 'trash-outline',
-                            'lock' => 'lock-closed-outline',
-                            '' => 'help-outline'
-                        };
-                        $ret = '<span class="uk-text-' . $colors[$k] . '" uk-tooltip="' . Stringify::capitalize($val) . '"><ion-icon name="' . $icon . '"></ion-icon></span>';
-                        $count++;
-
-                        return $ret;
-
-                        break;
-                }
-            }
-        });
-    }
 
 }

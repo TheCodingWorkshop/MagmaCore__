@@ -1,4 +1,5 @@
 err_unchange: No changes
+err_account_not_active: Your account was found. But is not activated.
 err_field_require: One or more empty fields detected.
 err_password_require: Please enter your password.
 err_invalid_credentials: Unmatched credentials. Please try again.

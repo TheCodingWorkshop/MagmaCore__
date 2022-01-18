@@ -12,18 +12,28 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Role;
 
+use MagmaCore\Datatable\DataColumnTrait;
 use MagmaCore\Datatable\AbstractDatatableColumn;
-use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
+use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 
 class RoleColumn extends AbstractDatatableColumn
 {
 
-    private TemporaryRoleModel $tempRole;
+    use DataColumnTrait;
 
-    public function __construct()
+
+    private TemporaryRoleModel $tempRole;
+    private RolePermissionModel $rolePermModel;
+    private string $controller = 'role';
+
+    /**
+     * @param RolePermissionModel $rolePermModel
+     */
+    public function __construct(RolePermissionModel $rolePermModel)
     {
         $this->tempRole = new TemporaryRoleModel();
+        $this->rolePermModel = $rolePermModel;
     }
 
     /**
@@ -63,7 +73,7 @@ class RoleColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => true,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<div>';
@@ -102,8 +112,8 @@ class RoleColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    $html = $twigExt->tableDateFormat($row, "created_at");
+                'formatter' => function ($row, $tempExt) {
+                    $html = $tempExt->tableDateFormat($row, "created_at");
                     $html .= '<div><small>By Admin</small></div>';
                     return $html;
                 }
@@ -115,10 +125,10 @@ class RoleColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        $html .= $twigExt->tableDateFormat($row, "modified_at");
+                        $html .= $tempExt->tableDateFormat($row, "modified_at");
                         $html .= '<div><small>By Admin</small></div>';
                     } else {
                         $html .= '<small>Never!</small>';
@@ -133,16 +143,25 @@ class RoleColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
-                            'has_permission' => $this->hasPermission($row),
-                            'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
-                            'trash' => ['tooltip' => 'Trash', 'icon' => 'ion-ios-trash']
+                            'more' => [
+                                'icon' => 'ion-more',
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
+                                        '',
+                                        $row,
+                                        $this->controller
+                                    );
+                                }
+                            ],
+                   
                         ],
                         $row,
-                        $twigExt,
-                        'role',
+                        $tempExt,
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['role_name']}</strong> role."
@@ -154,21 +173,42 @@ class RoleColumn extends AbstractDatatableColumn
     }
 
     /**
-     * Undocumented function
+     * Returns the action links for the roles table action tabs
+     *
+     * @param array $row
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'has_permission' => $this->hasPermission($row),
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'delete' => ['name' => 'trash role', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
+
+    /**
+     * Custom conditional links for table action tabs
      *
      * @param array $row
      * @return array
      */
     private function hasPermission(array $row): array
     {
-        $rolePerm = (new RolePermissionModel())
-            ->getRepo()
-            ->findOneBy(['role_id' => $row['id']]);
+        $rolePerm = $this->rolePermModel->getRepo()->findOneBy(['role_id' => $row['id']]);
         if ($rolePerm != null) {
-            $array = ['icon' => 'ion-locked', 'tooltip' => 'Role Lock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-success'];
+            $array = ['name' => 'Assigned', 'icon' => 'lock-closed-outline', 'tooltip' => 'Role Lock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-success'];
         } else {
-            $array = ['icon' => 'ion-unlocked', 'tooltip' => 'Role Unlock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-warning'];
+            $array = ['name' => 'Unassigned', 'icon' => 'lock-open-outline', 'tooltip' => 'Role Unlock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-warning'];
         }
         return $array;
     }
+
+
 }

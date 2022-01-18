@@ -61,7 +61,7 @@ class SimpleUpdateAction implements DomainActionLogicInterface
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
                 $entityCollection = $controller->userRole
                     ->getEntity()
-                    ->wash($formData)
+                    ->wash($formBuilder->getData())
                     ->rinse()
                     ->dry();
                 $data = $entityCollection->all();

@@ -14,7 +14,6 @@ namespace MagmaCore\Ash\Components\Uikit;
 
 use Exception;
 use MagmaCore\Auth\Roles\PrivilegedUser;
-use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\DataObjectLayer\DataLayerClientFacade;
 
@@ -62,10 +61,14 @@ class UikitNavigationExtension
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {
                 $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav>';
-                $element .= '<li class="uk-nav-header">Actions</li>';
+                $element .= '<li class="uk-nav-header">Manage
+                </li>';
                 $element .= '<hr>';
                 foreach ($data as $key => $item) {
-
+                    
+                    if ($controller->thisRouteController() === $item['menu_name']) {
+                        $controller->getSession()->set('commander_icon', $item['menu_icon']);
+                    }
                     $childQuery = 'SELECT * FROM menu_item WHERE item_original_id = ' . $item['id'];
                     $children = $this->repo->getClientCrud()->rawQuery($childQuery, [], 'fetch_all');
 
@@ -73,7 +76,9 @@ class UikitNavigationExtension
                         $isParent = (isset($children) && count($children) > 0);
                         $active = ($routeController === $item['menu_name'] && $routeController !=='dashboard') ? 'uk-open' : '';
                         $element .= '<li class="' . ($isParent ? 'uk-parent' . $active : '') . '">';
+                        
                         $element .= '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
+                        //$element .=  '<span style="margin-bottom: 15px;" class="uk-margin-small-right"><ion-icon class="ion-24" name="' . $item['menu_icon'] . '"></ion-icon></span>';
                         $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));
                         $element .= '</a>';
                         if ($isParent) {
@@ -97,10 +102,11 @@ class UikitNavigationExtension
                         $element .= '</li>' . PHP_EOL;
                     }
 
-                     if (isset($item['menu_break_point']) && $item['menu_break_point'] !==null){
-                        $element .= '<li class="uk-nav-header">' . $item['menu_break_point'] ?? null . '</li>';
-                        continue;
-                    }
+                    // if (isset($item['menu_break_point'])){
+                    //     $element .= '<li class="uk-nav-header">' . $item['menu_break_point'] . '</li>';
+                    //     $element .= '<hr>';
+                    //     continue;
+                    // }
                 }
 
                 $element .= '</ul>';

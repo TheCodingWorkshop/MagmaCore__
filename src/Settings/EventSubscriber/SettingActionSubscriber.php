@@ -15,7 +15,6 @@ namespace MagmaCore\Settings\EventSubscriber;
 use MagmaCore\Settings\Event\SettingActionEvent;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use JetBrains\PhpStorm\ArrayShape;
 use Exception;
 
 /**
@@ -37,7 +36,7 @@ class SettingActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    #[ArrayShape([SettingActionEvent::NAME => "array[]"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             SettingActionEvent::NAME => [

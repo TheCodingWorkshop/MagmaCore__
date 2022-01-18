@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace MagmaCore\UserManager\Rbac\EventSubscriber;
 
 use MagmaCore\UserManager\Rbac\Event\RolePermissionAssignedActionEvent;
-use JetBrains\PhpStorm\ArrayShape;
-use JetBrains\PhpStorm\NoReturn;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
@@ -50,7 +48,7 @@ class RolePermissionAssignedActionSubscriber implements EventSubscriberInterface
      * @return array
      */
 
-    #[ArrayShape([RolePermissionAssignedActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             RolePermissionAssignedActionEvent::NAME => [
@@ -79,7 +77,7 @@ class RolePermissionAssignedActionSubscriber implements EventSubscriberInterface
         $this->flashingEvent($event);
     }
 
-    #[NoReturn] public function assignedRolePermission(RolePermissionAssignedActionEvent $event)
+    public function assignedRolePermission(RolePermissionAssignedActionEvent $event)
     {
         /* ensure permission isn't already assigned before assigned to avoid duplicate entry error */
         $context = $this->flattenContext($event->getContext());

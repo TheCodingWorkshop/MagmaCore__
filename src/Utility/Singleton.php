@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Utility;
 
-abstract class Singleton
+class Singleton
 {
 
     /**
@@ -29,7 +29,7 @@ abstract class Singleton
     /**
      * @throws \Exception
      */
-    protected final function __wakeup()
+    public final function __wakeup()
     { 
         throw new \Exception("Cannot unserialize a singleton.");
     }
@@ -52,6 +52,5 @@ abstract class Singleton
         return self::$instance[$subClass];
     }
 
-    abstract public function initialize() : Object;
  
 }

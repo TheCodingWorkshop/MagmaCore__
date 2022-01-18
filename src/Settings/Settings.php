@@ -75,6 +75,8 @@ class Settings
         $set = $this->model->getRepo()->getEm()->getCrud()->update(['setting_value' => $value, 'setting_name' => $name], 'setting_name');
         if ($set)
             return true;
+
+        return false;
     }
 
     /**

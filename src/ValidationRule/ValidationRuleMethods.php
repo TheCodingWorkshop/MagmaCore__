@@ -14,6 +14,8 @@ namespace MagmaCore\ValidationRule;
 
 class ValidationRuleMethods
 {
+
+    protected array $errors = [];
     /**
      * Main constructor class
      *
@@ -26,21 +28,25 @@ class ValidationRuleMethods
     /**
      * Dispatch the validation error
      *
-     * @param array $msg
+     * @param string $msg
      * @param object $controller
      * @param object $validationClass
      * @return void
      */
-    public function getError(array $msg, object $controller, object $validationClass): void
+    public function getError(string $msg, object $controller, object $validationClass)
     {
-        if ($controller->error) {
-            $controller
-                ->error
-                ->addError($msg, $controller)
-                ->dispatchError(
-                    ($validationClass->validationRedirect() !== '') ? $validationClass->validationRedirect() :
-                        $controller->onSelf()
-                );
-        }
+        $controller->flashMessage($msg, $controller->flashWarning());
+        $controller->redirect($controller->onSelf());
+
+        // if (isset($controller->error)) {
+        //     $controller
+        //         ->error
+        //         ->addError($this->errors, $controller)
+        //         ->dispatchError(
+        //             ($validationClass->validationRedirect() !== '') ? $validationClass->validationRedirect() :
+        //                 $controller->onSelf()
+        //         );
+
+        // }
     }
 }

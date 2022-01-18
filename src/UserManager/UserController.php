@@ -11,37 +11,32 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager;
 
-use App\Forms\Admin\User\SettingsForm;
-use App\Forms\Admin\User\BulkDeleteForm;
-use MagmaCore\UserManager\Event\UserActionEvent;
-use MagmaCore\UserManager\Event\UserRoleActionEvent;
-use MagmaCore\UserManager\Forms\Admin\UserForm;
-use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
-use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
-use MagmaCore\UserManager\Model\UserMetaDataModel;
+//use App\Forms\Admin\User\SettingsForm;
+use Exception;
+use MagmaCore\Base\Access;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\Base\Events\BulkActionEvent;
+use MagmaCore\UserManager\UserRelationship;
+use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\UserManager\Model\UserLogModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
-use MagmaCore\UserManager\Model\UserPreferenceModel;
-use MagmaCore\UserManager\Entity\UserRoleEntity;
-use MagmaCore\UserManager\Schema\UserLogSchema;
-use MagmaCore\UserManager\Repository\UserRoleRepository;
-use MagmaCore\UserManager\DataColumn\UserLogColumn;
-use MagmaCore\UserManager\UserRelationship;
-use MagmaCore\UserManager\Rbac\Entity\TemporaryRoleEntity;
-use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\UserManager\Forms\Admin\UserForm;
+use MagmaCore\UserManager\Schema\UserLogSchema;
+use MagmaCore\UserManager\Entity\UserRoleEntity;
+use MagmaCore\UserManager\Event\UserActionEvent;
+use MagmaCore\UserManager\Model\UserMetaDataModel;
+use MagmaCore\UserManager\DataColumn\UserLogColumn;
+use MagmaCore\UserManager\Event\UserRoleActionEvent;
+use MagmaCore\UserManager\Model\UserPreferenceModel;
+use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
+use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
-use MagmaCore\Base\BaseProtectedRoutes;
+use MagmaCore\UserManager\Repository\UserRoleRepository;
+use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\DataObjectLayer\DataLayerTrait;
-use MagmaCore\Utility\Yaml;
-use MagmaCore\Base\Access;
-use MagmaCore\Base\Events\BulkActionEvent;
+use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 
-use JetBrains\PhpStorm\NoReturn;
-use Exception;
-
-#[BaseProtectedRoutes]
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
@@ -58,7 +53,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      * @return void
      * @throws BaseInvalidArgumentException
      */
-    #[NoReturn] public function __construct(array $routeParams)
+    public function __construct(array $routeParams)
     {
         parent::__construct($routeParams);
         /**
@@ -79,7 +74,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userPrivilege' => UserPrivilegeForm::class,
                 'userPreferenceRepo' => UserPreferenceModel::class,
                 'userPreferencesForm' => UserPreferencesForm::class,
-                'formSettings' => SettingsForm::class,
+                //'formSettings' => SettingsForm::class,
                 'userRole' => UserRoleModel::class,
                 'userRoleRepo' => UserRoleRepository::class,
                 'tempRole' => TemporaryRoleModel::class,
@@ -223,7 +218,8 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function editAction()
     {
         $this->editAction
-            ->setAccess($this, Access::CAN_EDIT)
+            //->setAccess($this, Access::CAN_EDIT)
+            ->setOwnerAccess($this)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], ['user_id' => $this->thisRouteID()])
             ->render()
             ->with(['user' => $this->toArray($this->findOr404())])
@@ -279,11 +275,11 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 $id = $this->repository->getSchemaID();
                 $this->showBulkAction
                     ->setAccess($this, Access::CAN_BULK_DELETE_USER)
-                    ->execute($this, NULL, NULL, NULL, __METHOD__)
+                    ->execute($this, NULL, BulkActionEvent::class, NULL, __METHOD__)
                     ->render()
                     ->with(
                         [
-                            'selected' => $this->formBuilder->getData()[$id],
+                            'selected' => $this->formBuilder->getData()[$id] ?? $_POST[$id],
                             'action' => $action
                         ]
                     )
@@ -457,6 +453,20 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->render()
             ->with([])
             ->table()
+            ->end();
+    }
+
+    protected function personalAction()
+    {
+        $this->showAction
+            ->setAccess($this, Access::CAN_SHOW)
+            ->execute($this, NULL, NULL, NULL, __METHOD__)
+            ->render()
+            ->with(
+                [
+                ]
+            )
+            ->singular()
             ->end();
     }
 

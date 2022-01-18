@@ -106,6 +106,26 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     }
 
     /**
+     * Return true if the user account is activated. ie. status is set to active
+     * returns false otherwise.
+     *
+     * @param string $email
+     * @return boolean
+     */
+    public function accountActive(string $email): bool
+    {
+        if (!empty($email)) {
+            $result = $this->getRepo()->findObjectBy(['email' => $email], ['status']);
+            if ($result) {
+                if ($result->status === 'active') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Validate the new user password. Using the validate user object
      * Once the password is validated it will then be hash using the
      * passing hash from our traits services
@@ -144,6 +164,26 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     public function role(): object
     {
         return $this->getRelationship(RoleRelationship::class);
+    }
+
+    /**
+     * Return the user object based on the passed parameter
+     *
+     * @param integer $userID
+     * @return object|null
+     */
+    public function getUser(int $userID): ?object
+    {
+        if (empty($userID) || $userID === 0) {
+            throw new BaseInvalidArgumentException('Please add a valid user id');
+        }
+
+        $user = $this->getRepo()->findObjectBy(['id' => $userID]);
+        if ($user) {
+            return $user;
+        }
+
+        return null;
     }
 
 }

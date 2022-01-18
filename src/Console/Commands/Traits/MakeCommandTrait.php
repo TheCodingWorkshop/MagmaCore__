@@ -213,8 +213,8 @@ trait MakeCommandTrait
 
     private function resolveMigrationFromOptions(mixed $options)
     {
-        var_dump($options);
-        die;
+//        var_dump($options);
+//        die;
     }
 
 }

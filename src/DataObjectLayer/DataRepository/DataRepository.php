@@ -81,7 +81,7 @@ class DataRepository implements DataRepositoryInterface
     private function isEmpty(int $id): void
     {
         if (empty($id))
-            throw new DataLayerInvalidArgumentException('Argument should not be empty');
+            throw new DataLayerInvalidArgumentException(__METHOD__ . ' method $id argument is empty or invalid. Please address this issue in your code which is calling this method.');
     }
 
     /**
@@ -374,9 +374,10 @@ class DataRepository implements DataRepositoryInterface
      */
     public function findAndReturn(int $id, array $selectors = []): self
     {
-        if (empty($id) || $id === 0) {
-            throw new DataLayerInvalidArgumentException('Please add a valid argument');
-        }
+        // if (empty($id) || $id === 0) {
+        //     throw new DataLayerInvalidArgumentException(__METHOD__ . ' method $id argument is empty or invalid. Please address this issue in your code which is calling this method.');
+        // }
+        $this->isEmpty($id);
         try {
             $this->findAndReturn = $this->findObjectBy(['id' => $id], $selectors);
             return $this;
@@ -394,8 +395,8 @@ class DataRepository implements DataRepositoryInterface
             return $this->findAndReturn;
         } else {
             header('HTTP/1.1 404 not found');
-            // $twig = new \Magma\Base\BaseView();
-            //$twig->twigRender('error/404.html.twig');
+            // $template = new \MagmaCore\Base\BaseView();
+            // $template->errorTemplateRender('error/404.html.twig');
             exit;
         }
     }
@@ -418,6 +419,18 @@ class DataRepository implements DataRepositoryInterface
     public function fetchLastID(): int
     {
         return $this->em->getCrud()->lastID();
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param integer $quantity
+     * @param string $orderBy
+     * @return void
+     */
+    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id')
+    {
+        
     }
 
 }

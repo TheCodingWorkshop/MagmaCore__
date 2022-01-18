@@ -26,7 +26,7 @@ use MagmaCore\DataObjectLayer\DataRelationship\DataRelationalInterface;
 use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
 use Throwable;
 
-class BaseModel
+class BaseModel extends BaseModelRelationship
 {
     use ModelCastingTrait;
 
@@ -59,11 +59,8 @@ class BaseModel
      * @param string $tableSchemaID
      * @param string|null $entity
      */
-    public function __construct(
-        string $tableSchema = null,
-        string $tableSchemaID = null,
-        string $entity = null
-    ) {
+    public function __construct(string $tableSchema = null,string $tableSchemaID = null,string $entity = null) 
+    {
         $this->throwException($tableSchema, $tableSchemaID);
         if ($entity !== null) {
             $this->entity  = BaseApplication::diGet($entity);
@@ -75,6 +72,8 @@ class BaseModel
         $this->tableSchemaID = $tableSchemaID;
         $this->casting(self::ALLOWED_CASTING_TYPES);
         $this->createRepository($this->tableSchema, $this->tableSchemaID);
+
+        parent::__construct($this);
     }
 
     /**
@@ -108,9 +107,9 @@ class BaseModel
 
     /**
      * Returns the current repository
-     * @return Object
+     * @return object
      */
-    public function getRepo()
+    public function getRepo(): object
     {
         return $this->repository;
     }
@@ -203,35 +202,6 @@ class BaseModel
     }
 
     /**
-     * Build relationships between tables
-     *
-     * @param string $relationshipType
-     * @return object
-     */
-    public function setRelationship(string $relationshipType): object
-    {
-        $relationship = BaseApplication::diGet($relationshipType);
-        if (!$relationship instanceof DataRelationalInterface) {
-            throw new DataRelationshipInvalidArgumentException('');
-        }
-        return $relationship;
-    }
-
-    /**
-     * Returns the associated relationship objects
-     * @param string $relationships
-     * @return object
-     */
-    public function getRelationship(string $relationships): object
-    {
-        $relationshipObject = BaseApplication::diGet($relationships);
-        if (!$relationshipObject instanceof BaseRelationshipInterface) {
-            throw new BaseInvalidArgumentException('');
-        }
-        return $relationshipObject->united();
-    }
-
-    /**
      * Create method which initialize the schema object and return its result
      * within the set class property.
      *
@@ -271,7 +241,7 @@ class BaseModel
      * @param string $model
      * @return array
      */
-    public function getFillables(string $model): array
+    public function getFillables(?string $model = null): array
     {
         if (!$this->fillable) {
             throw new BaseInvalidArgumentException('No fillable array set for your entity class ' . $model);
@@ -358,12 +328,31 @@ class BaseModel
      *
      * @return array
      */
-    public function getClonableKeys(): array
+    public function getClonableKeys(): ?array
     {
         if (is_array($this->cloneableKeys) && count($this->cloneableKeys) > 0) {
             return $this->cloneableKeys;
         }
+        return null;
     }
+
+    /**
+     * Get the value of a column[name] for the current queried ID. The name of the column must
+     * be specified within the second argument.
+     * 
+     * @param int $id
+     * @param string $field
+     * @return mixed
+     */
+    public function getSelectedNameField(int $id, string $field = null, ?string $model = null): mixed
+    {
+        $name = $this->getRepo()->findObjectBy(['id' => $id], [$field]);
+        if ($field === null) {
+            throw new BaseInvalidArgumentException('Your second argument is null. This needs to represent a column name for the matching repository.');
+        }
+        return $name->$field;
+    }
+
 
 
 

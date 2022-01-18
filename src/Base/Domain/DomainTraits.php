@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use Closure;
 use Exception;
-use MagmaCore\Base\Exception\BaseException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
@@ -22,7 +20,7 @@ use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
-use MagmaCore\Auth\Authorized;
+use MagmaCore\Base\Access;
 
 trait DomainTraits
 {
@@ -319,6 +317,16 @@ trait DomainTraits
         $this->controller->view($this->fileToRender, $context);
     }
 
+    public function endWithApiEndpoint()
+    {
+        $this->isRestFul = true;
+        $context = (isset($this->superContext) && count($this->superContext) > 0) ? $this->superContext : $this->context;
+        if (is_bool($this->domainAction) && $this->domainAction === true) {
+            echo $this->controller->apiResponse->response(['data' => $context]);
+        }
+
+    }
+
     public function endAfterExecution(): string
     {
         return '';
@@ -503,13 +511,30 @@ trait DomainTraits
     public function setAccess(object $controller, string $permission): self
     {
         $privilege = PrivilegedUser::getUser();
-        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())) {
+        $this->privilege = $privilege;
+        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())){
             $controller->flashMessage('Access Denied!', $controller->flashWarning());
             $controller->redirect('/admin/accessDenied/index');
         }
         return $this;
     }
 
+    public function setOwnerAccess(object $controller)
+    {
+        $privilege = PrivilegedUser::getUser();
+        $userSessionID = (int)$controller->getSession()->get('user_id');
+        if ($userSessionID === 1) {
+            $routeID = (int)$controller->thisRouteID() !==null ? $controller->thisRouteID() : null;
+            if ($userSessionID === $routeID && $privilege->hasPrivilege(ACCESS::CAN_EDIT_OWN_ACCOUNT)) {
+                return $this;
+            } else {
+                /* Might not be doing anything */
+                $this->setAccess($controller, ACCESS::CAN_EDIT_OWN_ACCOUNT);
+            }
+    
+        }
+        return $this;
+    }
     
     /**
      * @param object $controller

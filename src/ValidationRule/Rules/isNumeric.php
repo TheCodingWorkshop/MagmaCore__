@@ -22,7 +22,7 @@ class isNumeric extends ValidationRuleMethods
     {
         if (isset($validationClass->key)) {
             if (!is_numeric($validationClass->value)) {
-                $this->getError(Error::display('err_invalid_numeric'), $controller, $validationClass);
+                $this->getError(array_values(Error::display('err_invalid_numeric'))[0], $controller, $validationClass);
             }
         }
     }

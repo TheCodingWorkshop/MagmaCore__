@@ -28,6 +28,12 @@ class RoleModel extends AbstractBaseModel
     protected const TABLESCHEMAID = 'id';
      /**/
     public const COLUMN_STATUS = [];
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [
+        'role_name',
+        'role_description',
+        'created_byid',
+    ];
 
     /**
      * Main constructor class which passes the relevant information to the
@@ -74,8 +80,7 @@ class RoleModel extends AbstractBaseModel
      */
     public function getNameForSelectField($id): mixed
     {
-        $name = $this->getRepo()->findObjectBy(['id' => $id], ['role_name']);
-        return $name->role_name;
+        return $this->getSelectedNameField($id, 'role_name');
     }
 
     public function user()

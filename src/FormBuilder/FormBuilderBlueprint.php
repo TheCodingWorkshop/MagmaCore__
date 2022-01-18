@@ -12,13 +12,14 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
-use MagmaCore\FormBuilder\Type\NumberType;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
 use MagmaCore\FormBuilder\Type\HiddenType;
+use MagmaCore\FormBuilder\Type\NumberType;
 use MagmaCore\FormBuilder\Type\SelectType;
 use MagmaCore\FormBuilder\Type\SubmitType;
+use MagmaCore\FormBuilder\Type\UploadType;
 use MagmaCore\FormBuilder\Type\CheckboxType;
 use MagmaCore\FormBuilder\Type\PasswordType;
 use MagmaCore\FormBuilder\Type\TextareaType;
@@ -55,6 +56,22 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
 
         ];
     }
+
+    private function subArg(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        string $onclick = null
+    ): array {
+        return [
+            'name' => $name,
+            'class' => $class,
+            'value' => ($value !== null) ? $value : '',
+            'onclick' => $onclick
+
+        ];
+    }
+
 
     public function text(
         string $name,
@@ -226,21 +243,29 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
         ];
     }
 
-
-
-    public function submit(
-        string $name,
-        array $class = [],
-        mixed $value = null
-    ): array {
+    public function upload(string $name, array $class = [], ?string $value = null, bool $multiple = true)
+    {
         return [
-            SubmitType::class => [
-                $this->arg($name, $class, $value)
+            UploadType::class => [
+                ['name' => $name, 'class' => $class, 'value' => $value, 'multiple' => $multiple]
             ]
         ];
     }
 
-    public function choices(array $choices, mixed $default = null, object $form = null): array
+    public function submit(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        ?string $onclick = null
+    ): array {
+        return [
+            SubmitType::class => [
+                $this->subArg($name, $class, $value, $onclick)
+            ]
+        ];
+    }
+
+    public function choices(array $choices, string|int|array $default = null, object $form = null): array
     {
         return [
             'choices' => $choices,

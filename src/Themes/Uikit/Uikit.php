@@ -26,7 +26,8 @@ class Uikit implements ThemeBuilderInterface
                 'uk-table-hover',
                 'uk-table-striped',
                 'uk-table-responsive',
-                'uk-table-condensed'
+                'uk-table-condensed',
+                'uk-table-small'
             ],
             'table_reset_link' => 'uk-link-reset',
             'paging' => [

@@ -14,7 +14,6 @@ namespace MagmaCore\UserManager\PasswordRecovery;
 
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\Auth\Contracts\UserPasswordRecoveryInterface;
-use MagmaCore\Base\BaseView;
 use MagmaCore\Mailer\Exception\MailerException;
 use MagmaCore\Mailer\MailerFacade;
 use MagmaCore\Utility\HashGenerator;

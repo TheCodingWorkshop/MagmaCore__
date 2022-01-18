@@ -22,7 +22,7 @@ class isArray extends ValidationRuleMethods
     {
         if (isset($validationClass->key)) {
             if (!is_array($validationClass->value)) {
-                $this->getError(Error::display('err_invalid_array'), $controller, $validationClass);
+                $this->getError(array_values(Error::display('err_invalid_array'))[0], $controller, $validationClass);
             }
         }
     }

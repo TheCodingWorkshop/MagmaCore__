@@ -12,10 +12,10 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
-use App\Event\ControllerSettingsActionEvent;
-use App\Forms\Admin\Controller\ControllerSettingsForm;
-use App\Model\ControllerSettingsModel;
-
+use MagmaCore\Administrator\ControllerSettingsForm;
+use MagmaCore\Administrator\ControllerSettingsModel;
+use MagmaCore\Administrator\ControllerSettingsEntity;
+use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Middleware\Before\LoginRequired;
@@ -45,7 +45,7 @@ use MagmaCore\RestFul\RestHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Settings\Entity\ControllerSettingEntity;
 use MagmaCore\Settings\Event\ControllerSettingActionEvent;
-use JetBrains\PhpStorm\ArrayShape;
+use MagmaCore\Administrator\Middleware\Before\IntegrityConstraints;
 
 class AdminController extends BaseController
 {
@@ -93,6 +93,8 @@ class AdminController extends BaseController
                 'settingsAction' => SettingsAction::class,
                 'apiResponse' => RestHandler::class,
                 'changeRowsAction' => ChangeRowsAction::class,
+                'controllerSettingsForm' => ControllerSettingsForm::class,
+                'controllerRepository' => ControllerSettingsModel::class
             ]
         );
 
@@ -107,13 +109,14 @@ class AdminController extends BaseController
      *
      * @return array
      */
-    #[ArrayShape(['LoginRequired' => "string", 'AdminAuthentication' => "string", 'AuthorizedIsNull' => "string", 'SessionExpires' => "string"])] protected function callBeforeMiddlewares(): array
+    protected function callBeforeMiddlewares(): array
     {
         return [
             'LoginRequired' => LoginRequired::class,
             'AdminAuthentication' => AdminAuthentication::class,
             'AuthorizedIsNull' => AuthorizedIsNull::class,
             'SessionExpires' => SessionExpires::class,
+            //'IntegrityConstraints' => IntegrityConstraints::class
         ];
     }
 
@@ -182,5 +185,16 @@ class AdminController extends BaseController
             ->endAfterExecution();
     }
 
+    protected function settingsAction()
+    {
+        $this->editAction
+            ->execute(
+                $this, 
+                ControllerSettingsEntity::class, 
+                ControllerSettingsActionEvent::class, 
+                NULL, 
+                __METHOD__
+            );
+    }
 
 }

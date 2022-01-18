@@ -20,7 +20,6 @@ use MagmaCore\FormBuilder\FormBuilderBlueprint;
 use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
-use MagmaCore\Utility\Utilities;
 
 class RoleAssignedForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {

@@ -58,7 +58,7 @@ class MenuValidate extends AbstractDataRepositoryValidation
     public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null): array
     {
         $this->validate($entityCollection, $dataRepository);
-        $dataCollection = $this->mergeWithFields($entityCollection->all());
+        $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         $newCleanData = [];
         if (null !== $dataCollection) {
             $newCleanData = [
@@ -66,6 +66,7 @@ class MenuValidate extends AbstractDataRepositoryValidation
                 'menu_description' => $this->isSet('menu_description', $dataCollection, $dataRepository),
                 'parent_menu' => $this->isSet('parent_menu', $dataCollection, $dataRepository),
                 'menu_break_point' => $this->isSet('menu_break_point', $dataCollection, $dataRepository),
+                'menu_icon' => $this->isSet('menu_icon', $dataCollection, $dataRepository),
                 'menu_order' => $this->isSet('menu_order', $dataCollection, $dataRepository),
                 'created_byid' => $this->getCreator($dataCollection)
             ];
@@ -131,8 +132,8 @@ class MenuValidate extends AbstractDataRepositoryValidation
     {
         if ($dataRepository !== null) {
             if (
-                $entityCollection['role_name'] === $dataRepository->role_name &&
-                $entityCollection['role_description'] === $dataRepository->role_description
+                $entityCollection['menu_name'] === $dataRepository->role_name &&
+                $entityCollection['menu_description'] === $dataRepository->role_description
             ) {
                 if ($controller = $this->rules->getController()) {
                     if ($controller->error) {

@@ -76,6 +76,22 @@ class MenuForm extends ClientFormBuilder implements ClientFormBuilderInterface
 
             ->add($this->blueprint->text('menu_break_point', ['uk-input'], $this->hasValue('menu_break_point'), false))
 
+            ->add($this->blueprint->text(
+                'menu_icon', 
+                ['uk-form-1-2', 'uk-input'], 
+                $this->hasValue('menu_icon'), false
+            ),
+            null,
+            $this->blueprint->settings(
+                false, 
+                null, 
+                true, 
+                '', 
+                false, 
+                null, 
+                '<a class="uk-text-link" target="_blank" href="https://ionic.io/ionicons">Get more icons</a>')
+            )
+
             ->add($this->blueprint->textarea('menu_description', ['uk-textarea'], 'menu_description'), $this->hasValue('menu_description'))
 
             ->add($this->blueprint->select(

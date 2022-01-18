@@ -56,12 +56,16 @@ class Console implements ConsoleInterface
 
     private function getCommandsValue()
     {
+        // $commandName = $commandClass = '';
+        // (is_string($commandName) ? $commandName : throw new BaseInvalidArgumentException("Invalid {$commandName}. This should be a string"));
+        // (class_exists($commandClass) ? $commandName : throw new BaseLogicException("{$commandClass} is missing from the commander directory."));
+
         foreach ($this->getCommands() as $name => $command) {
             if (isset($name)) {
                 $commandName = $command['name'] ?? null;
                 $commandClass = $command['class'] ?? null;
-                (is_string($commandName) ?: throw new BaseInvalidArgumentException("Invalid {$commandName}. This should be a string"));
-                (class_exists($commandClass) ?: throw new BaseLogicException("{$commandClass} is missing from the commander directory."));
+                (is_string($commandName) ? $commandName : throw new BaseInvalidArgumentException("Invalid {$commandName}. This should be a string"));
+                (class_exists($commandClass) ? $commandClass : throw new BaseLogicException("{$commandClass} is missing from the commander directory."));
                 return [
                     $commandName,
                     $commandClass,

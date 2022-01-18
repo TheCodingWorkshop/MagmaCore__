@@ -8,7 +8,7 @@ interface DomainActionLogicInterface
 {
 
     /**
-     * Undocumented function
+     * Logic execution 
      *
      * @param Object $controller
      * @param string|null $entityObject

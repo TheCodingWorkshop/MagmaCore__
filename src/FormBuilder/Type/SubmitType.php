@@ -45,6 +45,7 @@ class SubmitType extends InputType implements FormExtensionTypeInterface
         $this->defaults = [
             'type' => $this->type,
             'value' => '',
+            'onclick' => "",
             'formaction' => '',
             'formenctype' => '', /* ['application/x-www-form-urlencoded', 'multipart/fom-data', 'text/plain'] */
             'formmethod' => '', /* ['get', 'post'] */

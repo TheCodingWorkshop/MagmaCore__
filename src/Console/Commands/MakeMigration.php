@@ -11,11 +11,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Console\Commands;
 
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Console\ConsoleCommand;
 use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Exception\BaseRuntimeException;
 use MagmaCore\Console\Commands\Traits\MakeMigrationTrait;
-use MagmaCore\Console\ConsoleCommand;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Console\Exception\MakeCommandFileAlreadyExistException;
 
 class MakeMigration extends ConsoleCommand
 {

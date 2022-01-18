@@ -62,9 +62,10 @@ class NewAction implements DomainActionLogicInterface
 
             if ($formBuilder?->csrfValidate()) {
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
+
                 $action = $controller->repository
                     ->getRepo()
-                    ->validateRepository($entityCollection, $entityObject)
+                    ->validateRepository($entityCollection, $entityObject, null, $controller)
                     ->persistAfterValidation();
 
                 if ($action) {

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use Exception;
-use MagmaCore\Ash\TemplateExtension;
 use Throwable;
 use MagmaCore\Error\Error;
 use ParagonIE\AntiCSRF\AntiCSRF;
@@ -21,6 +20,7 @@ use MagmaCore\Session\SessionTrait;
 use MagmaCore\FormBuilder\Traits\FormalizerTrait;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
+use MagmaCore\Http\Request;
 
 class FormBuilder extends AbstractFormBuilder
 {
@@ -36,6 +36,7 @@ class FormBuilder extends AbstractFormBuilder
     protected string $element = '';
     protected Object $error;
     private object|null $dataRepository = null;
+
     /**
      * Main class constructor
      * 
@@ -48,7 +49,18 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
-     * Undocumented function
+     * Returns the request/response object
+     *
+     * @param string $url
+     * @return Request
+     */
+    public function getRequest(): Request
+    {
+        return new Request();
+    }
+
+    /**
+     * Use to customzied the HTML form attributes
      *
      * @param array $args
      * @return FormBuilder
@@ -133,7 +145,7 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
-     * Undocumented function
+     * Build the form HTML element
      *
      * @param Object $objectType
      * @return string
@@ -237,6 +249,8 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Check whether the request can be handled
+     * 
      * @return array
      * @throws Throwable
      */
@@ -263,7 +277,7 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
-    protected function getStream()
+    private function getStream()
     {
         $contentType = isset($_SERVER['CONTENT_TYPE']) && $_SERVER['REQUEST_METHOD'] == 'POST' ? trim($_SERVER['CONTENT_TYPE']) : '';
         if ($contentType === 'application/json') {
@@ -288,6 +302,7 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Get the request method verb as a string
      * @throws Throwable
      */
     public function getMethod(string $method) : string
@@ -299,6 +314,7 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Returns json data
      * @throws Throwable
      */
     public function getJson()
@@ -308,6 +324,7 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Returns form data
      * @throws Throwable
      */
     public function getData() : array
@@ -318,6 +335,7 @@ class FormBuilder extends AbstractFormBuilder
     }
 
     /**
+     * Is the request an ajax request
      * @return boolean
      */
     public function isAjax(): bool

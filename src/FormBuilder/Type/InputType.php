@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder\Type;
 
-use JetBrains\PhpStorm\ArrayShape;
-use JetBrains\PhpStorm\Pure;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\FormBuilder\FormBuilderTrait;
 use MagmaCore\FormBuilder\FormBuilderTypeInterface;
@@ -60,7 +58,7 @@ class InputType implements FormBuilderTypeInterface
      *
      * @return array
      */
-    #[ArrayShape(['type' => "string", 'name' => "string", 'id' => "mixed|string", 'class' => "string[]", 'checked' => "false", 'required' => "false", 'disabled' => "false", 'autofocus' => "false", 'autocomplete' => "false"])] public function getBaseOptions() : array
+    public function getBaseOptions() : array
     {
         return [
             'type' => $this->type, 
@@ -98,7 +96,7 @@ class InputType implements FormBuilderTypeInterface
      */
     private function buildExtensionObject() : void
     {
-        $getExtensionNamespace = 'MagmaCore\FormBuilder\Type\\' . $this->buildExtensionName();
+        $getExtensionNamespace = __NAMESPACE__ . '\\' . $this->buildExtensionName();
         $getExtensionObject = new $getExtensionNamespace($this->fields);
         if (!$getExtensionObject instanceof FormExtensionTypeInterface) {
             throw new FormBuilderInvalidArgumentException($this->buildExtensionName() . ' is not a valid form extension type object.');
@@ -174,7 +172,7 @@ class InputType implements FormBuilderTypeInterface
         return (!empty($this->settings) ? array_merge($defaults, $this->settings) : $defaults);
     }
 
-    #[Pure] public function filtering(): string
+    public function filtering(): string
     {
         return $this->renderHtmlElement($this->attr, $this->options);
     }
@@ -189,6 +187,16 @@ class InputType implements FormBuilderTypeInterface
         switch ($this->getType()) :
             case 'radio' :
                 return sprintf("%s", $this->filtering());
+                break;
+            case 'file' :
+                return sprintf(
+                    '<div class="js-upload" uk-form-custom>
+                    <input type="file" multiple>
+                    <button %s type="button" tabindex="-1">%s</button>
+                </div>', 
+                $this->filtering(),
+                $this->options
+                );
                 break;
             case 'checkbox' :
                 return sprintf("\n<input %s>&nbsp;%s\n", $this->filtering(), ($this->settings['checkbox_label'] !='' ? $this->settings['checkbox_label'] : ''));

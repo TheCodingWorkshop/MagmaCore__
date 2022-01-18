@@ -12,10 +12,11 @@ declare(strict_types=1);
 namespace MagmaCore\Console\Commands;
 
 use http\Env\Request;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Console\ConsoleCommand;
 use MagmaCore\Base\Exception\BaseRuntimeException;
 use MagmaCore\Console\Commands\Traits\MakeCommandTrait;
-use MagmaCore\Console\ConsoleCommand;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Console\Exception\MakeCommandFileAlreadyExistException;
 
 class MakeCommand extends ConsoleCommand
 {

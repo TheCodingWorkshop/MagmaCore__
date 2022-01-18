@@ -227,13 +227,14 @@ class DashboardRepository
     #[ArrayShape(['home' => "string[]", 'session' => "string[]", 'github' => "string[]", 'health' => "string[]", 'activities' => "string[]", 'project' => "string[]", 'notifications' => "string[]"])] public function getNavSwitcher(): array
     {
         return [
-            'home' => ['icon' => 'home-outline', 'include' => 'block_links'],
+            'members' => ['icon' => 'person-outline', 'include' => 'block_links'],
+            'ticket' => ['icon' => 'receipt-outline', 'include' => 'block_ticket'],
             'session' => ['icon' => 'stats-chart-outline', 'include' => 'block_statistics'],
-            'github' => ['icon' => 'logo-github', 'include' => 'block_github'],
+            //'github' => ['icon' => 'logo-github', 'include' => 'block_github'],
             'health' => ['icon' => 'pulse-outline', 'include' => 'block_health_status'],
-            'activities' => ['icon' => 'receipt-outline', 'include' => 'block_activities'],
+            
             'project' => ['icon' => 'git-branch-outline', 'include' => 'block_project'],
-            'notifications' => ['icon' => 'notifications-outline', 'include' => 'block_notifications'],
+            // 'notifications' => ['icon' => 'notifications-outline', 'include' => 'block_notifications'],
         ];
     }
 

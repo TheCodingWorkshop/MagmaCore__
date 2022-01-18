@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-//use App\Entity\UserEntity;
-use MagmaCore\UserManager\UserEntity;
+use App\Entity\UserProfileEntity;
 use MagmaCore\Error\Error;
 
-if (!class_exists(UserEntity::class)) {
+if (!class_exists(UserProfileEntity::class)) {
     die('UserEntity class does not exists within the application');
 }
 
@@ -16,19 +15,34 @@ class DomainLogicRules
 {
 
     /**
+     * Redirect on error
+     *
+     * @param object $controller
+     * @param string $msg
+     * @return void
+     */
+    public function errorRedirect(object $controller, string $msg): void
+    {
+        $controller->flashMessage($msg, $controller->flashWarning());
+        $controller->redirect($controller->onSelf());
+
+    }
+
+    /**
      * Ensure the password is verified before the action is carried out
      *
      * @param string $value
      * @param string $key
-     * @param Object $controller
+     * @param object $controller
      * @return void
      */
     public function passwordRequired(string $value, string $key, Object $controller): void
     {
         if (!$controller->repository->verifyPassword($controller, $controller->findOr404()->id)) {
-            if ($controller->error) {
-                $controller->error->addError(Error::display('err_invalid_credentials'), $controller)->dispatchError();
-            }
+            $this->errorRedirect(
+                $controller, 
+                array_values(Error::display('err_invalid_credentials'))[0]
+            );
         }
     }
 
@@ -44,10 +58,12 @@ class DomainLogicRules
     {
         $this->passwordRequired($value, $key, $controller);
 
-        if (!$controller->repository->isPasswordMatching($controller, new UserEntity($controller->formBuilder->getData()))) {
-            if ($controller->error) {
-                $controller->error->addError(Error::display('err_mismatched_password'), $controller)->dispatchError();
-            }
+        if (!$controller->repository->isPasswordMatching($controller, new UserProfileEntity($controller->formBuilder->getData()))) {
+            $this->errorRedirect(
+                $controller, 
+                array_values(Error::display('err_mismatched_password'))[0]
+            );
+
         }
     }
 }

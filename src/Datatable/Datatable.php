@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Datatable;
 
+use MagmaCore\Ash\Extensions\TemplateExtension;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
 use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
-use MagmaCore\Http\RequestHandler;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 
@@ -24,7 +24,7 @@ class Datatable extends AbstractDatatable
 {
 
     protected string $element = '';
-    protected object $tb;
+    protected ?object $tb = null;
 
     private int|false $currentPage = false;
     private int|false $totalPages = false;
@@ -46,7 +46,7 @@ class Datatable extends AbstractDatatable
      * @param ThemeBuilder $themeBuilder
      * @throws ThemeBuilderInvalidArgumentException
      */
-    public function __construct(ThemeBuilder $themeBuilder)
+    public function __construct(?ThemeBuilder $themeBuilder = null)
     {
         $this->tb = $themeBuilder->create(Uikit::class);
         parent::__construct();
@@ -104,6 +104,9 @@ class Datatable extends AbstractDatatable
         return $this->tableColumn;
     }
 
+    /**
+     * @return string|null
+     */
     public function table(): null|string
     {
         extract($this->attr, EXTR_SKIP);
@@ -122,7 +125,9 @@ class Datatable extends AbstractDatatable
                         if (isset($column['show_column']) && $column['show_column'] != false) {
                             $this->element .= '<td id="toggle-' . $column['db_row'] . '" class="' . ($this->tableColumn == $column['db_row'] ? $this->tdClass : '') . ' ' . $column['class'] . '">';
                             if (is_callable($column['formatter'])) {
-                                $this->element .= call_user_func_array($column['formatter'], [$row, (new TwigExtension())]);
+                                $this->element .= call_user_func_array(
+                                    $column['formatter'],
+                                    [$row, (new TemplateExtension())]);
                             } else {
                                 $this->element .= ($row[$column['db_row']] ?? '');
                             }
@@ -141,6 +146,11 @@ class Datatable extends AbstractDatatable
         return $this->element;
     }
 
+    /**
+     * @param string $status
+     * @param bool $inFoot
+     * @return string
+     */
     protected function tableGridElements(string $status, bool $inFoot = false): string
     {
         $element = sprintf('<%s>', ($inFoot) ? 'tfoot' : 'thead');
@@ -169,7 +179,7 @@ class Datatable extends AbstractDatatable
     {
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
-            $element .= '<a class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
+            $element .= '<a data-turbo="true" class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
 
             $element .= $column['dt_row'];
 
@@ -204,7 +214,7 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage - 1)
             );
         } else {
-            $element .= sprintf('<a href="?page=%s">', ($this->currentPage - 1));
+            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage - 1));
         }
         //$element .= '<span><ion-icon name="caret-back-outline"></ion-icon></span>';
         $element .= '<span><ion-icon name="chevron-back-outline"></ion-icon></span></a>' . PHP_EOL;
@@ -235,7 +245,7 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage + 1)
             );
         } else {
-            $element .= sprintf('<a href="?page=%s">', ($this->currentPage + 1));
+            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage + 1));
         }
         $element .= '<span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>' . PHP_EOL;
         //$element .= '<span><ion-icon name="caret-forward-outline"></ion-icon></span>';

@@ -12,17 +12,14 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
-use MagmaCore\Base\Exception\BaseRuntimeException;
-use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Utility\Yaml;
-use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseApplication;
-use MagmaCore\Base\Exception\BaseException;
+use MagmaCore\Base\Exception\BaseRuntimeException;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\EventDispatcher\ListenerProviderInterface;
 use MagmaCore\Base\Exception\BaseBadFunctionCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Base\Events\BeforeRenderActionEvent;
-use MagmaCore\Base\Events\BeforeControllerActionSubscriber;
+use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 
 trait ControllerTrait
 {

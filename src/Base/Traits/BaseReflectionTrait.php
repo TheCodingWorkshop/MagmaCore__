@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types=1);
 
@@ -32,6 +40,21 @@ trait BaseReflectionTrait
             $this->reflection = new ReflectionClass($name);
         }
         return $this;
+    }
+
+    /**
+     * @param mixed $args
+     * @return object
+     * @throws \ReflectionException
+     */
+    public function instance(mixed $args)
+    {
+        return $this->reflection->newInstance($args);
+    }
+
+    public function instanceArgs(array $args = [])
+    {
+        return $this->reflection->newInstanceArgs($args);
     }
 
     public function hasMethod(string $name): ReflectionMethod|false
@@ -81,7 +104,7 @@ trait BaseReflectionTrait
         return $this->reflection->getProperties($filters);
     }
 
-    public function hasProp(): ReflectionProperty|false
+    public function hasProp(string $name): ReflectionProperty|false
     {
         $has = $this->reflection->hasProperty($name);
         return is_bool($has) && $has === true ? $this->prop($name) : false;
@@ -101,7 +124,7 @@ trait BaseReflectionTrait
     /**
      * @return ReflectionClassConstant|false
      */
-    public function hasConst(): ReflectionClassConstant|false
+    public function hasConst(string $name): ReflectionClassConstant|false
     {
         $has = $this->reflection->hasConstant($name);
         return is_bool($has) && $has === true ? $this->const($name) : false;

@@ -2,6 +2,8 @@ request:
   \MagmaCore\Http\RequestHandler
 response:
   \MagmaCore\Http\ResponseHandler
+restful:
+  \MagmaCore\RestFul\RestHandler
 formBuilder:
   \MagmaCore\FormBuilder\FormBuilder
 eventDispatcher:
@@ -12,8 +14,6 @@ tableGrid:
   \MagmaCore\Datatable\Datatable
 collection:
   \MagmaCore\Collection\Collection
-#number:
-#  \MagmaCore\Collections\Number\NumberCollection
 global:
   \MagmaCore\Session\GlobalManager\GlobalManager
 flatDb:

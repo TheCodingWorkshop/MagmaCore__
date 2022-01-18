@@ -152,7 +152,7 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     /**
-     * Undocumented function
+     * Assigned role route
      *
      * @return void
      */
@@ -218,4 +218,5 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
         }
         return false;
     }
+
 }

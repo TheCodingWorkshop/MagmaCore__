@@ -84,7 +84,7 @@ class UserActionSubscriber implements EventSubscriberInterface
      * @return array
      */
 
-    #[ArrayShape([UserActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             UserActionEvent::NAME => [
@@ -146,7 +146,7 @@ class UserActionSubscriber implements EventSubscriberInterface
      */
     public function sendActivationEmail(UserActionEvent $event): bool
     {
-        if ($this->onRoute($event, self::NEW_ACTION) || $this->onRoute($event, self::REGISTER_ACTION)) {
+        if ($this->onRoute($event, (string)self::NEW_ACTION) || $this->onRoute($event, self::REGISTER_ACTION)) {
             if ($event) {
                 $user = $this->flattenContext($event->getcontext());
                 if (is_array($user) && count($user) > 0) {
@@ -177,7 +177,7 @@ class UserActionSubscriber implements EventSubscriberInterface
      */
     public function createUserLog(UserActionEvent $event): bool
     {
-        if ($this->onRoute($event, self::NEW_ACTION) || $this->onRoute($event, self::REGISTER_ACTION)) {
+        if ($this->onRoute($event, (string)self::NEW_ACTION) || $this->onRoute($event, self::REGISTER_ACTION)) {
             if ($event) {
                 $user = $this->flattenContext($event->getContext());
                 if ($user) {
@@ -216,7 +216,7 @@ class UserActionSubscriber implements EventSubscriberInterface
      */
     public function assignedUserRole(UserActionEvent $event): bool
     {
-        if ($this->onRoute($event, self::NEW_ACTION)) {
+        if ($this->onRoute($event, (string)self::NEW_ACTION)) {
             if ($event) {
                 $user = $this->flattenContext($event->getContext());
                 if (is_array($user) && count($user) > 0 && !empty($user['role_id'])) {
@@ -269,7 +269,7 @@ class UserActionSubscriber implements EventSubscriberInterface
     public function updateStatusIfStatusIsTrash(UserActionEvent $event): bool
     {
         /* @todo log this request on success or failure */
-        if ($this->onRoute($event, self::NEW_ACTION)) {
+        if ($this->onRoute($event, (string)self::NEW_ACTION)) {
             $user = $this->flattenContext($event->getContext());
             if ($user) {
                 $status = $user['status']; /* Get the status */

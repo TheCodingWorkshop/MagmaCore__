@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Administrator\Dashboard;
 
+use MagmaCore\Utility\Curl;
 use MagmaCore\Administrator\Dashboard\DashboardRepository;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
@@ -52,7 +53,6 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
      */
     protected function indexAction()
     {
-
         //$this->setAccess($this, 'can_view');
         $this->render(
             'admin/dashboard/index.html',

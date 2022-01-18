@@ -24,7 +24,6 @@ use MagmaCore\Base\Domain\Actions\LoginAction;
 use MagmaCore\Base\Domain\Actions\LogoutAction;
 use MagmaCore\Base\Domain\Actions\SessionExpiredAction;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 
 class SecurityController extends BaseController
 {
@@ -69,7 +68,7 @@ class SecurityController extends BaseController
      *
      * @return array
      */
-    #[ArrayShape(['isUserAccountActivated' => "string", 'isAlreadyLogin' => "string"])] protected function callBeforeMiddlewares(): array
+    protected function callBeforeMiddlewares(): array
     {
         return [
             'isUserAccountActivated' => isUserAccountActivated::class,

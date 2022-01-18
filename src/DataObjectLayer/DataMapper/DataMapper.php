@@ -12,15 +12,14 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use PDO;
-use PDOStatement;
-
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
-use MagmaCore\DataObjectLayer\DatabaseConnection\DatabaseTransaction;
+use MagmaCore\DataObjectLayer\DatabaseTransaction\DatabaseTransaction;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use PDOStatement;
+use PDO;
 
 class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {

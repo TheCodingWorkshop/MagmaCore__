@@ -28,7 +28,8 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'target' => '_self', /* defaults loads into itself */
         'novalidate' => false,
         "autocomplete" => false,
-        "leave_form_open" => false
+        "leave_form_open" => false,
+        "data-turbo-frame" => ''
         //"onSubmit" => "UIkitNotify()"
     ];
 
@@ -93,6 +94,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         }
         switch ($key):
             case 'action':
+            case 'data-turbo-frame' :
                 if (!is_string($key)) {
                     throw new FormBuilderInvalidArgumentException('Invalid action key. This must be a string.');
                 }

@@ -108,14 +108,40 @@ services:
     setting.subscriber:
       class: \MagmaCore\Settings\EventSubscriber\SettingActionSubscriber
       register_route_feedback:
-       MagmaCore\Settings\SettingController::indexAction:
+        MagmaCore\Settings\SettingController::purgeAction:
           msg: Changes Saved
+
+    account.subscriber:
+      class: \App\EventSubscriber\UserProfileActionSubscriber
+      register_route_feedback:
+        App\Controller\Profile\AccountController::nameAction:
+          msg: Your name was changed successfully!
+        App\Controller\Profile\AccountController::emailAction:
+          msg: Your email was changed successfully!
+        App\Controller\Profile\AccountController::passwordAction:
+          msg: Your password was changed successfully!
+
 
     menu.subscriber:
       class: \MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber
       register_route_feedback:
         MagmaCore\PanelMenu\MenuController::editAction:
           msg: Changes Saved
+  
+    message.subscriber:
+      class: \App\EventSubscriber\MessageActionSubscriber
+      register_route_feedback:
+        App\Controller\Admin\MessageController::starredAction:
+          msg: Changes Saved
+        App\Controller\Admin\MessageController::unstarredAction:
+          msg: Changes Saved
+        App\Controller\Admin\MessageController::markedAction:
+          msg: Changes Saved
+        App\Controller\Admin\MessageController::unmarkedAction:
+          msg: Changes Saved
+        App\Controller\Admin\MessageController::newAction:
+          msg: Message Sent
+
 
     ########################## CORE SYSTEM EVENTS ##########################
     base_controller_action.subscriber:

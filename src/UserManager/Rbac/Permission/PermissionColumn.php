@@ -12,10 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Permission;
 
+use MagmaCore\Datatable\DataColumnTrait;
 use MagmaCore\Datatable\AbstractDatatableColumn;
 
 class PermissionColumn extends AbstractDatatableColumn
 {
+
+    use DataColumnTrait;
+
+    private string $controller = 'permission';
 
     /**
      * @param array $dbColumns
@@ -43,7 +48,7 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => true,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
@@ -73,7 +78,7 @@ class PermissionColumn extends AbstractDatatableColumn
 //                'show_column' => true,
 //                'sortable' => true,
 //                'searchable' => true,
-//                'formatter' => function ($row, $twigExt) {
+//                'formatter' => function ($row, $tempExt) {
 //                    return $row['permission_group'] ?? 'None';
 //                }
 //            ],
@@ -84,8 +89,8 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    $html = $twigExt->tableDateFormat($row, "created_at");
+                'formatter' => function ($row, $tempExt) {
+                    $html = $tempExt->tableDateFormat($row, "created_at");
                     $html .= '<div><small>By Admin</small></div>';
                     return $html;
                 }
@@ -97,10 +102,10 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
+                'formatter' => function ($row, $tempExt) {
                     $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        $html .= $twigExt->tableDateFormat($row, "modified_at");
+                        $html .= $tempExt->tableDateFormat($row, "modified_at");
                         $html .= '<div><small>By Admin</small></div>';
                     } else {
                         $html .= '<small>Never!</small>';
@@ -115,15 +120,24 @@ class PermissionColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => false,
                 'searchable' => false,
-                'formatter' => function ($row, $twigExt) {
-                    return $twigExt->action(
+                'formatter' => function ($row, $tempExt) {
+                    return $tempExt->action(
                         [
-                            'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
-                            'trash' => ['tooltip' => 'Trash', 'icon' => 'ion-ios-trash']
+                            'more' => [
+                                'icon' => 'ion-more',
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
+                                        '',
+                                        $row,
+                                        $this->controller
+                                    );
+                                }
+                            ],
                         ],
                         $row,
-                        $twigExt,
-                        'permission',
+                        $tempExt,
+                        $this->controller,
                         false,
                         'Are You Sure!',
                         "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['permission_name']}</strong> role."
@@ -133,4 +147,24 @@ class PermissionColumn extends AbstractDatatableColumn
 
         ];
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'delete' => ['name' => 'trash permission', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
 }
