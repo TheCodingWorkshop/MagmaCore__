@@ -145,6 +145,27 @@ trait EventDispatcherTrait
         return null;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $cleanData
+     * @param mixed|null $dataRepository
+     * @return mixed
+     */
+    public function isSet(string $key, mixed $cleanData, mixed $dataRepository = null): mixed
+    {
+        if (is_object($cleanData)) {
+            return $cleanData->$key ?? (($dataRepository !== null) ? $dataRepository->$key : null);
+        } elseif (is_array($cleanData)) {
+            return array_key_exists($key, $cleanData) ? $cleanData[$key] : (($dataRepository !== null) ? $dataRepository->$key : null);
+        } else {
+            return $cleanData[$key];
+        }
+    }
+
+    /**
+     * @param array $context
+     * @return array|string
+     */
     public function flattenContext(array $context): array|string
     {
         if (is_array($context)) {

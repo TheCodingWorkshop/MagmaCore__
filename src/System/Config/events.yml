@@ -37,6 +37,8 @@ services:
         MagmaCore\UserManager\UserController::cloneAction:
           msg: Item cloned successfully.
           redirect: user.index
+        MagmaCore\UserManager\UserController::preferencesAction:
+          msg: Preferences updated successfully.
         App\Controller\RegistrationController::registerAction:
           msg: Your account was created!
 
@@ -91,6 +93,8 @@ services:
 
     userRole.subscriber:
       class: \MagmaCore\UserManager\EventSubscriber\UserRoleActionSubscriber
+    userPreference.subscriber:
+      class: \MagmaCore\UserManager\EventSubscriber\UserPreferenceActionSubscriber
 
     security.subscriber:
       class: \MagmaCore\UserManager\Security\EventSubscriber\LoginActionSubscriber

@@ -13,6 +13,7 @@ namespace MagmaCore\UserManager;
 
 use Exception;
 use MagmaCore\Base\Access;
+use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\Events\BulkActionEvent;
 use MagmaCore\UserManager\UserRelationship;
@@ -28,10 +29,11 @@ use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\UserManager\DataColumn\UserLogColumn;
 use MagmaCore\UserManager\Event\UserRoleActionEvent;
 use MagmaCore\UserManager\Model\UserPreferenceModel;
+use MagmaCore\UserManager\Model\UserPreferenceEntity;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
-use MagmaCore\UserManager\Repository\UserRoleRepository;
+//use MagmaCore\UserManager\Repository\UserRoleRepository;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
@@ -73,14 +75,12 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userPrivilege' => UserPrivilegeForm::class,
                 'userPreferenceRepo' => UserPreferenceModel::class,
                 'userPreferencesForm' => UserPreferencesForm::class,
-                //'formSettings' => SettingsForm::class,
                 'userRole' => UserRoleModel::class,
-                'userRoleRepo' => UserRoleRepository::class,
+                //'userRoleRepo' => UserRoleRepository::class, /* using this also gives access to userRole */
                 'tempRole' => TemporaryRoleModel::class,
                 'userLogRepo' => UserLogModel::class,
                 'userFillable' => UserFillable::class,
                 'userRelationship' => UserRelationship::class,
-                //'bulkDeleteForm' => BulkDeleteForm::class
 
             ]
         );
@@ -392,16 +392,20 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function preferencesAction()
     {
-        $this->newAction
+        $this->updateOnEvent
             ->setAccess($this, Access::CAN_EDIT_PREFERENCES)
-            ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__)
+            ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [], $this->userPreferenceRepo)
             ->render()
             ->with(
                 [
                     'user_preference' => $this->userPreferenceRepo->getRepo()->findObjectBy(['user_id' => $this->thisRouteID()])
                 ]
             )
-            ->form($this->userPreferencesForm)
+            ->form(
+                $this->userPreferencesForm,
+                null,
+                $this->userPreferenceRepo->getRepo()->findObjectBy(['user_id' => $this->thisRouteID()])
+            )
             ->end();
     }
 
@@ -417,7 +421,10 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     /**
-     * Render the user privilege view
+     * Render the user privilege view.
+     * Note that this routes is being handled by event dispatching the record gets updated when the
+     * UserRoleActionEvent gets fired which is on this route. See that \MagmaCore\UserManager\EventSubscriber\UserRoleActionSubscriber
+     * for code implimentation
      */
     protected function privilegeAction()
     {
@@ -427,7 +434,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 
         $this->simpleUpdateAction
             ->setAccess($this, Access::CAN_EDIT_PRIVILEGE)
-            ->execute($this, UserRoleEntity::class, UserRoleActionEvent::class, NULL, __METHOD__, [], $eventDispatchData)
+            ->execute($this, UserRoleEntity::class, UserRoleActionEvent::class, NULL, __METHOD__, [], $eventDispatchData, $this->userRole)
             ->render()
             ->with(
                 [

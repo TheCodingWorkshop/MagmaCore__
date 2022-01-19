@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Controller;
 
+use MagmaCore\Administrator\Controller\AdminController;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Entity\UserRoleEntity;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;

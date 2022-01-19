@@ -40,7 +40,7 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
   # stimulus:
   #   src: "https://unpkg.com/stimulus/dist/stimulus.umd.js"

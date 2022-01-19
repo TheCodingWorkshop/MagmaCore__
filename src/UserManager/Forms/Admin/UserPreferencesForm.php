@@ -45,7 +45,6 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
      */
     public function createForm(string $action, ?object $dataRepository = null, ?object $callingController = null): string
     {
-
         return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "userPreferencesForm"])
             ->addRepository($dataRepository)
             ->add(
@@ -53,7 +52,7 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
                     'language',
                     ['uk-select']
                 ),
-                $this->blueprint->choices([]),
+                $this->blueprint->choices(['en_GB', 'en_US', 'fr', 'es', 'de'], $this->hasValue('language'), $this),
                 $this->blueprint->settings(false, null, true, 'Language', true, null, 'The language that the control panel should use.')
             )
             ->add(
@@ -63,31 +62,41 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
                     'week_start_on',
                     $this->hasValue('week_start_on')
                 ),
-                $this->blueprint->choices(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], 'monday'),
+                $this->blueprint->choices(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], $this->hasValue('week_start_on')),
                 $this->blueprint->settings(false, null, true, 'Week Starts On', true, null, 'Choose the what the week starts.')
             )
             ->add(
                 $this->blueprint->checkbox(
-                    'notifications',
+                    'enable_notification',
                     ['uk-checkbox'],
-                    true
+                    $this->hasValue('enable_notification')
                 ),
                 null,
                 $this->blueprint->settings(false, null, false, null, true, 'Enable Notifications')
             )
             ->add(
                 $this->blueprint->textarea(
-                    'user_address',
+                    'address',
                     ['uk-textarea'],
-                    'user_address',
-                    $this->getRepository()->firstname . ' address (optional)'
+                    'address',
+                    $this->getRepository()->address . ' address (optional)'
+                ),
+                $this->hasValue('address'),
+                $this->blueprint->settings(false, null, false, null, true)
+            )
+            ->add(
+                $this->blueprint->hidden(
+                    'user_id',
+                    $dataRepository->user_id,
+                    [],
                 ),
                 null,
                 $this->blueprint->settings(false, null, false, null, true)
             )
+
             ->add(
                 $this->blueprint->submit(
-                    $this->hasValue('id') ? 'edit-user' : 'new-user',
+                    $this->hasValue('id') ? 'preferences-user' : 'preferences-user',
                     ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
                     'Save'
                 ),

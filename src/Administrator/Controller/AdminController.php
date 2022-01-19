@@ -39,6 +39,7 @@ use MagmaCore\Base\Domain\Actions\ShowAction;
 use MagmaCore\Base\Domain\Actions\ShowBulkAction;
 use MagmaCore\Base\Domain\Actions\SimpleCreateAction;
 use MagmaCore\Base\Domain\Actions\SimpleUpdateAction;
+use MagmaCore\Base\Domain\Actions\UpdateOnEvent;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Datatable\Datatable;
@@ -92,6 +93,7 @@ class AdminController extends BaseController
                 'cloneAction' => CloneAction::class,
                 'logIndexAction' => LogIndexAction::class,
                 'showAction' => ShowAction::class,
+                'updateOnEvent' => UpdateOnEvent::class,
                 'changeStatusAction' => ChangeStatusAction::class,
                 'settingsAction' => SettingsAction::class,
                 'apiResponse' => RestHandler::class,

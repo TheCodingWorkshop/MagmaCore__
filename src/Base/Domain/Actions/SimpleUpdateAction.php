@@ -59,21 +59,21 @@ class SimpleUpdateAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
 
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
-                $entityCollection = $controller->userRole
-                    ->getEntity()
-                    ->wash($formBuilder->getData())
-                    ->rinse()
-                    ->dry();
+            $_optional = ($optional !==null) ? $optional : null;
+
+            $entityCollection = $_optional->getEntity()
+                ->wash($formBuilder->getData())
+                ->rinse()
+                ->dry();
                 $data = $entityCollection->all();
 
             unset($data[$this->getSubmitValue()]); /* remove the submit from the final array */
-                $controller->userRole
-                    ->getRepo()
+
+            $_optional->getRepo()
                     ->getEm()
                     ->getCrud()
                     ->update(
-                        array_merge($data, $controller->userRoleRepo->getRepoUserIDArray($controller->thisRouteID())),
-                        $controller->userRoleRepo->getRepoSchemaID()
+                        array_merge($data, [$_optional->getSchemaID() => $controller->thisRouteID()]), $_optional->getSchemaID()
                     );
                     $this->dispatchSingleActionEvent(
                         $controller,

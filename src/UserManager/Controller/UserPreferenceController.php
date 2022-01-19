@@ -12,12 +12,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Controller;
 
-use MagmaCore\UserManager\Entity\UserLogEntity;
-use MagmaCore\UserManager\Model\UserLogModel;
+use MagmaCore\Administrator\Controller\AdminController;
+use MagmaCore\UserManager\Entity\UserPreferenceEntity;
+use MagmaCore\UserManager\Model\UserPreferenceModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
-final class UserLogController extends AdminController
+final class UserPreferenceController extends AdminController
 {
 
     use DataLayerTrait;
@@ -43,8 +44,8 @@ final class UserLogController extends AdminController
          */
         $this->addDefinitions(
             [
-                'repository' => UserLogModel::class,
-                'entity' => UserLogEntity::class,
+                'repository' => UserPreferenceModel::class,
+                'entity' => UserPreferenceEntity::class,
             ]
         );
     }

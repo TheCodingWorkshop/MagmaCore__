@@ -15,6 +15,7 @@ namespace MagmaCore\UserManager\EventSubscriber;
 use App\Model\NotificationModel;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
+use MagmaCore\UserManager\Model\UserPreferenceModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Base\Contracts\BaseActionEventInterface;
@@ -41,6 +42,7 @@ class UserActionSubscriber implements EventSubscriberInterface
     private BaseView $view;
     private UserRoleModel $userRole;
     private NotificationModel $notify;
+    private UserPreferenceModel $userPreferenceModel;
 
     /**
      * Add other route index here in order for that route to flash properly. this array is index array
@@ -58,6 +60,7 @@ class UserActionSubscriber implements EventSubscriberInterface
     protected const LOCK_ACTION = 'lock';
     protected const UNLOCK_ACTION = 'unlock';
     protected const ACTIVE_ACTION = 'active';
+    protected const PREFERENCE_ACTION = 'preferences';
     protected const ACTIVATION_PATH = '/activation/activate';
 
 
@@ -69,12 +72,13 @@ class UserActionSubscriber implements EventSubscriberInterface
      * @param UserRoleModel $userRole
      * @param NotificationModel $notify
      */
-    public function __construct(MailerFacade $mailer, BaseView $view, UserRoleModel $userRole, NotificationModel $notify)
+    public function __construct(MailerFacade $mailer, BaseView $view, UserRoleModel $userRole, NotificationModel $notify, UserPreferenceModel $userPreferenceModel)
     {
         $this->mailer = $mailer;
         $this->view = $view;
         $this->userRole = $userRole;
         $this->notify = $notify;
+        $this->userPreferenceModel = $userPreferenceModel;
     }
 
     /**
@@ -91,8 +95,9 @@ class UserActionSubscriber implements EventSubscriberInterface
                 ['flashUserEvent', self::FLASH_MESSAGE_PRIORITY],
                 ['assignedUserRole'],
                 ['sendActivationEmail'],
-                //['updateUserRole'],
                 ['createUserLog'],
+                ['addUserPreferences', -800],
+                ['updateUserPreferences'],
                 ['updateStatusIfStatusIsTrash', -900]
             ]
         ];
@@ -306,5 +311,55 @@ class UserActionSubscriber implements EventSubscriberInterface
         // return false;
 
     }
+
+    public function addUserPreferences(UserActionEvent $event)
+    {
+        if ($this->onRoute($event, (string)self::NEW_ACTION)) {
+            $user = $this->flattenContext($event->getContext());
+            if ($user) {
+                $preferences = [
+                    'user_id' => $user['last_id'],
+                    'enable_notification' => 1,
+                    'language' => 'en_GB',
+                    'week_start_on' => 'Monday',
+                ];
+                if (isset($this->userPreferenceModel)) {
+                    $new = $this->userPreferenceModel->getRepo()->getEm()->getCrud()->create($preferences);
+                    if ($new) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+
+    public function updateUserPreferences(UserActionEvent $event)
+    {
+        if ($this->onRoute($event, self::PREFERENCE_ACTION)) {
+            $user = $this->flattenContext($event->getContext());
+            $dataRepository = $this->userPreferenceModel->getRepo();
+            $oldvalues = $dataRepository->findObjectBy(['user_id' => $user['user_id']]);
+
+            $preferences = [
+                'user_id' => (int)$user['user_id'],
+                'enable_notification' => $this->isSet('enable_notification', $user, $oldvalues),
+                'language' => $this->isSet('language', $user, $oldvalues),
+                'week_start_on' => $this->isSet('week_start_on', $user, $oldvalues),
+                'address' => $this->isSet('address', $user, $oldvalues)
+            ];
+            if (isset($this->userPreferenceModel)) {
+                $update = $this->userPreferenceModel
+                    ->getRepo()
+                    ->getEm()
+                    ->getCrud()
+                    ->update($preferences, 'user_id');
+                if ($update) {
+                    return true;
+                }
+            }
+        }
+    }
+
 
 }

@@ -17,29 +17,30 @@ use MagmaCore\Base\Domain\DomainTraits;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
- * items are sanitize and validated before persisting to database. The class will 
+ * items are sanitize and validated before persisting to database. The class will
  * also dispatched any validation error before persistence. The logic also implements
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class EditAction implements DomainActionLogicInterface
+class UpdateOnEvent implements DomainActionLogicInterface
 {
 
     use DomainTraits;
 
-    public bool $passwordRequired = false;
+    /** @var bool */
+    protected bool $isRestFul = false;
 
     /**
-     * execute logic for adding new items to the database()
+     * execute logic for adding new items to the database(). Post data is returned as a collection
      *
-     * @param object $controller - The controller object implementing this object
+     * @param Object $controller - The controller object implementing this object
      * @param string|null $entityObject
      * @param string|null $eventDispatcher - the eventDispatcher for the current object
      * @param string|null $objectSchema
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return EditAction
+     * @return NewAction
      */
     public function execute(
         object $controller,
@@ -55,38 +56,34 @@ class EditAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-
         $formBuilder = $controller->formBuilder;
 
-        if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
-            if ($formBuilder?->csrfValidate()) {
-                
-                /* enforce any set rules */
-                $this->enforceRules($rules, $controller);
+        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+            $_optional = ($optional !==null) ? $optional : null;
 
-                $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
-                $action = $controller->repository->getRepo()
-                    ->validateRepository(
-                        $entityCollection,
-                        $entityObject,
-                        $controller->repository
-                            ->getRepo()
-                            ->findAndReturn($controller->thisRouteID())
-                            ->or404()
-                    )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
+            $entityCollection = $_optional->getEntity()
+                ->wash($formBuilder->getData())
+                ->rinse()
+                ->dry();
+            $data = $entityCollection->all();
 
-                if ($action) {
-                    $this->dispatchSingleActionEvent(
-                        $controller,
-                        $eventDispatcher,
-                        $method,
-                        $controller->repository->getRepo()->validatedDataBag(),
-                        $additionalContext
-                    );
+            unset($data[$this->getSubmitValue()], $data['_CSRF_INDEX'], $data['_CSRF_TOKEN']); /* remove the submit from the final array */
 
-                }
-            }
+            $this->dispatchSingleActionEvent(
+                $controller,
+                $eventDispatcher,
+                $method,
+                array_merge($data, $additionalContext ? $additionalContext : []),
+                $additionalContext
+            );
+
+
         endif;
         return $this;
     }
+
+
 }
+
+
+

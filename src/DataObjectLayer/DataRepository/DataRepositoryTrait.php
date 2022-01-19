@@ -54,7 +54,7 @@ trait DataRepositoryTrait
         if (is_string($entityObject) && !empty($entityObject)) {
             switch ($entityObject) :
                 case $entityObject :
-                    $validationClassName = str_replace('Entity', 'Validate', $entityObject);
+                    $validationClassName = str_replace(['Entity', 'Model'], 'Validate', $entityObject);
                     if ($validationClassName) {
                         $newValidationObject = BaseApplication::diGet($validationClassName);
                         if (!$newValidationObject instanceof DataRepositoryValidationInterface) {

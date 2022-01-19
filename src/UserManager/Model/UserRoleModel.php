@@ -24,7 +24,7 @@ class UserRoleModel extends AbstractBaseModel
     /** @var string */
     protected const TABLESCHEMA = 'user_role';
     /** @var string */
-    protected const TABLESCHEMAID = 'id';
+    protected const TABLESCHEMAID = 'user_id';
     /** @var object $relationship */
     protected object $relationship;
 
@@ -50,6 +50,15 @@ class UserRoleModel extends AbstractBaseModel
     {
         return [
         ];
+    }
+
+    /**
+     * @param object $controller
+     * @return array
+     */
+    public function getUserRoleID(object $controller): array
+    {
+        return $controller->flattenArray($this->getRepo()->findBy(['role_id'], [self::TABLESCHEMAID => $controller->thisRouteID()]));
     }
 
     /**
