@@ -32,14 +32,13 @@ class UikitSimplePaginationExtension
         $name = $controller->thisRouteController();
         $name = Stringify::pluralize($name);
         $name = Stringify::capitalize($name);
-        // style="z-index: 980;" uk-sticky="offset: 80; bottom: #top; cls-active: uk-card uk-card-body uk-card-default; animation: uk-animation-slide-top"
         $html = '<section>';
             $html .= '<nav aria-label="Pagination" uk-navbar>';
                 $html .= '<div class="uk-navbar-left">';
                 $html .= $this->navContentLeft($controller, $name);
                 $html .= '</div>';
                 $html .= '<div class="uk-navbar-center">';
-                $html .= $this->navContentCentre($controller);
+                $html .= $this->navContentCentre($controller, $name);
                 $html .= '</div>';
                 $html .= '<div class="uk-navbar-right">';
                 $html .= $this->navContentRight($controller);
@@ -64,14 +63,14 @@ class UikitSimplePaginationExtension
         <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
         <span></span>
         </button></li>
-        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-28"><ion-icon name="add-outline"></ion-icon></span></a></li>
+        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-21"><ion-icon name="add-outline"></ion-icon></span></a></li>
         
-        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-28"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-21"><ion-icon name="trash-outline"></ion-icon></span></button></li>
 
-        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-28"><ion-icon name="copy-outline"></ion-icon></span></button>
+        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-21"><ion-icon name="copy-outline"></ion-icon></span></button>
         </li>
 
-        <li><a class="uk-link-reset" href="#"><span uk-icon="icon: bag"></span> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
+        <li><a uk-tooltip="Total ' . $name . '" class="uk-link-reset uk-text-meta" href="#"> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
         </ul>
 
         ';
@@ -87,10 +86,13 @@ class UikitSimplePaginationExtension
         ';
     }
 
-    private function navContentCentre()
+    private function navContentCentre(object $controller, string $name)
     {
         return '
-        filter|search
+        <div class="uk-search">
+             <a href="" class="uk-search-icon-flip" uk-search-icon></a>
+             <input type="search" class="uk-search-input uk-form-blank uk-border-bottom" onkeyup="tableFilter()" id="table_filter" placeholder="Filter ' . $name . '..." />
+         </div>
         ';
     }
 

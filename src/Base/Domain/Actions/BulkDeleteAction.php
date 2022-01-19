@@ -54,12 +54,11 @@ class BulkDeleteAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
         $formBuilder = $controller->formBuilder;
-        var_dump($formData);
-        die;
 
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
 
             $formData = $this->isAjaxOrNormal();
+
             if ($this->isArrayGood($formData)) {
                 $schemaID = $controller->repository->getSchemaID();
                 $action = array_map(fn($id) => $controller?->repository

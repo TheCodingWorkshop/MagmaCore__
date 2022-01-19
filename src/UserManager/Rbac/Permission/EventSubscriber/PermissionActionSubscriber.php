@@ -14,7 +14,6 @@ namespace MagmaCore\UserManager\Rbac\Permission\EventSubscriber;
 
 use MagmaCore\UserManager\Rbac\Permission\Event\PermissionActionEvent;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
-use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Utility\Yaml;
@@ -61,7 +60,7 @@ class PermissionActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    #[ArrayShape([PermissionActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             PermissionActionEvent::NAME => [

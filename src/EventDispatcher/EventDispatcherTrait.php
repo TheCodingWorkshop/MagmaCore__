@@ -86,7 +86,7 @@ trait EventDispatcherTrait
             $routesArray = $this->trailingRoutes($event);
             if (in_array($event->getMethod(), array_keys($routesArray), true)) {
                 $_msg = array_key_exists('msg', $routesArray[$event->getMethod()]);
-                $event->getObject()->flashMessage(($_msg === true) ? $routesArray[$event->getMethod()]['msg'] : ''); /* render a default message */
+                $event->getObject()->flashMessage(($_msg === true) ? '<ion-icon name="checkmark-outline"></ion-icon> ' . $routesArray[$event->getMethod()]['msg'] : ''); /* render a default message */
                 if (null !== $cb) {
                     call_user_func_array($cb, [$event, $routesArray]);
                 } else {

@@ -56,7 +56,6 @@ class UikitNavigationExtension
         $routeController = $controller->thisRouteController();
         $element = $active = '';
         if (isset($controller)) {
-            //$query = 'SELECT * FROM menus JOIN menu_item ON menus.id = menu_item.item_original_id';
             $query = 'SELECT * FROM menus ORDER BY menu_order DESC';
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {

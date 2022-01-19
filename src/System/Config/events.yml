@@ -52,6 +52,16 @@ services:
           redirect: role.index
         MagmaCore\UserManager\Rbac\Role\RoleController::assignedAction:
           msg: New permission successfully assigned to role.
+        MagmaCore\UserManager\Rbac\Role\RoleController::bulkAction:
+          msg: Changes Saved
+          redirect: role.index
+        MagmaCore\UserManager\Rbac\Role\RoleController::bulkDeleteAction:
+          msg: 1 or more roles deleted successfully
+          redirect: role.index
+        MagmaCore\UserManager\Rbac\Role\RoleController::bulkCloneAction:
+          msg: Changes Saved
+          redirect: role.index
+
 
     role_permission_assigned.subscriber:
       class: \MagmaCore\UserManager\Rbac\EventSubscriber\RolePermissionAssignedActionSubscriber
@@ -68,6 +78,15 @@ services:
           msg: Permission updated!
         MagmaCore\UserManager\Rbac\Permission\PermissionController::deleteAction:
           msg: Permission deleted!
+          redirect: permission.index
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkAction:
+          msg: 1 or more roles deleted successfully
+          redirect: permission.index
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkDeleteAction:
+          msg: 1 or more permission deleted successfully
+          redirect: permission.index
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkCloneAction:
+          msg: 1 or more permission cloned successfully
           redirect: permission.index
 
     userRole.subscriber:
@@ -122,7 +141,6 @@ services:
           msg: Your email was changed successfully!
         App\Controller\Profile\AccountController::passwordAction:
           msg: Your password was changed successfully!
-
 
     menu.subscriber:
       class: \MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber

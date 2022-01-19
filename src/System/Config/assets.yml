@@ -19,10 +19,19 @@ stylesheets:
     href: "https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300&display=swap"
     enable: true
     cdn: true
+  normalize:
+    href: "/public/assets/css/normalize.css"
+    enable: true
+    cdn: false
+  main:
+    href: "/public/assets/css/main.css"
+    enable: true
+    cdn: false
   custom:
     href: "/public/assets/css/uikit/custom.css"
     enable: true
     cdn: false
+
 
 scripts:
   turbo_hotwire:
@@ -79,6 +88,14 @@ scripts:
     crossorigin: "anonymous"
     type: javascript
     location: header
+    enable: true
+    cdn: false
+  modernizr:
+    src: "/public/assets/js/uikit/modernizr-3.11.2.min.js"
+    integrity: ""
+    crossorigin: "anonymous"
+    type: javascript
+    location: footer
     enable: true
     cdn: false
   # sparks:
