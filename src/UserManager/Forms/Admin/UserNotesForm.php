@@ -18,7 +18,7 @@ use MagmaCore\FormBuilder\ClientFormBuilderInterface;
 use MagmaCore\FormBuilder\FormBuilderBlueprint;
 use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 
-class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilderInterface
+class UserNotesForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {
 
     /** @var FormBuilderBlueprintInterface $blueprint */
@@ -48,40 +48,13 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
         return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "userPreferencesForm"])
             ->addRepository($dataRepository)
             ->add(
-                $this->blueprint->select(
-                    'language',
-                    ['uk-select']
-                ),
-                $this->blueprint->choices(['en_GB', 'en_US', 'fr', 'es', 'de'], $this->hasValue('language'), $this),
-                $this->blueprint->settings(false, null, true, 'Language', true, null, 'The language that the control panel should use.')
-            )
-            ->add(
-                $this->blueprint->select(
-                    'week_start_on',
-                    ['uk-select', 'uk-form-width-small'],
-                    'week_start_on',
-                    $this->hasValue('week_start_on')
-                ),
-                $this->blueprint->choices(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], $this->hasValue('week_start_on')),
-                $this->blueprint->settings(false, null, true, 'Week Starts On', true, null, 'Choose the what the week starts.')
-            )
-            ->add(
-                $this->blueprint->checkbox(
-                    'enable_notification',
-                    ['uk-checkbox'],
-                    $this->hasValue('enable_notification')
-                ),
-                null,
-                $this->blueprint->settings(false, null, false, null, true, 'Enable Notifications')
-            )
-            ->add(
                 $this->blueprint->textarea(
-                    'address',
-                    ['uk-textarea'],
-                    'address',
-                    $this->getRepository()->address . ' address (optional)'
+                    'notes',
+                    ['uk-textarea', 'uk-width-1-1', 'uk-height-large'],
+                    'notes',
+                    'Add Notes'
                 ),
-                $this->hasValue('address'),
+                $this->hasValue('notes'),
                 $this->blueprint->settings(false, null, false, null, true)
             )
             ->add(
@@ -96,9 +69,9 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
 
             ->add(
                 $this->blueprint->submit(
-                    $this->hasValue('id') ? 'preferences-user' : 'preferences-user',
+                    $this->hasValue('id') ? 'notes-user' : 'notes-user',
                     ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
-                    'Update'
+                    'Add Note'
                 ),
                 null,
                 $this->blueprint->settings(false, null, false, null, true)

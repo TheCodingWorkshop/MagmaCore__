@@ -14,6 +14,7 @@ namespace MagmaCore\UserManager;
 use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
+use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\Events\BulkActionEvent;
 use MagmaCore\UserManager\UserRelationship;
@@ -32,11 +33,12 @@ use MagmaCore\UserManager\Model\UserPreferenceModel;
 use MagmaCore\UserManager\Model\UserPreferenceEntity;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
+use MagmaCore\UserManager\Forms\Admin\UserNotesForm;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
-//use MagmaCore\UserManager\Repository\UserRoleRepository;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
+use MagmaCore\UserManager\Entity\UserNoteEntity;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -76,11 +78,13 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userPreferenceRepo' => UserPreferenceModel::class,
                 'userPreferencesForm' => UserPreferencesForm::class,
                 'userRole' => UserRoleModel::class,
-                //'userRoleRepo' => UserRoleRepository::class, /* using this also gives access to userRole */
                 'tempRole' => TemporaryRoleModel::class,
                 'userLogRepo' => UserLogModel::class,
                 'userFillable' => UserFillable::class,
                 'userRelationship' => UserRelationship::class,
+                'userNotesForm' => UserNotesForm::class,
+                'userNoteModel' => UserNoteModel::class,
+                'userNoteEntity' => UserNoteEntity::class
 
             ]
         );
@@ -466,6 +470,25 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->render()
             ->with([])
             ->table()
+            ->end();
+    }
+
+    protected function notesAction()
+    {
+        $this->updateOnEvent
+            ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [], $this->userNoteModel)
+            ->render()
+            ->with(
+                [
+                    'row' => $this->toArray($this->findOr404()),
+                    'notes' => $this->toArray($this->userNoteModel->getRepo()->findBy(['notes', 'created_at', 'user_id', 'id'], ['user_id' => $this->thisRouteID()]))
+                ]
+            )
+            ->form(
+                $this->userNotesForm,
+                null,
+                $this->userNoteModel->getRepo()->findObjectBy(['user_id' => $this->thisRouteID()])
+            )
             ->end();
     }
 

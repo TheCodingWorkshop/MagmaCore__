@@ -15,6 +15,7 @@ namespace MagmaCore\UserManager\EventSubscriber;
 use App\Model\NotificationModel;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
+use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\UserManager\Model\UserPreferenceModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\Base\BaseView;
@@ -43,6 +44,7 @@ class UserActionSubscriber implements EventSubscriberInterface
     private UserRoleModel $userRole;
     private NotificationModel $notify;
     private UserPreferenceModel $userPreferenceModel;
+    private UserNoteModel $userNoteModel;
 
     /**
      * Add other route index here in order for that route to flash properly. this array is index array
@@ -61,6 +63,8 @@ class UserActionSubscriber implements EventSubscriberInterface
     protected const UNLOCK_ACTION = 'unlock';
     protected const ACTIVE_ACTION = 'active';
     protected const PREFERENCE_ACTION = 'preferences';
+    protected const NOTES_ACTION = 'notes';
+
     protected const ACTIVATION_PATH = '/activation/activate';
 
 
@@ -72,13 +76,21 @@ class UserActionSubscriber implements EventSubscriberInterface
      * @param UserRoleModel $userRole
      * @param NotificationModel $notify
      */
-    public function __construct(MailerFacade $mailer, BaseView $view, UserRoleModel $userRole, NotificationModel $notify, UserPreferenceModel $userPreferenceModel)
+    public function __construct(
+        MailerFacade $mailer,
+        BaseView $view,
+        UserRoleModel $userRole,
+        NotificationModel $notify,
+        UserPreferenceModel $userPreferenceModel,
+        UserNoteModel $userNoteModel
+    )
     {
         $this->mailer = $mailer;
         $this->view = $view;
         $this->userRole = $userRole;
         $this->notify = $notify;
         $this->userPreferenceModel = $userPreferenceModel;
+        $this->userNoteModel = $userNoteModel;
     }
 
     /**
@@ -98,6 +110,7 @@ class UserActionSubscriber implements EventSubscriberInterface
                 ['createUserLog'],
                 ['addUserPreferences', -800],
                 ['updateUserPreferences'],
+                ['addUserNote'],
                 ['updateStatusIfStatusIsTrash', -900]
             ]
         ];
@@ -356,6 +369,50 @@ class UserActionSubscriber implements EventSubscriberInterface
                     ->update($preferences, 'user_id');
                 if ($update) {
                     return true;
+                }
+            }
+        }
+    }
+
+    public function addUserNote(UserActionEvent $event)
+    {
+        if ($this->onRoute($event, (string)self::NEW_ACTION)) {
+            $user = $this->flattenContext($event->getContext());
+            if ($user) {
+                $preferences = [
+                    'user_id' => $user['last_id'],
+                    'notes' => sprintf('Welcome %s %s', $user['firstname'], $user['lastname']),
+                ];
+                if (isset($this->userNoteModel)) {
+                    $new = $this->userNoteModel->getRepo()->getEm()->getCrud()->create($preferences);
+                    if ($new) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+
+    public function addUpdateUserNotes(UserActionEvent $event)
+    {
+        if ($this->onRoute($event, self::NOTES_ACTION)) {
+            $user = $this->flattenContext($event->getContext());
+            $dataRepository = $this->userNoteModel->getRepo();
+            $oldvalues = $dataRepository->findObjectBy(['user_id' => $user['user_id']]);
+
+            var_dump($user);
+            die;
+            if ($user) {
+                $note = [
+                    'user_id' => $user['user_id'],
+                    'notes' => $this->isSet('notes', $user, $oldValues),
+                ];
+                if (isset($this->userNoteModel)) {
+                    $new = $this->userNoteModel->getRepo()->getEm()->getCrud()->create($note);
+                    if ($new) {
+                        return true;
+                    }
                 }
             }
         }

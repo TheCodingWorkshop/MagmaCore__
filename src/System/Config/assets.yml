@@ -5,7 +5,7 @@ stylesheets:
     cdn: true
   summernote:
     href: "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
-    enable: false
+    enable: true
     cdn: true
   ionicons:
     href: "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
@@ -80,7 +80,7 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: false
+    enable: true
     cdn: true
   sidebar:
     src: "/public/assets/js/uikit/sidebar.js"

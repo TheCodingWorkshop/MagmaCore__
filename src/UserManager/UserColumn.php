@@ -192,6 +192,7 @@ class UserColumn extends AbstractDatatableColumn
     private function itemsDropdown(array $row, string $controller): array
     {
         $items = [
+            'notes' => ['name' => 'add notes', 'icon' => 'reader-outline'],
             'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
             'privilege' => ['name' => 'Edit Privilege', 'icon' => 'key-outline'],
             'preferences' => ['name' => 'Edit Preferences', 'icon' => 'options-outline'],

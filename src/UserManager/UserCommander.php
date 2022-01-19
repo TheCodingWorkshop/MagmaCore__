@@ -39,7 +39,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'hard-delete',
         'privilege',
         'preferences',
-        'personal'
+        'personal',
+        'notes'
     ];
 
     private array $noCommander = [];
@@ -99,6 +100,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'preferences' => $suffix . " Preferences",
             'privileges' => $suffix . " Privileges",
             'personal' => $suffix . " Personal Space",
+            'notes' => 'Add Notes',
             default => "Unknown"
         };
     }

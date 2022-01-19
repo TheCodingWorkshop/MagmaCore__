@@ -14,5 +14,5 @@ namespace MagmaCore\UserManager\Entity;
 
 use MagmaCore\Base\BaseEntity;
 
-class UserEntity extends BaseEntity
+class UserNoteEntity extends BaseEntity
 {}
