@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Logger;
 
-use MagmaCore\Logger\Handler\LoggerHandlerInterface;
-use MagmaCore\Logger\LoggerInterface;
 use Throwable;
+use MagmaCore\Logger\LoggerInterface;
+use MagmaCore\Logger\Exception\LoggerException;
+use MagmaCore\Logger\Handler\LoggerHandlerInterface;
 
 class Logger implements LoggerInterface
 {
@@ -85,10 +86,10 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array $context
      */
-    private function writeLog(string $message, array $context): void
+    private function writeLog($level, string $message, array $context): void
     {
         try{
-            $this->loggerHandler->write($message, $context);
+            $this->loggerHandler->write($level, $message, $context);
         }catch(Throwable $throw) {
             throw new LoggerException('An exception was thrown in writing the log to the handler.', 0, $throw);
         }

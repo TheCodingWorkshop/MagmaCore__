@@ -20,8 +20,6 @@ use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Middleware\Before\LoginRequired;
 use MagmaCore\Administrator\Middleware\Before\SessionExpires;
-use MagmaCore\Auth\Roles\Roles;
-use MagmaCore\Base\Access;
 use MagmaCore\Base\BaseController;
 use MagmaCore\Base\Domain\Actions\BlankAction;
 use MagmaCore\Base\Domain\Actions\BulkDeleteAction;
@@ -47,8 +45,7 @@ use MagmaCore\RestFul\RestHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Settings\Entity\ControllerSettingEntity;
 use MagmaCore\Settings\Event\ControllerSettingActionEvent;
-use MagmaCore\Administrator\Middleware\Before\IntegrityConstraints;
-use MagmaCore\UserManager\Event\UserActionEvent;
+use MagmaCore\Base\Domain\Actions\BulkUpdateAction;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 
 class AdminController extends BaseController
@@ -88,6 +85,7 @@ class AdminController extends BaseController
                 'deleteAction' => DeleteAction::class,
                 'bulkDeleteAction' => BulkDeleteAction::class,
                 'bulkCloneAction' => BulkCloneAction::class,
+                'bulkUpdateAction' => BulkUpdateAction::class,
                 'showBulkAction' => ShowBulkAction::class,
                 'indexAction' => IndexAction::class,
                 'cloneAction' => CloneAction::class,

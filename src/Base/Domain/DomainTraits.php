@@ -305,6 +305,28 @@ trait DomainTraits
     }
 
     /**
+     * Undocumented function
+     *
+     * @param object $controller
+     * @param object $repository
+     * @param string $primaryKey
+     * @param string $msg
+     * @return self
+     */
+    public function exists(object $controller, object $repository, string $primaryKey, string $msg, array $selector = []): self
+    {
+        $queriedID = $controller->thisRouteID();
+        if ($queriedID) {
+            $record = $repository->getRepo()->findObjectBy([$primaryKey => $queriedID], $selector);
+            if ($record === null) {
+                $controller->flashMessage(sprintf('%s', $msg), $controller->flashWarning());
+                $controller->redirect('/admin/user/index');
+            }
+        }
+        return $this;
+    }
+
+    /**
      * The end method which finally renders the BaseController render method and
      * pass the populated arguments based on the method chaining
      *

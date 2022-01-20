@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
-use MagmaCore\Base\Contracts\BaseRelationshipInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use MagmaCore\Base\BaseEntity;
@@ -22,8 +21,6 @@ use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
-use MagmaCore\DataObjectLayer\DataRelationship\DataRelationalInterface;
-use MagmaCore\DataObjectLayer\DataRelationship\Exception\DataRelationshipInvalidArgumentException;
 use Throwable;
 
 class BaseModel extends BaseModelRelationship

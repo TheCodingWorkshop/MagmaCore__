@@ -57,7 +57,7 @@ class NativeLoggerHandler extends AbstractLoggerHandler
             return;
         }
         $line = $this->format($level, $message, $context);
-        file_put_contents($this->getFile(), $line, FILE_APPEND | LOCK_EX);
+        file_put_contents($this->getLogFile(), $line, FILE_APPEND | LOCK_EX);
     }
 
 }

@@ -396,26 +396,26 @@ class UserActionSubscriber implements EventSubscriberInterface
 
     public function addUpdateUserNotes(UserActionEvent $event)
     {
-        if ($this->onRoute($event, self::NOTES_ACTION)) {
-            $user = $this->flattenContext($event->getContext());
-            $dataRepository = $this->userNoteModel->getRepo();
-            $oldvalues = $dataRepository->findObjectBy(['user_id' => $user['user_id']]);
+        // if ($this->onRoute($event, self::NOTES_ACTION)) {
+        //     $user = $this->flattenContext($event->getContext());
+        //     $dataRepository = $this->userNoteModel->getRepo();
+        //     $oldvalues = $dataRepository->findObjectBy(['user_id' => $user['user_id']]);
 
-            var_dump($user);
-            die;
-            if ($user) {
-                $note = [
-                    'user_id' => $user['user_id'],
-                    'notes' => $this->isSet('notes', $user, $oldValues),
-                ];
-                if (isset($this->userNoteModel)) {
-                    $new = $this->userNoteModel->getRepo()->getEm()->getCrud()->create($note);
-                    if ($new) {
-                        return true;
-                    }
-                }
-            }
-        }
+        //     var_dump($user);
+        //     die;
+        //     if ($user) {
+        //         $note = [
+        //             'user_id' => $user['user_id'],
+        //             'notes' => $this->isSet('notes', $user, $oldValues),
+        //         ];
+        //         if (isset($this->userNoteModel)) {
+        //             $new = $this->userNoteModel->getRepo()->getEm()->getCrud()->create($note);
+        //             if ($new) {
+        //                 return true;
+        //             }
+        //         }
+        //     }
+        // }
     }
 
 

@@ -44,6 +44,7 @@ interface ClientRepositoryInterface
      * @return array
      */
     public function get(array $conditions = []) : array;
+    public function getObject(array $conditions = [], array $selectors = []): object;
 
     /**
      * Perform validation within the save method before insert or updating

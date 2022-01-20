@@ -32,6 +32,7 @@ trait ControllerMenuTrait
     use BaseReflectionTrait;
     use SystemEventTrait;
     use ControllerTrait;
+    use ControllerSettingTrait;
 
     private array $usables = [
         'index' => 'View All',
@@ -119,6 +120,7 @@ trait ControllerMenuTrait
                         // if (class_exists($columnString)) {
                         //     $this->initializeControllerSettings($routeParams['controller'], $columnString, $lastMenuID);
                         // }
+                        $this->buildController($routeParams, $lastMenuID);
                         return true;
                     }
                 }

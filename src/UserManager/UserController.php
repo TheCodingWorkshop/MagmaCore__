@@ -44,6 +44,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait;
+    private const NO_USER_NOTE = 'The Queried ID is missing the starter notes. You can update the account, to generate a starter note.';
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -130,9 +131,14 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 [
                     'table_tabs' => [
                         'primary' => ['tab' => 'Primary', 'icon' => 'person', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
-                        'logs' => ['tab' => 'Logs', 'icon' => 'reader', 'value' => $logCount, 'data' => '', 'meta' => "{$logCount} Logged {$logCriticalCount} critical"],
+                        
+                        'logs' => ['tab' => 'Logs', 'icon' => 'reader', 'value' => $logCount, 
+                        'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
+                        
                         'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
+                        
                         'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
+                        
                         'lock' => ['tab' => 'Lock', 'icon' => 'lock-closed', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
 
                     ],
@@ -279,7 +285,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function bulkAction()
     {
-        foreach (['bulk-delete', 'bulk-clone'] as $action) {
+        foreach (['bulk-delete', 'bulk-clone', 'bulkUnlockAll', 'bulkDeleteAll'] as $action) {
             if (array_key_exists($action, $this->formBuilder->getData())) {
                 $id = $this->repository->getSchemaID();
                 $this->showBulkAction
@@ -327,6 +333,18 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 ->endAfterExecution();
         }
     }
+
+    protected function bulkUnlockAllAction()
+    {
+        if (array_key_exists('bulkUnlockAll-user', $this->formBuilder->getData())) {
+            $this->bulkUpdateAction
+                ->setAccess($this, Access::CAN_BULK_DELETE)
+                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ['status' => 'active'])
+                ->endAfterExecution();
+        }
+
+    }
+
 
     /**
      * Change a user status to lock
@@ -476,6 +494,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function notesAction()
     {
         $this->updateOnEvent
+            ->exists($this, $this->userNoteModel, 'user_id', self::NO_USER_NOTE, ['user_id'])
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [], $this->userNoteModel)
             ->render()
             ->with(

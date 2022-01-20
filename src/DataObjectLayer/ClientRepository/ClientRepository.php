@@ -92,6 +92,23 @@ class ClientRepository implements ClientRepositoryInterface
         } catch (Throwable $throw) {
             throw $throw;
         }
+    }   
+
+    /**
+     * Return data as an aobject
+     *
+     * @param array $conditions
+     * @param array $selectors
+     * @return object
+     */
+    public function getObject(array $conditions = [], array $selectors = []): object
+    {
+        try {
+            return $this->em->getCrud()->get($selectors, $conditions);
+        } catch (Throwable $throw) {
+            throw $throw;
+        }
+
     }
 
 
