@@ -121,7 +121,7 @@ class CommanderBar implements CommanderBarInterface
     {
         if (isset($this->controller)) {
            if (!in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetFilter())) {
-                return '<a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-28 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
+                return '<a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-21 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
                     <ion-icon name="funnel-outline"></ion-icon>
                     </a>';
             }
@@ -131,40 +131,20 @@ class CommanderBar implements CommanderBarInterface
     private function commanderOverlaySearch(): string
     {
         return '
-        <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
+        <div class="nav-overlay uk-navbar-left uk-flex-1 uk-text-small" hidden>
 
         <div class="uk-navbar-item uk-width-expand">
-            <form class="uk-search uk-search-navbar uk-width-1-1">
+            <form class="uk-search uk-search-navbar uk-width-1-2">
                 <input name="s" class="uk-search-input" type="search" placeholder="Filtering ' . Stringify::pluralize(ucwords($this->controller->thisRouteController())) . '...." autofocus>
             </form>
         </div>
 
-        <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()"><ion-icon size="large" name="close-outline"></ion-icon></a>
+        <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()"><ion-icon class="ion-21" name="close-outline"></ion-icon></a>
 
     </div>
         ';
     }
 
-    private function actionButton(): string
-    {
-        if (isset($this->controller)) {
-            return match ($this->controller->thisRouteAction()) {
-                'new', 'edit', 'show', 'hard-delete', 'preferences', 'privileges' => 'Listings',
-                default => 'Add new'
-            };
-        }
-    }
-
-    private function actionPath(): string
-    {
-        if (isset($this->controller)) {
-            return match ($this->controller->thisRouteAction()) {
-                'new', 'edit', 'show', 'hard-delete', 'preferences', 'privileges' => '/' . $this->controller->thisRouteNamespace() . '/' . $this->controller->thisRouteController() . '/' . 'index',
-                'index' => '/admin/' . $this->controller->thisRouteController() . '/new',
-                default => 'javascript:history.back()'
-            };
-        }
-    }
 
     public function __toString()
     {

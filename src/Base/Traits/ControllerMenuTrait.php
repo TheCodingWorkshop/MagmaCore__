@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
+use MagmaCore\DataObjectLayer\ClientRepository\ClientRepository;
+use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryFactory;
 use ReflectionMethod;
 use ReflectionException;
 use MagmaCore\Utility\Yaml;
@@ -32,7 +34,6 @@ trait ControllerMenuTrait
     use BaseReflectionTrait;
     use SystemEventTrait;
     use ControllerTrait;
-    use ControllerSettingTrait;
 
     private array $usables = [
         'index' => 'View All',
@@ -106,6 +107,7 @@ trait ControllerMenuTrait
                         'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
                     ];
                     $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);
+
                     if ($new) {
                         $lastMenuID = $this->getMenu()->getRepo()->fetchLastID();
                         $this->hasMenuItems($routeParams, $lastMenuID);
@@ -118,9 +120,8 @@ trait ControllerMenuTrait
                         /* end */
                         $columnString = '\App\DataColumns\\' . ucwords($routeParams['controller'] . 'Column');
                         // if (class_exists($columnString)) {
-                        //     $this->initializeControllerSettings($routeParams['controller'], $columnString, $lastMenuID);
+                        //$this->initializeControllerSettings($routeParams['controller'], $columnString, $lastMenuID);
                         // }
-                        $this->buildController($routeParams, $lastMenuID);
                         return true;
                     }
                 }
@@ -231,5 +232,36 @@ trait ControllerMenuTrait
 
         return strtolower($url);
     }
+
+    /**
+     * Return the client repository object
+     *
+     * @return ClientRepository
+     */
+    private function getControllerModel(): ClientRepository
+    {
+        return (new ClientRepositoryFactory(
+            'controller_model',
+            'controller_settings',
+            'id'))->create(ClientRepository::class);
+    }
+
+    /**
+     * Get a controller database row based on the method argument
+     *
+     * @param array $conditions
+     * @return array|null
+     */
+    private function getController(array $conditions): ?array
+    {
+        $model = $this->getControllerModel();
+        if ($model !==null) {
+            return $model->get($conditions);
+        }
+
+        return null;
+
+    }
+
 
 }

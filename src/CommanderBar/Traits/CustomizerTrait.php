@@ -25,7 +25,7 @@ trait CustomizerTrait
             }
         }
         $commander = '<li>';
-        $commander .= '<a href="#"><ion-icon size="large" name="settings-outline"></ion-icon></a>';
+        $commander .= '<a href="#"><ion-icon class="ion-21" name="settings-outline"></ion-icon></a>';
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
 
         $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';

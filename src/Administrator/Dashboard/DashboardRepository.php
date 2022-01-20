@@ -230,7 +230,7 @@ class DashboardRepository
             'members' => ['icon' => 'person-outline', 'include' => 'block_links'],
             'ticket' => ['icon' => 'receipt-outline', 'include' => 'block_ticket'],
             'session' => ['icon' => 'stats-chart-outline', 'include' => 'block_statistics'],
-            //'github' => ['icon' => 'logo-github', 'include' => 'block_github'],
+            'github' => ['icon' => 'logo-github', 'include' => 'block_github'],
             'health' => ['icon' => 'pulse-outline', 'include' => 'block_health_status'],
             
             'project' => ['icon' => 'git-branch-outline', 'include' => 'block_project'],

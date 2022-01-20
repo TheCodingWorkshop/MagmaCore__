@@ -33,7 +33,6 @@ use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use Exception;
-use MagmaCore\Base\Traits\ControllerSettingTrait;
 
 class BaseController extends AbstractBaseController
 {
@@ -42,7 +41,6 @@ class BaseController extends AbstractBaseController
     use ControllerCastingTrait;
     use ControllerPrivilegeTrait;
     use ControllerMenuTrait;
-    use ControllerSettingTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -70,7 +68,6 @@ class BaseController extends AbstractBaseController
         $this->diContainer(Yaml::file('providers'));
         $this->initEvents();
         $this->buildControllerMenu($routeParams);
-        $this->buildController($routeParams);
 
     }
 

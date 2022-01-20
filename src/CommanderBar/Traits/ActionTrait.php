@@ -30,13 +30,13 @@ trait ActionTrait
         $commander .= $this->commanderFiltering() ?? ''; // filtering
         $commander .= '<ul class="uk-iconnav">';
         $commander .= '<li>';
-        $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="ion-28">';
+        $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="ion-21">';
         $commander .= '<ion-icon name="reader-outline"></ion-icon>';
         $commander .= '</a>';
         $commander .= '</li>';
         $commander .= PHP_EOL;
         $commander .= '<li>';
-        $commander .= '<a href="' . $this->actionPath() . '" uk-tooltip="Go Back" class="uk-button uk-button-primary uk-button-small uk-link-reset uk-link-toggle">';
+        $commander .= '<a style="margin-top:-5px;" href="' . $this->actionPath() . '" class="uk-button uk-button-primary uk-button-small uk-link-reset uk-link-toggle">';
         $commander .= $this->actionButton();
         $commander .= '</a>';
         $commander .= '</li>';
@@ -44,6 +44,26 @@ trait ActionTrait
         $commander .= '</ul>';
 
         return $commander;
+    }
+    private function actionButton(): string
+    {
+        if (isset($this->controller)) {
+            return match ($this->controller->thisRouteAction()) {
+                'new', 'edit', 'show', 'hard-delete', 'preferences', 'privileges' => 'Listings',
+                default => 'Add new'
+            };
+        }
+    }
+
+    private function actionPath(): string
+    {
+        if (isset($this->controller)) {
+            return match ($this->controller->thisRouteAction()) {
+                'new', 'edit', 'show', 'hard-delete', 'preferences', 'privileges' => '/' . $this->controller->thisRouteNamespace() . '/' . $this->controller->thisRouteController() . '/' . 'index',
+                'index' => '/admin/' . $this->controller->thisRouteController() . '/new',
+                default => 'javascript:history.back()'
+            };
+        }
     }
 
 

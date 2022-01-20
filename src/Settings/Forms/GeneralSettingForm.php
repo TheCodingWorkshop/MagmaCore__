@@ -130,12 +130,13 @@ class GeneralSettingForm extends ClientFormBuilder implements ClientFormBuilderI
                 $this->blueprint->settings(false, null, false, null, true, null, 'Add some brief description about your application.')
             )
             ->add(
-                $this->blueprint->checkbox(
+                $this->blueprint->select(
                     'menu_icon',
-                    ['uk-checkbox'],
+                    ['uk-select', 'uk-form-width-small'],
+                    'id',
                     $this->settings->get('menu_icon')
                 ),
-                null,
+                $this->blueprint->choices(['on', 'off'], $this->settings->get('menu_icon')),
                 $this->blueprint->settings(false, null, false, null, true, null, 'Enable/Disable menu icons.')
             )
 
