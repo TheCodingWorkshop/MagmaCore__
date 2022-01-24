@@ -10,16 +10,15 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\PanelMenu;
+namespace MagmaCore\Ticket;
 
-use MagmaCore\PanelMenu\MenuModel;
 use MagmaCore\CommanderBar\ApplicationCommanderInterface;
 use MagmaCore\CommanderBar\ApplicationCommanderTrait;
 use MagmaCore\CommanderBar\CommanderUnsetterTrait;
 use MagmaCore\Utility\Stringify;
 use Exception;
 
-class MenuCommander extends MenuModel implements ApplicationCommanderInterface
+class TicketCommander extends TicketModel implements ApplicationCommanderInterface
 {
 
     use ApplicationCommanderTrait;
@@ -35,14 +34,17 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
         'edit',
         'show',
         'log',
+        'bulk',
+        'trash',
+        'hard-delete',
     ];
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new'];
-    private array $noManager = [];
-    private array $noAction = [];
-    private array $noFilter = ['edit', 'show', 'new'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'trash', 'bulk'];
+    private array $noManager = ['trash', 'new', 'bulk'];
+    private array $noAction = ['trash'];
+    private array $noFilter = ['edit', 'show', 'new', 'trash'];
 
     private object $controller;
 
@@ -55,7 +57,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
      */
     public function getYml(): array
     {
-        return $this->findYml('menu');
+        return $this->findYml('ticket');
     }
 
     /**
@@ -65,7 +67,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
      */
     public function getGraphs(): string
     {
-        return '';
+        return '<div id="sparkline"></div>';
     }
 
     /**
@@ -79,14 +81,17 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
     {
         $this->getHeaderBuildException($controller, self::INNER_ROUTES);
         $this->controller = $controller;
-        $suffix = $this->getHeaderBuildEdit($controller, 'menu_name');
+        $suffix = $this->getHeaderBuildEdit($controller, 'ticket_name');
 
         return match ($controller->thisRouteAction()) {
             'index' => $this->getStatusColumnFromQueryParams($controller),
-            'new' => 'Create New Menu',
-            'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'menu_name'),
+            'new' => 'Create New',
+            'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'ticket_name'),
             'show' => "Viewing " . $suffix,
+            'bulk' => (isset($_POST['bulk-delete']) ? 'Bulk Delete' : 'Bulk Cloning'),
+            'trash' => 'Trash Listings',
             'log' => Stringify::capitalize($controller->thisRouteController()) . ' Log',
+            'hard-delete' => "Deleting " . $suffix,
             default => "Unknown"
         };
     }

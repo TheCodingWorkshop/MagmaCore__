@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\UserManager;
+namespace MagmaCore\Ticket;
 
 use MagmaCore\Collection\Collection;
 use MagmaCore\DataObjectLayer\DataRepository\AbstractDataRepositoryValidation;
@@ -23,7 +23,7 @@ use MagmaCore\ValidationRule\ValidationRule;
 use MagmaCore\Utility\RandomCharGenerator;
 use Exception;
 
-class UserValidate extends AbstractDataRepositoryValidation
+class TicketValidate extends AbstractDataRepositoryValidation
 {
 
     use UtilityTrait;
@@ -34,7 +34,6 @@ class UserValidate extends AbstractDataRepositoryValidation
     protected array $dataBag = [];
     /** @var ValidationRule $rules */
     protected ValidationRule $rules;
-    protected ?string $randomPassword = null;
 
     /** @var string - empty string will redirect on the same request */
     protected const REDIRECT_BACK_TO = '';
@@ -53,8 +52,7 @@ class UserValidate extends AbstractDataRepositoryValidation
     public function __construct(ValidationRule $rules)
     {
         $this->rules = $rules;
-        $this->rules->addObject(UserController::class, $this);
-        $this->randomPassword = RandomCharGenerator::generate();
+        $this->rules->addObject(TicketController::class, $this);
     }
 
     /**
@@ -70,39 +68,19 @@ class UserValidate extends AbstractDataRepositoryValidation
         $this->validate($entityCollection, $dataRepository);
         $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         if (null !== $dataCollection) {
-            $email = $this->isSet('email', $dataCollection, $dataRepository);
-            list($tokenHash, $activationHash) = (new HashGenerator())->hash();
-            list($encodedPassword, $randomPassword) = $this->userPassword($dataCollection);
 
             $newCleanData = [
-                'firstname' => $this->isSet('firstname', $dataCollection, $dataRepository),
-                'lastname' => $this->isSet('lastname', $dataCollection, $dataRepository),
-                'email' => $email,
-                'password_hash' => $encodedPassword,
-                'activation_token' => $tokenHash,
-                'status' => $this->isSet('status', $dataCollection, $dataRepository) ?? Yaml::file('app')['system']['default_status'],
-                'created_byid' => $this->getCreator($dataCollection) ?? 0,
-                'gravatar' => GravatarGenerator::setGravatar($email),
-                'remote_addr' => ClientIP::getClientIp()
+//                'firstname' => $this->isSet('firstname', $dataCollection, $dataRepository),
+//                'lastname' => $this->isSet('lastname', $dataCollection, $dataRepository),
+//                'email' => $email,
+//                'password_hash' => $encodedPassword,
+//                'activation_token' => $tokenHash,
+//                'status' => $this->isSet('status', $dataCollection, $dataRepository) ?? Yaml::file('app')['system']['default_status'],
+//                'created_byid' => $this->getCreator($dataCollection) ?? 0,
+//                'gravatar' => GravatarGenerator::setGravatar($email),
+//                'remote_addr' => ClientIP::getClientIp()
             ];
 
-            /* Settings additional data which will get merge with the dataBag */
-            $this->dataBag['activation_hash'] = $activationHash;
-
-            if (array_key_exists('role_id', $dataCollection)) {
-                $this->dataBag['role_id'] = intval($dataCollection['role_id']);
-            }
-
-            /**
-             * When updating we want to unset some key from the $newCleanData array so we
-             * are not overwriting key aspects of the user object. ie. We don't wanna mess
-             * with the user password. And we don't wanna generate a new activation_token
-             * on user update so we will remove these two keys from the array. And !is_null
-             * is simple ensuring we have a user object that we are unsetting from.
-             */
-            if (!is_null($dataRepository)) {
-                unset($newCleanData['activation_token'], $newCleanData['password_hash']);
-            }
 
         }
         return [
@@ -110,7 +88,7 @@ class UserValidate extends AbstractDataRepositoryValidation
             $this->validatedDataBag(
                 array_merge(
                     $newCleanData,
-                    ['random_pass' => $randomPassword]
+                    []
                 )
             )
         ];
@@ -167,10 +145,10 @@ class UserValidate extends AbstractDataRepositoryValidation
             function ($key, $value, $entityCollection, $dataRepository) {
                 if ($rules = $this->rules) {
                     return match ($key) {
-                        'password_hash', 'client_password_hash' => $rules->addRule("required"),
-                        'email' => $rules->addRule("required|email"),
-                        'firstname', 'lastname' => $rules->addRule("required"),
-                        'status' => $rules->addRule('string'),
+//                        'password_hash', 'client_password_hash' => $rules->addRule("required"),
+//                        'email' => $rules->addRule("required|email"),
+//                        'firstname', 'lastname' => $rules->addRule("required"),
+//                        'status' => $rules->addRule('string'),
                         default => NULL
                     };
                 }

@@ -10,12 +10,15 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Auth\Entity;
+namespace MagmaCore\Ticket\Event;
 
-use MagmaCore\Base\BaseEntity;
+use MagmaCore\Base\BaseActionEvent;
 
-/** @todo try and access the schema object to fetch the database column dynamically */
-class MenuItemEntity extends BaseEntity
-{ }
+class TicketActionEvent extends BaseActionEvent
+{
 
+    /** @var string - name of the event */
+    public const NAME = 'magmacore.ticket.event.ticket_action_event';
+
+}
 

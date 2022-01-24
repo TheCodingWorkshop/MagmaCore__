@@ -12,16 +12,18 @@ declare(strict_types=1);
 
 namespace MagmaCore\PanelMenu;
 
-use MagmaCore\PanelMenu\MenuCommander;
-use MagmaCore\PanelMenu\MenuColumn;
-use MagmaCore\PanelMenu\MenuSchema;
+use MagmaCore\Base\Access;
 use MagmaCore\PanelMenu\MenuForm;
-use MagmaCore\PanelMenu\Event\MenuActionEvent;
-use MagmaCore\Panelmenu\MenuEntity;
 use MagmaCore\PanelMenu\MenuModel;
-use MagmaCore\Auth\Model\MenuItemModel;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\PanelMenu\MenuColumn;
+use MagmaCore\Panelmenu\MenuEntity;
+use MagmaCore\PanelMenu\MenuSchema;
+use MagmaCore\PanelMenu\MenuCommander;
+use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
+use MagmaCore\PanelMenu\Event\MenuActionEvent;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber;
 
 class MenuController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -85,9 +87,9 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
 
     protected function newAction()
     {
-        $this->indexAction
+        $this->newAction
             ->setAccess($this, 'can_add')
-            ->execute($this, NULL, NULL, MenuSchema::class, __METHOD__)
+            ->execute($this, MenuEntity::class, MenuActionSubscriber::class, MenuSchema::class, __METHOD__)
             ->render()
             ->with(
                 [
@@ -115,6 +117,18 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             ->form($this->formMenu)
             ->end();
     }
+
+    // protected function trashAction()
+    // {
+    //     var_dump('welcome');
+    //     die;
+    //     $this->changeStatusAction
+    //         ->setAccess($this, Access::CAN_LOCK)
+    //         ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__,[], [],
+    //             ['deleted_at' => 1])
+    //         ->endAfterExecution();
+
+    // }
 
     /**
      * Remove a menu item from the usable list of items

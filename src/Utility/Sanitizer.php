@@ -48,6 +48,7 @@ class Sanitizer
                     case is_array($value) :
                         if (count($value) > 0) {
                             foreach ($value as $arrKey => $arrValue) {
+                                //$input[$arrKey] = self::clean($arrValue);
                                 if (isset($arrKey) && $arrKey !='') {
                                     if (is_int($arrValue)) {
                                         $input[$arrKey] = isset($arrValue) ? filter_var($arrValue, FILTER_SANITIZE_NUMBER_INT) : '';

@@ -201,6 +201,10 @@ class InputType implements FormBuilderTypeInterface
             case 'checkbox' :
                 return sprintf("\n<input %s>&nbsp;%s\n", $this->filtering(), ($this->settings['checkbox_label'] !='' ? $this->settings['checkbox_label'] : ''));
                 break;
+
+            case 'button' :
+                return $this->dropdownButton();
+                break;
             case 'multiple_checkbox' :
                 if (
                     isset($this->options) && 
@@ -215,6 +219,43 @@ class InputType implements FormBuilderTypeInterface
                 return sprintf("\n<input %s>\n", $this->filtering());
                 break;
         endswitch;
+    }
+
+    /**
+     * @return string
+     */
+    public function dropdownButton(): string
+    {
+        $btn = '<div class="uk-button-group">';
+        $btn .= '<button ' . $this->filtering() . '>Save & Continue</button>';
+        $btn .= '<div class="uk-inline">';
+        $btn .= '<button class="uk-button uk-button-default" type="button"><span uk-icon="icon:  triangle-down"></span></button>';
+        $btn .= '<div uk-dropdown="mode: click; boundary: ! .uk-button-group; boundary-align: true;">';
+        $btn .= '<ul class="uk-nav uk-dropdown-nav">';
+        if (is_array($this->options) && count($this->options) > 0) {
+            foreach ($this->options as $key => $option) {
+                $btn .= '<li>';
+                $name = $id = $class = $value = '';
+                $name = isset($option['name']) ? $option['name'] : '';
+                $id = isset($option['id']) ? $option['id'] : '';
+                $class = isset($option['class']) ? $option['class'] : '';
+                $value = isset($option['value']) ? $option['value'] : '';
+                $btn .= sprintf(
+                    '<input type="submit" name="%s" id="%s" value="%s" class="uk-button uk-button-text uk-button-small %s">',
+                    $name,
+                    $id,
+                    $value,
+                    $class
+                );
+                $btn .= '</li>' . "\n";
+            }
+        }
+        $btn .= '</ul>';
+        $btn .= '</div>';
+        $btn .= '</div>';
+        $btn .= '</div>';
+
+        return $btn;
     }
 
 }

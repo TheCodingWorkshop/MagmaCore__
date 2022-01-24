@@ -37,7 +37,7 @@ class UikitNavigationExtension
      * @param string $permission
      * @return bool
      */
-    public function hideMenuIfNoPermission($controller, $permission): bool
+    public function hideMenuIfNoPermission(object $controller, $permission): bool
     {
         $privilege = PrivilegedUser::getUser();
         if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())) {
@@ -53,10 +53,13 @@ class UikitNavigationExtension
      */
     public function register(object $controller = null): string
     {
+        $config = $controller->settings;
         $routeController = $controller->thisRouteController();
         $element = $active = '';
         if (isset($controller)) {
+
             $query = 'SELECT * FROM menus ORDER BY menu_order DESC';
+
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {
                 $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav>';
@@ -68,50 +71,70 @@ class UikitNavigationExtension
                     if ($controller->thisRouteController() === $item['menu_name']) {
                         $controller->getSession()->set('commander_icon', $item['menu_icon']);
                     }
-                    $childQuery = 'SELECT * FROM menu_item WHERE item_original_id = ' . $item['id'];
+                    $childQuery = 'SELECT * FROM menu_items WHERE item_original_id = ' . $item['id'];
                     $children = $this->repo->getClientCrud()->rawQuery($childQuery, [], 'fetch_all');
 
-                    if ($item) {
+                    if (array_key_exists('parent_menu', $item) && $item['parent_menu'] === 1) {
                         $isParent = (isset($children) && count($children) > 0);
                         $active = ($routeController === $item['menu_name'] && $routeController !=='dashboard') ? 'uk-open' : '';
                         $element .= '<li class="' . ($isParent ? 'uk-parent' . $active : '') . '">';
-                        
-                        $element .= '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
-                        //$element .=  '<span style="margin-bottom: 15px;" class="uk-margin-small-right"><ion-icon class="ion-24" name="' . $item['menu_icon'] . '"></ion-icon></span>';
-                        $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));
-                        $element .= '</a>';
+                        $element .= $this->getParentAnchorElement($item, $element, $config);
                         if ($isParent) {
                             $element .= '<ul class="uk-nav-sub uk-navbar-primary">';
                             foreach ($children as $child) {
                                 if ($child['item_usable'] === 1) {
-                                    //if ($this->hideMenuIfNoPermission($controller, 'can_view')) {
-                                        $element .= '<li>';
-                                            $element .= '<a href="' . ($child['item_url'] ?? '') . '">';
-                                            $element .= str_replace(
-                                                ['Index', 'New', 'Log'],
-                                                ['View', 'Add New', 'View Log'],
-                                                Stringify::capitalize($child['item_label'] ?? 'Unknown Child'));
-                                            $element .= '</a>';
-                                        $element .= '</li>';
-                                    //}
+                                    $element .= '<li>';
+                                    $element .= $this->getChildAnchorElement($child, $element);
+                                    $element .= '</li>';
                                 }
                             }
                             $element .= '</ul>' . PHP_EOL;
                         }
                         $element .= '</li>' . PHP_EOL;
+                    } else {
+                        $element .= $this->getParentAnchorElement($item, $element, $config);
                     }
 
-                    // if (isset($item['menu_break_point'])){
-                    //     $element .= '<li class="uk-nav-header">' . $item['menu_break_point'] . '</li>';
-                    //     $element .= '<hr>';
-                    //     continue;
-                    // }
                 }
 
                 $element .= '</ul>';
                 $element .= PHP_EOL;
             }
         }
+        return $element;
+    }
+
+    /**
+     * @param mixed $item
+     * @param string $element
+     * @param $config
+     * @return string
+     */
+    public function getParentAnchorElement(mixed $item, string $element, $config): string
+    {
+        $element = '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
+        if ($config->get('menu_icon') === 'on') {
+            $element .= '<span style="margin-bottom: 15px;" class="uk-margin-small-right"><ion-icon class="ion-' . $config->get('menu_icon_size') . '" name="' . $item['menu_icon'] . '-outline"></ion-icon></span>';
+        }
+
+        $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));
+        $element .= '</a>';
+        return $element;
+    }
+
+    /**
+     * @param mixed $child
+     * @param string $element
+     * @return string
+     */
+    public function getChildAnchorElement(mixed $child, string $element): string
+    {
+        $element = '<a href="' . ($child['item_url'] ?? '') . '">';
+        $element .= str_replace(
+            ['Index', 'New', 'Log'],
+            ['View', 'Add New', 'View Log'],
+            Stringify::capitalize($child['item_label'] ?? 'Unknown Child'));
+        $element .= '</a>';
         return $element;
     }
 }

@@ -19,13 +19,20 @@ use ReflectionException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\ClientIP;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Auth\Model\MenuModel;
 use MagmaCore\Base\Events\EventLogger;
-use MagmaCore\Auth\Model\MenuItemModel;
+use MagmaCore\PanelMenu\MenuModel;
+use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\System\Event\SystemActionEvent;
 use MagmaCore\Base\Traits\BaseReflectionTrait;
 use MagmaCore\System\EventTrait\SystemEventTrait;
+use MagmaCore\Base\Exception\BaseNoClassFoundExeption;
+
+/**
+ * This class is responsible for creating allowable sidebar menu and its related items. Menu items
+ * are defined within the $usables array. Meaning all controller which will have a sidebar menu
+ * must consists a index, new, log menu item
+ */
 
 trait ControllerMenuTrait
 {
@@ -48,7 +55,8 @@ trait ControllerMenuTrait
      */
     public function getMenuItem(): object
     {
-        return new MenuItemModel();
+        if (class_exists(MenuItemModel::class))
+            return new MenuItemModel();
     }
 
     /**
@@ -57,7 +65,11 @@ trait ControllerMenuTrait
      */
     private function getMenu(): object
     {
-        return new MenuModel();
+        try {
+            return new MenuModel();
+        } catch(BaseNoClassFoundExeption $e) {
+            throw new BaseNoClassFoundExeption(MenuModel::class . ' The requested class was not found.');
+        }
     }
 
     /**
@@ -93,10 +105,13 @@ trait ControllerMenuTrait
      */
     public function buildControllerMenu(array $routeParams): bool
     {
-        if (count($routeParams)) {
+        if (count($routeParams)) { /* Ensure we have atleast 1 route within the array */
+            /* routes we don't want building a menu for */
             $disallowedControllers = Yaml::file('app')['disallowed_controllers'];
             if (!in_array($routeParams['controller'], $disallowedControllers)) {
+                /* check if the menu name exists if not then create it using the isset() */
                 $controllerMenu = $this->getControllerMenu(['menu_name' => $routeParams['controller']]);
+
                 if (!isset($controllerMenu)) {
                     $fields = [
                         'menu_name' => $routeParams['controller'],
@@ -110,6 +125,7 @@ trait ControllerMenuTrait
 
                     if ($new) {
                         $lastMenuID = $this->getMenu()->getRepo()->fetchLastID();
+                        /* Once we insert the menu name lets in insert some items for it */
                         $this->hasMenuItems($routeParams, $lastMenuID);
 
                         /* log Event data */
@@ -146,7 +162,7 @@ trait ControllerMenuTrait
         if (isset($parentMenu->menu_name) && $parentMenu->menu_name !==null ) {
             $controllerName = Stringify::studlyCaps($parentMenu->menu_name . 'Controller');
             $namespace = (isset($routeParams['namespace']) ? '\App\Controller\Admin\\' . $controllerName : '\App\Controller\\' . $controllerName);
-            $reflectionClass = $this->reflection($namespace ?? null);
+            //$reflectionClass = $this->reflection($namespace ?? null);
             /* We only want the protected methods */
             $hasMethods = $this->reflection($namespace)->methods(ReflectionMethod::IS_PROTECTED);
             if (is_array($hasMethods) && count($hasMethods) > 0) {
@@ -186,7 +202,11 @@ trait ControllerMenuTrait
                         'item_usable' => $this->getUsableMenuItems($itemName[0], $routeParams)
                     ];
 
-                    return $this->getMenuItem()->getRepo()->getEm()->getCrud()->create($fields);
+                    return $this->getMenuItem()
+                        ->getRepo()
+                        ->getEm()
+                        ->getCrud()
+                        ->create($fields);
 
                 }
             }, $methods);

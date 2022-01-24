@@ -10,18 +10,17 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\PanelMenu;
+namespace MagmaCore\UserManager\Rbac\Group;
 
-use MagmaCore\PanelMenu\MenuModel;
+use Exception;
 use MagmaCore\CommanderBar\ApplicationCommanderInterface;
 use MagmaCore\CommanderBar\ApplicationCommanderTrait;
 use MagmaCore\CommanderBar\CommanderUnsetterTrait;
-use MagmaCore\Utility\Stringify;
-use Exception;
 
-class MenuCommander extends MenuModel implements ApplicationCommanderInterface
+class GroupCommander extends GroupModel implements ApplicationCommanderInterface
 {
 
+    /** @var ApplicationCommanderTrait - this is required */
     use ApplicationCommanderTrait;
     use CommanderUnsetterTrait;
 
@@ -33,16 +32,16 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
         'index',
         'new',
         'edit',
-        'show',
-        'log',
+        'bulk',
+        'assigned'
     ];
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new'];
-    private array $noManager = [];
+    private array $noCustomizer = ['new', 'edit'];
+    private array $noManager = ['new'];
     private array $noAction = [];
-    private array $noFilter = ['edit', 'show', 'new'];
+    private array $noFilter = ['new', 'edit'];
 
     private object $controller;
 
@@ -55,7 +54,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
      */
     public function getYml(): array
     {
-        return $this->findYml('menu');
+        return $this->findYml('group');
     }
 
     /**
@@ -65,7 +64,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
      */
     public function getGraphs(): string
     {
-        return '';
+        return '<div id="sparkline"></div>';
     }
 
     /**
@@ -79,17 +78,15 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
     {
         $this->getHeaderBuildException($controller, self::INNER_ROUTES);
         $this->controller = $controller;
-        $suffix = $this->getHeaderBuildEdit($controller, 'menu_name');
 
         return match ($controller->thisRouteAction()) {
             'index' => $this->getStatusColumnFromQueryParams($controller),
-            'new' => 'Create New Menu',
-            'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'menu_name'),
-            'show' => "Viewing " . $suffix,
-            'log' => Stringify::capitalize($controller->thisRouteController()) . ' Log',
+            'new' => 'Create New Group',
+            'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'group_name'),
+            'assigned' => 'Group Assignment',
+            'bulk' => 'Bulk Delete',
             default => "Unknown"
         };
     }
 
 }
-

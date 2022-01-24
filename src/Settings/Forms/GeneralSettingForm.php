@@ -139,6 +139,17 @@ class GeneralSettingForm extends ClientFormBuilder implements ClientFormBuilderI
                 $this->blueprint->choices(['on', 'off'], $this->settings->get('menu_icon')),
                 $this->blueprint->settings(false, null, false, null, true, null, 'Enable/Disable menu icons.')
             )
+            ->add(
+                $this->blueprint->text(
+                    'menu_icon_size',
+                    ['uk-form-width-small', 'uk-border-bottom', 'uk-form-blank'],
+                    $this->settings->get('menu_icon_size'),
+                    false,
+                    'Menu Iocn...'
+                ),
+                null,
+                $this->blueprint->settings(false, null, false, 'Name', true, null, 'Alter the size of your menu icon (18, 21 or 23px)')
+            )
 
             ->add(
                 $this->blueprint->submit(

@@ -10,11 +10,13 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Auth\Entity;
+namespace MagmaCore\UserManager\Rbac\Group\Event;
 
-use MagmaCore\Base\BaseEntity;
+use MagmaCore\Base\BaseActionEvent;
 
-/** @todo try and access the schema object to fetch the database column dynamically */
-class MenuEntity extends BaseEntity
-{}
+class GroupActionEvent extends BaseActionEvent
+{
 
+    /** @var string - name of the event */
+    public const NAME = 'magmacore.usermanager.rbac.group.event.group_action_event';
+}

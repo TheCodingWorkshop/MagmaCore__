@@ -7,21 +7,29 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 declare(strict_types=1);
 
-namespace MagmaCore\Auth\Model;
+namespace MagmaCore\UserManager\Rbac\Group\Model;
 
-use MagmaCore\Auth\Entity\MenuEntity;
 use MagmaCore\Base\AbstractBaseModel;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\UserManager\Rbac\Group\Entity\GroupRoleEntity;
 
-class MenuModel extends AbstractBaseModel
+class UserGroupModel extends AbstractBaseModel
 {
 
     /** @var string */
-    protected const TABLESCHEMA = 'menus';
+    protected const TABLESCHEMA = 'user_group';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [
+        'group_name',
+        'group_slug',
+        'group_description',
+        'created_byid',
+    ];
+
 
     /**
      * Main constructor class which passes the relevant information to the
@@ -33,7 +41,7 @@ class MenuModel extends AbstractBaseModel
      */
     public function __construct()
     {
-        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, MenuEntity::class);
+        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, NULL);
     }
 
     /**
@@ -44,15 +52,6 @@ class MenuModel extends AbstractBaseModel
     public function guardedID(): array
     {
         return [];
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function getNameForSelectField($id): mixed
-    {
-        return $this->getSelectedNameField($id, 'menu_name');
     }
 
 }

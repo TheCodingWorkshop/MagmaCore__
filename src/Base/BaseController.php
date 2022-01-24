@@ -15,6 +15,7 @@ namespace MagmaCore\Base;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
+use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
 use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Utility\Yaml;
@@ -32,6 +33,8 @@ use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
+use MagmaCore\Base\Exception\BaseOutOfBoundException;
+
 use Exception;
 
 class BaseController extends AbstractBaseController
@@ -449,6 +452,7 @@ class BaseController extends AbstractBaseController
     {
         return $this->baseApp($this)->loadCache();
     }
+
 
 
 }

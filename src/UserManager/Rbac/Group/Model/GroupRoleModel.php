@@ -10,21 +10,27 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\PanelMenu;
+namespace MagmaCore\UserManager\Rbac\Group\Model;
 
-use MagmaCore\PanelMenu\MenuEntity;
 use MagmaCore\Base\AbstractBaseModel;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\UserManager\Rbac\Group\Entity\GroupRoleEntity;
 
-class MenuModel extends AbstractBaseModel
+class GroupRoleModel extends AbstractBaseModel
 {
 
     /** @var string */
-    protected const TABLESCHEMA = 'menus';
+    protected const TABLESCHEMA = 'group_role';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
-    /** @var array */
-    protected const COLUMN_STATUS = [];
+    public const COLUMN_STATUS = [];
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [
+        'group_name',
+        'group_slug',
+        'group_description',
+        'created_byid',
+    ];
+
 
     /**
      * Main constructor class which passes the relevant information to the
@@ -36,7 +42,7 @@ class MenuModel extends AbstractBaseModel
      */
     public function __construct()
     {
-        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, MenuEntity::class);
+        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, GroupRoleEntity::class);
     }
 
     /**
@@ -46,10 +52,8 @@ class MenuModel extends AbstractBaseModel
      */
     public function guardedID(): array
     {
-        return [
-        ];
+        return [];
     }
-
     /**
      * Return an array of column values if table supports the column field
      *
@@ -60,14 +64,5 @@ class MenuModel extends AbstractBaseModel
         return self::COLUMN_STATUS;
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function getNameForSelectField($id): mixed
-    {
-        return $this->getSelectedNameField($id, 'menu_name');
-    }
-
-
 }
+

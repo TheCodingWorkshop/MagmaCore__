@@ -153,7 +153,8 @@ class MenuColumn extends AbstractDatatableColumn
                                         $this->itemsDropdown($row, $this->controller),
                                         '',
                                         $row,
-                                        $this->controller
+                                        $this->controller,
+                                        ['can_view_menu']
                                     );
                                 }
                             ],

@@ -10,14 +10,18 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\PluginPanel;
+namespace MagmaCore\UserManager\Rbac\Group;
 
+use MagmaCore\Datatable\DataColumnTrait;
 use MagmaCore\Datatable\AbstractDatatableColumn;
 
-class PluginColumn extends AbstractDatatableColumn
+class GroupColumn extends AbstractDatatableColumn
 {
 
-    private string $controller = 'plugin';
+    use DataColumnTrait;
+
+    private string $controller = 'group';
+
     /**
      * @param array $dbColumns
      * @param object|null $callingController
@@ -34,11 +38,11 @@ class PluginColumn extends AbstractDatatableColumn
                 'sortable' => false,
                 'searchable' => true,
                 'formatter' => function ($row) {
-                    return '<input type="checkbox" class="uk-checkbox" id="plugins-' . $row['id'] . '" name="id[]" value="' . $row['id'] . '">';
+                    return '<input type="checkbox" class="uk-checkbox" id="group-' . $row['id'] . '" name="id[]" value="' . $row['id'] . '">';
                 }
             ],
             [
-                'db_row' => 'permission_name',
+                'db_row' => 'group_name',
                 'dt_row' => 'Name',
                 'class' => '',
                 'show_column' => true,
@@ -50,8 +54,8 @@ class PluginColumn extends AbstractDatatableColumn
                     $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';
-                    $html .= $row["permission_name"] . "<br/>";
-                    $html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["permission_description"] . '</small></div>';
+                    $html .= $row["group_name"] . "<br/>";
+                    $html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["group_description"] . '</small></div>';
                     $html .= '</div>';
                     $html .= '</div>';
 
@@ -59,7 +63,7 @@ class PluginColumn extends AbstractDatatableColumn
                 }
             ],
             [
-                'db_row' => 'permission_description',
+                'db_row' => 'group_description',
                 'dt_row' => 'Description',
                 'class' => '',
                 'show_column' => false,
@@ -99,6 +103,16 @@ class PluginColumn extends AbstractDatatableColumn
                 }
             ],
             [
+                'db_row' => 'created_byid',
+                'dt_row' => 'Author',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => true,
+                'searchable' => false,
+                'formatter' => ''
+            ],
+
+            [
                 'db_row' => '',
                 'dt_row' => 'Action',
                 'class' => '',
@@ -113,21 +127,20 @@ class PluginColumn extends AbstractDatatableColumn
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
                                         $this->itemsDropdown($row, $this->controller),
-                                        $this->getDropdownStatus($row),
+                                        '',
                                         $row,
                                         $this->controller,
-                                        ['can_view_plugin']
+                                        ['can_view_group']
                                     );
                                 }
                             ],
-
                         ],
                         $row,
                         $tempExt,
-                        'plugin',
+                        $this->controller,
                         false,
                         'Are You Sure!',
-                        "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['permission_name']}</strong> role.",
+                        "You are about to carry out an irreversable action. Are you sure you want to delete <strong class=\"uk-text-danger\">{$row['group_name']}</strong> group."
                     );
                 }
             ],
@@ -139,14 +152,14 @@ class PluginColumn extends AbstractDatatableColumn
      * Undocumented function
      *
      * @param array $row
-     * @param string $controller
      * @return array
      */
     private function itemsDropdown(array $row, string $controller): array
     {
         $items = [
+            'assigned' => ['name' => 'Assigned', 'icon' => 'lock-closed-outline'],
             'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'trash' => ['name' => 'trash account', 'icon' => 'trash-bin-outline']
+            'delete' => ['name' => 'trash permission', 'icon' => 'trash-bin-outline']
         ];
         return array_map(
             fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
@@ -154,6 +167,5 @@ class PluginColumn extends AbstractDatatableColumn
             $items
         );
     }
-
 
 }

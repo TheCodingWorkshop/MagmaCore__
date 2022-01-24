@@ -13,9 +13,13 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Extensions\Modules;
 
 use Closure;
+use MagmaCore\Base\Traits\BaseAnchorTrait;
+
 
 class IconNavExtension
 {
+
+    use BaseAnchorTrait;
 
     /** @var string */
     protected const TRASH_KEY = 'trash';
@@ -39,7 +43,7 @@ class IconNavExtension
      * @param boolean $vertical
      * @return string
      */
-    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false, Closure $callback = null): string
+    public function iconNav(array $icons = [], array $row = null, Object $twigExt = null, string $controller = null, bool $vertical = false, Closure $callback = null, ?string $permission = null): string
     {
         $html = '';
         if (is_array($icons) && count($icons) > 0) {
@@ -67,7 +71,7 @@ class IconNavExtension
                 
                 $html .=  "\n" . sprintf(
                     '<li><a href="%s"%s%s%s>%s</a>',
- 
+
                     ($path ? $path : $toggleID),
                     (isset($tooltip) ? ' uk-tooltip="' . $tooltip . '"' : ' uk-tooptip="' . $key . '"'),
 
@@ -107,7 +111,6 @@ class IconNavExtension
                 $html .= '</li>' . "\n";
             }
             $html .= "</ul>";
-
             return $html;
         }
     }

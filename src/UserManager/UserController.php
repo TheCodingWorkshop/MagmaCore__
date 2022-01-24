@@ -116,6 +116,10 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function indexAction()
     {
 
+//        $test = $this->protectedAnchor(['href' => 'http://localhost'], 1270, 'No Link', '');
+//        var_dump($test);
+//        die;
+
         $trashCount = $this->repository->getRepo()->count(['status' => 'trash']);
         $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
         $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);

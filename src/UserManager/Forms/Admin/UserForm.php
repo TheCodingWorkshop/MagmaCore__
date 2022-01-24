@@ -111,12 +111,27 @@ class UserForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 null,
                 $this->blueprint->settings(false, null, false)
             )
+//            ->add($this->blueprint->dropdownSubmit(
+//                $this->hasValue('id') ? 'edit-user' : 'new-user',
+//                ['uk-button', 'uk-button-primary', 'uk-button-small', 'uk-form-width-medium'],
+//                'Save'
+//            ),
+//
+//                [
+//                    'edit' => [
+//                        'name' => $this->hasValue('id') ? 'edit-user' : 'new-user',
+//                        'value' => 'Save & Edit',
+//                        'id' => 'save_and_edit'
+//                    ]
+//                ],
+//                $this->blueprint->settings(false, null, false, null, true)
+//            )
             ->add($this->blueprint->submit(
                 $this->hasValue('id') ? 'edit-user' : 'new-user',
                 ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
-                'Save'
+                'Save & Continue'
             ),
-                
+
                 null,
                 $this->blueprint->settings(false, null, false, null, true)
             )

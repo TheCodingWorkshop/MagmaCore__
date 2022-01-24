@@ -22,6 +22,11 @@ en:
   permission_assigned: Permission Assigned
   assigned_to: Assigned To
   role: Role
+  roles: Roles
+  group: Group
+  groups: Groups
+  group_name: Group Name
+  group_assigned: Group Assigned
 
   getting_started: Getting Started
   application: application
@@ -78,3 +83,4 @@ en:
   password: Password
   activation_hash: Activation Hash
   last_5_users: Last 5 Users
+

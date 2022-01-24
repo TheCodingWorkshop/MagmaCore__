@@ -12,10 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\PanelMenu\EventSubscriber;
 
-use MagmaCore\PanelMenu\Event\MenuActionEvent;
 use Exception;
-use JetBrains\PhpStorm\ArrayShape;
-use MagmaCore\Auth\Model\MenuItemModel;
+use MagmaCore\PanelMenu\Event\MenuActionEvent;
+use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 
@@ -34,6 +33,8 @@ class MenuActionSubscriber implements EventSubscriberInterface
     private const EDIT_ACTION = 'edit';
     /* @var string */
     protected const INDEX_ACTION = 'index';
+    /* @var string */
+    protected const NEW_ACTION = 'new';
 
     private MenuItemModel $menuItem;
 
@@ -52,12 +53,12 @@ class MenuActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    #[ArrayShape([MenuActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             MenuActionEvent::NAME => [
                 ['flashLoginEvent', self::FLASH_MESSAGE_PRIORITY],
-                ['addMenuItem']
+                //['addMenuItem']
             ]
         ];
     }
@@ -94,6 +95,26 @@ class MenuActionSubscriber implements EventSubscriberInterface
                 }
                 return true;
             }
+        }
+        return false;
+    }
+
+    /**
+     * @param MenuActionEvent $event
+     * @return bool
+     */
+    public function setMenuParentToZero(MenuActionEvent $event): bool
+    {
+        if ($this->onRoute($event, self::NEW_ACTION)) {
+            $context = $this->flattenContext($event->getContext());
+
+//            if (isset($context['item_usable']) && count($context['item_usable']) > 0) {
+//                foreach ($context['item_usable'] as $itemID) {
+//                    $itemID = (int)$itemID;
+//                    $this->menuItem->getRepo()->findByIdAndUpdate(['item_usable' => 1], $itemID);
+//                }
+//                return true;
+//            }
         }
         return false;
     }

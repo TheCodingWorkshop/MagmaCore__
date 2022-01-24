@@ -42,6 +42,17 @@ services:
         App\Controller\RegistrationController::registerAction:
           msg: Your account was created!
 
+    group.subscriber:
+      class: \MagmaCore\UserManager\Rbac\Group\EventSubscriber\GroupActionSubscriber
+      register_route_feedback:
+        MagmaCore\UserManager\Rbac\Group\GroupController::newAction:
+          msg: New Group Added!
+        MagmaCore\UserManager\Rbac\Group\GroupController::editAction:
+          msg: Group updated!
+        MagmaCore\UserManager\Rbac\Group\GroupController::deleteAction:
+          msg: Group Deleted!
+          redirect: group.index
+
     role.subscriber:
       class: \MagmaCore\UserManager\Rbac\Role\EventSubscriber\RoleActionSubscriber
       register_route_feedback:

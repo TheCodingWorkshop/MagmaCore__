@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
+use MagmaCore\FormBuilder\Type\ButtonType;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
@@ -264,6 +265,20 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
             ]
         ];
     }
+
+    public function dropdownSubmit(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        ?string $onclick = null
+    ): array {
+        return [
+            ButtonType::class => [
+                $this->subArg($name, $class, $value, $onclick)
+            ]
+        ];
+    }
+
 
     public function choices(array $choices, string|int|array $default = null, object $form = null): array
     {

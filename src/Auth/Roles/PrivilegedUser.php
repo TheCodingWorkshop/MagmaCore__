@@ -84,6 +84,16 @@ class PrivilegedUser
     }
 
     /**
+     * Check whether the current role ID is link to any permission
+     * @param int $roldID
+     * @return bool
+     */
+    public function hasRolePrivilege(int $roldID): bool
+    {
+        return $this->getPermissionByRoleID($roleID);
+    }
+
+    /**
      * Check if a user a specific role
      * @param $role
      * @return bool
@@ -131,5 +141,12 @@ class PrivilegedUser
         }
     }
 
+    public function getRoleByGroupID(int $groupID)
+    {
+        $roles = Role::getRoleGroups($groupID);
+        foreach ((array)$roles as $role) {
+            return $role;
+        }
+    }
 
 }

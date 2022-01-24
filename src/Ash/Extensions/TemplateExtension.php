@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Extensions;
 
+use MagmaCore\Base\Traits\BaseAnchorTrait;
 use MagmaCore\Utility\Stringify;
 
 use MagmaCore\Session\SessionTrait;
@@ -27,6 +28,7 @@ class TemplateExtension
 {
 
     use SessionTrait;
+    use BaseAnchorTrait;
 
     /**
      * Undocumented function
@@ -92,7 +94,7 @@ class TemplateExtension
      * @param mixed $values
      * @return string
      */
-    public function getDropdown(array $items = [], string|null $status = null, array $row = [], string|null $controller = null): string
+    public function getDropdown(array $items = [], string|null $status = null, array $row = [], string|null $controller = null, array $permission = []): string
     {
         $element = '';
         $_controller = ($controller !==null) ? $controller : '';
@@ -103,10 +105,20 @@ class TemplateExtension
             $element .= '<li class="uk-active"><a href="#">' . ($status !==null) ? Stringify::capitalize($status) : 'Status Unknown' . '</a></li>';
             foreach ($items as $key => $item) {
                 $element .= '<li>';
-                $element .= '<a data-turbo="true" href="'.(isset($item['path']) ? $item['path']:'') . '">';
-                $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
-                $element .= Stringify::capitalize($item['name']);
-                $element .= '</a>';
+                $element .= $this->protectedAnchor(
+                    [
+                        'href' => (isset($item['path']) ? $item['path']:''),
+                        'turbo' => true,
+                    ],
+                    (int)$row['id'],
+                    (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '') . ' ' .Stringify::capitalize($item['name']),
+                    $permission
+                );
+
+//                $element .= '<a data-turbo="true" href="'.(isset($item['path']) ? $item['path']:'') . '">';
+//                $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
+//                $element .= Stringify::capitalize($item['name']);
+//                $element .= '</a>';
                 $element .= '</li>';
                 $element .= PHP_EOL;
             }
@@ -186,8 +198,9 @@ class TemplateExtension
         string $controller,
         bool $vertical = false,
         string $title = null,
-        string $description = null
+        string $description = null,
+        ?string $permission = null
     ): string {
-        return (new ColumnActionExtension())->action($action, $row, $twigExt, $controller, $vertical, $title, $description);
+        return (new ColumnActionExtension())->action($action, $row, $twigExt, $controller, $vertical, $title, $description, $permission);
     }
 }

@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace MagmaCore\Auth\Roles;
 
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
+use MagmaCore\UserManager\Rbac\Group\Model\GroupRoleModel;
 
 class Role
 {
 
     /** @var array  */
     protected array $permissions;
+    protected array $gRoles;
 
     /**
      * Role constructor.
@@ -49,6 +51,29 @@ class Role
             return $role;
         }
     }
+
+    /**
+     * return a role object with associated group
+     * @param $roleID
+     * @return array
+     */
+    public static function getRoleGroups($groupID)
+    {
+        $role = new Role();
+        $sql = "SELECT t2.role_name FROM group_role as t1 JOIN roles as t2 ON t1.group_id = t2.id WHERE t1.group_id = :group_id";
+        $row = (new GroupRoleModel())
+            ->getRepo()
+            ->getEm()
+            ->getCrud()
+            ->rawQuery($sql, ['group_id' => $groupID], 'fetch_all');
+        if ($row) {
+            foreach ($row as $r) {
+                $role->gRoles[$r['role_name']] = true;
+            }
+            return $role;
+        }
+    }
+
 
     /**
      * Check if a permission is set

@@ -12,14 +12,13 @@ declare(strict_types=1);
 
 namespace MagmaCore\PanelMenu;
 
-use MagmaCore\Auth\Model\MenuItemModel;
-use MagmaCore\Auth\Model\MenuModel;
-use MagmaCore\DataObjectLayer\DataLayerTrait;
-use MagmaCore\FormBuilder\ClientFormBuilder;
-use MagmaCore\FormBuilder\ClientFormBuilderInterface;
-use MagmaCore\FormBuilder\FormBuilderBlueprint;
-use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 use Exception;
+use MagmaCore\FormBuilder\ClientFormBuilder;
+use MagmaCore\DataObjectLayer\DataLayerTrait;
+use MagmaCore\FormBuilder\FormBuilderBlueprint;
+use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
+use MagmaCore\FormBuilder\ClientFormBuilderInterface;
+use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 
 class MenuForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {

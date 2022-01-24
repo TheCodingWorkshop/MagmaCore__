@@ -35,13 +35,13 @@ class ColumnActionExtension
         string $controller, 
         bool $vertical = false,
         string $title = null,
-        string $description = null): string
+        string $description = null, ?string $permission = null): string
     {
         $iconNav = new IconNavExtension();
         $element = '';
         if (is_array($action) && count($action) > 0) {
             if ($row !=null) {
-                $element .= $iconNav->iconNav($action, $row, $twigExt, $controller, $vertical);
+                $element .= $iconNav->iconNav($action, $row, $twigExt, $controller, $vertical, null, $permission);
             }
             $element .= $iconNav->confirmationModal($row['id'], $controller, $title, $description);
         }

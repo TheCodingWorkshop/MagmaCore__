@@ -10,21 +10,27 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\PanelMenu;
+namespace MagmaCore\Ticket;
 
-use MagmaCore\PanelMenu\MenuEntity;
 use MagmaCore\Base\AbstractBaseModel;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Utility\UtilityTrait;
 
-class MenuModel extends AbstractBaseModel
+class TicketModel extends AbstractBaseModel
 {
 
+    use UtilityTrait;
+
     /** @var string */
-    protected const TABLESCHEMA = 'menus';
+    protected const TABLESCHEMA = 'tickets';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
-    /** @var array */
-    protected const COLUMN_STATUS = [];
+    /** @var array - field casting */
+    protected array $cast = [];
+    /* @var array COLUMN_STATUS */
+    public const COLUMN_STATUS = [];
+
+    /** @var array $fillable - an array of fields that should not be null */
+    protected array $fillable = [];
 
     /**
      * Main constructor class which passes the relevant information to the
@@ -36,7 +42,8 @@ class MenuModel extends AbstractBaseModel
      */
     public function __construct()
     {
-        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, MenuEntity::class);
+        parent::__construct(self::TABLESCHEMA, self::TABLESCHEMAID, TicketEntity::class);
+
     }
 
     /**
@@ -46,8 +53,7 @@ class MenuModel extends AbstractBaseModel
      */
     public function guardedID(): array
     {
-        return [
-        ];
+        return [];
     }
 
     /**
@@ -60,14 +66,15 @@ class MenuModel extends AbstractBaseModel
         return self::COLUMN_STATUS;
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function getNameForSelectField($id): mixed
+    public function ticketStatusMenu(): array
     {
-        return $this->getSelectedNameField($id, 'menu_name');
+        return [
+            'open' => ['name' => 'Open', 'icon' => 'folder-open-outline'],
+            'closed' => ['name' => 'Closed', 'icon' => 'send-outline'],
+            'resolved' => ['name' => 'Resolved', 'icon' => 'pencil-outline'],
+        ];
     }
 
 
 }
+
