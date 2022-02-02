@@ -118,17 +118,15 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
-    // protected function trashAction()
-    // {
-    //     var_dump('welcome');
-    //     die;
-    //     $this->changeStatusAction
-    //         ->setAccess($this, Access::CAN_LOCK)
-    //         ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__,[], [],
-    //             ['deleted_at' => 1])
-    //         ->endAfterExecution();
+    protected function deleteAction()
+    {
+        $this->deleteAction
+            ->setAccess($this, Access::CAN_DELETE)
+            ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
 
-    // }
+        
+    }
 
     /**
      * Remove a menu item from the usable list of items

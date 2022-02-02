@@ -111,17 +111,20 @@ class FormBuilder extends AbstractFormBuilder
      * HTML elements wrap around each input tag for better styling of each element
      *
      * @param array $args
+     * @param bool $noForm = true Whether to render the actual form tags
      * @return string|bool
      * @throws Exception
      */
-    public function build(array $args = []): string|bool
+    public function build(array $args = [], bool $noForm = true, bool $disableCsrf = true): string|bool
     { 
         if ($args) {
             $this->htmlAttr = array_merge(self::HTML_ELEMENT_PARTS, $args);
         } else {
             $this->htmlAttr = self::HTML_ELEMENT_PARTS;
         }
-        $this->element .= sprintf('<form %s>', $this->renderHtmlElement($this->formAttr));
+        if ($noForm) {
+            $this->element .= sprintf('<form %s>', $this->renderHtmlElement($this->formAttr));
+        }
             if (is_array($this->inputObject)) {
                 foreach ($this->inputObject as $objectType) {
                     foreach ((array)$objectType->configureOptions() as $key => $value) {
@@ -130,12 +133,13 @@ class FormBuilder extends AbstractFormBuilder
                     $this->element .= $this->processFormFields($objectType);
                 }
             }
-            if ($this->addCsrf) {
+            if ($disableCsrf === true) {
                 $this->element .= $this->csrfForm($this->formAttr['action']);
             }
             $this->element .= PHP_EOL;
-
-        $this->element .= (isset($this->formAttr['leave_form_open']) && $this->formAttr['leave_form_open'] === true ? '' : '</form>');
+        if ($noForm) {
+            $this->element .= '</form>';
+        }
 
         $this->element .= PHP_EOL;
         if (isset($this->element) && !empty($this->element)) {

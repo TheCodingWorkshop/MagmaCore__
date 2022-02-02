@@ -5,7 +5,8 @@ app:
   app_name: LavaStudio
   core_name: Magma
   app_version: 1.0.0
-  core_version: 1.0.0
+  core_version: 1.3.9
+  core_db_version: 1.0.0
   app_email: magmacore@lavastudio.co.uk
   app_author: Ricardo Miller
 
@@ -25,17 +26,13 @@ settings:
 #=============================================================================
 #=============================================================================
 theme_builder:
-  libraries:
+  cssDriver:
     uikit:
-      class: \MagmaCore\Themes\Library\Uikit\Uikit
+      class: \MagmaCore\ThemeBuilder\CssDriver\UikitCssDriver
       default: true
       version: 1.0
     bootstrap:
-      class: \MagmaCore\Themes\Library\Bootstrap\Bootstrap
-      default: false
-      version: 1.0
-    tailwind:
-      class: \MagmaCore\Themes\Library\Tailwind
+      class: \MagmaCore\ThemeBuilder\CssDriver\BootstrapCssDriver
       default: false
       version: 1.0
 

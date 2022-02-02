@@ -199,8 +199,12 @@ class QueryBuilder extends AbstractQueryBuilder
         } else if (empty($this->key['conditions'])) {
             $this->sqlQuery = " WHERE 1";
         }
+        // if (isset($this->key['limit']) && $this->key['limit'] !== '') {
+        //     $this->sqlQuery .= ' LIMIT ' . $this->key['limit'];
+        // } 
         $this->sqlQuery .= $this->orderByQuery();
         $this->sqlQuery .= $this->queryOffset();
+        
 
         return $this->sqlQuery;
     }

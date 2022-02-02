@@ -144,7 +144,7 @@ class PermissionValidate extends AbstractDataRepositoryValidation
         $this->doValidation(
             $entityCollection,
             $dataRepository,
-            function ($key, $value, $entityVollection, $dataRepository) {
+            function ($key, $value, $entityCollection, $dataRepository) {
                 if ($rules = $this->rules) {
                     return match ($key) {
                         'permission_name' => $rules->addRule("required|unique"),

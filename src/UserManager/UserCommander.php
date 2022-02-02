@@ -40,13 +40,14 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'privilege',
         'preferences',
         'personal',
-        'notes'
+        'notes',
+        'overview'
     ];
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes'];
-    private array $noManager = ['trash', 'new', 'bulk', 'personal'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes', 'overview'];
+    private array $noManager = ['trash', 'new', 'bulk', 'personal', 'overview'];
     private array $noAction = ['trash', 'personal'];
     private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences', 'personal'];
 
@@ -101,6 +102,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'privileges' => $suffix . " Privileges",
             'personal' => $suffix . " Personal Space",
             'notes' => 'Add Notes',
+            'overview' => 'Users Overview',
             default => "Unknown"
         };
     }

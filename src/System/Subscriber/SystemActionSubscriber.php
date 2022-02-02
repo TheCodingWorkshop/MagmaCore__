@@ -35,7 +35,7 @@ class SystemActionSubscriber implements EventSubscriberInterface
      * @return array
      */
 
-    #[ArrayShape([SystemActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             SystemActionEvent::NAME => [

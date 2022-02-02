@@ -13,19 +13,21 @@ declare(strict_types=1);
 namespace MagmaCore\Administrator\Dashboard;
 
 use MagmaCore\UserManager\UserModel;
-use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\Numbers\Number;
+use MagmaCore\Ticket\TicketModel;
 
 class DashboardRepository
 {
 
     private UserModel $user;
     private Number $number;
+    private TicketModel $ticketModel;
 
-    public function __construct(UserModel $user, Number $number)
+    public function __construct(UserModel $user, Number $number, TicketModel $ticketModel)
     {
         $this->user = $user;
         $this->number = $number;
+        $this->ticketModel = $ticketModel;
         $this->number->addNumber($this->user->getRepo()->count());
     }
 
@@ -59,7 +61,7 @@ class DashboardRepository
     }
 
 
-    #[ArrayShape(['privilege' => "string[]", 'static_pages' => "string[]", 'privileges' => "string[]", 'extension' => "string[]"])] public function getQuickLinks(): array
+    public function getQuickLinks(): array
     {
         return [
             'privilege' => ['name' => 'Create new privileges', 'path' => '/admin/role/new'],
@@ -69,7 +71,7 @@ class DashboardRepository
         ];
     }
 
-    #[ArrayShape(['user' => "array", 'page' => "array", 'attachment' => "array", 'unread_message' => "array"])] public function getStatistics(): array
+    public function getStatistics(): array
     {
         return [
             'user' => ['icon' => 'person', 'counter' => 1.2, 'percentage' => 8],
@@ -79,7 +81,7 @@ class DashboardRepository
         ];
     }
 
-    #[ArrayShape(['branch' => "array", 'pull' => "array", 'commit' => "array", 'merge' => "array"])] public function getGithubStats(): array
+    public function getGithubStats(): array
     {
         return [
             'branch' => ['icon' => 'git-branch', 'counter' => 1.2, 'percentage' => 8],
@@ -162,7 +164,7 @@ class DashboardRepository
      *
      * @return array
      */
-    #[ArrayShape(['active' => "array", 'pending' => "array", 'lock' => "array", 'trash' => "array"])] public function userPercentage(): array
+    public function userPercentage(): array
     {
         $this->number->addNumber($this->totalUsers());
         $activeUsers = $this->number->percentage($this->totalActiveUsers());
@@ -177,14 +179,14 @@ class DashboardRepository
         ];
     }
 
-    #[ArrayShape(['Team' => "array", 'Tasks' => "array", 'Events' => "array"])] public function mainCards(): array
+    public function mainCards(): array
     {
         return [
-            'Team' => [
+            'Registered' => [
                 'icon' => 'people-outline',
                 'path' => '/admin/team/index',
                 'desc' => [
-                    'Found 2 superadmin account and 1 contributor account.',
+                    '15+ new user account registered over the pass 28 days.',
                 ]
             ],
             'Tasks' => [
@@ -210,7 +212,7 @@ class DashboardRepository
      *
      * @return array
      */
-    #[ArrayShape(['tv' => "array", 'on' => "array"])] public function userSession(): array
+    public function userSession(): array
     {
         return [
             'tv' => ['count' => 2.6, 'name' => 'Total Visits'],
@@ -224,7 +226,7 @@ class DashboardRepository
     }
 
 
-    #[ArrayShape(['home' => "string[]", 'session' => "string[]", 'github' => "string[]", 'health' => "string[]", 'activities' => "string[]", 'project' => "string[]", 'notifications' => "string[]"])] public function getNavSwitcher(): array
+    public function getNavSwitcher(): array
     {
         return [
             'members' => ['icon' => 'person-outline', 'include' => 'block_links'],
@@ -238,7 +240,7 @@ class DashboardRepository
         ];
     }
 
-    #[ArrayShape(['Security' => "string[]", 'Report' => "string[]", 'Settings' => "string[]"])] public function getBlockActivities(): array
+    public function getBlockActivities(): array
     {
         return [
             'Security' => [
@@ -256,6 +258,18 @@ class DashboardRepository
                 'path' => '/admin/event/index',
                 'desc' => 'Settings page allows customization of your application.'
             ]
+        ];
+    }
+
+    public function ticketCounter()
+    {
+        $count = $this->ticketModel->getRepo();
+        return [
+            'tickets_today' => $count->getEm()->getCrud()->rawQuery('SELECT count(*) FROM `tickets` WHERE DATE(created_at) = :created_at', ['created_at' => 'CURDATE()']),
+            'open' => $count->count(['status' => 'open']),
+            'closed' => $count->count(['status' => 'closed']),
+            'resolved' => $count->count(['status' => 'resolved']),
+            'all_tickets' => $count->count()
         ];
     }
 }

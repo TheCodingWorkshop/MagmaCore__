@@ -59,7 +59,8 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'file',
         'month',
         'week',
-        'hidden'
+        'hidden',
+        'editor',
     ];
     /** @var array */
     const HTML_ELEMENT_PARTS = [

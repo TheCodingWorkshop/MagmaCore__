@@ -38,6 +38,11 @@ trait DataSchemaTypesTrait
                     throw new DataSchemaInvalidArgumentException('');
                 }
                 break;
+            case 'options':
+                if (!is_array($value) or count($value) < 0) {
+                    throw new DataSchemaInvalidArgumentException('');
+                }
+                break;
             case 'length':
                 if (!is_int($value)) {
                     throw new DataSchemaInvalidArgumentException('');
@@ -99,6 +104,12 @@ trait DataSchemaTypesTrait
     {
         extract($this->getRow());
         return (isset($null) && $null === false) ? ' NOT NULL' : '';
+    }
+
+    public function _enum(): array
+    {
+        extract($this->getRow());
+        return (isset($options) && count($options) > 0) ? ' enum(' . implode(', ', $options) . ')' : [];
     }
 
     public function _default(): string

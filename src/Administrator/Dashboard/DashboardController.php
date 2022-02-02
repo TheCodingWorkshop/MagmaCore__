@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Administrator\Dashboard;
 
-use MagmaCore\Utility\Curl;
 use MagmaCore\Administrator\Dashboard\DashboardRepository;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 
@@ -53,7 +52,6 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
      */
     protected function indexAction()
     {
-        //$this->setAccess($this, 'can_view');
         $this->render(
             'admin/dashboard/index.html',
             [
@@ -69,8 +67,17 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
                 'main_cards' => $this->repository->mainCards(),
                 'unique_visits' => $this->repository->getSessionUniqueVisits(),
                 'block_activities' => $this->repository->getBlockActivities(),
+                'ticket_count' => $this->repository->ticketCounter(),
+
+                'todays_datetime' => date("F j, Y, g:i a")
             ]
         );
+    }
+
+    protected function datetimeAction()
+    {
+        $msg = date("F j, Y, g:i a");
+        echo $msg;
     }
 
 

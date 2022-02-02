@@ -191,12 +191,15 @@ class InputType implements FormBuilderTypeInterface
             case 'file' :
                 return sprintf(
                     '<div class="js-upload" uk-form-custom>
-                    <input type="file" multiple>
+                    <input type="file" name="%s" id="%s multiple>
                     <button %s type="button" tabindex="-1">%s</button>
+                    %s
                 </div>', 
+                $this->fields['name'],
+                $this->fields['name'],
                 $this->filtering(),
-                $this->options
-                );
+                $this->options,
+                $this->fields['value'] !== '' ? '<div class="uk-text-danger uk-text-bolder"><code>' . $this->fields['value'] . '</code></div>' : '');
                 break;
             case 'checkbox' :
                 return sprintf("\n<input %s>&nbsp;%s\n", $this->filtering(), ($this->settings['checkbox_label'] !='' ? $this->settings['checkbox_label'] : ''));
@@ -256,6 +259,13 @@ class InputType implements FormBuilderTypeInterface
         $btn .= '</div>';
 
         return $btn;
+    }
+
+    private function resolvedUploadPreview()
+    {
+        return '
+        <div class="uk-thumbnail uk-border-rounded"><img alt="' . $this->fields['value'] . '" src="/public/assets/images/flags/' . $this->fields['value'] . '.svg" width="30" /></div>
+        ';
     }
 
 }

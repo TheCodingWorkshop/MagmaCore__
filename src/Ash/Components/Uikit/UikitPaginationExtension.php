@@ -12,8 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
+use MagmaCore\Ash\Traits\TemplateTraits;
+
 class UikitPaginationExtension
 {
+
+    use TemplateTraits;
 
     /** @var string */
     public const NAME = 'uikit_pagination';
@@ -27,7 +31,7 @@ class UikitPaginationExtension
     public function register(object $controller = null): string
     {
         return '
-        <section class="">
+        <section class="' . $this->disabledClass($controller) . '">
             <nav aria-label="Pagination" uk-navbar>
                 <div class="uk-navbar-left" style="margin-top: -15px;">
                 </div>
@@ -41,6 +45,19 @@ class UikitPaginationExtension
             </nav>
         </section>
         ' . PHP_EOL;
+    }
+
+    private function jumpPaging(object $controller): string
+    {
+        $html = '';
+        $html .= '<div>';
+        $html .= '<select name="page_jump" class="uk-select uk-form-blank uk-border-bottom">';
+        $html .= '<option>Jump</option>';
+        $html .= '</select>';
+        $html .= '</div>';
+        $html .= $controller->tableGrid->getTotalPages();
+
+        return $html;
     }
 
     /**

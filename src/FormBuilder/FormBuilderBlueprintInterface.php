@@ -46,6 +46,8 @@ interface FormBuilderBlueprintInterface
         array $class = []
     ): array;
 
+    public function editor(string $id, array $class = []): array;
+
     public function textarea(
         string $name,
         array $class = [],

@@ -13,7 +13,7 @@ namespace MagmaCore\Auth;
 
 use MagmaCore\Base\Exception\BaseUnexpectedValueException;
 use MagmaCore\Auth\Model\RememberedLoginModel as RememberedLogin;
-use MagmaCore\Auth\Roles\Roles;
+use MagmaCore\Base\Exception\BaseNoClassFoundExeption;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Cookie\CookieFacade;
 use MagmaCore\UserManager\UserModel;
@@ -39,6 +39,21 @@ class Authorized
         'status'
 
     ];
+
+    /**
+     * Return the user model class if it exists. Which it should as this is part of the core
+     * framework
+     *
+     * @return UserModel
+     */
+    private static function userModel(): UserModel
+    {
+        if (!class_exists($userModel = UserModel::class)) {
+            throw new BaseNoClassFoundExeption(sprintf('%s class is missing. In order to utalize the Authorized script within MagmaCore. Then a user model is required.', UserModel::class));
+        }
+
+        return new $userModel();
+    }
 
     /**
      * Login the user
@@ -86,7 +101,7 @@ class Authorized
     {
         $userSessionID = self::getCurrentSessionID();
         if (isset($userSessionID)) {
-            return (new UserModel())->getRepo()->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
+            return self::userModel()->getRepo()->findObjectBy(['id' => $userSessionID], self::FIELD_SESSIONS);
         } else {
             $user = self::loginFromRemembermeCookie();
             if ($user) {

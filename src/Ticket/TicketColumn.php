@@ -239,6 +239,8 @@ class TicketColumn extends AbstractDatatableColumn
         if (!in_array($row['status'], ['open', 'closed', 'resolved'])) {
             return '<span>Unknown</span>';
         }
+//        $query = $_GET['status'] ?? '';
+//        if (isset($_GET['status']) && $_GET['status'] === $row['status']) {}
         return match($row['status']) {
             'open' => '<span class="uk-text-warning">Open</span>',
             'closed' => '<span class="uk-text-danger">Closed</span>',

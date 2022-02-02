@@ -18,6 +18,7 @@ use MagmaCore\Base\Events\BeforeControllerActionEvent;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
 use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
+use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
 use MagmaCore\Auth\Authorized;
@@ -40,10 +41,10 @@ use Exception;
 class BaseController extends AbstractBaseController
 {
 
-    use SessionTrait;
-    use ControllerCastingTrait;
-    use ControllerPrivilegeTrait;
-    use ControllerMenuTrait;
+    use SessionTrait,
+        ControllerCastingTrait,
+        ControllerPrivilegeTrait,
+        ControllerMenuTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -451,6 +452,12 @@ class BaseController extends AbstractBaseController
     public function cache(): object
     {
         return $this->baseApp($this)->loadCache();
+    }
+
+    public function themeBuilder(): object
+    {
+        $themeBuilder = GlobalManager::get('themeBuilder_global');
+        return $themeBuilder;
     }
 
 

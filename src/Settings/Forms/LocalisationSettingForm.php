@@ -43,11 +43,28 @@ class LocalisationSettingForm extends ClientFormBuilder implements ClientFormBui
      */
     public function createForm(string $action, ?object $dataRepository = null, ?object $callingController = null): string
     {
-        return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "tableForm"])
+        return $this->form(['action' => $action, 'enctype' => 'multipart/form-data', 'class' => ['uk-form-stacked'], "id" => "tableForm"])
             ->addRepository($dataRepository)
             ->add(
+                $this->blueprint->text('file_name', ['uk-form-blank', 'uk-border-bottom'], $this->hasValue('file_name'), false, 'Filename'),
+                NULL,
+                $this->blueprint->settings(false, null, false, null, true)
+
+            )
+            ->add(
+                $this->blueprint->text('locale', ['uk-form-blank', 'uk-border-bottom'], $this->hasValue('locale'), false, 'Locale'),
+                NULL,
+                $this->blueprint->settings(false, null, false, null, true)
+
+            )
+            ->add(
+                $this->blueprint->upload('file_path', ['uk-button', 'uk-button-small', 'uk-button-default'], (string)$this->hasValue('file_path'), true),
+                '<span class="ion-28"><ion-icon style="margin-top:10px;" name="cloud-upload"></ion-icon></span>',
+                $this->blueprint->settings(false, null, false, null, true, '', 'Upload your locale .yml file')
+            )
+            ->add(
                 $this->blueprint->submit(
-                    $this->hasValue('settings_id') ? 'edit-settings' : 'new-settings',
+                    'localisation-setting',
                     ['uk-button', 'uk-button-primary'],
                     'Save'
                 ),

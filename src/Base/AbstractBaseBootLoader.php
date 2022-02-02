@@ -20,7 +20,7 @@ use MagmaCore\Router\RouterFactory;
 use MagmaCore\Session\SessionFacade;
 use MagmaCore\Base\Traits\BootstrapTrait;
 use MagmaCore\Container\ContainerFactory;
-use MagmaCore\Themes\ThemeBuilderFactory;
+use MagmaCore\ThemeBuilder\ThemeBuilderFactory;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Utility\Singleton;
 
@@ -212,17 +212,19 @@ abstract class AbstractBaseBootLoader extends Singleton
 
     /**
      * Load the themeBuilder component
-     *
-     * @return ThemeBuilder
      */
-    protected function loadThemeBuilder(): ThemeBuilder
+    public function loadThemeBuilder()
     {
-        $themeFactory = new ThemeBuilderFactory();
-        $themeOptions = $this->application->getThemeBuilderOptions();
-        $themeDefault = $this->application->getDefaultThemeBuilder();
-        $themeBuilder = $themeFactory->create($themeDefault, $themeOptions);
-        if ($themeBuilder)
-            return $themeBuilder;
+        $themeFactory = (new ThemeBuilderFactory())
+            ->create(
+                $this->application->getDefaultThemeBuilder(),
+                $this->application->getThemeBuilderOptions()
+            );
+
+        if ($this->application->isThemeBuilderGlobal() === true) {
+            GLobalManager::set($this->application->getGlobalThemeBuilderKey(), $themeFactory->getCssDriver());
+        }
+        return $themeFactory->getCssDriver();
 
     }
 

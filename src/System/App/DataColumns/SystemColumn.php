@@ -13,10 +13,15 @@ declare(strict_types=1);
 namespace MagmaCore\System\App\DataColumns;
 
 use MagmaCore\Datatable\AbstractDatatableColumn;
+use MagmaCore\Datatable\DataColumnTrait;
 use MagmaCore\Utility\Stringify;
 
 class SystemColumn extends AbstractDatatableColumn
 {
+
+    use DataColumnTrait;
+
+    private string $controller = 'system';
 
     /**
      * @param array $dbColumns
@@ -157,7 +162,18 @@ class SystemColumn extends AbstractDatatableColumn
                 'formatter' => function ($row, $twigExt) {
                     return $twigExt->action(
                         [
-                            'file-edit' => ['tooltip' => 'Edit', 'icon' => 'ion-compose'],
+                            'more' => [
+                                'icon' => 'ion-more',
+                                'callback' => function ($row, $tempExt) {
+                                    return $tempExt->getDropdown(
+                                        $this->itemsDropdown($row, $this->controller),
+                                        $this->getDropdownStatus($row),
+                                        $row,
+                                        $this->controller,
+                                        ['can_view_message']
+                                    );
+                                }
+                            ],
                         ],
                         $row,
                         $twigExt,
@@ -171,5 +187,26 @@ class SystemColumn extends AbstractDatatableColumn
 
         ];
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param array $row
+     * @param string $controller
+     * @return array
+     */
+    private function itemsDropdown(array $row, string $controller): array
+    {
+        $items = [
+            'show' => ['name' => 'show', 'icon' => 'create-outline'],
+            'trash' => ['name' => 'trash account', 'icon' => 'trash-bin-outline']
+        ];
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+    }
+
 }
 

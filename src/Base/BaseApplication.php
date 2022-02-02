@@ -31,6 +31,8 @@ class BaseApplication extends AbstractBaseBootLoader
     protected array $cache = [];
     protected bool $isCacheGlobal = false;
     protected ?string $globalCacheKey = null;
+    protected ?string $globalThemeBuilderKey = null;
+    protected bool $isGlobalThemeBuilder = false;
     protected array $routes = [];
     protected array $containerProviders = [];
     protected string|null $routeHandler;
@@ -452,13 +454,18 @@ class BaseApplication extends AbstractBaseBootLoader
      * Pass the thene builder option
      *
      * @param array $themeBuilderOptions
-     * @return void
+     * @param bool $isGlobal
+     * @param string|null $globalKey
+     * @return $this
      */
-    public function setThemeBuilder(array $themeBuilderOptions = []): self
+    public function setThemeBuilder(array $themeBuilderOptions = [], bool $isGlobal = false, ?string $globalKey = null): self
     {
-        //if (count($this->themeBuilderOptions) > 0) {
-            $this->themeBuilderOptions = $themeBuilderOptions;
-        //}
+        if (count($themeBuilderOptions) < 0) {
+            throw new BaseInvalidArgumentException(sprintf('%s options have return empty.', implode(' '. $themeBuilderOptions)));
+        }
+        $this->isGlobalThemeBuilder = $isGlobal;
+        $this->globalThemeBuilderKey = $globalKey;
+        $this->themeBuilderOptions = $themeBuilderOptions;
         return $this;
     }
 
@@ -480,7 +487,7 @@ class BaseApplication extends AbstractBaseBootLoader
     public function getDefaultThemeBuilder(): ?string
     {
         if (count($this->themeBuilderOptions) > 0) {
-            foreach ($this->themeBuilderOptions['libraries'] as $key => $value) {
+            foreach ($this->themeBuilderOptions['cssDriver'] as $key => $value) {
                 if (array_key_exists('default', $value)) {
                     if ($value['default'] === true) {
                         return $value['class'];
@@ -488,7 +495,31 @@ class BaseApplication extends AbstractBaseBootLoader
                 }
             }
         }
+        return null;
     }
+
+    /**
+     * Turn on global caching from public/index.php bootstrap file to make the cache
+     * object available globally throughout the application using the GlobalManager object
+     * @return bool
+     */
+    public function isThemeBuilderGlobal(): bool
+    {
+        return isset($this->isGlobalThemeBuilder) && $this->isGlobalThemeBuilder === true;
+    }
+
+    /**
+     * @return string
+     * @throws BaseLengthException
+     */
+    public function getGlobalThemeBuilderKey(): string
+    {
+        if ($this->globalThemeBuilderKey !==null && strlen($this->globalThemeBuilderKey) < 3) {
+            throw new BaseLengthException($this->globalThemeBuilderKey . ' is invalid this needs to be more than 3 characters long');
+        }
+        return ($this->globalThemeBuilderKey !==null) ? $this->globalThemeBuilderKey : 'themeBuilder_global';
+    }
+
 
     public function run(): void
     {
@@ -499,7 +530,7 @@ class BaseApplication extends AbstractBaseBootLoader
         $this->loadCache();
         $this->loadLogger();
         $this->loadEnvironment();
-        //$this->loadThemeBuilder();
+        $this->loadThemeBuilder();
         $this->loadRoutes();
     }
 }

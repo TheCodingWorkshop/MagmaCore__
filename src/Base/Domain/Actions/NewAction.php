@@ -68,6 +68,7 @@ class NewAction implements DomainActionLogicInterface
                     ->validateRepository($entityCollection, $entityObject, null, $controller)
                     ->persistAfterValidation();
 
+
                 if ($action) {
                     $this->dispatchSingleActionEvent(
                         $controller,

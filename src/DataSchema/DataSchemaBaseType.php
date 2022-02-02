@@ -103,7 +103,7 @@ class DataSchemaBaseType implements DataSchemaTypeInterface
         $segment = '';
 
         /* print the type and name is using length/value concat that in brackets and list specified attribute for row */
-        $segment .= $this->_name() . $this->_length() . $this->_attributes();
+        $segment .= $this->_name() . $this->_length() . $this->_enum() . $this->_attributes();
         /* auto_increment comes under extra apply this is necessary */
         $segment .= $this->_extra();
         /* specify null values to field */

@@ -36,7 +36,7 @@ abstract class AbstractQueryBuilder implements QueryBuilderInterface
         'table' => '',
         'type' => '',
         'raw' => '',
-
+        'limit' => '',
         'join_to' => '',
         'join_to_selectors' => [],
         'join_type' => '',
@@ -65,7 +65,7 @@ abstract class AbstractQueryBuilder implements QueryBuilderInterface
     {
         // Append the limit and offset statement for adding pagination to the query
         if (isset($this->key["params"]["limit"]) && $this->key["params"]["offset"] != -1) {
-            $this->sqlQuery .= " LIMIT :offset, :limit";
+            $this->sqlQuery .= " LIMIT :offset, :limit"; /* this is the short syntax */
         }
 
     }

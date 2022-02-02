@@ -31,6 +31,7 @@ class SystemCommander extends EventModel implements ApplicationCommanderInterfac
      */
     protected const INNER_ROUTES = [
         'index',
+        'show'
     ];
 
     private array $noCommander = ['index'];
@@ -79,6 +80,7 @@ class SystemCommander extends EventModel implements ApplicationCommanderInterfac
 
         return match ($controller->thisRouteAction()) {
             'index' => $this->getStatusColumnFromQueryParams($controller),
+            'show' => 'View Log Entry #' . $controller->thisRouteID(),
             default => "Unknown"
         };
     }

@@ -99,6 +99,13 @@ class MenuActionSubscriber implements EventSubscriberInterface
         return false;
     }
 
+    // public function deleteMenuItems(MenuActionEvent $event)
+    // {
+    //     if ($this->onRoute($event, 'trash')) {
+
+    //     }
+    // }
+
     /**
      * @param MenuActionEvent $event
      * @return bool

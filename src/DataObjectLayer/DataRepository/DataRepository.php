@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use Throwable;
 use MagmaCore\Utility\Sortable;
 use MagmaCore\Utility\Paginator;
@@ -121,8 +122,11 @@ class DataRepository implements DataRepositoryInterface
         $this->isEmpty($id);
         try {
             return $this->findOneBy(['id' => $id]);
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to find the queried object by the argument ID. The item might not exists. %s', $err->getMessage()));
+
+           // throw $throwable;
         }
     }
 
@@ -136,8 +140,11 @@ class DataRepository implements DataRepositoryInterface
     {
         try {
             return $this->findBy();
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to fetch all the table records. %s', $err->getMessage()));
+
+            //throw $throwable;
         }
     }
 
@@ -151,12 +158,19 @@ class DataRepository implements DataRepositoryInterface
      * @return array
      * @throws Throwable
      */
-    public function findBy(array $selectors = [], array $conditions = [], array $parameters = [], array $optional = []): array
+    public function findBy(
+        array $selectors = [], 
+        array $conditions = [], 
+        array $parameters = [], 
+        array $optional = []): array
     {
         try {
             return $this->em->getCrud()->read($selectors, $conditions, $parameters, $optional);
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to fetch the array by the following conditions %s', $err->getMessage()));
+
+            //throw $throwable;
         }
     }
 
@@ -172,8 +186,11 @@ class DataRepository implements DataRepositoryInterface
         $this->isArray($conditions);
         try {
             return $this->em->getCrud()->read([], $conditions);
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to the queried object by the following conditions. %s', $err->getMessage()));
+
+           // throw $throwable;
         }
     }
 
@@ -189,8 +206,10 @@ class DataRepository implements DataRepositoryInterface
         $this->isArray($conditions);
         try {
             return $this->em->getCrud()->get($selectors, $conditions);
-        } catch (Throwable) {
-            throw new DataLayerNoValueException('The method should have returned an object. But instead nothing has come back. Check that your source contains values.');
+        } catch (throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to fetch the data from the database. Please check your model is referencing the correct database table. %s', $err->getMessage()));
+
         }
     }
 
@@ -209,8 +228,11 @@ class DataRepository implements DataRepositoryInterface
         $this->isArray($conditions);
         try {
             return $this->em->getCrud()->search($selectors, $conditions, $parameters, $optional);
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to find the specified search result. %s', $err->getMessage()));
+
+           // throw $throwable;
         }
     }
 
@@ -253,8 +275,11 @@ class DataRepository implements DataRepositoryInterface
                     return $delete;
                 }
             }
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to find and delete the queried object. %s', $err->getMessage()));
+
+            //throw $throwable;
         }
         return false;
     }
@@ -280,7 +305,10 @@ class DataRepository implements DataRepositoryInterface
                 }
             }
         } catch (Throwable $throwable) {
-            throw $throwable;
+            throw new DataLayerException(
+                sprintf('Unable to find and update the queried object. %s', $err->getMessage()));
+
+            //throw $throwable;
         }
         return false;
     }
@@ -381,8 +409,11 @@ class DataRepository implements DataRepositoryInterface
         try {
             $this->findAndReturn = $this->findObjectBy(['id' => $id], $selectors);
             return $this;
-        } catch (Throwable $throwable) {
-            throw $throwable;
+        } catch (Throwable $err) {
+            throw new DataLayerException(
+                sprintf('Unable to find and return the queried object. %s', $err->getMessage()));
+
+            //throw $throwable;
         }
     }
 

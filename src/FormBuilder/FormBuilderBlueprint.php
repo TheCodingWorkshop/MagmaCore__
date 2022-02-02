@@ -12,10 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\FormBuilder;
 
-use MagmaCore\FormBuilder\Type\ButtonType;
 use MagmaCore\FormBuilder\Type\TextType;
 use MagmaCore\FormBuilder\Type\EmailType;
 use MagmaCore\FormBuilder\Type\RadioType;
+use MagmaCore\FormBuilder\Type\ButtonType;
+use MagmaCore\FormBuilder\Type\EditorType;
 use MagmaCore\FormBuilder\Type\HiddenType;
 use MagmaCore\FormBuilder\Type\NumberType;
 use MagmaCore\FormBuilder\Type\SelectType;
@@ -70,6 +71,20 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
             'value' => ($value !== null) ? $value : '',
             'onclick' => $onclick
 
+        ];
+    }
+
+    /**
+     * Editor which returns an empty div tag with the id and class properties
+     *
+     * @param string $id
+     * @param array $class
+     * @return array
+     */
+    public function editor(string $id, array $class = []): array
+    {
+        return [
+            EditorType::class => ['id' => $id, 'class' => $class]
         ];
     }
 

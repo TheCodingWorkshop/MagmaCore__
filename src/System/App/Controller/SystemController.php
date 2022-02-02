@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\System\App\Controller;
 
+use MagmaCore\Administrator\Controller\AdminController;
 use MagmaCore\System\App\Commander\SystemCommander;
 use MagmaCore\System\App\Model\EventModel;
 use MagmaCore\Base\BaseController;
@@ -12,7 +13,7 @@ use MagmaCore\System\App\Schema\EventSchema;
 use MagmaCore\System\Event\SystemActionEvent;
 use MagmaCore\Utility\Yaml;
 
-class SystemController extends BaseController
+class SystemController extends AdminController
 {
 
     /**
@@ -55,6 +56,22 @@ class SystemController extends BaseController
     }
 
     /**
+     * Returns a 404 error page if the data is not present within the database
+     * else return the requested object
+     *
+     * @return mixed
+     */
+    public function findOr404(): mixed
+    {
+        if (isset($this)) {
+            return $this->repository->getRepo()
+                ->findAndReturn($this->thisRouteID())
+                ->or404();
+        }
+    }
+
+
+    /**
      * @throws \Exception
      */
     protected function indexAction()
@@ -86,6 +103,16 @@ class SystemController extends BaseController
                 'search_query' => $this->request->handler()->query->getAlnum($args['filter_alias'])
             ]
         );
+    }
+
+    protected function showAction()
+    {
+        $this->showAction
+            ->execute($this, NULL, NULL, NULL, __METHOD__)
+            ->render()
+            ->with()
+            ->singular()
+            ->end();
     }
 
 }

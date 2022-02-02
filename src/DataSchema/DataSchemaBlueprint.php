@@ -78,6 +78,13 @@ class DataSchemaBlueprint implements DataSchemaBlueprintInterface
         ];
     }
 
+    public function enum(string $name, array $options = [], bool $null = false, mixed $default = null): array
+    {
+        return [
+            StringType::class => ['name' => $name, 'type' => 'enum', 'options' => $options, 'null' => $null, 'default' => $default]
+        ];
+    }
+
     /**
      * create an text based row.
      *

@@ -72,9 +72,9 @@ class CommanderBar implements CommanderBarInterface
 
             $commander .= PHP_EOL;
             $commander .= '<div class="uk-navbar-right">';
-            //$commander .= $this->actions();
+            $commander .= $this->actions();
             $commander .= '</div>';
-            //$commander .= $this->commanderOverlaySearch();
+            $commander .= $this->commanderOverlaySearch();
             $commander .= PHP_EOL;
 
             $commander .= '</nav>';
@@ -135,7 +135,7 @@ class CommanderBar implements CommanderBarInterface
 
         <div class="uk-navbar-item uk-width-expand">
             <form class="uk-search uk-search-navbar uk-width-1-2">
-                <input name="s" class="uk-search-input" type="search" placeholder="Filtering ' . Stringify::pluralize(ucwords($this->controller->thisRouteController())) . '...." autofocus>
+                <input name="s" class="uk-search-input" type="search" placeholder="Search..." autofocus>
             </form>
         </div>
 

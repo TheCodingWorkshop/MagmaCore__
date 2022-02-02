@@ -12,11 +12,14 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
+use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\UserManager\UserColumn;
 
 class UikitSimplePaginationExtension
 {
+
+    use TemplateTraits;
 
     /** @var string */
     public const NAME = 'uikit_simple_pagination';
@@ -32,7 +35,7 @@ class UikitSimplePaginationExtension
         $name = $controller->thisRouteController();
         $name = Stringify::pluralize($name);
         $name = Stringify::capitalize($name);
-        $html = '<section>';
+        $html = '<section class="' . $this->disabledClass($controller) . '">';
             $html .= '<nav aria-label="Pagination" uk-navbar>';
                 $html .= '<div class="uk-navbar-left">';
                 $html .= $this->navContentLeft($controller, $name);

@@ -40,7 +40,7 @@ interface FormBuilderInterface
      * @param array $args
      * @return string|bool
      */
-    public function build(array $args = []): string|bool;
+    public function build(array $args = [], bool $noForm = true, bool $disableCsrf = false): string|bool;
 
     /**
      * @return array

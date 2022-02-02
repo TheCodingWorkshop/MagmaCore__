@@ -40,6 +40,9 @@ class Datatable extends AbstractDatatable
     private mixed $tableOrder;
     private object $request;
 
+    /* @var ThemeBuilder */
+    protected $tableCss = [];
+
     /**
      * Undocumented function
      *
@@ -73,6 +76,9 @@ class Datatable extends AbstractDatatable
         $this->dataColumns = $this->dataColumnObject->columns($dbColumns, $callingController);
         $this->sortController = $sortController;
         $this->getRepositoryParts($dataRepository);
+
+        /* css themeBuilder */
+        $this->tableCss = $callingController->themeBuilder()->table();
         if ($request)
             $this->request = $request;
 

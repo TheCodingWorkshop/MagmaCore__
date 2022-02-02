@@ -116,10 +116,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function indexAction()
     {
 
-//        $test = $this->protectedAnchor(['href' => 'http://localhost'], 1270, 'No Link', '');
-//        var_dump($test);
-//        die;
-
         $trashCount = $this->repository->getRepo()->count(['status' => 'trash']);
         $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
         $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);
@@ -178,6 +174,11 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
+    protected function overviewAction()
+    {
+        $this->view('/admin/user/users_overview.html', []);
+    }
+
     /**
      * The show action request displays singular information about a user. This is a
      * read only request. Information here cannot be edited.
@@ -231,7 +232,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function editAction()
     {
         $this->editAction
-            //->setAccess($this, Access::CAN_EDIT)
+            ->setAccess($this, Access::CAN_EDIT)
             ->setOwnerAccess($this)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], ['user_id' => $this->thisRouteID()])
             ->render()

@@ -78,4 +78,9 @@ class Utilities
         return array_change_key_case($newOptions);
     }
 
+    public static function isSet(string $key = null, array $array = []): bool
+    {
+        return array_key_exists($key, $array) === true;
+    }
+
 }

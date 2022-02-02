@@ -40,7 +40,7 @@ class Translation implements TranslationInterface
         $localePath = APP_ROOT . "/Resources/translations/php";
         $locale = "{$localePath}/{$translation}/{$translation}.yml";
         $localeDefault = "{$localePath}/{$defaultLocale}/{$defaultLocale}.yml";
-        var_dump(Yaml::file($localeDefault));
+        //var_dump(Yaml::file($localeDefault));
 
         if (
             file_exists($locale) && 

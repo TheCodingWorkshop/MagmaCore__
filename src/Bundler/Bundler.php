@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the MagmaCore package.
+ *
+ * (c) Ricardo Miller <ricardomiller@lava-studio.co.uk>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace MagmaCore\Bundler;
 
@@ -93,9 +101,11 @@ class Bundler
         $newInstance = new \StdClass;
         if (is_array($this->bundler) && count($this->bundler) > 0) {
             foreach ($this->bundler as $bundle) {
+                /* the component name */
                 $bundleName = array_key_exists('name', $bundle) ? $bundle['name'] : '';
                 if ($bundleName !=='') {
                     if (array_key_exists('version', $bundle) && $bundle['version'] !=='') {
+                        /* the component version */
                         $bundleVersion = array_key_exists('min_php_version', $bundle) ? $bundle['min_php_version'] : '';
                         if (version_compare(PHP_VERSION, $bundleVersion) < 0) {
                             throw new LogicException($bundleName . ' Is atleast ' . $bundleVersion . ' The current installed PHP version is ' . PHP_VERSION . ' Your PHP environment is outdated');
@@ -103,6 +113,7 @@ class Bundler
                         $overridables = $this->resolveComponentBundleOverridableOptions($bundle, $bundleName);
 
                         $bundleClass = array_key_exists('factory', $bundle) ? $bundle['factory'] : [];
+                        /* Classes should be design to be loaded via the container meaning only type-hinted classes are allowed */
                         $factory = $this->container->get($bundleClass['class']);
                         if (!$factory instanceof  FactoryInterface) {
                             throw new BlankUnexpectedValueException(
@@ -128,6 +139,7 @@ class Bundler
     }
 
     /**
+     * The override options will only be available if overriding_options is set ot true
      * @param array $bundle
      * @param string $bundleName
      * @return array

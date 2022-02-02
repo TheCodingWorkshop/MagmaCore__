@@ -76,6 +76,11 @@ class TicketController extends \MagmaCore\Administrator\Controller\AdminControll
         }
     }
 
+    /**
+     * Display all tickets within a datatable route
+     *
+     * @return void
+     */
     protected function indexAction()
     {
         $this->indexAction
@@ -92,6 +97,11 @@ class TicketController extends \MagmaCore\Administrator\Controller\AdminControll
             ?->end();
     }
 
+    /**
+     * New action route for addiing a new ticket
+     *
+     * @return void
+     */
     protected function newAction()
     {
         $this->newAction

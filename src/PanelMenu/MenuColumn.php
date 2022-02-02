@@ -182,7 +182,7 @@ class MenuColumn extends AbstractDatatableColumn
     {
         $items = [
             'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'trash' => ['name' => 'trash menu', 'icon' => 'trash-bin-outline']
+            'delete' => ['name' => 'trash menu', 'icon' => 'trash-bin-outline']
         ];
         return array_map(
             fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),

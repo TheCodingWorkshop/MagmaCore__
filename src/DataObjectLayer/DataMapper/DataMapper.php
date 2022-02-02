@@ -248,11 +248,12 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
         $this->start();
         try {
             $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
-            $this->commit();
-        } catch (DataLayerException $e) {
-           $this->revert();
-           throw new DataLayerException($e->getMessage());
+           $this->commit();
+        } catch (PDOException $e) {
+            $this->revert();
+           throw new PDOException('Data persistant error ' . $e->getMessage());
         }
+
     }
 
     /**
@@ -270,7 +271,7 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
             $this->commit();
         } catch (DataLayerException $e) {
            $this->revert();
-           throw new DataLayerException($e->getMessage());
+           throw new DataLayerException('error ' . $e->getMessage());
         }
         
     }

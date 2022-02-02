@@ -146,6 +146,8 @@ services:
           msg: Changes Saved
         MagmaCore\Settings\SettingController::generalAction:
           msg: Changes Saved
+        MagmaCore\Settings\SettingController::localisationAction:
+          msg: New locale language file added successfully.
 
     account.subscriber:
       class: \App\EventSubscriber\UserProfileActionSubscriber
@@ -162,7 +164,10 @@ services:
       register_route_feedback:
         MagmaCore\PanelMenu\MenuController::editAction:
           msg: Changes Saved
-  
+        MagmaCore\PanelMenu\MenuController::deleteAction:
+          msg: Menu deleted!
+          redirect: menu.index
+
     message.subscriber:
       class: \App\EventSubscriber\MessageActionSubscriber
       register_route_feedback:

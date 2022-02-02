@@ -12,27 +12,31 @@ declare(strict_types=1);
 
 namespace MagmaCore\Settings;
 
-use MagmaCore\Settings\SettingCommander;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\Settings\Settings;
+use MagmaCore\Settings\SettingModel;
 use MagmaCore\Settings\SettingColumn;
 use MagmaCore\Settings\SettingEntity;
-use MagmaCore\Settings\Event\SettingActionEvent;
-use MagmaCore\Settings\Forms\ApplicationSettingForm;
+use MagmaCore\Settings\SettingCommander;
+use MagmaCore\Localisation\LocalisationModel;
+use MagmaCore\Base\Domain\Actions\PurgeAction;
+use MagmaCore\Localisation\LocalisationEntity;
+use MagmaCore\Settings\Forms\PurgeSettingForm;
+use MagmaCore\Settings\Forms\ToolsSettingForm;
+use MagmaCore\Base\Domain\Actions\ConfigAction;
 use MagmaCore\Settings\Forms\AvatarSettingForm;
+use MagmaCore\Settings\Event\SettingActionEvent;
+use MagmaCore\Settings\Forms\DefaultSettingForm;
+use MagmaCore\Settings\Forms\GeneralSettingForm;
 use MagmaCore\Settings\Forms\BrandingSettingForm;
 use MagmaCore\Settings\Forms\DatetimeSettingForm;
-use MagmaCore\Settings\Forms\DefaultSettingForm;
+use MagmaCore\Settings\Forms\SecuritySettingForm;
 use MagmaCore\Settings\Forms\ExtensionSettingForm;
 use MagmaCore\Settings\Forms\FormattingSettingForm;
-use MagmaCore\Settings\Forms\GeneralSettingForm;
+use MagmaCore\Settings\Forms\ApplicationSettingForm;
 use MagmaCore\Settings\Forms\LocalisationSettingForm;
-use MagmaCore\Settings\Forms\PurgeSettingForm;
-use MagmaCore\Settings\Forms\SecuritySettingForm;
-use MagmaCore\Settings\Forms\ToolsSettingForm;
-use MagmaCore\Settings\SettingModel;
-use MagmaCore\Base\Domain\Actions\ConfigAction;
-use MagmaCore\Base\Domain\Actions\PurgeAction;
+use MagmaCore\Localisation\LocalisationController;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Settings\Settings;
 
 class SettingController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -76,11 +80,13 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
                 'localisationSettingForm' => LocalisationSettingForm::class,
                 'brandingSettingForm' => BrandingSettingForm::class,
                 'extensionSettingForm' => ExtensionSettingForm::class,
+                'localisationModel' => LocalisationModel::class,
 
             ]
         );
 
     }
+
 
     /**
      * Returns a 404 error page if the data is not present within the database
@@ -88,10 +94,10 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
      *
      * @return mixed
      */
-    public function findOr404(): mixed
+    public function findOr404(?int $queriedID = null): mixed
     {
         return $this->repository->getRepo()
-            ->findAndReturn($this->thisRouteID())
+            ->findAndReturn($queriedID !==null ? $queriedID : $this->thisRouteID())
             ->or404();
     }
 
@@ -143,20 +149,44 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
             ->setAccess($this, 'can_edit_tool')
             ->execute($this, SettingEntity::class, SettingActionEvent::class, NULL, __METHOD__)
             ->render()
-            ->with([])
+            ->with(
+                [
+                    'system_report' => $this->repository->getSystemReport()
+                ]
+            )
             ->form($this->toolsSettingForm)
             ->end();
     }
 
     protected function localisationAction()
     {
-        $this->configAction
-            ->execute($this, SettingEntity::class, SettingActionEvent::class, NULL, __METHOD__)
-            ->render()
-            ->with([])
-            ->form($this->localisationSettingForm)
-            ->end();
+        $locales=  $this->localisationModel->getRepo()->findAll();
+        $total_locale = $this->localisationModel->getRepo()->count();
+
+        if ($queriedID = $this->request->handler()->query->getAlnum('delete_id')) {
+            $this->localisationModel->getRepo()->findByIdAndDelete(['id' => (int)$queriedID]);
+            $this->flashMessage('Localisation file deleted!');
+            $this->redirect('/admin/setting/localisation');
+        }
+
+        if (!empty($this->thisRouteID())) {
+            $this->editAction
+                ->execute(new LocalisationController($this->routeParams), LocalisationEntity::class, SettingActionEvent::class, NULL, __METHOD__)
+                ->render()
+                ->with(['all' => $locales, 'total_locale' => $total_locale, 'id' => $this->thisRouteID()])
+                ->form($this->localisationSettingForm)
+                ->end();
+        } else {
+            $this->newAction
+                ->execute(new LocalisationController($this->routeParams), LocalisationEntity::class, SettingActionEvent::class, NULL, __METHOD__)
+                ->render()
+                ->with(['all' => $locales, 'total_locale' => $total_locale])
+                ->form($this->localisationSettingForm)
+                ->end();
+        }
+
     }
+
 
     protected function brandingAction()
     {

@@ -45,27 +45,27 @@ class Request
 
     public function isGet(): bool
     {
-        return $this->getMethod() === 'GET';
+        return $this->getMethod() === self::METHOD_GET;
     }
 
     public function isPost(): bool
     {
-        return $this->getMethod() === 'POST';
+        return $this->getMethod() === self::METHOD_POST;
     }
 
     public function isDelete(): bool
     {
-        return $this->getMethod() === 'DELETE';
+        return $this->getMethod() === self::METHOD_DELETE;
     }
 
     public function isPatch(): bool
     {
-        return $this->getMethod() === 'PATCH';
+        return $this->getMethod() === self::METHOD_PATCH;
     }
 
     public function isPut(): bool
     {
-        return $this->getMethod() === 'PUT';
+        return $this->getMethod() === self::METHOD_PUT;
     }
 
     public function getBody(): array

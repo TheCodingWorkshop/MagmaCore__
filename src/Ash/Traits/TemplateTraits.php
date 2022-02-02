@@ -45,11 +45,8 @@ trait TemplateTraits
                             $jsFile = $this->resolvePath($file['src']);
                         }
                         if ($jsFile) {
-                            //$minifier = new Minify\CSS($jsFile);                            
-                            // $script = '<script>';
-                            // $script .= ' src="' . $jsFile . '"';
-                            // $script .= isset($file['reload']) && $$file['reload'] === true ? ' data-turbo-track="reload"' : '';
-                            echo '<script src="' . $jsFile . '" data-turbo-track="reload"></script>' . "\n";
+                            /* Get the specified route index position */
+                            $this->getScriptsByConditions($file, $jsFile);
                         }
                     }
                 }
@@ -82,17 +79,81 @@ trait TemplateTraits
                     }
 
                     if ($cssFile) {
-                        $css = '<link rel="stylesheet"';
-                        $css .= ' href="' . $cssFile . '"';
-                        $css .= isset($file['reload']) && $file['reload'] === true ? ' data-turbo-frame="reload"' : '';
-                        $css .= '>' . "\n";
-                        echo $css;
+                        $this->printStylesheets($cssFile, $file);
                     }
                 }
             }
         }
     }
 
+    /**
+     * Return the index position of the route. index[0] = the route namespace
+     * index[1] = the route controller and index[2] = the route controller method. 
+     *
+     * @param integer|null $position
+     * @return string
+     */
+    private function parseRouteUrl(?int $position = 1): string
+    {
+        $parts = explode('/', $_SERVER['QUERY_STRING']);
+        $routeParts = isset($parts[$position]) ? $parts[$position] : '';
+        return $routeParts;
+    }
+
+    /**
+     * Conditionally load a asset. By default all assets which is set to true will be loaded 
+     * within the client browser. setting any asset to false will completely disable that asset
+     * everywhere. However we can define the [routes] property within the asset.yml file and 
+     * pass an array of routes we want the asset to be loaded on. Not defining this key will 
+     * load the asset everywhere.
+     *
+     * @param array $file
+     * @param string|null $assetFile - styles ot scripts
+     * @return void
+     */
+    private function getScriptsByConditions(array $file = [], string $assetFile = null, ?int $position = 1): void
+    {
+        if (is_array($file['routes']) && count($file['routes']) > 0) {
+            foreach ($file['routes'] as $route) {
+                if ($$this->parseRouteUrl($position) === $route) {
+                    $this->printScripts($assetFile, $file);
+                }
+            }
+        } else {
+            $this->printScripts($assetFile, $file);
+        }
+
+    }
+
+    /**
+     * Echo the script tag for use within MagmaCore templating engine
+     *
+     * @param string|null $jsFile
+     * @param array $file
+     * @return void
+     */
+    private function printScripts(string $jsFile = null, array $file = [])
+    {
+        echo sprintf(
+            '<script src="%s"%s%s%s></script>%s', 
+            $jsFile, 
+            isset($file['turbo_reload']) && $file['turbo_reload'] === true ? ' data-turbo-track="reload"' : '',
+            !empty($file['integrity']) ? ' integrity="' . $file['integrity'] . '"' : '',
+            !empty($file['crossorigin']) ? ' crossorigin="' . $file['crossorigin'] . '"' : '',
+            PHP_EOL
+        );
+
+    }
+
+    private function printStylesheets(string $cssFile = null, array $file = [])
+    {
+        $css = '<link rel="stylesheet"';
+        $css .= ' href="' . $cssFile . '"';
+        $css .= isset($file['reload']) && $file['reload'] === true ? ' data-turbo-frame="reload"' : '';
+        $css .= '>' . "\n";
+        echo $css;
+
+    }
 
     /**
      * throw a file not found exception is the file being loaded doesn't exists.
@@ -108,4 +169,10 @@ trait TemplateTraits
         }
         return $file;
     }
+
+    private function disabledClass(object $controller): string
+    {
+        return isset($controller->tableGrid) && $controller->tableGrid->getTotalRecords() === 0 ? ' uk-disabled' : '';
+    }
+
 }
