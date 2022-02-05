@@ -13,7 +13,9 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
+use MagmaCore\Cache\CacheInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Cache\CacheFacade;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -22,10 +24,22 @@ use MagmaCore\Base\Domain\DomainTraits;
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class ShowBulkAction implements DomainActionLogicInterface
+class ListAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
+
+    private object $controller;
+    private string $method;
+    private ?string $schema;
+
+    /** @return void - not currently being used */
+    private CacheInterface $cache;
+
+    /** @return void - not currently being used */
+    public function __construct(CacheFacade $cache)
+    {
+    }
 
     /**
      * execute logic for adding new items to the database()
@@ -37,7 +51,7 @@ class ShowBulkAction implements DomainActionLogicInterface
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return ShowAction
+     * @return IndexAction
      */
     public function execute(
         object $controller,
@@ -54,13 +68,20 @@ class ShowBulkAction implements DomainActionLogicInterface
         $this->method = $method;
         $this->schema = $objectSchema;
 
-        $formBuilder = $controller->formBuilder;
-        if (!array_key_exists($controller->repository->getSchemaID(), $formBuilder->getData())) {
-            $icon = '<ion-icon name="warning-outline"></ion-icon>';
-            $controller->flashMessage("{$icon} Items must be selected in order to perform this action. No items have been changed.", $controller->flashWarning());
-            $redirectPath = '/admin/' . $controller->thisRouteController() . '/index';
-            $controller->redirect($redirectPath);
-        }
+        $started = MICROTIME_START;
+
+        $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
+        $this->args = $this->getControllerArgs($controller);
+        $controllerName = $controller->thisRouteController();
+        $this->listings = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+
+        $end = MICROTIME_END;
+        //Calculate the difference in microseconds.
+        $difference = $end - $started;
+
+        //Format the time so that it only shows 10 decimal places.
+        $this->queryTime = number_format($difference, 8);
         return $this;
     }
+
 }

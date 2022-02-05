@@ -79,7 +79,7 @@ class DataRepository implements DataRepositoryInterface
      * @param integer $id
      * @return void
      */
-    private function isEmpty(int $id): void
+    private function isEmpty(?int $id = null): void
     {
         if (empty($id))
             throw new DataLayerInvalidArgumentException(__METHOD__ . ' method $id argument is empty or invalid. Please address this issue in your code which is calling this method.');
@@ -304,7 +304,7 @@ class DataRepository implements DataRepositoryInterface
                     return $update;
                 }
             }
-        } catch (Throwable $throwable) {
+        } catch (Throwable $err) {
             throw new DataLayerException(
                 sprintf('Unable to find and update the queried object. %s', $err->getMessage()));
 

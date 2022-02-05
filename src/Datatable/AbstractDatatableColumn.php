@@ -58,4 +58,17 @@ abstract class AbstractDatatableColumn implements DatatableColumnInterface
             }
         }
     }
+
+    /**
+     * Return an array of action links for each row within the data table
+     *
+     * @param array $row
+     * @param string|null $controller
+     * @param object|null $tempExt
+     * @return array
+     */
+    abstract public function columnActions(array $row = [], ?string $controller = null, object $tempExt = null): array;
+
+
+
 }

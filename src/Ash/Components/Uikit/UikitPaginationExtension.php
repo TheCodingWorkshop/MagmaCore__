@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
+use MagmaCore\Utility\Yaml;
 use MagmaCore\Ash\Traits\TemplateTraits;
 
 class UikitPaginationExtension
@@ -30,11 +31,18 @@ class UikitPaginationExtension
      */
     public function register(object $controller = null): string
     {
-        return '
+        $html = '';
+        $html .= '
         <section class="' . $this->disabledClass($controller) . '">
             <nav aria-label="Pagination" uk-navbar>
-                <div class="uk-navbar-left" style="margin-top: -15px;">
-                </div>
+                <div class="uk-navbar-left" style="margin-top: -15px;">';
+                
+                if ($this->hasYamlSupport($controller) === true) {
+                    $html .= $this->repositoryTrash($controller);
+                } else {
+                    $html .= '';
+                }
+                $html .= '</div>
                 <div class="uk-navbar-right">
                 ' . $this->getRowsPerPage($controller) . '
                 <small>' . $this->infoPaging($controller) . '</small>
@@ -45,6 +53,127 @@ class UikitPaginationExtension
             </nav>
         </section>
         ' . PHP_EOL;
+
+        return $html;
+    }
+
+    private function controllerName(object $controller): string
+    {
+        return $controller->thisRouteController();
+    }
+
+    /**
+     * Render the trigger for the slide out trash can
+     *
+     * @param object $controller
+     * @return string
+     */
+    private function repositoryTrash(object $controller): string
+    {
+        $html = '';
+        $trashCount = $controller->repository->getRepo()->count(['deleted_at' => 1]);
+        if ($this->hasTrashSupport($controller)) {
+            $html = '<ul class="uk-iconnav">';
+            $html .= '<li>';
+            $html .= '<a id="trash-can-trigger-' . $this->controllerName($controller) . '" uk-toggle="target: #offcanvas-flip" uk-tooltip="Open Trash" class="uk-link-reset uk-text-danger" href="#">';
+            $html .= '<ion-icon class="ion-24" name="trash-bin-outline"></ion-icon>';
+            $html .= sprintf('<span class="uk-text-top">(%s)</span>', ($trashCount ?: 0));
+            $html .= '</a>';
+            $html .= '</li>';
+            $html .= '</ul>';
+            $html .= $this->trashCan($controller, $trashCount);
+            $html .= PHP_EOL;
+    
+        }
+        return $html;
+    }
+    
+    /**
+     * Render the slide out trash can. trash items can be restored or emptied from ths 
+     * slide out panel view.
+     *
+     * @param object $controller
+     * @param integer $trashCount
+     * @return string
+     */
+    private function trashCan(object $controller, int $trashCount): string
+    {
+
+        $html = '<div id="offcanvas-flip" class="trash-can-' . $this->controllerName($controller) . '" uk-offcanvas="flip: true; overlay: true">';
+            $html .= '<div class="uk-offcanvas-bar">';
+                $html .= '<button class="uk-offcanvas-close" type="button" uk-close></button>';
+                $html .= '<div class="uk-card-header">';
+                    $html .= '<div class="uk-grid-small uk-flex-middle" uk-grid>';
+                        $html .= '<div class="uk-width-auto ion-64">';
+                            $html .= '<ion-icon name="trash-bin-outline"></ion-icon>';
+                        $html .= '</div>';
+                        $html .= '<div class="uk-width-expand">';
+                        $html .= '<h3 class="uk-card-title uk-text-bolder uk-margin-remove-bottom">' . ($trashCount ?: 0) . ' Trash</h3>';
+                        $html .= '<p class="uk-text-meta uk-margin-remove-top">';
+                        $html .= '<span>Theres currently ' . ($trashCount ?: 0) . ' item in the trash.</span>';
+                        $html .= '<hr>';
+                        $html .= '</p>';
+                        $html .= '</div>';
+                    $html .= '</div>';
+                $html .= '</div>';
+                if ($trashCount > 0) {
+                    $html .= '<button class="uk-button uk-button-small uk-button-danger" name="emptyTrash-' . $this->controllerName($controller) . '" type="submit">Empty</button>';
+                    $html .= '<button class="uk-margin-small-left uk-button uk-button-small uk-button-default" name="restoreTrash-' . $this->controllerName($controller) . '" type="submit">Restore</button>';
+                } else {
+                    $html .= '<p class="uk-text-lead uk-text-center">No Trash!</p>';
+                }
+
+                $html .= '<div class="uk-panel uk-margin">';
+                $html .= '<ul class="uk-list uk-list-divider uk-list-striped uk-list-collapse">';
+                    $html .= $this->renderTrashLists($controller, $trashCount);
+                $html .= '</ul>';
+                $html .= '</div>';
+            $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
+     * Render the trash list
+     *
+     * @param object $controller
+     * @param integer $trashCount
+     * @return void
+     */
+    private function renderTrashLists(object $controller, int $trashCount)
+    {
+        $html = '';
+        if ($trashCount > 0) {
+            $items = $controller->repository->getRepo()->findBy(['id'], ['deleted_at' => 1]);
+            if (count($items) > 0) {
+                foreach ($items as $item) {
+                    $html .= '<li>';
+                        $html .= '<div class="uk-clearfix">';
+                            $html .= '<div class="uk-float-left">';
+                                $html .= '#' . $item['id'] . ' ';
+                                $html .= sprintf('%s', $controller->repository->getnameForSelectField($item['id']));
+                            $html .= '</div>';
+
+                            $html .= '<div class="uk-float-right">';
+                                $html .= sprintf('<a uk-tooltip="Restore" class="uk-link-reset" href="/admin/%s/%s/untrash">', $this->controllerName($controller), $item['id']);
+                                $html .= '<ion-icon name="refresh-outline"></ion-icon>';
+                                $html .= '<input type="hidden" name="id[]" value="' . $item['id'] . '" />';
+                                $html .= '</a>';
+
+                                $html .= sprintf('<a uk-tooltip="Delete" class="uk-link-reset uk-text-danger" href="/admin/%s/%s/hard-delete">', $this->controllerName($controller), $item['id']);
+                                $html .= '<ion-icon name="trash-outline"></ion-icon>';
+                                $html .= '</a>';
+
+                            $html .= '</div>';
+                        $html .= '</div>';
+                    $html .= '</li>';
+                    $html .= PHP_EOL;
+                }
+            }
+        }
+
+        return $html;
     }
 
     private function jumpPaging(object $controller): string

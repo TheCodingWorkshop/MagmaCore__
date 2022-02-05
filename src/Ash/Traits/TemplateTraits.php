@@ -175,4 +175,37 @@ trait TemplateTraits
         return isset($controller->tableGrid) && $controller->tableGrid->getTotalRecords() === 0 ? ' uk-disabled' : '';
     }
 
+    private function hasYamlSupport(object $controller): bool
+    {
+        $yaml = Yaml::file('controller')[$controller->thisRouteController()]['trash_can_support'];
+
+        return ($yaml === true) ? true : false;
+    }
+
+    /**
+     * Check whether a model has trash support ie. the deleted_at column within the
+     * database table
+     *
+     * @param object $controller
+     * @return boolean
+     */
+    public function hasTrashSupport(object $controller): bool
+    {
+        if (!isset($controller->repository)) {
+            throw new \Exception(sprintf('Missing repository property for controller [%s]. [%s] is trying to access this property to check whether your table support the trash feature', get_class($controller), __METHOD__));
+        }
+        
+        if (!method_exists($controller, 'schemaAsString')) {
+            throw new \Exception(sprintf('Your controller class is missing [%s] method. This is now required as of version [%s]', 'schemaAsString', '1.3.9'));
+        }
+        $columns = $controller->repository->getColumns($controller->schemaAsString());
+        if (is_array($columns)) {
+            if (!in_array($controller->repository->trashSupport(), $columns)) {
+                throw new \Exception('Trash feature is not supported by your model');
+            }
+        }
+
+        return true;
+    }
+
 }

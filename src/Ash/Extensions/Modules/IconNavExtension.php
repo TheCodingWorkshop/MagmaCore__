@@ -66,8 +66,7 @@ class IconNavExtension
                 }
                 $newIcon = (isset($icon)) ? $icon : $key;
                 $newRatio = (isset($ratio) ? $ratio : '21');
-
-                $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : 'Unknown');
+                $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : '<ion-icon class="ion-21" name="' . $newIcon . '"></ion-icon>');
                 
                 $html .=  "\n" . sprintf(
                     '<li><a href="%s"%s%s%s>%s</a>',

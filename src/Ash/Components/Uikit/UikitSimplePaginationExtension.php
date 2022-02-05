@@ -68,7 +68,7 @@ class UikitSimplePaginationExtension
         </button></li>
         <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-21"><ion-icon name="add-outline"></ion-icon></span></a></li>
         
-        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-delete" id="bulk_delete" uk-tooltip="Bulk Delete"><span class="ion-21"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash"><span class="ion-21"><ion-icon name="trash-outline"></ion-icon></span></button></li>
 
         <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-21"><ion-icon name="copy-outline"></ion-icon></span></button>
         </li>

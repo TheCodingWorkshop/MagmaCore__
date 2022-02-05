@@ -38,8 +38,12 @@ class Access
 
     public const CAN_BULK_DELETE = 'can_bulk_delete';
     public const CAN_BULK_CLONE = 'can_bulk_clone';
+    public const CAN_BULK_RESTORE = 'can_bulk_restore';
+    public const CAN_BULK_TRASH = 'can_bulk_trash';
+    public const CAN_BULK_UNTRASH = 'can_bulk_untrash';
 
     public const CAN_EDIT_OWN_ACCOUNT = 'can_edit_own_account';
+    public const CAN_UNTRASH = 'can_untrash';
 
 
 }

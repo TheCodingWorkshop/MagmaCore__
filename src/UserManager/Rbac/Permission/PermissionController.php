@@ -12,17 +12,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Permission;
 
-use MagmaCore\Base\Events\BulkActionEvent;
-use MagmaCore\UserManager\BulkActionTrait;
-use MagmaCore\UserManager\Rbac\Permission\Event\PermissionActionEvent;
-use MagmaCore\UserManager\Rbac\Permission\PermissionForm;
-use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Access;
+use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
+use MagmaCore\UserManager\Rbac\Permission\PermissionForm;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\UserManager\Rbac\Role\Event\RoleActionEvent;
+use MagmaCore\Base\Traits\ControllerCommonTrait;
+use MagmaCore\UserManager\Rbac\Permission\PermissionEntity;
+use MagmaCore\UserManager\Rbac\Permission\PermissionSchema;
+use MagmaCore\UserManager\Rbac\Permission\Event\PermissionActionEvent;
 
 class PermissionController extends \MagmaCore\Administrator\Controller\AdminController
 {
+
+    use ControllerCommonTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -67,6 +69,16 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
         return $this->repository->getRepo()
             ->findAndReturn($this->thisRouteID())
             ->or404();
+    }
+
+    /**
+     * Return the schema as a string
+     *
+     * @return string
+     */
+    public function schemaAsString(): string
+    {
+        return PermissionSchema::class;
     }
 
     /**
@@ -124,13 +136,36 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             ->end();
     }
 
+    protected function trashAction()
+    {
+        $this->ifCanTrashAction
+            ->setAccess($this, Access::CAN_TRASH)
+            ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__, [], [], PermissionSchema::class)
+            ->endAfterExecution();
+    }
+
+    /**
+     * As trashing an item changes the deleted_at column to 1 we can reset that to 0
+     * for individual items.
+     *
+     * @return void
+     */
+    protected function untrashAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, PermissionEntity::class, PermissionActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0])
+        ->endAfterExecution();
+
+    }
+
     /**
      * The delete action request. is responsible for deleting a single record from
      * the database. This method is not a submittable method hence why this check has
      * been omitted. This a simple click based action. which is triggered within the
      * datatable. An event will be dispatch by this action
      */
-    protected function deleteAction()
+    protected function hardDeleteAction()
     {
         $this->deleteAction
             ->setAccess($this, Access::CAN_DELETE)
@@ -138,61 +173,13 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
     }
 
     /**
-     * The bulk delete action request. is responsible for deleting multiple record from
-     * the database. This method is not a submittable method hence why this check has
-     * been omitted. This a simple click based action. which is triggered within the
-     * datatable. An event will be dispatch by this action
+     * Bulk action route
+     *
+     * @return void
      */
-    protected function bulkAction()
+    public function bulkAction()
     {
-        foreach (['bulk-delete', 'bulk-clone'] as $action) {
-            if (array_key_exists($action, $this->formBuilder->getData())) {
-                $id = $this->repository->getSchemaID();
-                $this->showBulkAction
-                    ->setAccess($this, Access::CAN_BULK_DELETE)
-                    ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__)
-                    ->render()
-                    ->with(
-                        [
-                            'selected' => $this->formBuilder->getData()[$id] ?? $_POST[$id],
-                            'action' => $action,
-                        ]
-                    )
-                    ->form($this->bulkDeleteForm)
-                    ->end();
-            }
-        }
-    }
-
-
-    /**
-     * The bulk delete action request. is responsible for deleting multiple record from
-     * the database. This method is not a submittable method hence why this check has
-     * been omitted. This a simple click based action. which is triggered within the
-     * datatable. An event will be dispatch by this action
-     */
-    protected function bulkDeleteAction()
-    {
-        if (array_key_exists('bulkDelete-permission', $this->formBuilder->getData())) {
-            $this->bulkDeleteAction
-                ->setAccess($this, Access::CAN_BULK_DELETE)
-                ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__)
-                ->endAfterExecution();
-        }
-    }
-
-    /**
-     * Clone a user account and append a unique index to prevent email unique key
-     * collision
-     */
-    protected function bulkCloneAction()
-    {
-        if (array_key_exists('bulkClone-permission', $this->formBuilder->getData())) {
-            $this->bulkCloneAction
-                ->setAccess($this, Access::CAN_BULK_CLONE)
-                ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__)
-                ->endAfterExecution();
-        }
+        $this->chooseBulkAction($this, PermissionActionEvent::class);
     }
 
 }

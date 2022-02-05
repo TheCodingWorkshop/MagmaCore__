@@ -194,7 +194,7 @@ class TemplateExtension
     public function action(
         array $action,
         array $row = null,
-        Object $twigExt = null,
+        object $twigExt = null,
         string $controller,
         bool $vertical = false,
         string $title = null,

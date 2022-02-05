@@ -141,6 +141,11 @@ class BaseModel extends BaseModelRelationship
         return $this->entity;
     }
 
+    public function trashSupport(): string
+    {
+        return 'deleted_at';
+    }
+
     /**
      * Allows models to retrieve other models. Simple pass in the qualified namespace of the model
      * we want an object of ie getOtherModel(RoleModel::class)->getRepo() which will give access

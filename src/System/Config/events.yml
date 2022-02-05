@@ -60,20 +60,17 @@ services:
           msg: New Role Added!
         MagmaCore\UserManager\Rbac\Role\RoleController::editAction:
           msg: Role updated!
-        MagmaCore\UserManager\Rbac\Role\RoleController::deleteAction:
-          msg: Role Deleted!
+        MagmaCore\UserManager\Rbac\Role\RoleController::hardDeleteAction:
+          msg: Role deleted!
+          redirect: role.index
+        MagmaCore\UserManager\Rbac\Role\RoleController::trashAction:
+          msg: item trash successfully!
+          redirect: role.index
+        MagmaCore\UserManager\Rbac\Role\RoleController::untrashAction:
+          msg: item remove from trash successfully!
           redirect: role.index
         MagmaCore\UserManager\Rbac\Role\RoleController::assignedAction:
           msg: New permission successfully assigned to role.
-        MagmaCore\UserManager\Rbac\Role\RoleController::bulkAction:
-          msg: Changes Saved
-          redirect: role.index
-        MagmaCore\UserManager\Rbac\Role\RoleController::bulkDeleteAction:
-          msg: 1 or more roles deleted successfully
-          redirect: role.index
-        MagmaCore\UserManager\Rbac\Role\RoleController::bulkCloneAction:
-          msg: Changes Saved
-          redirect: role.index
 
 
     role_permission_assigned.subscriber:
@@ -89,17 +86,14 @@ services:
           msg: New permission added!
         MagmaCore\UserManager\Rbac\Permission\PermissionController::editAction:
           msg: Permission updated!
-        MagmaCore\UserManager\Rbac\Permission\PermissionController::deleteAction:
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::hardDeleteAction:
           msg: Permission deleted!
           redirect: permission.index
-        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkAction:
-          msg: 1 or more roles deleted successfully
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::trashAction:
+          msg: item trash successfully!
           redirect: permission.index
-        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkDeleteAction:
-          msg: 1 or more permission deleted successfully
-          redirect: permission.index
-        MagmaCore\UserManager\Rbac\Permission\PermissionController::bulkCloneAction:
-          msg: 1 or more permission cloned successfully
+        MagmaCore\UserManager\Rbac\Permission\PermissionController::untrashAction:
+          msg: item remove from trash successfully!
           redirect: permission.index
 
     userRole.subscriber:
@@ -187,6 +181,40 @@ services:
 #      register_route_feedback:
 #        App\Controller\Admin\SearchController::starredAction:
 #          msg: Changes Saved
+
+    category.subscriber:
+      class: \App\EventSubscriber\CategoryActionSubscriber
+      register_route_feedback:
+        App\Controller\Admin\CategoryController::newAction:
+          msg: New category added successfully!
+        App\Controller\Admin\CategoryController::editAction:
+          msg: Changes saved!
+        App\Controller\Admin\CategoryController::trashAction:
+          msg: Item thrown in the trash!
+          redirect: category.index
+        App\Controller\Admin\CategoryController::untrashAction:
+          msg: Category restored from trash!
+          redirect: category.index
+        App\Controller\Admin\CategoryController::hardDeleteAction:
+          msg: Category permanently deleted!
+          redirect: category.index
+
+    tag.subscriber:
+      class: \App\EventSubscriber\TagActionSubscriber
+      register_route_feedback:
+        App\Controller\Admin\TagController::newAction:
+          msg: New tag added successfully!
+        App\Controller\Admin\TagController::editAction:
+          msg: Changes saved!
+        App\Controller\Admin\TagController::trashAction:
+          msg: Item thrown in the trash!
+          redirect: tag.index
+        App\Controller\Admin\TagController::untrashAction:
+          msg: Tag restored from trash!
+          redirect: tag.index
+        App\Controller\Admin\TagController::hardDeleteAction:
+          msg: Tag permanently deleted!
+          redirect: tag.index
 
 
     ########################## CORE SYSTEM EVENTS ##########################

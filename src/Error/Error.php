@@ -44,7 +44,7 @@ class Error implements ErrorInterface
      * @param array $errorParams
      * @return void
      */
-    public function addError($error, Object $object, array $errorParams = []): Error
+    public function addError($error, Object $object, array $errorParams = []): self
     {
         if ($error)
             $this->errors = $error;
@@ -58,25 +58,23 @@ class Error implements ErrorInterface
      * 
      * @return ErrorInterface
      */
-    public function dispatchError(?string $redirectPath = null): ErrorInterface
+    public function dispatchError(?string $redirectPath = null): void
     {
         if (is_array($this->errors) && count($this->errors) > 0) {
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
             foreach ($this->errors as $error) {
-                $keys = array_keys((array)$error);
-                foreach ($error as $err) {
-                    $this->errorCode = $keys[0];
-                    $this->object->flashMessage($err, $this->object->flashWarning());
-                    $this->object->redirect(($redirectPath !== null) ? $redirectPath : $this->object->onSelf());
-                }
+                //$keys = array_keys((array)$error);
+                $this->object->flashMessage($error, $this->object->flashWarning());
+                $this->object->redirect($redirectPath !==null ? $redirectPath : $this->object->onSelf());
             }
         }
-        $this->hasError = false;
-        return $this;
+        // $this->hasError = false;
+        // $this->err = $err;
+        // return $this;
     }
 
     /**
-     * Return bool if the user was successfully updated.
+     * Return bool if the object was successfully updated.
      *
      * @param string $redirect
      * @param string|null $message
@@ -85,7 +83,7 @@ class Error implements ErrorInterface
     public function or(string $redirect, ?string $message = null): bool
     {
         if (!$this->hasError) {
-            $message = (null == !$message) ? $message : 'Changes Saved!';
+            $message = (null == !$message) ? $message : $this->err;
             $this->object->flashMessage($message, $this->object->flashSuccess());
             $this->object->redirect($redirect);
 
@@ -135,7 +133,7 @@ class Error implements ErrorInterface
     }
 
     /**
-     * Returns the error whcih matches the error code and returned a formatted array
+     * Returns the error which matches the error code and returned a formatted array
      * to be dispatched
      *
      * @param string $code

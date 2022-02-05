@@ -127,7 +127,7 @@ class PermissionColumn extends AbstractDatatableColumn
                                 'icon' => 'ion-more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
-                                        $this->itemsDropdown($row, $this->controller),
+                                        $this->columnActions($row, $this->controller),
                                         '',
                                         $row,
                                         $this->controller,
@@ -150,22 +150,21 @@ class PermissionColumn extends AbstractDatatableColumn
     }
 
     /**
-     * Undocumented function
+     * @inheritDoc
      *
      * @param array $row
+     * @param string|null $controller
+     * @param object|null $tempExt
      * @return array
      */
-    private function itemsDropdown(array $row, string $controller): array
+    public function columnActions(array $row = [], ?string $controller = null, ?object $tempExt = null): array
     {
-        $items = [
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'delete' => ['name' => 'trash permission', 'icon' => 'trash-bin-outline']
-        ];
-        return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
-            array_keys($items),
-            $items
+        return $this->filterColumnActions(
+            $row, 
+            $this->columnBasicLinks($this, $row), /* can merge additional links here to this column */
+            $controller
         );
     }
+
 
 }

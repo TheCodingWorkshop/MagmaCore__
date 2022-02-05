@@ -229,6 +229,22 @@ trait DomainTraits
         return null;
     }
 
+    public function listing(?object $repository = null): self
+    {
+        if ($this->listings) {
+            $tableContext = [
+                'listings' => ($repository !== null) ? $repository : $this->listings,
+                'query_time' => $this->queryTime,
+                'pagination' => $this->controller->tableGrid->pagination(),
+                'total_records' => $this->controller->tableGrid->totalRecords(),
+                'search_query' => $this->controller->request->handler()->query->getAlnum($this->args['filter_alias'])
+            ];
+        }
+        $this->superContext = array_merge($this->context, $tableContext);
+        return $this;
+
+    }
+
     /**
      * Return the auto generated table data or use the first argument to construct
      * a customized table data array. Second arguments allow you to configure the table

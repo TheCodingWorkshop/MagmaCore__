@@ -22,7 +22,6 @@ class RoleColumn extends AbstractDatatableColumn
 
     use DataColumnTrait;
 
-
     private TemporaryRoleModel $tempRole;
     private RolePermissionModel $rolePermModel;
     private string $controller = 'role';
@@ -150,7 +149,7 @@ class RoleColumn extends AbstractDatatableColumn
                                 'icon' => 'ion-more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
-                                        $this->itemsDropdown($row, $this->controller),
+                                        $this->columnActions($row, $this->controller, $tempExt),
                                         '',
                                         $row,
                                         $this->controller,
@@ -174,23 +173,30 @@ class RoleColumn extends AbstractDatatableColumn
     }
 
     /**
-     * Returns the action links for the roles table action tabs
+     * @inheritDoc
      *
      * @param array $row
+     * @param string|null $controller
+     * @param object|null $tempExt
      * @return array
      */
-    private function itemsDropdown(array $row, string $controller): array
+    public function columnActions(array $row = [], ?string $controller = null, ?object $tempExt = null): array
     {
-        $items = [
-            'has_permission' => $this->hasPermission($row),
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'delete' => ['name' => 'trash role', 'icon' => 'trash-bin-outline']
-        ];
-        return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
-            array_keys($items),
-            $items
+        return $this->filterColumnActions(
+            $row, 
+            $this->columnBasicLinks($this, $row), /* can merge additional links here to this column */
+            $controller
         );
+    }
+
+    /**
+     * @return array
+     */
+    private function moreLinks(array $row = []): array
+    {
+        return [
+            'has_permission' => $this->hasPermission($row),
+        ];
     }
 
 

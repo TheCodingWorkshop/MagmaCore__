@@ -95,4 +95,59 @@ trait DataColumnTrait
         });
     }
 
+    /**
+     * Truncate large string to the desired length
+     *
+     * @param string $str
+     * @param integer $max
+     * @param integer $min
+     * @return void
+     */
+    public function truncate(string $str, int $max = 100, int $min = 80)
+    {
+        if (strlen($str) > $max)
+            $str = substr($str, 0, $min) . ' ...';
+
+        return $str;
+    }
+
+    /**
+     * Return the 2 most common links within each data table row
+     *
+     * @return array
+     */
+    public function columnBasicLinks(object|string $class = null, array $row = []): array
+    {
+        $basics = [
+            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
+            'trash' => ['name' => 'trash (not permanent)', 'icon' => 'trash-bin-outline']
+        ];
+
+        if (method_exists($class, 'moreLinks')) {
+            return array_merge($basics, $this->moreLinks($row));
+        } else {
+            return $basics;
+        }
+
+    }
+
+    /**
+     * Loop through the lists of items provided for each data table row
+     *
+     * @param array $row
+     * @param array $items
+     * @param string|null $controller
+     * @return array
+     */
+    public function filterColumnActions(array $row = [], array $items = [], ?string $controller = null): array
+    {
+        return array_map(
+            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
+            array_keys($items),
+            $items
+        );
+
+    }
+
+
 }

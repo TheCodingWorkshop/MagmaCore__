@@ -46,6 +46,7 @@ use MagmaCore\Session\SessionTrait;
 use MagmaCore\Settings\Entity\ControllerSettingEntity;
 use MagmaCore\Settings\Event\ControllerSettingActionEvent;
 use MagmaCore\Base\Domain\Actions\BulkUpdateAction;
+use MagmaCore\Base\Domain\Actions\IfCanTrashAction;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 
 class AdminController extends BaseController
@@ -98,7 +99,8 @@ class AdminController extends BaseController
                 'changeRowsAction' => ChangeRowsAction::class,
                 'controllerSettingsForm' => ControllerSettingsForm::class,
                 'controllerRepository' => ControllerSettingsModel::class,
-                'bulkDeleteForm' => BulkDeleteForm::class
+                'bulkDeleteForm' => BulkDeleteForm::class,
+                'ifCanTrashAction' => IfCanTrashAction::class
 
             ]
         );

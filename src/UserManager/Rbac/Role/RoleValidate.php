@@ -57,7 +57,7 @@ class RoleValidate extends AbstractDataRepositoryValidation
     public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null): array
     {
         $this->validate($entityCollection, $dataRepository);
-        $dataCollection = $this->mergeWithFields($entityCollection->all());
+        $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         $newCleanData = [];
         if (null !== $dataCollection) {
             $newCleanData = [

@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Role\EventSubscriber;
 
-use MagmaCore\UserManager\Rbac\Role\Event\RoleActionEvent;
 use Exception;
-use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
+use MagmaCore\UserManager\Rbac\Role\Event\RoleActionEvent;
 
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES
@@ -30,6 +31,20 @@ class RoleActionSubscriber implements EventSubscriberInterface
     /** @var int - we want this to execute last so it doesn't interrupt other process */
     private const FLASH_MESSAGE_PRIORITY = -1000;
 
+    private const NEW_ACTION = 'new';
+
+    private RolePermissionModel $rolePermission;
+    private PermissionModel $permission;
+
+    /**
+     * @param RolePermissionModel $rolePermission
+     */
+    public function __construct(RolePermissionModel $rolePermission, PermissionModel $permission)
+    {
+        $this->rolePermission = $rolePermission;
+        $this->permission = $permission;
+    }
+
     /**
      * Subscribe multiple listeners to listen for the NewActionEvent. This will fire
      * each time a new user is added to the database. Listeners can then perform
@@ -37,11 +52,12 @@ class RoleActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    #[ArrayShape([RoleActionEvent::NAME => "array[]"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             RoleActionEvent::NAME => [
                 ['flashRoleEvent', self::FLASH_MESSAGE_PRIORITY],
+                ['addBasicPermissonToRule']
             ]
         ];
     }
@@ -61,6 +77,40 @@ class RoleActionSubscriber implements EventSubscriberInterface
     public function flashRoleEvent(RoleActionEvent $event): void
     {
         $this->flashingEvent($event);
+    }
+
+    /**
+     * Add the basic_access permission to each new role created. We only want to execute
+     * the on the newAction route only.
+     *
+     * @param RoleActionEvent $event
+     * @return void
+     */
+    public function addBasicPermissonToRule(RoleActionEvent $event): bool
+    {
+        if ($this->onRoute($event, self::NEW_ACTION)) {
+            $role = $this->flattenContext($event->getContext());
+            if (isset($role['last_id']) && $role['last_id'] !==0) {
+                $basicAccessPermID = $this->permission
+                ->getRepo()
+                ->findObjectBy(['permission_name' => 'basic_access'], ['id']);
+                
+                /* Now we have the permission ID lets insert the record within the role_permission table */
+                if ($basicAccessPermID->id) {
+                    $added = $this->rolePermission
+                    ->getRepo()
+                    ->getEm()
+                    ->getCrud()
+                    ->create(['role_id' => $role['last_id'], 'permission_id' => $basicAccessPermID->id]);
+
+                    if ($added) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 }
