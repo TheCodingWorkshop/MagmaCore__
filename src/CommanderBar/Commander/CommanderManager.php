@@ -12,8 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar\Commander;
 
-use MagmaCore\CommanderBar\CommanderBar;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\CommanderBar\CommanderBar;
 
 class CommanderManager
 {
@@ -28,7 +29,8 @@ class CommanderManager
 
         $command = PHP_EOL;
         $command .= '<li>';
-        $command .= '<a href="#"><ion-icon size="large" name="home-outline"></ion-icon></a>';
+        $command .= sprintf('<a href="#">%s</a>', IconLibrary::getIcon('home', 1.5));
+
         $command .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
         $command .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';
         $command .= '<div class="uk-width-1-3">';

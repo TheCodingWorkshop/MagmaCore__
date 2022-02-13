@@ -146,7 +146,7 @@ class RoleColumn extends AbstractDatatableColumn
                     return $tempExt->action(
                         [
                             'more' => [
-                                'icon' => 'ion-more',
+                                'icon' => 'more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
                                         $this->columnActions($row, $this->controller, $tempExt),
@@ -210,9 +210,9 @@ class RoleColumn extends AbstractDatatableColumn
     {
         $rolePerm = $this->rolePermModel->getRepo()->findOneBy(['role_id' => $row['id']]);
         if ($rolePerm != null) {
-            $array = ['name' => 'Assigned', 'icon' => 'lock-closed-outline', 'tooltip' => 'Role Lock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-success'];
+            $array = ['name' => 'Assigned', 'icon' => 'lock', 'tooltip' => 'Role Lock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-success'];
         } else {
-            $array = ['name' => 'Unassigned', 'icon' => 'lock-open-outline', 'tooltip' => 'Role Unlock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-warning'];
+            $array = ['name' => 'Unassigned', 'icon' => 'unlock', 'tooltip' => 'Role Unlock', 'path' => "/admin/role/{$row['id']}/assigned", 'color' => 'uk-text-warning'];
         }
         return $array;
     }

@@ -46,7 +46,7 @@ trait ControllerMenuTrait
         'index' => 'View All',
         'new' => 'Add New',
         'log' => 'Logs',
-        'statistics' => 'Statistics'
+        'settings' => 'Settings'
     ];
 
     /**
@@ -118,7 +118,7 @@ trait ControllerMenuTrait
                         'menu_description' => $routeParams['controller'] . ' parent menu item.',
                         'menu_order' => null,
                         'menu_break_point' => null,
-                        'menu_icon' => 'alert',
+                        'menu_icon' => 'warning',
                         'parent_menu' => (isset($routeParams['controller']) ? 1 : 0), //true/false
                     ];
                     $new = $this->getMenu()->getRepo()->getEm()->getCrud()->create($fields);

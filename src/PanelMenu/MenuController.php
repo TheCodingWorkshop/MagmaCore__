@@ -19,15 +19,18 @@ use MagmaCore\PanelMenu\MenuColumn;
 use MagmaCore\Panelmenu\MenuEntity;
 use MagmaCore\PanelMenu\MenuSchema;
 use MagmaCore\PanelMenu\MenuCommander;
-use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\PanelMenu\Event\MenuActionEvent;
+use MagmaCore\Base\Traits\ControllerCommonTrait;
+use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber;
+use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 
 class MenuController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
+    use ControllerCommonTrait;
     use DataLayerTrait;
 
     /**
@@ -56,7 +59,7 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
                 'column' => MenuColumn::class,
                 'entity' => MenuEntity::class,
                 'formMenu' => MenuForm::class,
-                'menuItem' => MenuItemModel::class
+                'menuItem' => MenuItemModel::class,
             ]
         );
     }
@@ -72,6 +75,11 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
         return $this->repository->getRepo()
             ->findAndReturn($this->thisRouteID())
             ->or404();
+    }
+
+    public function schemaAsString(): string
+    {
+        return MenuSchema::class;
     }
 
     protected function indexAction()
@@ -118,6 +126,48 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
+    /**
+     * Route which puts the item within the trash. This is only for supported models
+     * and is effectively changing the deleted_at column to 1. All datatable queries 
+     * deleted_at column should be set to 0. this will prevent any trash items 
+     * from showing up in the main table
+     *
+     * @return void
+     */
+    protected function trashAction()
+    {
+
+        die('workj');
+        // $this->ifCanTrashAction
+        //     ->setAccess($this, Access::CAN_TRASH)
+        //     ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__, [], [], MenuSchema::class)
+        //     ->endAfterExecution();
+    }
+
+    /**
+     * As trashing an item changes the deleted_at column to 1 we can reset that to 0
+     * for individual items.
+     *
+     * @return void
+     */
+    protected function untrashAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0])
+        ->endAfterExecution();
+
+    }
+
+    protected function hardDeleteAction()
+    {
+        $this->deleteAction
+            ->setAccess($this, Access::CAN_DELETE)
+            ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
+
+    }
+
     protected function deleteAction()
     {
         $this->deleteAction
@@ -125,7 +175,16 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__)
             ->endAfterExecution();
 
-        
+    }
+
+    /**
+     * Bulk action route
+     *
+     * @return void
+     */
+    public function bulkAction()
+    {
+        $this->chooseBulkAction($this, MenuActionEvent::class);
     }
 
     /**
@@ -149,6 +208,32 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
         return false;
     }
 
+    protected function settingsAction()
+    {
+        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
+        $this->sessionUpdateAction
+            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
+            ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
+            ->render()
+            ->with(
+                [
+                    'session_data' => $sessionData,
+                    'page_title' => 'Menu Settings',
+                    'last_updated' => $this->controllerSessionBackupModel
+                        ->getRepo()
+                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
+                ]
+            )
+            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
+            ->end();
+    }
+
+    protected function quickSaveAction()
+    {
+        if (isset($_POST['index-quick-save'])) {
+
+        }
+    }
 
 }
 

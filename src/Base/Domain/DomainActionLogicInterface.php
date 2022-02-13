@@ -56,7 +56,7 @@ interface DomainActionLogicInterface
      * @param mixed $data
      * @return self
      */
-    public function form(Object $formRendering, string|null $formAction = null, mixed $data = null): self;
+    public function form(object $formRendering = null, string|null $formAction = null, mixed $data = null): self;
 
     /**
      * Undocumented function

@@ -41,7 +41,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'preferences',
         'personal',
         'notes',
-        'overview'
+        'overview',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -103,6 +104,7 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'personal' => $suffix . " Personal Space",
             'notes' => 'Add Notes',
             'overview' => 'Users Overview',
+            'settings' => Stringify::capitalize($controller->thisRouteController()) . ' Settings',
             default => "Unknown"
         };
     }

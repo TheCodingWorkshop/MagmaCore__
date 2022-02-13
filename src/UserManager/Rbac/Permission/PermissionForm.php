@@ -12,27 +12,27 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Permission;
 
-use MagmaCore\FormBuilder\ClientFormBuilder;
-use MagmaCore\FormBuilder\ClientFormBuilderInterface;
-use MagmaCore\FormBuilder\FormBuilderBlueprint;
-use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
-use MagmaCore\Utility\Utilities;
 use Exception;
+use MagmaCore\PanelMenu\MenuModel;
+use MagmaCore\FormBuilder\ClientFormBuilder;
+use MagmaCore\FormBuilder\FormBuilderBlueprint;
+use MagmaCore\FormBuilder\ClientFormBuilderInterface;
+use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 
 class PermissionForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {
 
     /** @var FormBuilderBlueprintInterface $blueprint */
     private FormBuilderBlueprintInterface $blueprint;
-    private PermissionModel $model;
+    private MenuModel $model;
 
     /**
      * Main class constructor
      *
      * @param FormBuilderBlueprint $blueprint
-     * @param PermissionModel $model
+     * @param MenuModel $model
      */
-    public function __construct(FormBuilderBlueprint $blueprint, PermissionModel $model)
+    public function __construct(FormBuilderBlueprint $blueprint, MenuModel $model)
     {
         $this->blueprint = $blueprint;
         $this->model = $model;
@@ -40,9 +40,9 @@ class PermissionForm extends ClientFormBuilder implements ClientFormBuilderInter
     }
 
     /**
-     * @return PermissionModel
+     * @return MenuModel
      */
-    public function getModel(): PermissionModel
+    public function getModel(): MenuModel
     {
         return $this->model;
     }
@@ -59,19 +59,28 @@ class PermissionForm extends ClientFormBuilder implements ClientFormBuilderInter
         return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "permissionForm"])
             ->addRepository($dataRepository)
             ->add($this->blueprint->text('permission_name', [], $this->hasValue('permission_name')))
-//            ->add($this->blueprint->select(
-//                'permission_group[]',
-//                ['uk-select'],
-//                'permission_group',
-//                10,
-//                true,
-//            ),
-//            $this->blueprint->choices(
-//                array_column($this->model->getRepo()->findBy(['permission_name']), 'permission_name'),
-//                /* need to return a list of permission assigned to the role */'',
-//                $this
-//            ),
-//            $this->blueprint->settings(false, null, true, 'Permission Group', true, 'Select one one or more permissions'))
+           ->add($this->blueprint->select(
+               'resource_group',
+               ['uk-select'],
+               'resource_group',
+               10,
+               false,
+           ),
+           $this->blueprint->choices(
+               array_column($this->model->getRepo()->findBy(['menu_name']), 'menu_name'),
+               $this->hasValue('resource_group'),
+               $this
+           ),
+           $this->blueprint->settings(
+               false, 
+               null, 
+               true, 
+               'Permission Group', 
+               true, 
+               null, 
+               'Permission group or resource group allows us to group permission under a single resource. i.e all user permissions can be group under the user resource.')
+           )
+
             ->add($this->blueprint->textarea('permission_description', ['uk-textarea'], 'permission_name'), $this->hasValue('permission_description'))
             ->add(
                 $this->blueprint->submit(

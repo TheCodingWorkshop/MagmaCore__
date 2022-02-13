@@ -123,10 +123,10 @@ class GroupColumn extends AbstractDatatableColumn
                     return $tempExt->action(
                         [
                             'more' => [
-                                'icon' => 'ion-more',
+                                'icon' => 'more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
-                                        $this->itemsDropdown($row, $this->controller),
+                                        $this->columnActions($row, $this->controller),
                                         '',
                                         $row,
                                         $this->controller,
@@ -149,23 +149,32 @@ class GroupColumn extends AbstractDatatableColumn
     }
 
     /**
-     * Undocumented function
+     * @inheritDoc
      *
+     * @param array $row
+     * @param string|null $controller
+     * @param object|null $tempExt
+     * @return array
+     */
+    public function columnActions(array $row = [], ?string $controller = null, ?object $tempExt = null): array
+    {
+        return $this->filterColumnActions(
+            $row, 
+            $this->columnBasicLinks($this), /* can merge additional links here to this column */
+            $controller
+        );
+    }
+
+
+    /**
      * @param array $row
      * @return array
      */
-    private function itemsDropdown(array $row, string $controller): array
+    private function moreLinks(): array
     {
-        $items = [
-            'assigned' => ['name' => 'Assigned', 'icon' => 'lock-closed-outline'],
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'delete' => ['name' => 'trash permission', 'icon' => 'trash-bin-outline']
+        return [
+            'assigned' => ['name' => 'Assigned', 'icon' => 'lock'],
         ];
-        return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
-            array_keys($items),
-            $items
-        );
     }
 
 }

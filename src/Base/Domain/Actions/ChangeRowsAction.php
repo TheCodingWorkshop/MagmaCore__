@@ -12,8 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
-use MagmaCore\Base\Domain\DomainActionLogicInterface;
+use MagmaCore\Utility\Serializer;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Base\Domain\DomainActionLogicInterface;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -57,19 +58,33 @@ class ChangeRowsAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
 
         if (isset($formBuilder) && $formBuilder?->canHandleRequest()) :
-            $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
-        $formData = $entityCollection->all();
-        $action = $controller->controllerSettings->getRepo()->getEm()->getCrud()
-                ->update(['records_per_page' => (int)$formData['records_per_page'], 'controller_name' => (string)$formData['controller_name']], 'controller_name');
 
-            if ($action) {
-                $this->dispatchSingleActionEvent(
-                    $controller,
-                    $eventDispatcher,
-                    $method,
-                    ['action' => $action, 'controller_name' => $formData['controller_name']],
-                    $additionalContext
-                );
+            $formData = $formBuilder->getData();
+            $oldSession = $controller->controllerSessionData($controller);
+            /* Unset the old key and value */
+            unset($oldSession['records_per_page']);
+            /* push the new value back onto the old session array */
+            array_push($oldSession, ['records_per_page' => $formData['records_per_page']]);
+
+            /* flush the session then re-populate */
+            $key = $controller->thisRouteController() . '_settings';
+            $session = $controller->getSession();
+            if ($session->has($key)) {
+                $session->delete($key);
+
+                /* serialized the modified array */
+                $session->set($key, Serializer::compress($oldSession));
+                var_dump($controller->controllerSessionData());
+                die;
+                $controller->flashMessage('Changes saved');
+                $controller->redirect('/admin/user/index');
+                // $this->dispatchSingleActionEvent(
+                //     $controller,
+                //     $eventDispatcher,
+                //     $method,
+                //     ['controller_name' => $formData['controller_name']],
+                //     $additionalContext
+                // );
 
             }
         endif;

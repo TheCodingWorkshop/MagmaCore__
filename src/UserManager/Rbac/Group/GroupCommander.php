@@ -33,7 +33,8 @@ class GroupCommander extends GroupModel implements ApplicationCommanderInterface
         'new',
         'edit',
         'bulk',
-        'assigned'
+        'assigned',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -85,6 +86,7 @@ class GroupCommander extends GroupModel implements ApplicationCommanderInterface
             'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'group_name'),
             'assigned' => 'Group Assignment',
             'bulk' => 'Bulk Delete',
+            'settings' => 'Group Settings',
             default => "Unknown"
         };
     }

@@ -161,6 +161,15 @@ services:
         MagmaCore\PanelMenu\MenuController::deleteAction:
           msg: Menu deleted!
           redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::hardDeleteAction:
+          msg: Menu deleted!
+          redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::trashAction:
+          msg: Item trashed successfully!
+          redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::untrashAction:
+          msg: Item remove from trash successfully!
+          redirect: menu.index
 
     message.subscriber:
       class: \App\EventSubscriber\MessageActionSubscriber
@@ -181,6 +190,24 @@ services:
 #      register_route_feedback:
 #        App\Controller\Admin\SearchController::starredAction:
 #          msg: Changes Saved
+
+    post.subscriber:
+      class: \App\EventSubscriber\PostActionSubscriber
+      register_route_feedback:
+        App\Controller\Admin\PostController::newAction:
+          msg: New post added successfully!
+        App\Controller\Admin\PostController::editAction:
+          msg: Changes saved!
+        App\Controller\Admin\PostController::trashAction:
+          msg: Item thrown in the trash!
+          redirect: post.index
+        App\Controller\Admin\PostController::untrashAction:
+          msg: Post restored from trash!
+          redirect: post.index
+        App\Controller\Admin\PostController::hardDeleteAction:
+          msg: Post permanently deleted!
+          redirect: post.index
+
 
     category.subscriber:
       class: \App\EventSubscriber\CategoryActionSubscriber
@@ -215,6 +242,23 @@ services:
         App\Controller\Admin\TagController::hardDeleteAction:
           msg: Tag permanently deleted!
           redirect: tag.index
+
+    ticket.subscriber:
+      class: \MagmaCore\Ticket\EventSubscriber\TicketActionSubscriber
+      register_route_feedback:
+        MagmaCore\Ticket\TicketController::newAction:
+          msg: New ticket added!
+        MagmaCore\Ticket\TicketController::editAction:
+          msg: Ticket updated!
+        MagmaCore\Ticket\TicketController::hardDeleteAction:
+          msg: Tikcet deleted!
+          redirect: ticket.index
+        MagmaCore\Ticket\TicketController::trashAction:
+          msg: item trash successfully!
+          redirect: ticket.index
+        MagmaCore\Ticket\TicketController::untrashAction:
+          msg: item remove from trash successfully!
+          redirect: ticket.index
 
 
     ########################## CORE SYSTEM EVENTS ##########################

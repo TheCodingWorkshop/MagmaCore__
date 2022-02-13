@@ -51,11 +51,11 @@ class PermissionColumn extends AbstractDatatableColumn
                 'formatter' => function ($row, $tempExt) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
-                    $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
+                    $html .= '<span uk-tooltip="' . $row['permission_description'] . '" class="uk-text-teal" uk-icon="icon: info"></span>';
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';
                     $html .= $row["permission_name"] . "<br/>";
-                    $html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["permission_description"] . '</small></div>';
+                    //$html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["permission_description"] . '</small></div>';
                     $html .= '</div>';
                     $html .= '</div>';
 
@@ -71,17 +71,17 @@ class PermissionColumn extends AbstractDatatableColumn
                 'searchable' => false,
                 'formatter' => ''
             ],
-//            [
-//                'db_row' => 'permission_group',
-//                'dt_row' => 'Group',
-//                'class' => '',
-//                'show_column' => true,
-//                'sortable' => true,
-//                'searchable' => true,
-//                'formatter' => function ($row, $tempExt) {
-//                    return $row['permission_group'] ?? 'None';
-//                }
-//            ],
+            [
+                'db_row' => 'resource_group',
+                'dt_row' => 'Group',
+                'class' => '',
+                'show_column' => true,
+                'sortable' => false,
+                'searchable' => false,
+                'formatter' => function($row, $tempExt) use ($callingController) {
+                    return $row['resource_group'] ?? 'Not Set';
+                }
+            ],
             [
                 'db_row' => 'created_at',
                 'dt_row' => 'Published',
@@ -90,9 +90,10 @@ class PermissionColumn extends AbstractDatatableColumn
                 'sortable' => true,
                 'searchable' => false,
                 'formatter' => function ($row, $tempExt) {
-                    $html = $tempExt->tableDateFormat($row, "created_at");
-                    $html .= '<div><small>By Admin</small></div>';
-                    return $html;
+                    return sprintf(
+                        '<span uk-tooltip="By Admin">%s</span>', 
+                        $tempExt->tableDateFormat($row, "created_at")
+                    );
                 }
             ],
             [
@@ -103,14 +104,14 @@ class PermissionColumn extends AbstractDatatableColumn
                 'sortable' => true,
                 'searchable' => false,
                 'formatter' => function ($row, $tempExt) {
-                    $html = '';
                     if (isset($row["modified_at"]) && $row["modified_at"] != null) {
-                        $html .= $tempExt->tableDateFormat($row, "modified_at");
-                        $html .= '<div><small>By Admin</small></div>';
+                        return sprintf(
+                            '<span uk-tooltip="By Admin">%s</span>', 
+                            $tempExt->tableDateFormat($row, "modified_at")
+                        );
                     } else {
-                        $html .= '<small>Never!</small>';
+                        return '<small>Never!</small>';
                     }
-                    return $html;
                 }
             ],
             [
@@ -124,7 +125,7 @@ class PermissionColumn extends AbstractDatatableColumn
                     return $tempExt->action(
                         [
                             'more' => [
-                                'icon' => 'ion-more',
+                                'icon' => 'more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
                                         $this->columnActions($row, $this->controller),

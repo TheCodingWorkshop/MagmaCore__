@@ -53,7 +53,7 @@ trait FormalizerTrait
         } elseif (is_object($objectRepo = $this->getRepository())) {
             return empty($objectRepo->$fieldName) ? '' : $objectRepo->$fieldName;
         } else {
-            return false;
+            return null;
         }
     }
 

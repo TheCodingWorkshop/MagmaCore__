@@ -37,6 +37,7 @@ class TicketCommander extends TicketModel implements ApplicationCommanderInterfa
         'bulk',
         'trash',
         'hard-delete',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -92,6 +93,7 @@ class TicketCommander extends TicketModel implements ApplicationCommanderInterfa
             'trash' => 'Trash Listings',
             'log' => Stringify::capitalize($controller->thisRouteController()) . ' Log',
             'hard-delete' => "Deleting " . $suffix,
+            'settings' => 'Ticket Settings',
             default => "Unknown"
         };
     }

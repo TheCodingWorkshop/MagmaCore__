@@ -19,6 +19,7 @@ use MagmaCore\Themes\Uikit\Uikit;
 use MagmaCore\Twig\TwigExtension;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
+use MagmaCore\IconLibrary;
 
 class Datatable extends AbstractDatatable
 {
@@ -188,8 +189,9 @@ class Datatable extends AbstractDatatable
             $element .= '<a data-turbo="true" class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
 
             $element .= $column['dt_row'];
+            $element .= '<span uk-icon="icon: expand ' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '; ratio: 0.8"></span>';
 
-            $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
+           // $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
 
             $element .= '</a>';
         } else {
@@ -222,8 +224,8 @@ class Datatable extends AbstractDatatable
         } else {
             $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage - 1));
         }
-        //$element .= '<span><ion-icon name="caret-back-outline"></ion-icon></span>';
-        $element .= '<span><ion-icon name="chevron-back-outline"></ion-icon></span></a>' . PHP_EOL;
+        $element .= IconLibrary::getIcon('triangle-left', 0.9);
+        $element .= '</a>' . PHP_EOL;
         $element .= '</li>' . PHP_EOL;
 
         return $element;
@@ -253,8 +255,9 @@ class Datatable extends AbstractDatatable
         } else {
             $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage + 1));
         }
-        $element .= '<span><ion-icon name="chevron-forward-outline"></ion-icon></span></a>' . PHP_EOL;
-        //$element .= '<span><ion-icon name="caret-forward-outline"></ion-icon></span>';
+        $element .= IconLibrary::getIcon('triangle-right', 0.9);
+        $element .= '</a>' . PHP_EOL;
+
         $element .= '</li>' . PHP_EOL;
 
         return $element;

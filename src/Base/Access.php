@@ -44,6 +44,7 @@ class Access
 
     public const CAN_EDIT_OWN_ACCOUNT = 'can_edit_own_account';
     public const CAN_UNTRASH = 'can_untrash';
+    public const CAN_MANANGE_SETTINGS = 'can_manage_settings';
 
 
 }

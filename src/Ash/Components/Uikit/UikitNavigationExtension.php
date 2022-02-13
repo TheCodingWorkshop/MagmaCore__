@@ -13,8 +13,9 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Components\Uikit;
 
 use Exception;
-use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\DataObjectLayer\DataLayerClientFacade;
 
 class UikitNavigationExtension
@@ -62,8 +63,15 @@ class UikitNavigationExtension
 
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {
-                $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav>';
-                $element .= '<li class="uk-nav-header">Manage
+                $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background">';
+                $element .= '<li class="uk-nav-header">
+                <span>Manage</span>
+                <ul class="uk-iconnav uk-margin">
+    <li><a href="#" uk-icon="icon: plus"></a></li>
+    <li><a href="#" uk-icon="icon: file-edit"></a></li>
+    <li><a href="#" uk-icon="icon: copy"></a></li>
+    <li><a href="#"><span uk-icon="icon: bag"></span> (2)</a></li>
+</ul>
                 </li>';
                 $element .= '<hr>';
                 foreach ($data as $key => $item) {
@@ -114,7 +122,11 @@ class UikitNavigationExtension
     {
         $element = '<a href="' . ($item['path'] ?? 'javascript:void(0)') . '">';
         if ($config->get('menu_icon') === 'on') {
-            $element .= '<span style="margin-bottom: 15px;" class="uk-margin-small-right"><ion-icon class="ion-' . $config->get('menu_icon_size') . '" name="' . $item['menu_icon'] . '-outline"></ion-icon></span>';
+            $element .= sprintf(
+                '<span style="margin-bottom: 15px;"class="uk-margin-small-right">%s</span>',
+                IconLibrary::getIcon($item['menu_icon'], $config->get('menu_icon_size'))
+            );
+
         }
 
         $element .= Stringify::capitalize(($item['menu_name'] ?? 'Unknown'));

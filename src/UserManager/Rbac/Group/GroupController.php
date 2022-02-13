@@ -12,15 +12,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Rbac\Group;
 
-use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Base\Access;
-use MagmaCore\UserManager\Rbac\Group\Event\GroupActionEvent;
-use MagmaCore\UserManager\Rbac\Group\Event\GroupRoleAssignedActionEvent;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Rbac\Group\Model\GroupRoleModel;
 use MagmaCore\UserManager\Rbac\Group\Model\UserGroupModel;
 use MagmaCore\UserManager\Rbac\Group\Entity\GroupRoleEntity;
+use MagmaCore\UserManager\Rbac\Group\Event\GroupActionEvent;
 use MagmaCore\UserManager\Rbac\Group\Form\GroupAssignedForm;
-use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
+use MagmaCore\UserManager\Rbac\Group\Event\GroupRoleAssignedActionEvent;
 
 
 class GroupController extends \MagmaCore\Administrator\Controller\AdminController
@@ -57,6 +58,11 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
         return $this->repository->getRepo()
             ->findAndReturn($this->thisRouteID())
             ->or404();
+    }
+
+    public function schemaAsString(): string
+    {
+        return GroupSchema::class;
     }
 
     /**
@@ -111,6 +117,46 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
             ->end();
     }
 
+        /**
+     * Route which puts the item within the trash. This is only for supported models
+     * and is effectively changing the deleted_at column to 1. All datatable queries 
+     * deleted_at column should be set to 0. this will prevent any trash items 
+     * from showing up in the main table
+     *
+     * @return void
+     */
+    protected function trashAction()
+    {
+        $this->ifCanTrashAction
+            ->setAccess($this, Access::CAN_TRASH)
+            ->execute($this, NULL, GroupActionEvent::class, NULL, __METHOD__, [], [], GroupSchema::class)
+            ->endAfterExecution();
+    }
+
+    /**
+     * As trashing an item changes the deleted_at column to 1 we can reset that to 0
+     * for individual items.
+     *
+     * @return void
+     */
+    protected function untrashAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, GroupEntity::class, GroupActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0])
+        ->endAfterExecution();
+
+    }
+
+    protected function hardDeleteAction()
+    {
+        $this->deleteAction
+            ->setAccess($this, Access::CAN_DELETE)
+            ->execute($this, NULL, GroupActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
+
+    }
+
     /**
      * The delete action request. is responsible for deleting a single record from
      * the database. This method is not a submittable method hence why this check has
@@ -125,6 +171,17 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
             ->setAccess($this, Access::CAN_DELETE)
             ->execute($this, NULL, GroupActionEvent::class, NULL, __METHOD__);
     }
+
+    /**
+     * Bulk action route
+     *
+     * @return void
+     */
+    public function bulkAction()
+    {
+        $this->chooseBulkAction($this, GroupActionEvent::class);
+    }
+
 
     /**
      * Assigned role route
@@ -152,6 +209,25 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
             ->end();
     }
 
+    protected function settingsAction()
+    {
+        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
+        $this->sessionUpdateAction
+            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
+            ->execute($this, NULL, GroupActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
+            ->render()
+            ->with(
+                [
+                    'session_data' => $sessionData,
+                    'page_title' => 'Group Settings',
+                    'last_updated' => $this->controllerSessionBackupModel
+                        ->getRepo()
+                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
+                ]
+            )
+            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
+            ->end();
+    }
 
 
 }

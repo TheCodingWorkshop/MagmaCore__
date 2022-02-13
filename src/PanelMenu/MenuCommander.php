@@ -35,6 +35,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
         'edit',
         'show',
         'log',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -87,6 +88,7 @@ class MenuCommander extends MenuModel implements ApplicationCommanderInterface
             'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'menu_name'),
             'show' => "Viewing " . $suffix,
             'log' => Stringify::capitalize($controller->thisRouteController()) . ' Log',
+            'settings' => 'Menu Settings',
             default => "Unknown"
         };
     }

@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Roles;
 
-use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\Auth\Authorized;
-use MagmaCore\Base\Exception\BaseUnexpectedValueException;
+use MagmaCore\UserManager\Model\UserRoleModel;
+use MagmaCore\UserManager\Rbac\Role\RoleModel;
 
 class PrivilegedUser
 {
@@ -30,7 +30,7 @@ class PrivilegedUser
     {
         $user = Authorized::grantedUser();
         if ($user !==null) {
-            $privilegeUser = new PrivilegedUser();
+            $privilegeUser = new self();
             $privilegeUser->user_id = $user->id;
             $privilegeUser->email = $user->email;
             $privilegeUser->firstname = $user->firstname;
@@ -38,7 +38,7 @@ class PrivilegedUser
             $privilegeUser->fullname = $user->firstname . ' ' . $user->lastname;
             $privilegeUser->gravatar = $user->gravatar;
             $privilegeUser->status = $user->status;
-            $privilegeUser->initRoles($userID ?: $user->id);
+            $privilegeUser->initRoles(($userID !==null) ? $userID : $user->id);
             return $privilegeUser;
         } else {
             return false;
@@ -47,12 +47,12 @@ class PrivilegedUser
 
     /**
      * populate roles with their associated permissions
-     * @return void
+     * @return mixed
      */
-    public function initRoles(int $userID)
+    public function initRoles(?int $userID = null)
     {
-        $this->roles = [];
         $sql = "SELECT t1.role_id, t2.role_name FROM user_role as t1 JOIN roles as t2 ON t1.role_id = t2.id WHERE t1.user_id = :user_id";
+
         $row = (new UserRoleModel())
             ->getRepo()
             ->getEm()
@@ -88,7 +88,7 @@ class PrivilegedUser
      * @param int $roldID
      * @return bool
      */
-    public function hasRolePrivilege(int $roldID): bool
+    public function hasRolePrivilege(int $roleID): bool
     {
         return $this->getPermissionByRoleID($roleID);
     }
@@ -141,12 +141,12 @@ class PrivilegedUser
         }
     }
 
-    public function getRoleByGroupID(int $groupID)
-    {
-        $roles = Role::getRoleGroups($groupID);
-        foreach ((array)$roles as $role) {
-            return $role;
-        }
-    }
+    // public function getRoleByGroupID(int $groupID)
+    // {
+    //     $roles = Role::getRoleGroups($groupID);
+    //     foreach ((array)$roles as $role) {
+    //         return $role;
+    //     }
+    // }
 
 }

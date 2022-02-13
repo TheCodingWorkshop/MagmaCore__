@@ -32,7 +32,8 @@ class PermissionCommander extends PermissionModel implements ApplicationCommande
         'index',
         'new',
         'edit',
-        'bulk'
+        'bulk',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -83,6 +84,7 @@ class PermissionCommander extends PermissionModel implements ApplicationCommande
             'new' => 'Create New Permission',
             'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'permission_name'),
             'assigned' => 'Role Assignment',
+            'settings' => 'Permission Settings',
             'bulk' => 'Bulk Delete',
             default => "Unknown"
         };

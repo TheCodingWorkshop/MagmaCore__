@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar\Traits;
 
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 trait ManagerTrait
@@ -27,7 +28,9 @@ trait ManagerTrait
 
         $commander = PHP_EOL;
         $commander .= '<li>';
-        $commander .= '<a href="#" ><ion-icon class="ion-21" name="home-outline"></ion-icon></a>';
+        $commander .= sprintf('<a class="uk-icon-link" href="#"></a>', IconLibrary::getIcon('home', 1.2));
+
+        //$commander .= '<a href="#" ><ion-icon class="ion-21" name="home-outline"></ion-icon></a>';
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
         $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';
         $commander .= '<div class="uk-width-1-3">';
@@ -53,7 +56,8 @@ trait ManagerTrait
             $commander .= '<li class="uk-nav-divider"></li>';
             $commander .= '<li>';
             $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/index" uk-tooltip="View Trash" class="ion-28">';
-            $commander .= '<ion-icon name="home"></ion-icon>';
+            $commander .= IconLibrary::getIcon('home', 1.2);
+            // $commander .= '<ion-icon name="home"></ion-icon>';
             $commander .= '</a>';
             $commander .= '</li>';
             $commander .= '</ul>';

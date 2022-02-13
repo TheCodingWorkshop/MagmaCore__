@@ -12,22 +12,20 @@ declare(strict_types=1);
 namespace MagmaCore\FormBuilder;
 
 use Exception;
-use Throwable;
 use MagmaCore\Error\Error;
-use ParagonIE\AntiCSRF\AntiCSRF;
-use MagmaCore\Http\RequestHandler;
+use MagmaCore\Http\Request;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\FormBuilder\Traits\FormalizerTrait;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-use MagmaCore\FormBuilder\Exception\FormBuilderUnexpectedValueException;
-use MagmaCore\Http\Request;
+use MagmaCore\FormBuilder\Traits\FormTrait;
 
 class FormBuilder extends AbstractFormBuilder
 {
 
-    use FormBuilderTrait;
-    use FormalizerTrait;
-    use SessionTrait;
+    use FormBuilderTrait,
+        FormalizerTrait,
+        SessionTrait,
+        FormTrait;
 
     protected array $inputObject = [];
     protected array $htmlAttr = [];
@@ -126,6 +124,7 @@ class FormBuilder extends AbstractFormBuilder
             $this->element .= sprintf('<form %s>', $this->renderHtmlElement($this->formAttr));
         }
             if (is_array($this->inputObject)) {
+
                 foreach ($this->inputObject as $objectType) {
                     foreach ((array)$objectType->configureOptions() as $key => $value) {
                         $this->set($key, $value);
@@ -156,7 +155,6 @@ class FormBuilder extends AbstractFormBuilder
      */
     private function processFormFields(Object $objectType) : string
     {
-        //$html = $container = $before = $after = $show_label = $element_class =  $new_label = '';
         $html = '';
         foreach (self::SUPPORT_INPUT_TYPES as $field) :    
             switch ($objectType->getType()) :
@@ -164,7 +162,6 @@ class FormBuilder extends AbstractFormBuilder
                 
                     // [inline_flip_icon, inline_icon, inline_icon_class, before_after_wrapper etc...]
                     extract ($objectType->getSettings(), EXTR_SKIP);
-
                     /* Set the container icon flip left or right */
                     $flip_icon = (isset($inline_flip_icon) && $inline_flip_icon == true) ? ' uk-form-icon-flip' : '';
 
@@ -176,7 +173,9 @@ class FormBuilder extends AbstractFormBuilder
                         if (!empty($element)) {
                     
                             /* Main wrapper element html tag are set with in the $before variable */
+                            
                             $html .= (isset($before_after_wrapper) && $before_after_wrapper == true) ? "\n{$before}" : "";
+                            
                             /* Form label wrapping element */
                             $html .= ($show_label === true) ? $this->formLabel($objectType->getOptions(), '', $new_label) : '';
 
@@ -222,171 +221,17 @@ class FormBuilder extends AbstractFormBuilder
 
     }
 
-    /**
-     * Check the form can be submitted and the request if correct
-     *
-     * @param string $submit
-     * @return boolean
-     * @throws Throwable
-     */
-    public function isFormValid(string $submit): bool
+    private function throwExceptionIvalidWrapperClass(array $wrapperElement = null): void
     {
-        if ($this->canHandleRequest() && $this->isSubmittable($submit)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Throw an error if the csrf validation fails. 
-     *
-     * @param object $controller
-     * @return void
-     */
-    public function validateCsrf(object $controller)
-    {
-        if (!$this->csrfValidate()) {
-            if (isset($this->error)) {
-                $this->error->addError(Error::display('err_invalid_csrf'), $controller)->dispatchError();
-            }
-        }
-    }
-
-    /**
-     * Check whether the request can be handled
-     * 
-     * @return array
-     * @throws Throwable
-     */
-    public function canHandleRequest() : array
-    { 
-        $method = ($_SERVER['REQUEST_METHOD'] ?? '');
-        if ($method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
-            if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
-                $method == 'DELETE';
-            } elseif ($_SERVER['HTTP_X_HTTP_METHOD'] == 'PUT') {
-                $method == 'PUT';
-            } else {
-                throw new FormBuilderUnexpectedValueException('Unexpected Header');
-            }
-        }
-        try {
-            return [
-                $method,
-                (class_exists(RequestHandler::class)) ? (new RequestHandler())->handler()->request->all() : $_POST,
-                $this->getStream()
-            ];
-        } catch (Throwable $th) {
-            throw $th;
-        }
-    }
-
-    private function getStream()
-    {
-        $contentType = isset($_SERVER['CONTENT_TYPE']) && $_SERVER['REQUEST_METHOD'] == 'POST' ? trim($_SERVER['CONTENT_TYPE']) : '';
-        if ($contentType === 'application/json') {
-            $content = trim(file_get_contents('php://input', false, stream_context_get_default(), 0, $_SERVER['CONTENT_LENGTH']));
-            $decode = json_decode($content, true);
-            if (is_array($decode)) {
-                echo $decode;
-            } else {
-                throw new FormBuilderUnexpectedValueException('Invalid Data');
-            }
-        }
-    }
-
-    public function getFormAttr(string $attr)
-    {
-        if ($attr) {
-            $field = (new RequestHandler())->handler()->get($attr);
-            if ($field) {
-                return $field;
-            }
-        }
-    }
-
-    /**
-     * Get the request method verb as a string
-     * @throws Throwable
-     */
-    public function getMethod(string $method) : string
-    {
-        list($_method, $_post, $_json) = $this->canHandleRequest();
-        if ($_method === $method) {
-            return $_method;
-        }
-    }
-
-    /**
-     * Returns json data
-     * @throws Throwable
-     */
-    public function getJson()
-    {
-        list($_method, $_post, $_json) = $this->canHandleRequest();
-        return $_json;
-    }
-
-    /**
-     * Returns form data
-     * @throws Throwable
-     */
-    public function getData() : array
-    {
-        list($_method, $_post, $_json) = $this->canHandleRequest();
-        return $_post;
-
-    }
-
-    /**
-     * Is the request an ajax request
-     * @return boolean
-     */
-    public function isAjax(): bool
-    {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
-    
-    /**
-     * Check whether the form is submittable. Submit button should represent
-     * the argument name
-     *
-     * @param string $name - default to <input type="submit" name="submit">
-     * @return bool
-     */
-    public function isSubmittable(string $name = 'submit') : bool
-    {
-        return (isset($_POST[$name]));
-    }
-
-    /**
-     * Instantiate the external csrf fields
-     *
-     * @param mixed|null $lock
-     * @return string
-     * @throws Exception
-     */
-    public function csrfForm(mixed $lock = null): string
-    { 
-        static $addCsrf;
-        if ($addCsrf === null) {
-            $addCsrf = new AntiCSRF();
+        if ($wrapperElement !==null) {
+            foreach (['before', 'after'] as $wrapperClass) {
+                if (!in_array($wrapperClass, array_keys($wrapperElement))) {
+                    throw new \Exception(sprintf('Only before and after array keys are allowed here your key %s is not vali', implode(', ', $wrapperElement)));
+                }
+            }    
         }
 
-        return $addCsrf->insertToken($lock, false);
-
     }
 
-    /**
-     * Wrapper function for validating csrf token
-     *
-     * @return bool
-     */
-    public function csrfValidate(): bool
-    { 
-        $addCsrf = new AntiCSRF();
-        return $addCsrf->validateRequest();
-
-    }
 
 }

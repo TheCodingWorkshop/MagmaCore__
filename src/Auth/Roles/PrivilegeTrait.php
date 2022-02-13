@@ -11,10 +11,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Auth\Roles;
 
-use MagmaCore\UserManager\Model\UserRoleModel;
-use MagmaCore\Auth\Authorized;
-use MagmaCore\Base\Exception\BaseUnexpectedValueException;
-
 trait PrivilegeTrait
 {
 

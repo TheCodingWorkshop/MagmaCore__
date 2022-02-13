@@ -15,6 +15,7 @@ namespace MagmaCore\UserManager;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Datatable\AbstractDatatableColumn;
 use MagmaCore\Datatable\DataColumnTrait;
+use MagmaCore\IconLibrary;
 
 class UserColumn extends AbstractDatatableColumn
 {
@@ -57,7 +58,9 @@ class UserColumn extends AbstractDatatableColumn
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<div>' . $this->displayStatus($callingController, $row) . '</div>';
-                    $html .= '<div><a uk-tooltip="' . (!$privilege->getRole() ? 'No Role Assigned' : $privilege->getRole()) . '" href=""><ion-icon name="' . (!$privilege->getRole() ? 'alert-outline' : 'person-outline') . '"></ion-icon></a></div>';
+                    // $html .= '<div><a uk-tooltip="' . (!$privilege->getRole() ? 'No Role Assigned' : $privilege->getRole()) . '" href=""><ion-icon name="' . (!$privilege->getRole() ? 'alert-outline' : 'person-outline') . '"></ion-icon></a></div>';
+                    $html .= '<div><a uk-tooltip="' . (!$privilege->getRole() ? 'No Role Assigned' : $privilege->getRole()) . '" href="">' . IconLibrary::getIcon((!$privilege->getRole() ? 'warning' : 'user'), 0.7) . '</a></div>';
+
                     $html .= '<div></div>';
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';
@@ -144,7 +147,7 @@ class UserColumn extends AbstractDatatableColumn
                 'sortable' => false,
                 'searchable' => false,
                 'formatter' => function ($row, $tempExt) {
-                    return '<span class="ion-location ion-24" uk-tooltip="' . $row["remote_addr"] . '"></span>';
+                    return sprintf('<span uk-tooltip="%s">%s</span>', $row['remote_addr'], IconLibrary::getIcon('location', 1.5));
                 }
             ],
             [
@@ -158,7 +161,7 @@ class UserColumn extends AbstractDatatableColumn
                     return $tempExt->action(
                         [
                             'more' => [
-                                'icon' => 'ion-more',
+                                'icon' => 'more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
                                         $this->columnActions($row, $this->controller),
@@ -207,11 +210,12 @@ class UserColumn extends AbstractDatatableColumn
     private function moreLinks(): array
     {
         return [
-            'notes' => ['name' => 'add notes', 'icon' => 'reader-outline'],            'privilege' => ['name' => 'Edit Privilege', 'icon' => 'key-outline'],
-            'preferences' => ['name' => 'Edit Preferences', 'icon' => 'options-outline'],
-            'show' => ['name' => 'show', 'icon' => 'eye-outline'],
-            'clone' => ['name' => 'clone', 'icon' => 'copy-outline'],
-            'lock' => ['name' => 'lock account', 'icon' => 'lock-closed-outline'],
+            'notes' => ['name' => 'add notes', 'icon' => 'file'],            
+            'privilege' => ['name' => 'Edit Privilege', 'icon' => 'settings'],
+            'preferences' => ['name' => 'Edit Preferences', 'icon' => 'nut'],
+            'show' => ['name' => 'show', 'icon' => 'world'],
+            'clone' => ['name' => 'clone', 'icon' => 'copy'],
+            'lock' => ['name' => 'lock account', 'icon' => 'lock'],
         ];
     }
 

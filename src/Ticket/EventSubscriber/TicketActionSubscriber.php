@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Ticket\EventSubscriber;
 
 use MagmaCore\Ticket\Event\TicketActionEvent;
-use MagmaCore\Ticket\Model\TicketModel;
+use MagmaCore\Ticket\TicketModel;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use Exception;
@@ -73,6 +73,10 @@ class TicketActionSubscriber implements EventSubscriberInterface
      * @throws Exception
      */
     public function flashTicketEvent(TicketActionEvent $event)
+    {
+    }
+
+    public function addLastTicketIdToSession(TicketActionEvent $event)
     {
     }
 

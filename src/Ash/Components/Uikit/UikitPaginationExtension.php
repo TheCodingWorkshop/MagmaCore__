@@ -14,11 +14,14 @@ namespace MagmaCore\Ash\Components\Uikit;
 
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Ash\Traits\TemplateTraits;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\IconLibrary;
 
 class UikitPaginationExtension
 {
 
     use TemplateTraits;
+    use ControllerSessionTrait;
 
     /** @var string */
     public const NAME = 'uikit_pagination';
@@ -75,11 +78,14 @@ class UikitPaginationExtension
         if ($this->hasTrashSupport($controller)) {
             $html = '<ul class="uk-iconnav">';
             $html .= '<li>';
-            $html .= '<a id="trash-can-trigger-' . $this->controllerName($controller) . '" uk-toggle="target: #offcanvas-flip" uk-tooltip="Open Trash" class="uk-link-reset uk-text-danger" href="#">';
-            $html .= '<ion-icon class="ion-24" name="trash-bin-outline"></ion-icon>';
-            $html .= sprintf('<span class="uk-text-top">(%s)</span>', ($trashCount ?: 0));
-            $html .= '</a>';
+            $html .= sprintf(
+                '<a id="trash-can-trigger-%s" href="" uk-toggle="target: #offcanvas-flip" uk-tooltip="Open Trash" class="uk-text-danger">%s</a>', 
+                $this->controllerName($controller),
+                IconLibrary::getIcon('trash', 1.0),
+                $trashCount = $controller->repository->getRepo()->count(['deleted_at' => 1])
+            );
             $html .= '</li>';
+            $html .= '<li><a uk-tooltip="Total in trash" class="uk-text-danger uk-text-meta" href="#"> (' . $trashCount . ')</a></li>';
             $html .= '</ul>';
             $html .= $this->trashCan($controller, $trashCount);
             $html .= PHP_EOL;
@@ -104,8 +110,8 @@ class UikitPaginationExtension
                 $html .= '<button class="uk-offcanvas-close" type="button" uk-close></button>';
                 $html .= '<div class="uk-card-header">';
                     $html .= '<div class="uk-grid-small uk-flex-middle" uk-grid>';
-                        $html .= '<div class="uk-width-auto ion-64">';
-                            $html .= '<ion-icon name="trash-bin-outline"></ion-icon>';
+                        $html .= '<div class="uk-width-auto">';
+                            $html .= IconLibrary::getIcon('trash', 3.5);
                         $html .= '</div>';
                         $html .= '<div class="uk-width-expand">';
                         $html .= '<h3 class="uk-card-title uk-text-bolder uk-margin-remove-bottom">' . ($trashCount ?: 0) . ' Trash</h3>';
@@ -157,12 +163,12 @@ class UikitPaginationExtension
 
                             $html .= '<div class="uk-float-right">';
                                 $html .= sprintf('<a uk-tooltip="Restore" class="uk-link-reset" href="/admin/%s/%s/untrash">', $this->controllerName($controller), $item['id']);
-                                $html .= '<ion-icon name="refresh-outline"></ion-icon>';
+                                $html .= IconLibrary::getIcon('refresh', 0.7);
                                 $html .= '<input type="hidden" name="id[]" value="' . $item['id'] . '" />';
                                 $html .= '</a>';
 
                                 $html .= sprintf('<a uk-tooltip="Delete" class="uk-link-reset uk-text-danger" href="/admin/%s/%s/hard-delete">', $this->controllerName($controller), $item['id']);
-                                $html .= '<ion-icon name="trash-outline"></ion-icon>';
+                                $html .= IconLibrary::getIcon('trash', 0.7);
                                 $html .= '</a>';
 
                             $html .= '</div>';
@@ -199,7 +205,8 @@ class UikitPaginationExtension
         return '<small class="uk-margin-large-right">
         ' . sprintf('Rows per page %s', $tableRows) . '
         <div class="uk-inline">
-            <span class="uk-margin-top uk-margin-left"><ion-icon name="caret-down-outline"></ion-icon></span>
+            <span class="uk-margin-top uk-margin-left">
+            ' . IconLibrary::getIcon('triangle-down', 0.8) . '
             <div uk-dropdown="mode: click">
             ' . sprintf('Currently @ %s RPP.', $tableRows) . '
             <hr>
@@ -219,8 +226,10 @@ class UikitPaginationExtension
     private function getTableRows(object $controller): mixed
     {
         $globalTableRows = (int)$controller->settings->get('global_table_rows_per_page');
-        $controllerTableRows = $controller->controllerSettings->getRepo()
-                ->findObjectBy(['controller_name' => $controller->thisRouteController()], ['records_per_page'])->records_per_page ?? 5;
+
+        //$controllerTableRows = $this->sessionRecordsPerPage($controller) ?? 5;
+        $sessionData = $this->getSessionData($controller->thisRouteController() . '_settings', $controller);
+        $controllerTableRows = $sessionData['records_per_page'];
         /* We want to return the greater value */
         if (!empty($globalTableRows) && !empty($controllerTableRows))
             return ($controllerTableRows >= $globalTableRows) ? $controllerTableRows : $globalTableRows;
@@ -232,13 +241,13 @@ class UikitPaginationExtension
      */
     private function dropdownForm(object $controller): string
     {
-        $tableRow = $this->getTableRows($controller);
-        $html = '<form method="post" action="/admin/' . $controller->thisRouteController() . '/change-rows" class="uk-form-horizontal">';
-        $html .= '<input name="records_per_page" id="records_per_page" type="number" class="uk-input uk-form-width-small uk-form-blank uk-border-bottom" value="' . $tableRow . '" />';
-        $html .= '<input type="hidden" name="controller_name" id="controller_name" value="' . $controller->thisRouteController() . '" />';
-        $html .= '<button type="submit" name="rows_per_page" class="uk-button uk-button-small uk-button-primary">Go</button>';
-        $html .= '</form>' . PHP_EOL;
-        return $html;
+        // $tableRow = $this->getTableRows($controller);
+        // $html = '<form method="post" action="/admin/' . $controller->thisRouteController() . '/changeRow" class="uk-form-horizontal">';
+        // $html .= '<input name="records_per_page" id="records_per_page" type="number" class="uk-input uk-form-width-small uk-form-blank uk-border-bottom" value="' . $tableRow . '" />';
+        // $html .= '<button type="submit" name="rows_per_page" class="uk-button uk-button-small uk-button-primary">Go</button>';
+        // $html .= '</form>' . PHP_EOL;
+        // return $html;
+        return '';
     }
 
     /**
@@ -272,6 +281,6 @@ class UikitPaginationExtension
      */
     private function infoPaging(object $controller): string
     {
-        return sprintf('%s - %s of %s', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
+        return sprintf('Showing %s - %s of %s results', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
     }
 }

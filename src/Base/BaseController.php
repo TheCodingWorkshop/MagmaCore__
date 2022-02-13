@@ -15,7 +15,6 @@ namespace MagmaCore\Base;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
-use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
 use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Session\GlobalManager\GlobalManager;
@@ -34,9 +33,8 @@ use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
-use MagmaCore\Base\Exception\BaseOutOfBoundException;
-
 use Exception;
+use MagmaCore\Base\Traits\TableSettingsTrait;
 
 class BaseController extends AbstractBaseController
 {
@@ -44,7 +42,8 @@ class BaseController extends AbstractBaseController
     use SessionTrait,
         ControllerCastingTrait,
         ControllerPrivilegeTrait,
-        ControllerMenuTrait;
+        ControllerMenuTrait,
+        TableSettingsTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -57,6 +56,11 @@ class BaseController extends AbstractBaseController
     /** @var array */
     protected array $callAfterMiddlewares = [];
     protected array $controllerContext = [];
+
+    protected array $noSettingsController = [
+        'setting',
+        'dashboard'
+    ];
 
     /**
      * Main class constructor
@@ -72,6 +76,10 @@ class BaseController extends AbstractBaseController
         $this->diContainer(Yaml::file('providers'));
         $this->initEvents();
         $this->buildControllerMenu($routeParams);
+
+        if (!in_array($routeParams['controller'], $this->noSettingsController)) {
+            $this->initalizeControllerSession($this);
+        }
 
     }
 
@@ -200,6 +208,9 @@ class BaseController extends AbstractBaseController
         }
         return array_merge(
             ['current_user' => Authorized::grantedUser()],
+            ['this_route' => strtolower($this->thisRouteController())],
+            ['this_action' => strtolower($this->thisRouteAction())],
+            ['this_namespace' => strtolower($this->thisRouteNamespace())],
             ['privilege_user' => PrivilegedUser::getUser()],
             ['func' => new TemplateExtension($this)],
         );

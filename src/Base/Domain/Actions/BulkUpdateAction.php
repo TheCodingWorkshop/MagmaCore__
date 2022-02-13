@@ -58,7 +58,7 @@ class BulkUpdateAction implements DomainActionLogicInterface
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
 
             $formData = $this->isAjaxOrNormal();
-    
+
             if ($this->isArrayGood($formData)) {
                 $schemaID = $controller->repository->getSchemaID();
                 $action = array_map(fn($id) => $controller?->repository

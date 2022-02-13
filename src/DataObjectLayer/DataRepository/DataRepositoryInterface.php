@@ -102,12 +102,12 @@ interface DataRepositoryInterface
      * Returns the storage data as an array along with formatted paginated results. This method
      * will also returns queried search results
      *
-     * @param Object $request
+     * @param object $request
      * @param array $args
-     * @param array $relationship
+     * @param ?object $controller
      * @return array|false
      */
-    public function findWithSearchAndPaging(Object $request, array $args = [], array $relationship = []) : array|false;
+    public function findWithSearchAndPaging(object $request, array $args = [], ?object $controller = null) : array|false;
 
     /**
      * Find and item by its ID and return the object row else return 404 with the or404 chaining method

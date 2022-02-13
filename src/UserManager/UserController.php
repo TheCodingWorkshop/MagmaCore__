@@ -13,32 +13,33 @@ namespace MagmaCore\UserManager;
 
 use Exception;
 use MagmaCore\Base\Access;
-use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
-use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\Events\BulkActionEvent;
 use MagmaCore\UserManager\UserRelationship;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\UserManager\Model\UserLogModel;
+use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Forms\Admin\UserForm;
 use MagmaCore\UserManager\Schema\UserLogSchema;
+use MagmaCore\UserManager\Entity\UserNoteEntity;
 use MagmaCore\UserManager\Entity\UserRoleEntity;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\UserManager\DataColumn\UserLogColumn;
 use MagmaCore\UserManager\Event\UserRoleActionEvent;
-use MagmaCore\UserManager\Model\UserPreferenceModel;
-use MagmaCore\UserManager\Model\UserPreferenceEntity;
-use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
-use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
 use MagmaCore\UserManager\Forms\Admin\UserNotesForm;
+use MagmaCore\UserManager\Model\UserPreferenceModel;
+use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
+use MagmaCore\UserManager\Model\UserPreferenceEntity;
+use MagmaCore\UserManager\Forms\Admin\UserPrivilegeForm;
 use MagmaCore\UserManager\Rbac\Model\TemporaryRoleModel;
 use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
-use MagmaCore\UserManager\Entity\UserNoteEntity;
+use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -108,6 +109,11 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         }
     }
 
+    public function schemaAsString(): string
+    {
+        return UserSchema::class;
+    }
+
     /**
      * Entry method which is hit on request. This method should be implemented within
      * all sub controller class as a default landing point when a request is
@@ -130,16 +136,16 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ?->with(
                 [
                     'table_tabs' => [
-                        'primary' => ['tab' => 'Primary', 'icon' => 'person', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
+                        'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
                         
-                        'logs' => ['tab' => 'Logs', 'icon' => 'reader', 'value' => $logCount, 
+                        'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount, 
                         'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
                         
                         'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
                         
                         'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
                         
-                        'lock' => ['tab' => 'Lock', 'icon' => 'lock-closed', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
+                        'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
 
                     ],
                     'lists' => $this->repository
@@ -527,6 +533,24 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 ]
             )
             ->singular()
+            ->end();
+    }
+
+    protected function settingsAction()
+    {        
+        $this->sessionUpdateAction
+            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
+            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
+            ->render()
+            ->with(
+                [
+                    'session_data' => $this->controllerSessionData($this),
+                    'page_title' => 'User Settings',
+                    'session_model' => $this->sessionModel($this),
+                    'database_session_context' => $this->sessionModelContext($this),
+                ]
+            )
+            ->form($this->controllerSettingsForm)
             ->end();
     }
 

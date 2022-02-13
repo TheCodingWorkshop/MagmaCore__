@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\EventSubscriber;
 
-use App\Model\NotificationModel;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\UserManager\Model\UserNoteModel;
@@ -42,7 +41,6 @@ class UserActionSubscriber implements EventSubscriberInterface
     private MailerFacade $mailer;
     private BaseView $view;
     private UserRoleModel $userRole;
-    private NotificationModel $notify;
     private UserPreferenceModel $userPreferenceModel;
     private UserNoteModel $userNoteModel;
 
@@ -80,7 +78,6 @@ class UserActionSubscriber implements EventSubscriberInterface
         MailerFacade $mailer,
         BaseView $view,
         UserRoleModel $userRole,
-        NotificationModel $notify,
         UserPreferenceModel $userPreferenceModel,
         UserNoteModel $userNoteModel
     )
@@ -88,7 +85,6 @@ class UserActionSubscriber implements EventSubscriberInterface
         $this->mailer = $mailer;
         $this->view = $view;
         $this->userRole = $userRole;
-        $this->notify = $notify;
         $this->userPreferenceModel = $userPreferenceModel;
         $this->userNoteModel = $userNoteModel;
     }

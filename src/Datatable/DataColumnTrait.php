@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\Datatable;
 
 use Exception;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 trait DataColumnTrait
@@ -78,13 +79,13 @@ trait DataColumnTrait
                     case $val:
                         $icon = '';
                         $icon = match ($val) {
-                            'pending' => 'alert-circle-outline',
-                            'active' => 'checkmark-outline',
-                            'trash' => 'trash-outline',
-                            'lock' => 'lock-closed-outline',
-                            '' => 'help-outline'
+                            'pending' => 'warning',
+                            'active' => 'check',
+                            'trash' => 'trash',
+                            'lock' => 'lock',
+                            '' => 'question'
                         };
-                        $ret = '<span class="uk-text-' . $colors[$k] . '" uk-tooltip="' . Stringify::capitalize($val) . '"><ion-icon name="' . $icon . '"></ion-icon></span>';
+                        $ret = '<span class="uk-text-' . $colors[$k] . '" uk-tooltip="' . Stringify::capitalize($val) . '">' . IconLibrary::getIcon($icon, 0.7) . '</span>';
                         $count++;
 
                         return $ret;
@@ -119,8 +120,8 @@ trait DataColumnTrait
     public function columnBasicLinks(object|string $class = null, array $row = []): array
     {
         $basics = [
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'trash' => ['name' => 'trash (not permanent)', 'icon' => 'trash-bin-outline']
+            'edit' => ['name' => 'edit', 'icon' => 'pencil'],
+            'trash' => ['name' => 'trash (not permanent)', 'icon' => 'trash']
         ];
 
         if (method_exists($class, 'moreLinks')) {

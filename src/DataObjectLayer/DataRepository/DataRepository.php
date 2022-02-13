@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\DataObjectLayer\DataRepository;
 
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use Throwable;
 use MagmaCore\Utility\Sortable;
@@ -41,8 +42,9 @@ use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 class DataRepository implements DataRepositoryInterface
 {
 
-    use DataRepositoryTrait;
-    use DataRelationshipTrait;
+    use DataRepositoryTrait,
+        DataRelationshipTrait,
+        ControllerSessionTrait;
 
     protected EntityManagerInterface $em;
     private ?object $findAndReturn;
@@ -321,13 +323,17 @@ class DataRepository implements DataRepositoryInterface
      * @return array|false
      * @throws Throwable
      */
-    public function findWithSearchAndPaging(Object $request, array $args = [], array $relationship = []): array|false
+    public function findWithSearchAndPaging(Object $request, array $args = [], ?object $controller = null): array|false
     {
+
+        // $key = $controller->thisRouteController() . '_settings';
+        // var_dump($this->resolveAdditionalConditions($key, $controller));
+        // die;
         list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
 
         $sorting = new Sortable($args['sort_columns']);
-        $paging = new Paginator($totalRecords, $args['records_per_page'], $request->query->getInt('page', 1));
-        $parameters = ['limit' => $args['records_per_page'], 'offset' => $paging->getOffset()];
+        $paging = new Paginator($totalRecords, (int)$args['records_per_page'], $request->query->getInt('page', 1));
+        $parameters = ['limit' => (int)$args['records_per_page'], 'offset' => $paging->getOffset()];
         $optional = ['orderby' => $sorting->getColumn() . ' ' . $sorting->getDirection()];
 
         $searchConditions = [];

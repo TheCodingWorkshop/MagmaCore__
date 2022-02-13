@@ -20,7 +20,6 @@ use MagmaCore\Utility\HashGenerator;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\ValidationRule\ValidationRule;
-use MagmaCore\Utility\RandomCharGenerator;
 use Exception;
 
 class TicketValidate extends AbstractDataRepositoryValidation
@@ -68,7 +67,8 @@ class TicketValidate extends AbstractDataRepositoryValidation
         $this->validate($entityCollection, $dataRepository);
         $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         if (null !== $dataCollection) {
-
+var_dump($dataCollection);
+die;
             $newCleanData = [
 //                'firstname' => $this->isSet('firstname', $dataCollection, $dataRepository),
 //                'lastname' => $this->isSet('lastname', $dataCollection, $dataRepository),

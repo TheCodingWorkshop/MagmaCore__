@@ -29,8 +29,8 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
         'novalidate' => false,
         "autocomplete" => false,
         "leave_form_open" => false,
-        "data-turbo-frame" => ''
-        //"onSubmit" => "UIkitNotify()"
+        "data-turbo-frame" => '',
+        "onSubmit" => ""
     ];
 
     /** class constants for allowable field/input types */

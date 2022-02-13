@@ -14,10 +14,16 @@ namespace MagmaCore\Ash\Traits;
 
 use Exception;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Widget\WidgetFactory;
 use MagmaCore\Ash\Exception\FileNotFoundException;
+use MagmaCore\Base\Traits\BaseAnchorTrait;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryFactory;
 
 trait TemplateTraits
 {
+
+    use ControllerSessionTrait;
 
     /**
      * Add one or more js file. Can be used within the layout.html template to add template
@@ -175,11 +181,18 @@ trait TemplateTraits
         return isset($controller->tableGrid) && $controller->tableGrid->getTotalRecords() === 0 ? ' uk-disabled' : '';
     }
 
+    /**
+     * Show the trash can if and enable and the model supports it
+     *
+     * @param object $controller
+     * @return boolean
+     */
     private function hasYamlSupport(object $controller): bool
     {
-        $yaml = Yaml::file('controller')[$controller->thisRouteController()]['trash_can_support'];
+        $key = $controller->thisRouteController() . '_settings';
+        $trashSupport = $this->getSessionData($key, $controller);
 
-        return ($yaml === true) ? true : false;
+        return ($trashSupport['trash_can_support'] === "true") ? true : false;
     }
 
     /**
@@ -206,6 +219,30 @@ trait TemplateTraits
         }
 
         return true;
+    }
+
+    /**
+     * Render a template within the template to the client browser
+     *
+     * @param string $widgetName
+     * @param ?string $tableSchema
+     * @param ?string $tableSchemaID
+     * @param mixed $widgetData - Data the template can pass back to the widget component
+     * @return void
+     */
+    public function getWidget(string $widgetName, ?string $tableSchema = null, ?string $tableSchemaID = null, mixed $widgetData = null)
+    {
+        $widget = (new WidgetFactory)
+            ->create(
+                ClientRepositoryFactory::class, 
+                [
+                    $widgetName => [
+                    'table' => $tableSchema, 
+                    'table_id' => $tableSchemaID
+                    ]
+                ]
+            );
+        return $widget->renderWidget($widgetData);
     }
 
 }

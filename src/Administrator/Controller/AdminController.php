@@ -12,42 +12,44 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
-use MagmaCore\Administrator\ControllerSettingsForm;
-use MagmaCore\Administrator\ControllerSettingsModel;
-use MagmaCore\Administrator\ControllerSettingsEntity;
-use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
-use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
-use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
-use MagmaCore\Administrator\Middleware\Before\LoginRequired;
-use MagmaCore\Administrator\Middleware\Before\SessionExpires;
+use MagmaCore\Utility\Serializer;
 use MagmaCore\Base\BaseController;
-use MagmaCore\Base\Domain\Actions\BlankAction;
-use MagmaCore\Base\Domain\Actions\BulkDeleteAction;
-use MagmaCore\Base\Domain\Actions\BulkCloneAction;
-use MagmaCore\Base\Domain\Actions\ChangeRowsAction;
-use MagmaCore\Base\Domain\Actions\ChangeStatusAction;
-use MagmaCore\Base\Domain\Actions\DeleteAction;
-use MagmaCore\Base\Domain\Actions\EditAction;
-use MagmaCore\Base\Domain\Actions\IndexAction;
-use MagmaCore\Base\Domain\Actions\LogIndexAction;
-use MagmaCore\Base\Domain\Actions\NewAction;
-use MagmaCore\Base\Domain\Actions\CloneAction;
-use MagmaCore\Base\Domain\Actions\SettingsAction;
-use MagmaCore\Base\Domain\Actions\ShowAction;
-use MagmaCore\Base\Domain\Actions\ShowBulkAction;
-use MagmaCore\Base\Domain\Actions\SimpleCreateAction;
-use MagmaCore\Base\Domain\Actions\SimpleUpdateAction;
-use MagmaCore\Base\Domain\Actions\UpdateOnEvent;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Datatable\Datatable;
 use MagmaCore\RestFul\RestHandler;
 use MagmaCore\Session\SessionTrait;
-use MagmaCore\Settings\Entity\ControllerSettingEntity;
-use MagmaCore\Settings\Event\ControllerSettingActionEvent;
+use MagmaCore\Base\Domain\Actions\NewAction;
+use MagmaCore\Base\Domain\Actions\EditAction;
+use MagmaCore\Base\Domain\Actions\ShowAction;
+use MagmaCore\Base\Traits\TableSettingsTrait;
+use MagmaCore\Base\Domain\Actions\BlankAction;
+use MagmaCore\Base\Domain\Actions\CloneAction;
+use MagmaCore\Base\Domain\Actions\IndexAction;
+use MagmaCore\Base\Domain\Actions\DeleteAction;
+use MagmaCore\Base\Domain\Actions\UpdateOnEvent;
+use MagmaCore\Base\Domain\Actions\LogIndexAction;
+use MagmaCore\Base\Domain\Actions\SettingsAction;
+use MagmaCore\Base\Domain\Actions\ShowBulkAction;
+use MagmaCore\Base\Domain\Actions\BulkCloneAction;
+use MagmaCore\Administrator\ControllerSettingsForm;
+use MagmaCore\Base\Domain\Actions\BulkDeleteAction;
 use MagmaCore\Base\Domain\Actions\BulkUpdateAction;
+use MagmaCore\Base\Domain\Actions\ChangeRowsAction;
 use MagmaCore\Base\Domain\Actions\IfCanTrashAction;
+use MagmaCore\Administrator\ControllerSettingsModel;
+use MagmaCore\Administrator\ControllerSettingsEntity;
+use MagmaCore\Base\Domain\Actions\ChangeStatusAction;
+use MagmaCore\Base\Domain\Actions\SimpleCreateAction;
+use MagmaCore\Base\Domain\Actions\SimpleUpdateAction;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
+use MagmaCore\Base\Domain\Actions\SessionUpdateAction;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Settings\Event\ControllerSettingActionEvent;
+use MagmaCore\Administrator\Middleware\Before\LoginRequired;
+use MagmaCore\Administrator\Middleware\Before\SessionExpires;
+use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
+use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
+use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
+use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 
 class AdminController extends BaseController
 {
@@ -100,7 +102,9 @@ class AdminController extends BaseController
                 'controllerSettingsForm' => ControllerSettingsForm::class,
                 'controllerRepository' => ControllerSettingsModel::class,
                 'bulkDeleteForm' => BulkDeleteForm::class,
-                'ifCanTrashAction' => IfCanTrashAction::class
+                'ifCanTrashAction' => IfCanTrashAction::class,
+                'sessionUpdateAction' => SessionUpdateAction::class,
+                'controllerSessionBackupModel' => ControllerSessionBackupModel::class
 
             ]
         );
@@ -180,18 +184,6 @@ class AdminController extends BaseController
         return false;
     }
 
-    /**
-     * Global 
-     *
-     * @return void
-     */
-    protected function changeRowsAction()
-    {
-        $this->changeRowsAction
-            ->execute($this, ControllerSettingEntity::class, ControllerSettingActionEvent::class, NULL, __METHOD__)
-            ->endAfterExecution();
-    }
-
     protected function settingsAction()
     {
         $this->editAction
@@ -203,6 +195,68 @@ class AdminController extends BaseController
                 __METHOD__
             );
     }
+
+    /**
+     * Global 
+     *
+     * @return void
+     */
+    protected function changeRowAction()
+    {
+        $this->changeRowsAction
+            ->execute($this, NULL, ControllerSettingActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
+    }
+
+    public function sessionModel(object $controller = null): ?object
+    {
+        return $this->controllerSessionBackupModel
+        ->getRepo()
+        ->findObjectBy(['controller' => $controller->thisRouteController() . '_settings']);
+
+    }
+
+    public function sessionModelContext(object $controller = null): array|bool
+    {
+        $context = $this->sessionModel($controller)->context;
+        if ($context) {
+            return Serializer::unCompress($context);
+        }
+        return false;
+    }
+
+    /**
+     * Return the unserialized session data
+     *
+     * @param object|null $controller
+     * @return mixed
+     */
+    public function controllerSessionData(object $controller = null): mixed
+    {
+        $serialized = $controller->getSession()->get($this->thisRouteController() . '_settings');
+        if ($serialized) {
+            return Serializer::unCompress($serialized);
+        }
+
+        return false;
+    }
+
+    // public function isRestoredRequired(object $controller = null): bool
+    // {
+    //     $currentSession = $this->controllerSessionData($controller);
+    //     $databaseSession = $this->sessionModelContext($controller);
+    //     if (is_array($databaseSession)) {
+    //         foreach ($databaseSession as $key => $value) {
+    //             if ($currentSession[$key] === $value) {
+    //                 return true;
+    //             } else {
+    //                 return false;
+    //             }
+    //         }
+    //     }
+
+    //     return false;
+    // }
 
 
 }

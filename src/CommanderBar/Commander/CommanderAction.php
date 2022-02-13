@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\CommanderBar\Commander;
 
 use MagmaCore\CommanderBar\CommanderBar;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 class CommanderAction
@@ -29,8 +30,8 @@ class CommanderAction
         $command .= $comm->commanderFiltering() ?? ''; // filtering
         $command .= '<ul class="uk-iconnav">';
         $command .= '<li>';
-        $command .= '<a href="/admin/' . $comm->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="ion-28">';
-        $command .= '<ion-icon name="reader-outline"></ion-icon>';
+        // $command .= '<a style="margin-top:-10px;" href="/admin/' . $comm->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="uk-icon-link">';
+        $command .= IconLibrary::getIcon('file-text', 1);
         $command .= '</a>';
         $command .= '</li>';
         $command .= PHP_EOL;

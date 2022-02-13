@@ -74,10 +74,10 @@ class DashboardRepository
     public function getStatistics(): array
     {
         return [
-            'user' => ['icon' => 'person', 'counter' => 1.2, 'percentage' => 8],
-            'page' => ['icon' => 'document-text', 'counter' => 1.3, 'percentage' => 13],
-            'attachment' => ['icon' => 'document-attach', 'counter' => 1.5, 'percentage' => 2.5],
-            'unread_message' => ['icon' => 'mail-unread', 'counter' => 1.0, 'percentage' => 5.3]
+            'user' => ['icon' => 'user', 'counter' => 1.2, 'percentage' => 8],
+            'page' => ['icon' => 'file-text', 'counter' => 1.3, 'percentage' => 13],
+            'attachment' => ['icon' => 'cloud-upload', 'counter' => 1.5, 'percentage' => 2.5],
+            'unread_message' => ['icon' => 'mail', 'counter' => 1.0, 'percentage' => 5.3]
         ];
     }
 
@@ -85,8 +85,8 @@ class DashboardRepository
     {
         return [
             'branch' => ['icon' => 'git-branch', 'counter' => 1.2, 'percentage' => 8],
-            'pull' => ['icon' => 'git-pull-request', 'counter' => 1.3, 'percentage' => 13],
-            'commit' => ['icon' => 'git-commit', 'counter' => 1.5, 'percentage' => 189],
+            'pull' => ['icon' => 'pull', 'counter' => 1.3, 'percentage' => 13],
+            'commit' => ['icon' => 'push', 'counter' => 1.5, 'percentage' => 189],
             'merge' => ['icon' => 'git-merge', 'counter' => 1.0, 'percentage' => 5.3]
         ];
     }
@@ -183,21 +183,21 @@ class DashboardRepository
     {
         return [
             'Registered' => [
-                'icon' => 'people-outline',
+                'icon' => 'users',
                 'path' => '/admin/team/index',
                 'desc' => [
                     '15+ new user account registered over the pass 28 days.',
                 ]
             ],
             'Tasks' => [
-                'icon' => 'clipboard-outline',
-                'path' => '/admin.task/index',
+                'icon' => 'push',
+                'path' => '/admin/task/index',
                 'desc' => [
                     'There are 12 incomplete tasks and 3 completed tasks.'
                 ]
             ],
             'Events' => [
-                'icon' => 'calendar-outline',
+                'icon' => 'calendar',
                 'path' => '/admin/event/index',
                 'desc' => [
                     '2 events coming up next week'
@@ -229,14 +229,11 @@ class DashboardRepository
     public function getNavSwitcher(): array
     {
         return [
-            'members' => ['icon' => 'person-outline', 'include' => 'block_links'],
-            'ticket' => ['icon' => 'receipt-outline', 'include' => 'block_ticket'],
-            'session' => ['icon' => 'stats-chart-outline', 'include' => 'block_statistics'],
-            'github' => ['icon' => 'logo-github', 'include' => 'block_github'],
-            'health' => ['icon' => 'pulse-outline', 'include' => 'block_health_status'],
-            
-            'project' => ['icon' => 'git-branch-outline', 'include' => 'block_project'],
-            // 'notifications' => ['icon' => 'notifications-outline', 'include' => 'block_notifications'],
+            'members' => ['icon' => 'user', 'include' => 'block_links'],
+            'ticket' => ['icon' => 'tag', 'include' => 'block_ticket'],
+            'session' => ['icon' => 'history', 'include' => 'block_statistics'],
+            'health' => ['icon' => 'lifesaver', 'include' => 'block_health_status'],
+            'project' => ['icon' => 'git-branch', 'include' => 'block_project'],
         ];
     }
 
@@ -244,19 +241,19 @@ class DashboardRepository
     {
         return [
             'Security' => [
-                'icon' => 'lock-closed-outline',
+                'icon' => 'lock',
                 'path' => '/admin/security/index',
-                'desc' => 'Ensure your application is protected by completing these steps.'
+                'desc' => ['Ensure your application is protected by completing these steps.']
             ],
             'Report' => [
-                'icon' => 'hardware-chip-outline',
-                'path' => '/admin.task/index',
-                'desc' => 'System reports gathers information about your application environment.'
+                'icon' => 'file-edit',
+                'path' => '/admin/task/index',
+                'desc' => ['System reports gathers information about your application environment.']
             ],
             'Settings' => [
-                'icon' => 'settings-outline',
+                'icon' => 'settings',
                 'path' => '/admin/event/index',
-                'desc' => 'Settings page allows customization of your application.'
+                'desc' => ['Settings page allows customization of your application.']
             ]
         ];
     }

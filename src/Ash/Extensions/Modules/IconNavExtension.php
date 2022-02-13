@@ -14,7 +14,7 @@ namespace MagmaCore\Ash\Extensions\Modules;
 
 use Closure;
 use MagmaCore\Base\Traits\BaseAnchorTrait;
-
+use MagmaCore\IconLibrary;
 
 class IconNavExtension
 {
@@ -65,8 +65,9 @@ class IconNavExtension
                     $path = $this->determinePath($_icon, $key, [], $controller);
                 }
                 $newIcon = (isset($icon)) ? $icon : $key;
-                $newRatio = (isset($ratio) ? $ratio : '21');
-                $iconMarkup = (str_contains($newIcon, 'ion') ? '<span class="' . $newIcon . '" style="font-size:' . ($newRatio ? $newRatio : '21') . 'px;"></span>' : '<ion-icon class="ion-21" name="' . $newIcon . '"></ion-icon>');
+                $newRatio = (isset($ratio) ? $ratio : 0.9);
+
+                $iconMarkup = IconLibrary::getIcon($newIcon, $newRatio);
                 
                 $html .=  "\n" . sprintf(
                     '<li><a href="%s"%s%s%s>%s</a>',

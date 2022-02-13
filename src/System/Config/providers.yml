@@ -24,3 +24,5 @@ controllerSettings:
   \MagmaCore\Settings\Model\ControllerSettingModel
 settings:
   \MagmaCore\Settings\Settings
+widgetFactory:
+  \MagmaCore\Widget\WidgetFactory

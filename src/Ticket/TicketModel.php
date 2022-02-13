@@ -75,6 +75,14 @@ class TicketModel extends AbstractBaseModel
         ];
     }
 
+    public function getNameForSelectField($id)
+    {
+        $name = $this->getRepo()->findObjectBy(['id' => $id], ['ticket_desc']);
+        return $name->ticket_desc;
+    }
+
+
+
 
 }
 

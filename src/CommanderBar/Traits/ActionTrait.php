@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar\Traits;
 
-use MagmaCore\Utility\Stringify;
+use MagmaCore\IconLibrary;
 
 trait ActionTrait
 {
@@ -30,13 +30,13 @@ trait ActionTrait
         $commander .= $this->commanderFiltering() ?? ''; // filtering
         $commander .= '<ul class="uk-iconnav">';
         $commander .= '<li>';
-        $commander .= '<a href="/admin/' . $this->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="ion-21">';
-        $commander .= '<ion-icon name="reader-outline"></ion-icon>';
+        $commander .= '<a style="margin-top:-5px;" href="/admin/' . $this->controller->thisRouteController() . '/log" uk-tooltip="View Log" class="uk-icon-link">';
+        $commander .= IconLibrary::getIcon('file-text');
         $commander .= '</a>';
         $commander .= '</li>';
         $commander .= PHP_EOL;
         $commander .= '<li>';
-        $commander .= '<a style="margin-top:-5px;" href="' . $this->actionPath() . '" class="uk-button uk-button-primary uk-button-small uk-link-reset uk-link-toggle">';
+        $commander .= '<a style="margin-top:-10px;" href="' . $this->actionPath() . '" class="uk-button uk-button-default uk-button-small">';
         $commander .= $this->actionButton();
         $commander .= '</a>';
         $commander .= '</li>';

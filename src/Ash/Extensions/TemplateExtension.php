@@ -23,6 +23,7 @@ use MagmaCore\Ash\Extensions\Modules\IconNavExtension;
 use MagmaCore\Ash\Extensions\Modules\SearchBoxExtension;
 use MagmaCore\Ash\Extensions\Modules\SubheaderExtension;
 use MagmaCore\Ash\Extensions\Modules\ColumnActionExtension;
+use MagmaCore\IconLibrary;
 
 class TemplateExtension
 {
@@ -107,23 +108,22 @@ class TemplateExtension
                 $element .= '<li>';
                 $element .= $this->protectedAnchor(
                     [
-                        'href' => (isset($item['path']) ? $item['path']:''),
-                        'turbo' => true,
+                        'href' => (isset($item['path']) ? $item['path']:'#'),
+                        'turbo' => 'true',
+                        'class' => 'uk-icon-link'
                     ],
                     (int)$row['id'],
-                    (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '') . ' ' .Stringify::capitalize($item['name']),
+                    
+                    (isset($item['icon']) ? IconLibrary::getIcon($item['icon'], 0.9) : '') . ' ' .Stringify::capitalize($item['name']),
+
                     $permission
                 );
 
-//                $element .= '<a data-turbo="true" href="'.(isset($item['path']) ? $item['path']:'') . '">';
-//                $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
-//                $element .= Stringify::capitalize($item['name']);
-//                $element .= '</a>';
                 $element .= '</li>';
                 $element .= PHP_EOL;
             }
             $element .= '<li class="uk-nav-divider"></li>';
-            $element .= '<li><a data-turbo="true" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="ion-28"><ion-icon name="trash"></ion-icon></a></li>';
+            $element .= '<li><a data-turbo="true" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="uk-icon-link uk-text-danger">' . IconLibrary::getIcon('trash', 1.2) . ' (Permanent)</a></li>';
             $element .= '</ul>';
             $element .= PHP_EOL;
             $element .= '</div>';

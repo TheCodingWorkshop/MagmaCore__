@@ -12,14 +12,18 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
-use MagmaCore\Ash\Traits\TemplateTraits;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\UserManager\UserColumn;
+use MagmaCore\Ash\Traits\TemplateTraits;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\Console\ConsoleTrait;
 
 class UikitSimplePaginationExtension
 {
 
-    use TemplateTraits;
+    use ControllerSessionTrait,
+        ControllerSessionTrait,
+        TemplateTraits;
 
     /** @var string */
     public const NAME = 'uikit_simple_pagination';
@@ -32,9 +36,11 @@ class UikitSimplePaginationExtension
      */
     public function register(object $controller = null): string
     {
-        $name = $controller->thisRouteController();
-        $name = Stringify::pluralize($name);
-        $name = Stringify::capitalize($name);
+        $_name = $controller->thisRouteController();
+        $name = Stringify::pluralize($_name);
+        $name = Stringify::capitalize($_name);
+        $filter = $this->getSessionData($_name . '_settings', $controller);
+
         $html = '<section class="' . $this->disabledClass($controller) . '">';
             $html .= '<nav aria-label="Pagination" uk-navbar>';
                 $html .= '<div class="uk-navbar-left">';
@@ -47,6 +53,17 @@ class UikitSimplePaginationExtension
                 $html .= $this->navContentRight($controller);
                 $html .= '</div>';
             $html .= '</nav>';
+            $html .= '        <div class="uk-hidden uk-card uk-card-body uk-margin-bottom uk-padding-small" id="toggle-usage">';
+            $html .= '
+            <div class="uk-form-search">
+            <span uk-search-icon></span>
+            <input class="uk-search-input" name="' . $filter['filter_alias'] . '" type="search" placeholder="Search">
+            <code>You can search by [' . implode(' ', $filter['filter_by']) . '], this can be change from the settings page. <a href="/admin/' . $_name . '/settings">click here</a> filter_by option</code>
+            </div>
+        
+        ';
+            $html .= '</div>
+            ';
         $html .= '</section>';
 
         return $html;
@@ -64,18 +81,25 @@ class UikitSimplePaginationExtension
         <ul class="uk-iconnav">
         <li><button uk-tooltip="Select All" type="button" class="uk-button uk-button-small uk-button-default">
         <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
-        <span></span>
         </button></li>
-        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '"><span class="ion-21"><ion-icon name="add-outline"></ion-icon></span></a></li>
+        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '">' . IconLibrary::getIcon('plus') . '</a></li>
         
-        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash"><span class="ion-21"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash">' . IconLibrary::getIcon('trash') . '</button></li>
 
-        <li class=""><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy"><span class="ion-21"><ion-icon name="copy-outline"></ion-icon></span></button>
+        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy">' . IconLibrary::getIcon('copy') . '</button>
         </li>
 
-        <li><a uk-tooltip="Total ' . $name . '" class="uk-link-reset uk-text-meta" href="#"> (' . (isset($controller->repository) ? $controller->repository->getRepo()->count() : 0) . ')</a></li>
-        </ul>
+        <li>
+        <a uk-tooltip="Refresh" href="/admin/' . $controller->thisRouteController() . '/index">' . IconLibrary::getIcon('refresh') .  '</a>
+        </li>
 
+        <li>
+        <a uk-toggle="cls: uk-hidden; target: #toggle-usage;" uk-tooltip="Click me" href="#">' . IconLibrary::getIcon('download') .  '</a>
+        </li>
+
+        <li><a uk-tooltip="Total ' . $name . '" class="uk-link-reset uk-text-meta" href="#"> (' . $controller->tableGrid->getTotalRecords() . ')</a></li>
+        </ul>
+       
         ';
     }
 
@@ -130,7 +154,7 @@ class UikitSimplePaginationExtension
      */
     private function infoPaging(object $controller): string
     {
-        return sprintf('%s - %s of %s', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
+        return sprintf('Showing %s - %s of %s results', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
     }
 
     /**

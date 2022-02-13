@@ -57,13 +57,13 @@ class PermissionValidate extends AbstractDataRepositoryValidation
     public function validateBeforePersist(Collection $entityCollection, ?object $dataRepository = null): array
     {
         $this->validate($entityCollection, $dataRepository);
-        $dataCollection = $this->mergeWithFields($entityCollection->all());
+        $dataCollection = $this->mergeWithFields((array)$entityCollection->all());
         $newCleanData = [];
         if (null !== $dataCollection) {
             $newCleanData = [
                 'permission_name' => $this->isSet('permission_name', $dataCollection, $dataRepository),
                 'permission_description' => $this->isSet('permission_description', $dataCollection, $dataRepository),
-                //'permission_group' => $this->isSet('permission_group', $dataCollection, $dataRepository),
+                'resource_group' => $this->isSet('resource_group', $dataCollection, $dataRepository),
                 'created_byid' => $this->getCreator($dataCollection)
             ];
             $this->dataBag = [];

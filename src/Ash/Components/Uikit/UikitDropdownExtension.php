@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Components\Uikit;
 
 use JetBrains\PhpStorm\Pure;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 class UikitDropdownExtension
@@ -47,14 +48,17 @@ class UikitDropdownExtension
                     foreach ($items as $key => $item) {
                         $element .= '<li>';
                         $element .= '<a data-turbo="false" href="'.($item['path'] ?? '') . '">';
-                        $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
+                        // $element .= (isset($item['icon']) ? '<ion-icon size="small" name="' . $item['icon'] . '"></ion-icon>' : '');
+                        $element .= (isset($item['icon']) ? IconLibrary::getIcon($item['icon'], 1) : '');
+
                         $element .= Stringify::capitalize($item['name']);
                         $element .= '</a>';
                         $element .= '</li>';
                         $element .= PHP_EOL;
                     }
                     $element .= '<li class="uk-nav-divider"></li>';
-                    $element .= '<li><a data-turbo="false" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="ion-28"><ion-icon name="trash"></ion-icon></a></li>';
+                    $element .= '<li><a data-turbo="false" href="/admin/' . $_controller . '/' . $_row['id'] . '/hard-delete" class="uk-icon-link">';
+                    $element .= IconLibrary::getIcon('trash', 1.2);
                 $element .= '</ul>';
                 $element .= PHP_EOL;
             $element .= '</div>';

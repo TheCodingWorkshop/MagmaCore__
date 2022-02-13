@@ -141,9 +141,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
                 $this->sessionRegeneration();
             }
         } else {
-            $_SESSION = array();
-            session_destroy();
-            $this->startSession(); // restart session
+            // $_SESSION = array();
+            // session_destroy();
+            // $this->startSession(); // restart session
         }
     }
 }

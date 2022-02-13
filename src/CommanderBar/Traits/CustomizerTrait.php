@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar\Traits;
 
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 trait CustomizerTrait
@@ -25,7 +26,8 @@ trait CustomizerTrait
             }
         }
         $commander = '<li>';
-        $commander .= '<a href="#"><ion-icon class="ion-21" name="settings-outline"></ion-icon></a>';
+        $commander .= sprintf('<a class="uk-icon-link" href="#"></a>', IconLibrary::getIcon('settings', 1.2));
+
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
 
         $commander .= '<div class="uk-navbar-dropdown-grid uk-child-width-1-3" uk-grid>';

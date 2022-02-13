@@ -3,6 +3,7 @@
 namespace MagmaCore\Ash;
 
 use Exception;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\DateFormatter;
@@ -10,41 +11,44 @@ use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
+use MagmaCore\Base\Traits\BaseAnchorTrait;
 
 trait TemplateFunctionsTrait
 {
 
-    public function protectedAnchor(
-        array $props = [], ?int $userID = null, mixed $content = null, ?string $permission = null): string|bool
-    {
-        $privilege = PrivilegedUser::getUser();
-        if (count($props) > 0) {
-            foreach ($props as $key => $prop) {
-                if (!in_array($key, ['href', 'title', 'rel', 'class', 'id', 'style', 'uk-tooltip'])) {
-                    throw new TemplateLocaleOutOfBoundException('Invalid property set for anchor tag ' . [$key]);
-                }
+    use BaseAnchorTrait;
 
-                if ($privilege->hasPrivilege($permission)) {
-                    if (isset($prop[$key]) && $prop[$key] !=='') {
-                        $element = sprintf(
-                            '<a %s%s%s%s%s%s>%s</a>',
-                            $prop['href'],
-                            $prop['class'],
-                            $prop['id'],
-                            $prop['style'],
-                            $prop['title'],
-                            $prop['uk-tooltip'],
-                            $content
-                        );
-                    }
-                    return $element;
-                } else {
-                    return '';
-                }
-            }
-        }
-        return false;
-    }
+    // public function protectedAnchor(
+    //     array $props = [], ?int $userID = null, mixed $content = null, ?string $permission = null): string|bool
+    // {
+    //     $privilege = PrivilegedUser::getUser();
+    //     if (count($props) > 0) {
+    //         foreach ($props as $key => $prop) {
+    //             if (!in_array($key, ['href', 'title', 'rel', 'class', 'id', 'style', 'uk-tooltip'])) {
+    //                 throw new TemplateLocaleOutOfBoundException('Invalid property set for anchor tag ' . [$key]);
+    //             }
+
+    //             if ($privilege->hasPrivilege($permission)) {
+    //                 if (isset($prop[$key]) && $prop[$key] !=='') {
+    //                     $element = sprintf(
+    //                         '<a %s%s%s%s%s%s>%s</a>',
+    //                         $prop['href'],
+    //                         $prop['class'],
+    //                         $prop['id'],
+    //                         $prop['style'],
+    //                         $prop['title'],
+    //                         $prop['uk-tooltip'],
+    //                         $content
+    //                     );
+    //                 }
+    //                 return $element;
+    //             } else {
+    //                 return '';
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
 
     /**
      * Expose framework database configuration options to the template
@@ -180,7 +184,7 @@ trait TemplateFunctionsTrait
     public function getUsersFromRoleID(array $userRoleIDs): array
     {
         $results = array_filter($userRoleIDs, fn($userRoleID) => $userRoleID['user_id'], ARRAY_FILTER_USE_BOTH);
-        $users = array_map( fn($id) => (new UserModel())->getRepo()->findBy(['firstname', 'lastname', 'status', 'id'], ['id' => $id['user_id']]), $results);
+        $users = array_map( fn($id) => (new UserModel())->getRepo()->findBy(['firstname', 'lastname', 'status', 'id', 'gravatar'], ['id' => $id['user_id']]), $results);
         return $this->flattenArray($users);
 
     }
@@ -230,22 +234,41 @@ trait TemplateFunctionsTrait
      * @param array $userRoleIDs
      * @return string
      */
-    public function getUserOrderedListsFromRoles(array $userRoleIDs): string
+    public function getUserOrderedListsFromRoles(array $userRoleIDs = [], bool $thumbnavView = false, ?int $breakpoint = 3): string
     {
         $users = $this->getUsersFromRoleID($userRoleIDs);
         if (is_array($users) && count($users) > 0) {
-            $html = '<ul class="uk-panel uk-panel-scrollable">';
+            $html = '<ul class="' . ($thumbnavView === false ? 'uk-panel uk-panel-scrollable' : 'uk-thumbnav') . '">';
+            $i = 0;
+            $total = count($users);
             foreach ($users as $user) {
-                $html .= '<li>';
-                $html .= '<div class="uk-grid-small" uk-grid>';
-                $html .= '<div class="uk-width-expand" uk-leader>' . $user['firstname'] . ' ' . $user['lastname'] . '</div>';
-                $html .= '<div>';
-                $html .= '<a href="/admin/user/' . $user['id'] . '/edit" class="uk-reset-link" uk-tooltip="Edit ' . $user['firstname'] . '"><ion-icon name="create-outline"></ion-icon></a>';
-                $html .= '<a href="/admin/user/' . $user['id'] . '/privilege" class="uk-reset-link" uk-tooltip="Edit Privilege"><ion-icon name="key-outline"></ion-icon></a>';
-                $html .= '</div>';
-                $html .= '</div>';
-                $html .= '</li>';
+                if ($thumbnavView === false) {
+                    $html .= '<li>';
+                    $html .= '<div class="uk-grid-small" uk-grid>';
+                    $html .= '<div class="uk-width-expand" uk-leader>' . $user['firstname'] . ' ' . $user['lastname'] . '</div>';
+                    $html .= '<div>';
+                    $html .= '<a href="/admin/user/' . $user['id'] . '/edit" class="uk-reset-link" uk-tooltip="Edit ' . $user['firstname'] . '"><ion-icon name="create-outline"></ion-icon></a>';
+                    $html .= '<a href="/admin/user/' . $user['id'] . '/privilege" class="uk-reset-link" uk-tooltip="Edit Privilege"><ion-icon name="key-outline"></ion-icon></a>';
+                    $html .= '</div>';
+                    $html .= '</div>';
+                    $html .= '</li>';
+                } else {
+                    $html .= '<li class="uk-active">';
+                    $html .= '<a uk-tooltip="' . $user['firstname'] . ' ' . $user['lastname'] .  '" href="#">';
+                    $html .= '<img class="uk-border-pill" src="' . $user['gravatar'] . '" width="40" alt="">';
+                    $html .= '</a>';
+                    $html .= '</li>';
+                }
+
+                $i++;
+                if ($i === $breakpoint) {
+                    break;
+                }
+                
             }
+            if ($total !== $breakpoint)
+                $html .= '<li><sup>+' . ($total - $breakpoint) .' more</sup></li>';
+
             $html .= '</ul>';
 
             return $html;
@@ -295,6 +318,11 @@ trait TemplateFunctionsTrait
             }
         }
         return $html;
+    }
+
+    public function icon(string $name, mixed $size = 1.5, string $type = 'uikit'): string
+    {
+        return IconLibrary::getIcon($name, $size, $type);
     }
 
 

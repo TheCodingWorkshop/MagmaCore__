@@ -1,6 +1,7 @@
 stylesheets:
   uikit:
     href: "https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css"
+    #href: "https://cdn.jsdelivr.net/npm/uikit@3.10.1/dist/css/uikit.min.css"
     enable: true
     cdn: true
   editor:
@@ -9,7 +10,7 @@ stylesheets:
     cdn: true
   ionicons:
     href: "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
-    enable: true
+    enable: false
     cdn: true
   google_pre_connect:
     href: "https://fonts.gstatic.com"
@@ -40,7 +41,7 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
     routes: [] ## this will be displayed on all routes to have it display on specific routes simple pass in each route separated by a
   jquery:
@@ -57,10 +58,11 @@ scripts:
     crossorigin: "anonymous"
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
   uikit:
     src: "https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit.min.js"
+    #src: "https://cdn.jsdelivr.net/npm/uikit@3.10.1/dist/js/uikit.min.js"
     integrity: ""
     crossorigin: ""
     type: javascript
@@ -108,7 +110,8 @@ scripts:
     enable: true
     cdn: false
   uikit_icons:
-    src: "https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit-icons.min.js"
+    #src: "https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit-icons.min.js"
+    src: "https://cdn.jsdelivr.net/npm/uikit@3.10.1/dist/js/uikit-icons.min.js"
     integrity: ""
     crossorigin: ""
     type: javascript
@@ -121,7 +124,7 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
   ionicon:
     src: "https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"
@@ -129,7 +132,7 @@ scripts:
     crossorigin: ""
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
   fontawesome:
     src: "https://kit.fontawesome.com/b60c3fbedf.js"
@@ -137,7 +140,7 @@ scripts:
     crossorigin: anonymous
     type: javascript
     location: header
-    enable: true
+    enable: false
     cdn: true
   sparkline:
     src: "/public/assets/js/uikit/sparkline.js"
@@ -197,3 +200,11 @@ scripts:
     location: header
     enable: false
     cdn: false
+  vuejs:
+    src: "https://unpkg.com/vue@3"
+    integrity: ""
+    crossorigin: "anonymous"
+    type: javascript
+    location: header
+    enable: false
+    cdn: true

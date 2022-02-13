@@ -13,13 +13,14 @@ declare(strict_types=1);
 namespace MagmaCore\CommanderBar;
 
 use Exception;
+use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Base\BaseController;
-use MagmaCore\CommanderBar\Traits\ActionTrait;
-use MagmaCore\CommanderBar\Traits\CustomizerTrait;
-use MagmaCore\CommanderBar\Traits\ManagerTrait;
-use MagmaCore\CommanderBar\Traits\NotifiicationTrait;
 use MagmaCore\Themes\ThemeBuilderInterface;
+use MagmaCore\CommanderBar\Traits\ActionTrait;
+use MagmaCore\CommanderBar\Traits\ManagerTrait;
+use MagmaCore\CommanderBar\Traits\CustomizerTrait;
+use MagmaCore\CommanderBar\Traits\NotifiicationTrait;
 
 class CommanderBar implements CommanderBarInterface
 {
@@ -60,8 +61,8 @@ class CommanderBar implements CommanderBarInterface
             $commander .= $this->heading();
             $commander .= '<ul class="uk-navbar-nav">';
             $commander .= $this->notifications();
-            $commander .= $this->manager();
-            $commander .= $this->customizer();
+            //$commander .= $this->manager();
+            //$commander .= $this->customizer();
             $commander .= '</ul>';
             $commander .= '</div>';
             $commander .= PHP_EOL;
@@ -72,9 +73,9 @@ class CommanderBar implements CommanderBarInterface
 
             $commander .= PHP_EOL;
             $commander .= '<div class="uk-navbar-right">';
-            $commander .= $this->actions();
+            //$commander .= $this->actions();
             $commander .= '</div>';
-            $commander .= $this->commanderOverlaySearch();
+            //commander .= $this->commanderOverlaySearch();
             $commander .= PHP_EOL;
 
             $commander .= '</nav>';
@@ -109,9 +110,10 @@ class CommanderBar implements CommanderBarInterface
     public function heading(): string
     {
         $commanderSessionIcon = $this->controller->getSession()->get('commander_icon');
-        $hasIcon = isset($commanderSessionIcon) ? $commanderSessionIcon : 'help';
-        $commander = '<span style="margin-top: 15px;" class="ion-32 uk-text-emphasis"><ion-icon name="' . $hasIcon . '-outline"></ion-icon></span>';
-        $commander .= '<a class="uk-navbar-item uk-logo uk-text-emphasis" href="#">' .$this->controller->commander->getHeaderBuild($this->controller) . '</a>';
+        $hasIcon = isset($commanderSessionIcon) ? $commanderSessionIcon : 'question';
+        $commander = sprintf('<span class="uk-text-emphasis">%s</span>', IconLibrary::getIcon($hasIcon, 2));
+
+        $commander .= '<a class="uk-navbar-item uk-logo uk-text-emphasis" href="">' .$this->controller->commander->getHeaderBuild($this->controller) . '</a>';
         $commander .= PHP_EOL;
 
         return $commander;
@@ -121,8 +123,8 @@ class CommanderBar implements CommanderBarInterface
     {
         if (isset($this->controller)) {
            if (!in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetFilter())) {
-                return '<a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle ion-21 uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
-                    <ion-icon name="funnel-outline"></ion-icon>
+                return '<a style="margin-top: -10px;" href="#" uk-tooltip="Filter Users.." class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade">
+                ' . IconLIbrary::getIcon('search') . '
                     </a>';
             }
         }
@@ -139,7 +141,7 @@ class CommanderBar implements CommanderBarInterface
             </form>
         </div>
 
-        <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()"><ion-icon class="ion-21" name="close-outline"></ion-icon></a>
+        <a class="uk-navbar-toggle uk-text-muted" uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="javascript:void()">' . IconLibrary::getIcon('close', 1.0) . '</a>
 
     </div>
         ';

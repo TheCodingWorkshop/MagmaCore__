@@ -10,6 +10,7 @@
 
 namespace MagmaCore\Base\Traits;
 
+use MagmaCore\IconLibrary;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 
 trait BaseAnchorTrait
@@ -32,7 +33,14 @@ trait BaseAnchorTrait
             }
         }
         /* return a dummy link if the current logged in user doesn't have the correct permission */
-        return '<a class="uk-disabled uk-reset-link" href="javascript:void()">' . $content . '</a>';
+        return sprintf(
+            '<a href="%s" uk-tooltip="%s" class="uk-link-reset">%s %s</a>', 
+            'javascript:void()', 
+            'You don\'t haver permission to access this route',
+            IconLibrary::getIcon('ban', 0.6),
+            $content
+        );
+        //return '<a class="uk-disabled uk-reset-link" href="javascript:void()">' . $content . '</a>';
     }
 
     /**
@@ -43,7 +51,9 @@ trait BaseAnchorTrait
      */
     public function anchorTag(array $props, ?callable $callback, mixed $content): string
     {
-        return sprintf('<a %s%s%s%s%s%s%s>%s</a>',
+        return sprintf('%s <a %s%s%s%s%s%s%s>%s</a>',
+            array_key_exists('icon', $props) ? IconLibrary::getIcon($props['icon'], 0.7) : '',
+
             array_key_exists('href', $props) ? ' href="' . $props['href'] . '"' : '',
             array_key_exists('class', $props) ? ' class="' . $props['class'] . '"' : '',
             array_key_exists('id', $props) ? ' id="' . $props['id'] . '"' : '',

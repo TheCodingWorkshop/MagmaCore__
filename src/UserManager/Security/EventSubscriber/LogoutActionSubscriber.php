@@ -12,17 +12,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Security\EventSubscriber;
 
-use MagmaCore\UserManager\Security\Event\LogoutActionEvent;
-use MagmaCore\UserManager\Model\UserMetaDataModel;
+use Exception;
+use function date;
+use function array_map;
+use function serialize;
+use function array_reduce;
 use MagmaCore\Auth\Authorized;
+use JetBrains\PhpStorm\ArrayShape;
+use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use JetBrains\PhpStorm\ArrayShape;
-use function serialize;
-use function array_map;
-use function array_reduce;
-use function date;
-use Exception;
+use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
+use MagmaCore\PanelMenu\MenuModel;
+use MagmaCore\UserManager\Security\Event\LogoutActionEvent;
 
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES
@@ -37,6 +39,15 @@ class LogoutActionSubscriber implements EventSubscriberInterface
     private const FLASH_MESSAGE_PRIORITY = -1000;
     private const LOGOUT_ACTION = 'logout';
 
+    private ControllerSessionBackupModel $sessionBackup;
+    private MenuModel $menuModel;
+
+    public function __construct(ControllerSessionBackupModel $sessionBackup, MenuModel $menuModel)
+    {
+        $this->sessionBackup = $sessionBackup;
+        $this->menuModel = $menuModel;
+    }
+
     /**
      * Subscribe multiple listeners to listen for the NewActionEvent. This will fire
      * each time a new user is added to the database. Listeners can then perform
@@ -49,6 +60,7 @@ class LogoutActionSubscriber implements EventSubscriberInterface
         return [
             LogoutActionEvent::NAME => [
                 ['flashLogoutEvent', self::FLASH_MESSAGE_PRIORITY],
+                //['logControllerSession', -999],
                 ['afterLogout']
             ]
         ];
@@ -112,4 +124,52 @@ class LogoutActionSubscriber implements EventSubscriberInterface
             }
         }
     }
+
+    public function logControllerSession(LogoutActionEvent $event)
+    {
+        /* first we need to somehow get all the controller within the system. We should 
+        be able to retrieve this from the menus database table */
+        $controllers = array_column($this->menuModel->getRepo()->findBy(), 'menu_name');
+        /* append the _settings suffix to the controller name */
+        $sessionKey = array_map(fn($controller) => $controller . '_settings', $controllers );
+
+        /* Now we have the keys we will loop through and get the relevant session data belonging
+        to the key */
+
+        if (is_array($sessionKey) && count($sessionKey) > 0) {
+            /* This is safest way to retrive the index position of the $sessionKey array */
+            $indexPosition = array_search('dashboard_settings', $sessionKey);
+            /* Now we have the exact position we can unset it from the array */
+            unset($sessionKey[$indexPosition]);
+
+            $sessionObject = $event->getObject()->getSession();
+            array_map(function($key) use($sessionObject) {
+                if (!$sessionObject->has($key)) {
+                    throw new Exception();
+                }
+                $sessionData = $sessionObject->get($key);
+                if ($sessionData) {
+                    $this->sessionBackup
+                        ->getRepo()
+                        ->getEm()
+                        ->getCrud()
+                        ->create(
+                            [
+                                'controller' => $key,
+                                'context' => serialize($sessionData)
+                            ]
+                        );
+
+                }
+                
+            }, $sessionKey);
+
+
+        }
+        return true;
+
+    }
+
+
+
 }

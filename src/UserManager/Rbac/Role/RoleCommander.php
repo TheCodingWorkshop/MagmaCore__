@@ -33,7 +33,8 @@ class RoleCommander extends RoleModel implements ApplicationCommanderInterface
         'edit',
         'assigned',
         'log',
-        'bulk'
+        'bulk',
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -85,6 +86,7 @@ class RoleCommander extends RoleModel implements ApplicationCommanderInterface
             'edit' => "Edit " . $this->getHeaderBuildEdit($controller, 'role_name'),
             'assigned' => 'Role Assignment',
             'bulk' => 'Bulk',
+            'settings' => 'Role Settings',
             default => "Unknown"
         };
     }

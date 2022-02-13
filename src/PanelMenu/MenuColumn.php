@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\PanelMenu;
 
-use MagmaCore\Datatable\AbstractDatatableColumn;
+use MagmaCore\IconLibrary;
 use MagmaCore\Datatable\DataColumnTrait;
+use MagmaCore\PanelMenu\Form\MenuQuickEditForm;
+use MagmaCore\Datatable\AbstractDatatableColumn;
 
 class MenuColumn extends AbstractDatatableColumn
 {
@@ -21,6 +23,13 @@ class MenuColumn extends AbstractDatatableColumn
     use DataColumnTrait;
 
     private string $controller = 'menu';
+
+    private MenuQuickEditForm $menuQuickEditForm;
+
+    public function __construct(MenuQuickEditForm $menuQuickEditForm)
+    {
+        $this->menuQuickEditForm = $menuQuickEditForm;
+    }
 
     /**
      * @param array $dbColumns
@@ -48,10 +57,32 @@ class MenuColumn extends AbstractDatatableColumn
                 'show_column' => true,
                 'sortable' => true,
                 'searchable' => true,
-                'formatter' => function ($row, $tempExt) {
+                'formatter' => function ($row, $tempExt) use ($callingController) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
                     $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
+                    $html .= $tempExt->action(
+                        [
+                            'edit_modal' => [
+                                'icon' => 'pencil',
+                                'tooltip' => 'Quick Edit',
+                                'toggle_modal_edit' => true,
+                                'callback' => function($row, $tempExt) use ($callingController) {
+                                    return $tempExt->getModal(
+                                        [
+                                            'toggle_id' => 'edit-modal-menu-' . $row['id'],
+                                            'modal_title' => 'Quick Edit',
+                                            'modal_content' => $this->quickEditForm('', $row, $callingController)
+                                        ]
+                                    );
+                                }
+                            ]
+                            ],
+                            $row,
+                            $tempExt,
+                            $this->controller,
+                            false
+                    );
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';
                     $html .= $row["menu_name"] . "<br/>";
@@ -147,10 +178,10 @@ class MenuColumn extends AbstractDatatableColumn
                     return $tempExt->action(
                         [
                             'more' => [
-                                'icon' => 'ion-more',
+                                'icon' => 'more',
                                 'callback' => function ($row, $tempExt) {
                                     return $tempExt->getDropdown(
-                                        $this->itemsDropdown($row, $this->controller),
+                                        $this->columnActions($row, $this->controller),
                                         '',
                                         $row,
                                         $this->controller,
@@ -172,23 +203,60 @@ class MenuColumn extends AbstractDatatableColumn
         ];
     }
 
-        /**
-     * Undocumented function
+    /**
+     * @inheritDoc
      *
      * @param array $row
+     * @param string|null $controller
+     * @param object|null $tempExt
      * @return array
      */
-    private function itemsDropdown(array $row, string $controller): array
+    public function columnActions(array $row = [], ?string $controller = null, ?object $tempExt = null): array
     {
-        $items = [
-            'edit' => ['name' => 'edit', 'icon' => 'create-outline'],
-            'delete' => ['name' => 'trash menu', 'icon' => 'trash-bin-outline']
-        ];
-        return array_map(
-            fn($key, $value) => array_merge(['path' => $this->adminPath($row, $controller, $key)], $value),
-            array_keys($items),
-            $items
+        return $this->filterColumnActions(
+            $row, 
+            $this->columnBasicLinks($this), /* can merge additional links here to this column */
+            $controller
         );
+    }
+
+    private function quickEditForm(string $action = null, mixed $row = null, object $controller = null)
+    {
+         $html = '<form method="post" id="menuQuickEdit" class="uk-form-stacked">';
+         $html .= '<legend>' . sprintf('Quickly edit this item without entering the full edit route. <code>You are editing [%s] menu item</code>', $row['menu_name']) . '</legend>';
+         $html .= '
+         <div class="uk-margin">
+            <label class="uk-form-label" for="menu_order">Menu Order</label>
+            <div class="uk-form-controls">
+                <input class="uk-input uk-form-width-small" id="menu_order" name="menu_order" type="number" value="' . $row['menu_order']. '">
+            </div>
+            <span class="uk-text-meta">The order in which the menu item is displayed in the sidebr navigation. Higher the number the higher up the item will be placed, upto <code>100 maximum</code></span>
+
+        </div> 
+         ';
+
+         $html .= '
+         <div class="uk-margin">
+            <label class="uk-form-label" for="menu_icon">Menu Icon</label>
+            <div class="uk-form-controls">
+                <input class="uk-input uk-form-width-medium" id="menu_icon" name="menu_icon" type="text" value="' . $row['menu_icon'] . '">
+                ' . IconLibrary::getIcon($row['menu_icon']) . '
+            </div>
+            <span class="uk-text-meta">This is the small icon which sits beside your navigation menu item.</span>
+        </div> 
+         ';
+         $html .= '
+         <div class="uk-margin">
+            <div class="uk-form-controls">
+                <input class="uk-button uk-button-secondary uk-button-small" id="index_quick_save" name="index-quick-save" value="Quick Save" type="submit">
+                <a class="uk-button uk-button-small uk-button-text uk-text-secondary" href="/admin/menu/' . $row['id'] . '/edit">Full Edit</a>
+            </div>
+            <div id="quickSaveMessage"></div>
+        </div> 
+         ';
+        $html .= '</form>';
+
+        return $html;
     }
 
 }

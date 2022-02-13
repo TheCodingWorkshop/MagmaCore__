@@ -13,19 +13,26 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain;
 
 use Exception;
+use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Base\BaseModel;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Base\Domain\DomainActionLogTrait;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Auth\Roles\PrivilegedUser;
-use MagmaCore\Base\Domain\DomainActionLogTrait;
-use MagmaCore\Base\Access;
+use MagmaCore\Base\BaseApplication;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\Base\Traits\TableSettingsTrait;
+use MagmaCore\Utility\Serializer;
 
 trait DomainTraits
 {
 
-    use DomainActionLogTrait;
+    use DomainActionLogTrait,
+        ControllerSessionTrait,
+        TableSettingsTrait;
 
     protected array $allowedRules = [
         'password_required',
@@ -192,10 +199,13 @@ trait DomainTraits
      * @param Object $formRendering
      * @param string|null $formAction
      * @param mixed|null $data
-     * @return Actions\SettingsAction|Actions\ActivateAction|Actions\BulkDeleteAction|Actions\ConfigAction|Actions\DeleteAction|Actions\EditAction|Actions\IndexAction|Actions\LoginAction|Actions\LogoutAction|Actions\NewAction|Actions\NewPasswordAction|Actions\PurgeAction|Actions\ResetPasswordAction|Actions\SessionExpiredAction|Actions\ShowAction|DomainTraits
+     * @return $this
      */
-    public function form(Object $formRendering, string|null $formAction = null, mixed $data = null): self
+    public function form(object $formRendering = null, string|null $formAction = null, mixed $data = null): self
     {
+        if (!$formRendering) {
+            throw new \Exception('You need to pass your form object as the first argument for this method.');
+        }
         $this->superContext = array_merge(
             $this->context,
             [
@@ -208,6 +218,11 @@ trait DomainTraits
         );
         return $this;
 
+    }
+
+    public function info(): self
+    {
+        return $this;
     }
 
     /**
@@ -339,6 +354,11 @@ trait DomainTraits
                 $controller->redirect('/admin/user/index');
             }
         }
+        return $this;
+    }
+
+    public function dashboard(): self
+    {
         return $this;
     }
 
@@ -529,8 +549,10 @@ trait DomainTraits
             $arg = Yaml::file('controller')[$controller->thisRouteController()];
         }
 
+        $recordsPerPage = $controller->getSession()->get($controller->thisRouteController() . '_records_per_page');
+
         return [
-            'records_per_page' => $this->isSet('records_per_page', $a) ? $this->isSet('records_per_page', $a): $arg['records_per_page'],
+            'records_per_page' => isset($recordsPerPage) ? $recordsPerPage : $arg['records_per_page'],
             'query' => $this->isSet('query', $a) ? $this->isSet('query', $a) : $arg['query'],
             'filter_by' => $this->isSet('filter', $a) ? unserialize($this->isSet('filter', $a)) : $arg['filter_by'],
             'filter_alias' => $this->isSet('alias', $a) ? $this->isSet('alias', $a) : $arg['filter_alias'],
@@ -673,6 +695,89 @@ trait DomainTraits
                 return $con;
             }
         }
+    }
+
+    /**
+     * PreExcute currently only works with saving controller settings to the database and 
+     * re-populating the session if the session becomes invalid or destroyed
+     *
+     * @param object|null $controller
+     * @param object|null $formBuilder
+     * @param string|null $model
+     * @return void
+     */
+    public function preExecute(object $controller = null, object $formBuilder = null, ?string $model = null)
+    {
+
+        $this->isResetting($controller, $formBuilder);
+        if ($formBuilder->isFormValid($submitName = 'settings-' . $controller->thisRouteController() . '-backup')) {
+            $formData = $formBuilder->getData();
+            unset(
+                $formData['_CSRF_INDEX'], 
+                $formData['_CSRF_TOKEN'], 
+                $formData[$submitName]
+            );
+            $modelObject = BaseApplication::diGet($model);
+            if(!$modelObject instanceof BaseModel) {
+                throw new \Exception(sprintf('%s does not implement the BaseModel interface', $model));
+            }
+            /* check if we alreay have the settings if so drop it then replace it */
+            $existing = $modelObject->getRepo()->findObjectBy(['controller' => $controller->thisRouteController() . '_settings'], ['id']);
+            if ($existing->id !==null) {
+                $modelObject->getRepo()->findByIdAndDelete(['id' => $existing->id]);
+            }
+
+            $push = $modelObject->getRepo()
+                ->getEm()
+                ->getCrud()
+                ->create(
+                    [
+                        'controller' => $controller->thisRouteController() . '_settings',
+                        'context' => serialize($formData)
+                    ]
+                );
+
+            if ($push) {
+                $controller->flashMessage('Settings saved to database.');
+                $controller->redirect($controller->onSelf());
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Allows resetting of the controller settings page back to all default values defined
+     * within the controller.yml file
+     *
+     * @param object|null $controller
+     * @param object|null $formBuilder
+     * @return void
+     */
+    private function isResetting(object $controller = null, object $formBuilder = null): void
+    {
+        if ($formBuilder->isFormValid($resetName = 'settings-' . $controller->thisRouteController() . '-reset')) {
+            /* Get the session in question */
+            $session = $controller->getSession();
+            $sessionData = $session->get($key = $controller->thisRouteController() . '_settings');
+            if ($session->has($key)) {
+                $session->delete($key);
+                $initData = $this->initialSessionData(
+                    $key, 
+                    Yaml::file('controller')[$controller->thisRouteController()],
+                    $controller
+                );
+
+                $session->set($key, Serializer::compress($initData));
+
+                $controller->flashMessage('Default settings restored.');
+                $controller->redirect($controller->onSelf());
+            }
+
+        }
+
     }
 
 }

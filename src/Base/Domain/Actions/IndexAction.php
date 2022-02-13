@@ -16,6 +16,7 @@ use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Cache\CacheInterface;
 use MagmaCore\Cache\Storage\NativeCacheStorage;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\Cache\CacheFacade;
 use MagmaCore\Utility\Yaml;
 
@@ -29,7 +30,8 @@ use MagmaCore\Utility\Yaml;
 class IndexAction implements DomainActionLogicInterface
 {
 
-    use DomainTraits;
+    use DomainTraits,
+        ControllerSessionTrait;
 
     private object $controller;
     private string $method;
@@ -74,9 +76,11 @@ class IndexAction implements DomainActionLogicInterface
         $started = MICROTIME_START;
 
         $controller->getSession()->set('redirect_parameters', $_SERVER['QUERY_STRING']);
-        $this->args = $this->getControllerArgs($controller);
-        $controllerName = $controller->thisRouteController();
-        $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args);
+        //$this->args = $this->getControllerArgs($controller);
+        /* Using Sessions */
+        $this->args = $this->getSessionData($controller->thisRouteController() . '_settings', $controller);
+
+        $this->tableRepository = $controller->repository->getRepo()->findWithSearchAndPaging($controller->request->handler(), $this->args, $controller);
 
         $this->tableData = $controller->tableGrid;
         $end = MICROTIME_END;
