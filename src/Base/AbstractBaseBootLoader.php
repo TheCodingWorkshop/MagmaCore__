@@ -213,20 +213,20 @@ abstract class AbstractBaseBootLoader extends Singleton
     /**
      * Load the themeBuilder component
      */
-    public function loadThemeBuilder()
-    {
-        $themeFactory = (new ThemeBuilderFactory())
-            ->create(
-                $this->application->getDefaultThemeBuilder(),
-                $this->application->getThemeBuilderOptions()
-            );
+    // public function loadThemeBuilder()
+    // {
+    //     $themeFactory = (new ThemeBuilderFactory())
+    //         ->create(
+    //             $this->application->getDefaultThemeBuilder(),
+    //             $this->application->getThemeBuilderOptions()
+    //         );
 
-        if ($this->application->isThemeBuilderGlobal() === true) {
-            GLobalManager::set($this->application->getGlobalThemeBuilderKey(), $themeFactory->getCssDriver());
-        }
-        return $themeFactory->getCssDriver();
+    //     if ($this->application->isThemeBuilderGlobal() === true) {
+    //         GLobalManager::set($this->application->getGlobalThemeBuilderKey(), $themeFactory->getCssDriver());
+    //     }
+    //     return $themeFactory->getCssDriver();
 
-    }
+    // }
 
 
 

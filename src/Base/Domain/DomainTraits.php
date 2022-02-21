@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Base\Domain;
 
 use Exception;
+use Closure;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseModel;
@@ -300,6 +301,23 @@ trait DomainTraits
         return $this;
 
     }
+
+    /**
+     * @param Closure|null $callback
+     * @return $this
+     * @throws Exception
+     */
+    public function callback(Closure $callback = null): self
+    {
+        if (!$callback instanceof Closure) {
+            throw new Exception(sprintf('%s is not an instance of Closure', $callback));
+        }
+
+        $callback($this->controller->thisRouteController());
+        $this->superContext = array_merge($this->context, ['callback_data' => $callback]);
+        return $this;
+    }
+
 
     function array_flatten($array) {
         foreach ($array as $arr) {
@@ -612,7 +630,8 @@ trait DomainTraits
                     $method,
                     array(
                         $context,
-                        $additionalContext ? $additionalContext : []
+                        $additionalContext ? $additionalContext : [],
+                        (isset($this->actionOptional) && is_array($this->actionOptional) ? $this->actionOptional : [])
                     ),
                     $controller
                 ),

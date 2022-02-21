@@ -67,13 +67,14 @@ class Utilities
      * @param array $context
      * @return array|string
      */
-    public static function flattenContext(array $context): array|string
+    public static function flattenContext(array $context = []): array|string|null
     {
         if (is_array($context)) {
             foreach ($context as $con) {
                 return $con;
             }
         }
+        return null;
     }
 
 

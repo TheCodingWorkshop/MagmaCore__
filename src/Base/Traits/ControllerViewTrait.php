@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Traits;
 
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
+use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Ash\TemplateExtension;
@@ -25,16 +27,20 @@ trait ControllerViewTrait
     /**
      * Template context which relies on the application owning a user and permission
      * model before providing any data to the rendered template
-     * 
+     *
      * @return array
      */
-    public function templateModelContext(): array
+    private function templateModelContext(): array
     {
         if (!class_exists(UserModel::class) || !class_exists(PermissionModel::class)) {
             return array();
         }
         return array_merge(
             ['current_user' => Authorized::grantedUser()],
+            ['this_id' => $this->thisRouteID()],
+            ['this_route' => strtolower($this->thisRouteController())],
+            ['this_action' => strtolower($this->thisRouteAction())],
+            ['this_namespace' => strtolower($this->thisRouteNamespace())],
             ['privilege_user' => PrivilegedUser::getUser()],
             ['func' => new TemplateExtension($this)],
         );
@@ -42,7 +48,7 @@ trait ControllerViewTrait
 
     /**
      * Return some global context to all rendered templates
-     * 
+     *
      * @return array
      */
     private function templateGlobalContext(): array
@@ -73,7 +79,7 @@ trait ControllerViewTrait
 
     }
 
-        /**
+    /**
      * Rendered template exception
      * @return void
      */
@@ -100,11 +106,16 @@ trait ControllerViewTrait
     {
         $this->throwViewException();
         $templateContext = array_merge(
-            $this->templateGlobalContext(), 
+            $this->templateGlobalContext(),
             $this->templateModelContext()
         );
         if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
-            $this->dispatchEvent(BeforeRenderActionEvent::class);
+            $this->dispatchEvent(
+                BeforeRenderActionEvent::class.
+                $this->routeParams['action'],
+                [],
+                $this
+            );
         }
         $response = $this->response->handler();
         $request = $this->request->handler();

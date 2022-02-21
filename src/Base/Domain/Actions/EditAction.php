@@ -55,6 +55,7 @@ class EditAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $this->actionOptional = $optional;
 
         $formBuilder = $controller->formBuilder;
 
@@ -65,7 +66,7 @@ class EditAction implements DomainActionLogicInterface
                 $this->enforceRules($rules, $controller);
 
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
-                $action = $controller->repository->getRepo()
+                $controller->repository->getRepo()
                     ->validateRepository(
                         $entityCollection,
                         $entityObject,
@@ -75,16 +76,15 @@ class EditAction implements DomainActionLogicInterface
                             ->or404()
                     )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
 
-                if ($action) {
-                    $this->dispatchSingleActionEvent(
-                        $controller,
-                        $eventDispatcher,
-                        $method,
-                        $controller->repository->getRepo()->validatedDataBag(),
-                        $additionalContext
-                    );
 
-                }
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    $controller->repository->getRepo()->validatedDataBag() ?? [],
+                    $additionalContext
+                );
+
             }
         endif;
         return $this;

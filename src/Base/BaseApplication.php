@@ -458,67 +458,67 @@ class BaseApplication extends AbstractBaseBootLoader
      * @param string|null $globalKey
      * @return $this
      */
-    public function setThemeBuilder(array $themeBuilderOptions = [], bool $isGlobal = false, ?string $globalKey = null): self
-    {
-        if (count($themeBuilderOptions) < 0) {
-            throw new BaseInvalidArgumentException(sprintf('%s options have return empty.', implode(' '. $themeBuilderOptions)));
-        }
-        $this->isGlobalThemeBuilder = $isGlobal;
-        $this->globalThemeBuilderKey = $globalKey;
-        $this->themeBuilderOptions = $themeBuilderOptions;
-        return $this;
-    }
+    // public function setThemeBuilder(array $themeBuilderOptions = [], bool $isGlobal = false, ?string $globalKey = null): self
+    // {
+    //     if (count($themeBuilderOptions) < 0) {
+    //         throw new BaseInvalidArgumentException(sprintf('%s options have return empty.', implode(' '. $themeBuilderOptions)));
+    //     }
+    //     $this->isGlobalThemeBuilder = $isGlobal;
+    //     $this->globalThemeBuilderKey = $globalKey;
+    //     $this->themeBuilderOptions = $themeBuilderOptions;
+    //     return $this;
+    // }
 
     /**
      * Returns the theme builder options array from the yaml file
      *
      * @return array
      */
-    public function getThemeBuilderOptions(): array
-    {
-        return $this->themeBuilderOptions;
-    }
+    // public function getThemeBuilderOptions(): array
+    // {
+    //     return $this->themeBuilderOptions;
+    // }
 
     /**
      * Return the default theme builder library
      *
      * @return string
      */
-    public function getDefaultThemeBuilder(): ?string
-    {
-        if (count($this->themeBuilderOptions) > 0) {
-            foreach ($this->themeBuilderOptions['cssDriver'] as $key => $value) {
-                if (array_key_exists('default', $value)) {
-                    if ($value['default'] === true) {
-                        return $value['class'];
-                    }
-                }
-            }
-        }
-        return null;
-    }
+    // public function getDefaultThemeBuilder(): ?string
+    // {
+    //     if (count($this->themeBuilderOptions) > 0) {
+    //         foreach ($this->themeBuilderOptions['cssDriver'] as $key => $value) {
+    //             if (array_key_exists('default', $value)) {
+    //                 if ($value['default'] === true) {
+    //                     return $value['class'];
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return null;
+    // }
 
     /**
      * Turn on global caching from public/index.php bootstrap file to make the cache
      * object available globally throughout the application using the GlobalManager object
      * @return bool
      */
-    public function isThemeBuilderGlobal(): bool
-    {
-        return isset($this->isGlobalThemeBuilder) && $this->isGlobalThemeBuilder === true;
-    }
+    // public function isThemeBuilderGlobal(): bool
+    // {
+    //     return isset($this->isGlobalThemeBuilder) && $this->isGlobalThemeBuilder === true;
+    // }
 
     /**
      * @return string
      * @throws BaseLengthException
      */
-    public function getGlobalThemeBuilderKey(): string
-    {
-        if ($this->globalThemeBuilderKey !==null && strlen($this->globalThemeBuilderKey) < 3) {
-            throw new BaseLengthException($this->globalThemeBuilderKey . ' is invalid this needs to be more than 3 characters long');
-        }
-        return ($this->globalThemeBuilderKey !==null) ? $this->globalThemeBuilderKey : 'themeBuilder_global';
-    }
+    // public function getGlobalThemeBuilderKey(): string
+    // {
+    //     if ($this->globalThemeBuilderKey !==null && strlen($this->globalThemeBuilderKey) < 3) {
+    //         throw new BaseLengthException($this->globalThemeBuilderKey . ' is invalid this needs to be more than 3 characters long');
+    //     }
+    //     return ($this->globalThemeBuilderKey !==null) ? $this->globalThemeBuilderKey : 'themeBuilder_global';
+    // }
 
 
     public function run(): void
@@ -530,7 +530,7 @@ class BaseApplication extends AbstractBaseBootLoader
         $this->loadCache();
         $this->loadLogger();
         $this->loadEnvironment();
-        $this->loadThemeBuilder();
+        //$this->loadThemeBuilder();
         $this->loadRoutes();
     }
 }

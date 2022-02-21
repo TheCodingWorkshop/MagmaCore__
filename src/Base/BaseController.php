@@ -15,8 +15,11 @@ namespace MagmaCore\Base;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
+use MagmaCore\Base\Traits\ControllerFlashTrait;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
+use MagmaCore\Base\Traits\ControllerMonitorTrait;
 use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
+use MagmaCore\Base\Traits\ControllerViewTrait;
 use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
@@ -41,9 +44,12 @@ class BaseController extends AbstractBaseController
 
     use SessionTrait,
         ControllerCastingTrait,
-        ControllerPrivilegeTrait,
+        //ControllerPrivilegeTrait,
         ControllerMenuTrait,
-        TableSettingsTrait;
+        TableSettingsTrait,
+        ControllerFlashTrait,
+        ControllerViewTrait,
+        ControllerMonitorTrait;
 
     /** @var array */
     protected array $routeParams;
@@ -80,7 +86,7 @@ class BaseController extends AbstractBaseController
         if (!in_array($routeParams['controller'], $this->noSettingsController)) {
             $this->initalizeControllerSession($this);
         }
-
+        $this->pingMethods();
     }
 
     /**
@@ -195,104 +201,6 @@ class BaseController extends AbstractBaseController
             });
     }
 
-    /**
-     * Template context which relies on the application owning a user and permission
-     * model before providing any data to the rendered template
-     * 
-     * @return array
-     */
-    private function templateModelContext(): array
-    {
-        if (!class_exists(UserModel::class) || !class_exists(PermissionModel::class)) {
-            return array();
-        }
-        return array_merge(
-            ['current_user' => Authorized::grantedUser()],
-            ['this_route' => strtolower($this->thisRouteController())],
-            ['this_action' => strtolower($this->thisRouteAction())],
-            ['this_namespace' => strtolower($this->thisRouteNamespace())],
-            ['privilege_user' => PrivilegedUser::getUser()],
-            ['func' => new TemplateExtension($this)],
-        );
-    }
-
-    /**
-     * Return some global context to all rendered templates
-     * 
-     * @return array
-     */
-    private function templateGlobalContext(): array
-    {
-        return array_merge(
-            ['app' => Yaml::file('app')],
-            ['menu' => Yaml::file('menu')],
-            ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]
-        );
-    }
-
-    /**
-     * Allow all routes within a controller to access a central define set of template context variable. Which uses
-     * teh system session to store the current controller and validate that only the context set in a specific
-     * wont be accessible from another controller routes
-     *
-     * controller global set in userController wont be accessible in roleController
-     *
-     * @return array
-     */
-    protected function controllerViewGlobals(): array
-    {
-        $currentController = $this->getSession()->set('controller', $this->routeParams['controller']);
-        if ($this->thisRouteController() === $currentController) {
-            return $this->controllerContext;
-        }
-        return array();
-
-    }
-
-    /**
-     * Rendered template exception
-     * @return void
-     */
-    private function throwViewException(): void
-    {
-        if (null === $this->templateEngine) {
-            throw new BaseLogicException(
-                'You can not use the render method if the build in template engine is not available.'
-            );
-        }
-
-    }
-
-    /**
-     * Render a template response using Twig templating engine
-     *
-     * @param string $template - the rendering template
-     * @param array $context - template data context
-     * @return Response
-     * @throws LoaderError
-     * @throws BaseLogicException
-     */
-    public function view(string $template, array $context = [])
-    {
-        $this->throwViewException();
-        $templateContext = array_merge(
-            $this->templateGlobalContext(), 
-            $this->templateModelContext()
-        );
-        if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
-            $this->dispatchEvent(BeforeRenderActionEvent::class);
-        }
-        $response = $this->response->handler();
-        $request = $this->request->handler();
-        $response->setCharset('ISO-8859-1');
-        $response->headers->set('Content-Type', 'text/plain');
-        $response->setStatusCode($response::HTTP_OK);
-        $response->setContent($this->templateEngine->ashRender($template, array_merge($context, $templateContext, $this->controllerViewGlobals())));
-        if ($response->isNotModified($request)) {
-            $response->prepare($request);
-            $response->send();
-        }
-    }
 
     /**
      * @return array
@@ -300,20 +208,6 @@ class BaseController extends AbstractBaseController
     public function getRoutes(): array
     {
         return $this->routeParams;
-    }
-
-    /**
-     * Alias of view() method
-     *
-     * @param string $template - the rendering template
-     * @param array $context - template data context
-     * @return Response
-     * @throws LoaderError
-     * @throws BaseLogicException
-     */
-    public function render(string $template, array $context = [])
-    {
-        return $this->view($template, $context);
     }
 
     /**
@@ -356,79 +250,6 @@ class BaseController extends AbstractBaseController
     }
 
     /**
-     * Conbination method which encapsulate the flashing and redirecting all within
-     * a single method. Use the relevant arguments to customized the output
-     *
-     * @param boolean $action
-     * @param string|null $redirect
-     * @param string $message
-     * @param string $type
-     * @return void
-     */
-    public function flashAndRedirect(bool $action, ?string $redirect = null, string $message, string $type = FlashType::SUCCESS): void
-    {
-        if (is_bool($action)) {
-            $this->flashMessage($message, $type);
-            $this->redirect(($redirect === null) ? $this->onSelf() : $redirect);
-        }
-    }
-
-    /**
-     * Returns the session based flash message
-     *
-     * @param string $message
-     * @param string $type
-     * @return void
-     */
-    public function flashMessage(string $message, string $type = FlashType::SUCCESS)
-    {
-        $flash = (new Flash(SessionTrait::sessionFromGlobal()))->add($message, $type);
-        if ($flash) {
-            return $flash;
-        }
-    }
-
-    /**
-     * Returns the session based flash message type warning as string
-     *
-     * @return string
-     */
-    public function flashWarning(): string
-    {
-        return FlashType::WARNING;
-    }
-
-    /**
-     * Returns the session based flash message type success as string
-     *
-     * @return string
-     */
-    public function flashSuccess(): string
-    {
-        return FlashType::SUCCESS;
-    }
-
-    /**
-     * Returns the session based flash message type danger as string
-     *
-     * @return string
-     */
-    public function flashDanger(): string
-    {
-        return FlashType::DANGER;
-    }
-
-    /**
-     * Returns the session based flash message type info as string
-     *
-     * @return string
-     */
-    public function flashInfo(): string
-    {
-        return FlashType::INFO;
-    }
-
-    /**
      * Returns a translation string to convert to default or choosen locale
      *
      * @param string $locale
@@ -465,11 +286,11 @@ class BaseController extends AbstractBaseController
         return $this->baseApp($this)->loadCache();
     }
 
-    public function themeBuilder(): object
-    {
-        $themeBuilder = GlobalManager::get('themeBuilder_global');
-        return $themeBuilder;
-    }
+//    public function themeBuilder(): object
+//    {
+//        $themeBuilder = GlobalManager::get('themeBuilder_global');
+//        return $themeBuilder;
+//    }
 
 
 

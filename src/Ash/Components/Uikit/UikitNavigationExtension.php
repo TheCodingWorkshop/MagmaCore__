@@ -69,8 +69,8 @@ class UikitNavigationExtension
                 <ul class="uk-iconnav uk-margin">
     <li><a href="#" uk-icon="icon: plus"></a></li>
     <li><a href="#" uk-icon="icon: file-edit"></a></li>
-    <li><a href="#" uk-icon="icon: copy"></a></li>
-    <li><a href="#"><span uk-icon="icon: bag"></span> (2)</a></li>
+    <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
+    <li><a uk-tooltip="Notifications" href="#"><span uk-icon="icon: bell"></span> (2)</a></li>
 </ul>
                 </li>';
                 $element .= '<hr>';

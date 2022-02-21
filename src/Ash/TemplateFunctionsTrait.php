@@ -4,6 +4,7 @@ namespace MagmaCore\Ash;
 
 use Exception;
 use MagmaCore\IconLibrary;
+use MagmaCore\Utility\Serializer;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\DateFormatter;
@@ -76,6 +77,24 @@ trait TemplateFunctionsTrait
             $str = substr($str, 0, $min) . ' ...';
 
         return $str;
+    }
+
+    /**
+     * @param string|null $str
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
+    public function str(string $str = null, string $type = 'capital'): string
+    {
+        if (!empty($type)) {
+            return match($type) {
+                'upper' => strtoupper($str),
+                'lower' => strtolower($str),
+                'capital' => ucwords($str),
+                default => throw new \Exception(sprintf('%s is required', $str))
+            };
+        }
     }
 
     /**
@@ -325,5 +344,39 @@ trait TemplateFunctionsTrait
         return IconLibrary::getIcon($name, $size, $type);
     }
 
+    public function unserializer(mixed $data)
+    {
+        return Serializer::unCompress($data);
+    }
 
+    public function discovery($session, $controller, string $key = 'controller_discover')
+    {
+        $controllerKey = 'new_' . $controller . '_discovery';
+
+        if ($session->has($key)) {
+
+            $data = $session->get($key);
+            if ($data['parent_controller'] === $controller) {
+                $methods = $data[$controllerKey];
+                if (is_array($methods) && count($methods) > 0) {
+                    $html = '<ul class="uk-list uk-list-divider uk-list-collapse">';
+                    foreach ($methods as $method) {
+                        $html .= '
+                            <li>
+                                <div class="uk-clearfix">
+                                    <div class="uk-float-left">Method [' . $method . ']</div>
+                                    <div class="uk-float-right">install</div>
+                                </div>
+                            </li>
+
+                        ';
+                    }
+                    $html .= '</ul>';
+
+                    return $html;
+                }
+            }
+
+        }
+    }
 }

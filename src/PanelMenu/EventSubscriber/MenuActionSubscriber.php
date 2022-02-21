@@ -58,7 +58,7 @@ class MenuActionSubscriber implements EventSubscriberInterface
         return [
             MenuActionEvent::NAME => [
                 ['flashLoginEvent', self::FLASH_MESSAGE_PRIORITY],
-                //['addMenuItem']
+                ['addMenuItem']
             ]
         ];
     }
@@ -87,41 +87,14 @@ class MenuActionSubscriber implements EventSubscriberInterface
     public function addMenuItem(MenuActionEvent $event): bool
     {
         if ($this->onRoute($event, self::EDIT_ACTION)) {
-            $context = $this->flattenContext($event->getContext());
-            if (isset($context['item_usable']) && count($context['item_usable']) > 0) {
-                foreach ($context['item_usable'] as $itemID) {
+            $context = $this->flattenContext(array_column($event->getContext(), 'item_usable'));
+            if (isset($context) && count($context) > 0) {
+                foreach ($context as $itemID) {
                     $itemID = (int)$itemID;
                     $this->menuItem->getRepo()->findByIdAndUpdate(['item_usable' => 1], $itemID);
                 }
                 return true;
             }
-        }
-        return false;
-    }
-
-    // public function deleteMenuItems(MenuActionEvent $event)
-    // {
-    //     if ($this->onRoute($event, 'trash')) {
-
-    //     }
-    // }
-
-    /**
-     * @param MenuActionEvent $event
-     * @return bool
-     */
-    public function setMenuParentToZero(MenuActionEvent $event): bool
-    {
-        if ($this->onRoute($event, self::NEW_ACTION)) {
-            $context = $this->flattenContext($event->getContext());
-
-//            if (isset($context['item_usable']) && count($context['item_usable']) > 0) {
-//                foreach ($context['item_usable'] as $itemID) {
-//                    $itemID = (int)$itemID;
-//                    $this->menuItem->getRepo()->findByIdAndUpdate(['item_usable' => 1], $itemID);
-//                }
-//                return true;
-//            }
         }
         return false;
     }

@@ -40,6 +40,16 @@ class Datatable extends AbstractDatatable
     private mixed $tableColumn;
     private mixed $tableOrder;
     private object $request;
+    private array $tableClasses = [
+        'uk-table',
+        'uk-table-middle',
+        'uk-table-hover',
+        'uk-table-striped',
+        'uk-table-responsive',
+        'uk-table-condensed',
+        'uk-table-small'
+
+    ];
 
     /* @var ThemeBuilder */
     protected $tableCss = [];
@@ -50,9 +60,9 @@ class Datatable extends AbstractDatatable
      * @param ThemeBuilder $themeBuilder
      * @throws ThemeBuilderInvalidArgumentException
      */
-    public function __construct(?ThemeBuilder $themeBuilder = null)
+    public function __construct()
     {
-        $this->tb = $themeBuilder->create(Uikit::class);
+        //$this->tb = $themeBuilder->create(Uikit::class);
         parent::__construct();
     }
 
@@ -79,7 +89,7 @@ class Datatable extends AbstractDatatable
         $this->getRepositoryParts($dataRepository);
 
         /* css themeBuilder */
-        $this->tableCss = $callingController->themeBuilder()->table();
+        //$this->tableCss = $callingController->themeBuilder()->table();
         if ($request)
             $this->request = $request;
 
@@ -123,7 +133,7 @@ class Datatable extends AbstractDatatable
         $this->element .= $before;
         if (is_array($this->dataColumns) && count($this->dataColumns) > 0) {
             if (is_array($this->dataOptions) && $this->dataOptions != null) {
-                $this->element .= '<table id="' . ($table_id ?? '') . '" class="' . implode(' ', $this->tb->theme('table_class')) . '">' . "\n";
+                $this->element .= '<table id="' . ($table_id ?? '') . '" class="' . implode(' ', $this->tableClasses) . '">' . "\n";
                 $this->element .= ($show_table_thead) ? $this->tableGridElements($status) : false;
                 $this->element .= '<tbody>' . "\n";
                 foreach ($this->dataOptions as $row) {
@@ -186,7 +196,7 @@ class Datatable extends AbstractDatatable
     {
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
-            $element .= '<a data-turbo="true" class="' . $this->tb->theme('table_reset_link') . '" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
+            $element .= '<a data-turbo="true" class="uk-link-reset" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
 
             $element .= $column['dt_row'];
             $element .= '<span uk-icon="icon: expand ' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '; ratio: 0.8"></span>';
@@ -209,7 +219,7 @@ class Datatable extends AbstractDatatable
      */
     public function previousPaging(string $status, mixed $queryStatus): string
     {
-        $element = '<li class="' . ($this->currentPage == 1 ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
+        $element = '<li class="' . ($this->currentPage == 1 ? 'uk-disabled' : 'uk-active') . '">';
         if ($this->currentPage == 1) {
             $element .= sprintf(
                 '<a href="%s">',
@@ -240,7 +250,7 @@ class Datatable extends AbstractDatatable
      */
     public function nextPaging(string $status, mixed $queryStatus): string
     {
-        $element = '<li class="' . ($this->currentPage == $this->totalPages ? $this->tb->theme('paging')['disable'] : $this->tb->theme('paging')['active']) . '">';
+        $element = '<li class="' . ($this->currentPage == $this->totalPages ? 'uk-disabled' : 'uk-active') . '">';
         if ($this->currentPage == $this->totalPages) {
             $element .= sprintf(
                 '<a href="%s">',
