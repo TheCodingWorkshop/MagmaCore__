@@ -5,6 +5,8 @@ namespace MagmaCore\Ash;
 use Exception;
 use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Serializer;
+use MagmaCore\Utility\Utilities;
+use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\DateFormatter;
@@ -17,39 +19,9 @@ use MagmaCore\Base\Traits\BaseAnchorTrait;
 trait TemplateFunctionsTrait
 {
 
-    use BaseAnchorTrait;
+    use BaseAnchorTrait,
+        UtilityTrait;
 
-    // public function protectedAnchor(
-    //     array $props = [], ?int $userID = null, mixed $content = null, ?string $permission = null): string|bool
-    // {
-    //     $privilege = PrivilegedUser::getUser();
-    //     if (count($props) > 0) {
-    //         foreach ($props as $key => $prop) {
-    //             if (!in_array($key, ['href', 'title', 'rel', 'class', 'id', 'style', 'uk-tooltip'])) {
-    //                 throw new TemplateLocaleOutOfBoundException('Invalid property set for anchor tag ' . [$key]);
-    //             }
-
-    //             if ($privilege->hasPrivilege($permission)) {
-    //                 if (isset($prop[$key]) && $prop[$key] !=='') {
-    //                     $element = sprintf(
-    //                         '<a %s%s%s%s%s%s>%s</a>',
-    //                         $prop['href'],
-    //                         $prop['class'],
-    //                         $prop['id'],
-    //                         $prop['style'],
-    //                         $prop['title'],
-    //                         $prop['uk-tooltip'],
-    //                         $content
-    //                     );
-    //                 }
-    //                 return $element;
-    //             } else {
-    //                 return '';
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
 
     /**
      * Expose framework database configuration options to the template
@@ -339,44 +311,91 @@ trait TemplateFunctionsTrait
         return $html;
     }
 
+    /**
+     * Fetch an icon from the system icon object
+     * @param string $name
+     * @param mixed|float $size
+     * @param string $type
+     * @return string
+     */
     public function icon(string $name, mixed $size = 1.5, string $type = 'uikit'): string
     {
         return IconLibrary::getIcon($name, $size, $type);
     }
 
+    /**
+     * Allows us to unserialize serialize data from our html templates
+     * @param mixed $data
+     * @return mixed|string
+     */
     public function unserializer(mixed $data)
     {
         return Serializer::unCompress($data);
     }
 
-    public function discovery($session, $controller, string $key = 'controller_discover')
+    /**
+     * Show the latest discoveries on the main discovery page
+     * @param array $discoveries
+     * @return string
+     */
+    public function showDiscoveries(array $discoveries = []): string
     {
-        $controllerKey = 'new_' . $controller . '_discovery';
+        $html = '';
+        if ($this->isArrayCountable($discoveries)) {
+            $count = 0;
+            foreach ($discoveries as $discovery) {
+                $unSerializeMethods = Serializer::unCompress($discovery['current_new_method']);
+                $html .= sprintf('<div>%s</div>', ucwords($discovery['controller']));
+                $html .= sprintf('<div><small class="uk-block">Discovered %s</small></div>', DateFormatter::timeFormat($discovery['created_at']));
+                $html .= sprintf('<code>[%s] new method was discovered within this %s controller</code>', count($unSerializeMethods), ucwords($discovery['controller']));
+                $html .= sprintf('<div><code>[methods] = {%s}</code></div>', implode(', ', $unSerializeMethods));
+                $html .= '<hr>';
+                $count++;
+                if ($count === 2) {
+                    break;
+                }
+            }
+        }
 
-        if ($session->has($key)) {
+        return $html;
+    }
 
-            $data = $session->get($key);
-            if ($data['parent_controller'] === $controller) {
-                $methods = $data[$controllerKey];
-                if (is_array($methods) && count($methods) > 0) {
-                    $html = '<ul class="uk-list uk-list-divider uk-list-collapse">';
-                    foreach ($methods as $method) {
-                        $html .= '
+    /**
+     * @param $session
+     * @param $controller
+     * @param string $key
+     * @return string
+     */
+    public function discover($methods): string
+    {
+        $html = '';
+        if ($this->isArrayCountable($methods)) {
+            $html .= '<form method="post" action="/admin/discovery/install" />';
+            $html .= '<ul class="uk-list uk-list-divider uk-list-collapse">';
+            foreach ($methods as $method) {
+                $html .= '
                             <li>
                                 <div class="uk-clearfix">
                                     <div class="uk-float-left">Method [' . $method . ']</div>
-                                    <div class="uk-float-right">install</div>
+                                    <input type="hidden" name="methods[]" value="' . $method . '" />
+                                    <div class="uk-float-right"><a uk-tooltip="Push to methods" class="uk-link-reset" href="/admin/discovery/install">' . IconLibrary::getIcon('push') . '</a></div>
                                 </div>
                             </li>
 
                         ';
-                    }
-                    $html .= '</ul>';
 
-                    return $html;
-                }
             }
+            $html .= '</ul>';
+            $html .= '<div class="uk-margin">
+                            <input type="hidden" name="controller_id" value="' . (isset($_GET) ? $_GET['edit'] : 0) .' " />
+                            <input type="submit" class="uk-button uk-button-small uk-button-secondary" value="Add" name="install-discovery" />
+                        </div>';
+            $html .= '</form>';
 
         }
+
+        return $html;
     }
+
+
 }

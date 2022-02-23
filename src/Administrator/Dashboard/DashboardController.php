@@ -68,20 +68,8 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
         $this->render(
             'admin/dashboard/index.html',
             [
-                // "links" => $this->repository->getQuickLinks(),
-                // 'statistics' => $this->repository->getStatistics(),
-                // 'user_percentage' => $this->repository->userPercentage(),
-                // 'user_session' => $this->repository->userSession(),
-                // 'user_gained' => /*$this->repository->countlastMonthUsers()*/ 0,
-                // 'total_records' => $this->repository->totalUsers(),
-                // 'pending_users' => $this->repository->totalPendingUsers(),
-                // 'github' => $this->repository->getGithubStats(),
                 'nav_switcher' => $this->repo->getNavSwitcher(),
                 'main_cards' => $this->repo->mainCards(),
-                // 'unique_visits' => $this->repository->getSessionUniqueVisits(),
-                // 'block_activities' => $this->repository->getBlockActivities(),
-                // 'ticket_count' => $this->repository->ticketCounter(),
-
                 'todays_datetime' => date("F j, Y, g:i a")
             ]
         );
@@ -121,6 +109,11 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
             )
             ->info()
             ->end();
+    }
+
+    protected function historyAction()
+    {
+
     }
 
 

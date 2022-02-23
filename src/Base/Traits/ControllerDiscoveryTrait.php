@@ -19,17 +19,19 @@ trait ControllerDiscoveryTrait
 
     /**
      * Discover new controller by gatehering the parameters for the controller and inserting it
-     * within the database.
+     * within the database
      *
-     * @param object $model
+     * @param object|null $model
+     * @param string|null $controllerName
+     * @param string|null $classNamespace
+     * @return bool
+     * @throws \ReflectionException
      */
-    public function discoverNewController(object $model = null, ?string $controllerName = null, object $session = null, ?string $sessionKey = null): bool
+    public function discoverNewController(object $model = null, ?string $controllerName = null, ?string $classNamespace = null): bool
     {
-        if (!empty($controllerName)) {
-            $fields = ['controller' => $controllerName, 'methods' => Serializer::compress($this->getActionMethods()), 'active' => 0];
-            if ($session->has($sessionKey)) {
-                $session->set($sessionKey, $fields);
-            }
+        /* We want to eliminate the discovery controller itself from showing up */
+        if (!empty($controllerName) /*&& $controllerName !== 'discovery'*/) {
+            $fields = ['controller' => $controllerName, 'methods' => Serializer::compress($this->getActionMethods($classNamespace)), 'active' => 0];
             return $model
                 ->getEm()
                 ->getCrud()

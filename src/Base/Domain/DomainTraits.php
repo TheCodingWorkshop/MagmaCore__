@@ -318,6 +318,10 @@ trait DomainTraits
         return $this;
     }
 
+    public function blank(): self
+    {
+        return $this;
+    }
 
     function array_flatten($array) {
         foreach ($array as $arr) {

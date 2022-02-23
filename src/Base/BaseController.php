@@ -87,6 +87,7 @@ class BaseController extends AbstractBaseController
             $this->initalizeControllerSession($this);
         }
         $this->pingMethods();
+        $this->showDiscoveries();
     }
 
     /**

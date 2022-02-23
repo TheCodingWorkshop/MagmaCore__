@@ -18,7 +18,7 @@ use MagmaCore\UserManager\Entity\UserRoleEntity;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
-final class UserRoleController extends AdminController
+class UserRoleController extends AdminController
 {
 
     use DataLayerTrait;
