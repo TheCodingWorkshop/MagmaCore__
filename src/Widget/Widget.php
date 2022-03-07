@@ -13,6 +13,7 @@ namespace MagmaCore\Widget;
 
 use MagmaCore\Widget\Widgets\BaseWidget;
 use MagmaCore\Widget\Exception\WidgetException;
+use MagmaCore\Widget\Widgets\Notifications\NotificationWidget;
 use MagmaCore\Widget\Widgets\Tickets\TicketWidget;
 use MagmaCore\Widget\Widgets\Cards\ActiveNowWidget;
 use MagmaCore\Widget\Widgets\Cards\BounceRateWidget;
@@ -41,7 +42,8 @@ class Widget extends AbstractWidget
         WebsiteTrafficWidget::WIDGET_NAME => ['class' => WebsiteTrafficWidget::class],
         ListsWidget::WIDGET_NAME => ['class' => ListsWidget::class],
         TicketWidget::WIDGET_NAME => ['class' => TicketWidget::class],
-        MemberWidget::WIDGET_NAME => ['class' => MemberWidget::class]
+        MemberWidget::WIDGET_NAME => ['class' => MemberWidget::class],
+        NotificationWidget::WIDGET_NAME => ['class' => NotificationWidget::class],
 
     ];
 

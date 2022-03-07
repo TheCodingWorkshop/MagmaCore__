@@ -38,4 +38,19 @@ class BaseWidget
         return $html;
     }
 
+    public static function offCanvas(Closure $callback = null, ?string $trigger): string
+    {
+        if (!$callback instanceof Closure) {
+            throw new WidgetException(sprintf('%s is not a Closure', $callback));
+        }
+        $html = '<div id="' . $trigger . '" uk-offcanvas="flip: true; overlay: true">';
+            $html .= '<div class="uk-offcanvas-bar">';
+                $html .= '<button class="uk-offcanvas-close" type="button" uk-close></button>';
+                $html .= $callback(new self);
+            $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
 }

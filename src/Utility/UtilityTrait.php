@@ -49,5 +49,19 @@ trait UtilityTrait
         return $result;
     }
 
+    /**
+     * @param string $str
+     * @param int $max
+     * @param int $min
+     * @return string
+     */
+    public function truncate(string $str, int $max = 100, int $min = 80): string
+    {
+        if (strlen($str) > $max)
+            $str = substr($str, 0, $min) . ' ...';
+
+        return $str;
+    }
+
 
 }

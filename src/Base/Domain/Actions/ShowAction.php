@@ -57,6 +57,14 @@ class ShowAction implements DomainActionLogicInterface
         if ($this->hasRouteWithID()) {
             if ($this->isRouteIDEqual()) {
                 $this->singular = $controller->findOr404();
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    ['singular_data' => $controller->toArray($this->singular)],
+                    $additionalContext
+                );
+
             }
         }
 

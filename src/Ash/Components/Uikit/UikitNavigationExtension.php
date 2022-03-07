@@ -14,6 +14,7 @@ namespace MagmaCore\Ash\Components\Uikit;
 
 use Exception;
 use MagmaCore\IconLibrary;
+use MagmaCore\Notification\NotificationModel;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\DataObjectLayer\DataLayerClientFacade;
@@ -67,11 +68,11 @@ class UikitNavigationExtension
                 $element .= '<li class="uk-nav-header">
                 <span>Manage</span>
                 <ul class="uk-iconnav uk-margin">
-    <li><a href="#" uk-icon="icon: plus"></a></li>
-    <li><a href="#" uk-icon="icon: file-edit"></a></li>
-    <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
-    <li><a uk-tooltip="Notifications" href="#"><span uk-icon="icon: bell"></span> (2)</a></li>
-</ul>
+                    <li><a href="#" uk-icon="icon: plus"></a></li>
+                    <li><a href="#" uk-icon="icon: file-edit"></a></li>
+                    <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
+                    <li><a uk-toggle="target: #notification-panel" uk-tooltip="Notifications"><span uk-icon="icon: bell"></span> ' . $this->hasNotification($controller) . '</a></li>
+                </ul>
                 </li>';
                 $element .= '<hr>';
                 foreach ($data as $key => $item) {
@@ -148,5 +149,12 @@ class UikitNavigationExtension
             Stringify::capitalize($child['item_label'] ?? 'Unknown Child'));
         $element .= '</a>';
         return $element;
+    }
+
+    private function hasNotification(object $controller = null)
+    {
+        $notify = new NotificationModel();
+        $count = $notify->getRepo()->count(['notify_status' => 'unread']);
+        return ($count !==0) ? '<sup class="uk-badge">' . $count . '</sup>' : null;
     }
 }

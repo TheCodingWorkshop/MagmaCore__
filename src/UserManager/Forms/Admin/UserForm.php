@@ -87,6 +87,11 @@ class UserForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 $this->blueprint->choices(Yaml::file('controller')['user']['status_choices'], $dataRepository->status ?? 'pending'),
                 $this->blueprint->settings(false, null, true, null, true)
             )
+            ->add(
+                $this->blueprint->hidden('id', $this->hasValue('id'), []),
+                null,
+                $this->blueprint->settings(false, null, true, null, false)
+            )
             ->add($this->blueprint->select(
                 'role_id',
                 ['uk-select'],
@@ -135,6 +140,7 @@ class UserForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 null,
                 $this->blueprint->settings(false, null, false, null, true)
             )
+
             ->build(['before' => '<div class="uk-margin">', 'after' => '</div>']);
     }
 }

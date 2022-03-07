@@ -10,13 +10,13 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\UserManager;
+namespace MagmaCore\Notification;
 
 use MagmaCore\DataSchema\DataSchema;
 use MagmaCore\DataSchema\DataSchemaBlueprint;
 use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 
-class UserSchema implements DataSchemaBuilderInterface
+class NotificationSchema implements DataSchemaBuilderInterface
 {
 
     /** @var object - $schema for chaining the schema together */
@@ -24,7 +24,7 @@ class UserSchema implements DataSchemaBuilderInterface
     /** @var object - provides helper function for quickly adding schema types */
     protected object $blueprint;
     /** @var object - the database model this schema is linked to */
-    protected object $userModel;
+    protected object $model;
 
     /**
      * Main constructor class. Any typed hinted dependencies will be autowired. As this
@@ -32,14 +32,14 @@ class UserSchema implements DataSchemaBuilderInterface
      *
      * @param DataSchema $schema
      * @param DataSchemaBlueprint $blueprint
-     * @param UserModel $userModel
+     * @param NotificationModel $model
      * @return void
      */
-    public function __construct(DataSchema $schema, DataSchemaBlueprint $blueprint, UserModel $userModel)
+    public function __construct(DataSchema $schema, DataSchemaBlueprint $blueprint, NotificationModel $model)
     {
         $this->schema = $schema;
         $this->blueprint = $blueprint;
-        $this->userModel = $userModel;
+        $this->model = $model;
     }
 
     /**
@@ -50,27 +50,20 @@ class UserSchema implements DataSchemaBuilderInterface
     {
         return $this->schema
             ->schema()
-            ->table($this->userModel)
+            ->table($this->model)
             ->row($this->blueprint->autoID())
-            ->row($this->blueprint->varchar('firstname', 190))
-            ->row($this->blueprint->varchar('lastname', 190))
-            ->row($this->blueprint->varchar('email', 190))
-            ->row($this->blueprint->varchar('gravatar', 190, true, 'null'))
-            ->row($this->blueprint->varchar('status', 24))
-            ->row($this->blueprint->varchar('password_hash', 190))
-            ->row($this->blueprint->varchar('password_reset_hash', 64, true, 'null'))
-            ->row($this->blueprint->datetime('password_reset_expires_at', true, 'null'))
-            ->row($this->blueprint->varchar('activation_token', 64, true, 'null'))
-            ->row($this->blueprint->int('is_admin', 2, false))
-            ->row($this->blueprint->int('created_byid', 10, false))
+            ->row($this->blueprint->varchar('menu_name', 100))
+            ->row($this->blueprint->text('menu_description'))
+            ->row($this->blueprint->text('menu_description'))
             ->row($this->blueprint->datetime('created_at', false))
             ->row($this->blueprint->datetime('modified_at', true, 'null', 'on update CURRENT_TIMESTAMP'))
-            ->row($this->blueprint->varchar('remote_addr', 64, true, 'null'))
-            ->build(function ($schema) use ($otherData) {
+            ->build(function ($schema) {
                 return $schema
                     ->addPrimaryKey($this->blueprint->getPrimaryKey())
-                    ->setUniqueKey(['email', 'password_reset_hash', 'activation_token'])
+                    ->setUniqueKey(['menu_name'])
                     ->addKeys();
             });
     }
 }
+
+

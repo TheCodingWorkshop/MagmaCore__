@@ -66,6 +66,7 @@ class EditAction implements DomainActionLogicInterface
                 $this->enforceRules($rules, $controller);
 
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
+                $controller->getSession()->set('pre_action_' . $controller->thisRouteController(), (array)$entityCollection->all());
                 $controller->repository->getRepo()
                     ->validateRepository(
                         $entityCollection,
@@ -75,7 +76,6 @@ class EditAction implements DomainActionLogicInterface
                             ->findAndReturn($controller->thisRouteID())
                             ->or404()
                     )->saveAfterValidation([$controller->repository->getSchemaID() => $controller->thisRouteID()]);
-
 
                 $this->dispatchSingleActionEvent(
                     $controller,

@@ -260,6 +260,12 @@ services:
           msg: item remove from trash successfully!
           redirect: ticket.index
 
+    notification.subscriber:
+      class: \MagmaCore\Notification\EventSubscriber\NotificationActionSubscriber
+      register_route_feedback:
+        MagmaCore\Notification\NotificationController::newAction:
+          msg: New ticket added!
+
 
     ########################## CORE SYSTEM EVENTS ##########################
     base_controller_action.subscriber:

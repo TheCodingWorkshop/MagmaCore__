@@ -95,7 +95,6 @@ class UserActionSubscriber implements EventSubscriberInterface
      * additional tasks on that return object.
      * @return array
      */
-
     public static function getSubscribedEvents(): array
     {
         return [
@@ -107,9 +106,47 @@ class UserActionSubscriber implements EventSubscriberInterface
                 ['addUserPreferences', -800],
                 ['updateUserPreferences'],
                 ['addUserNote'],
+                ['userNotification', -800],
                 ['updateStatusIfStatusIsTrash', -900]
             ]
         ];
+    }
+
+    /**
+     * Add a system notification each time a request has been made from the user controller
+     * @param UserActionEvent $event
+     * @throws Exception
+     */
+    public function userNotification(UserActionEvent $event)
+    {
+        $this->notify($event, UserActionEvent::NAME, function($event, $trait) {
+            $method = $event->getMethod();
+            /* Get the ID of the currently logged in user */
+            $currentUserID = $event->getObject()->getSession()->get('user_id');
+            /* Get object of the currently logged in user */
+            $user = $event->getObject()->repository->getUser($currentUserID);
+
+            $preActionEditSession = $event->getObject()->getSession()->get('pre_action_edit_user');
+            unset(
+                $preActionEditSession['_CSRF_INDEX'],
+                $preActionEditSession['_CSRF_TOKEN'],
+                $preActionEditSession['edit-user'],
+                $preActionEditSession['new-user'],
+                $preActionEditSession['password_hash']
+            );
+
+            list($desc, $title) = $trait->resolveContextForDescription($event, $preActionEditSession, $method, $user);
+            $fields = [
+                'notify_title' => $title,
+                'notify_description' => $desc,
+                'notify_type' => 'system',
+                'notifier' => 'dunno yet',
+                'created_byid' => $currentUserID,
+            ];
+
+            return $fields;
+
+        });
     }
 
     /**

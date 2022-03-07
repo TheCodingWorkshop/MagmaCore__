@@ -15,6 +15,8 @@ namespace MagmaCore\EventDispatcher;
 use Closure;
 use Exception;
 use MagmaCore\Base\BaseActionEvent;
+use MagmaCore\Notification\NotificationModel;
+use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
@@ -174,4 +176,74 @@ trait EventDispatcherTrait
             }
         }
     }
+
+    /**
+     * @param object|null $event
+     * @param string|null $eventName
+     * @param Closure|null $callback
+     * @throws Exception
+     */
+    public function notify(object $event = null, ?string $eventName = null, Closure $callback = null)
+    {
+        if (!$callback instanceof Closure) {
+            throw new Exception(sprintf('%s is not an instance of Closure', $callback));
+        }
+        $controller = $event->getObject();
+        if ($controller->eventDispatcher->hasListeners($eventName) === true) {
+            $data = $callback($event, $this);
+            if (is_array($data) && count($data) > 0) {
+                $notify = (new NotificationModel())->getRepo();
+                $notify->getEm()
+                    ->getCrud()
+                    ->create($data);
+            }
+        }
+    }
+
+    /**
+     * @param array $context
+     * @param string|null $method
+     * @param object|null $object
+     * @return array|false
+     */
+    public function resolveContextForDescription(object $event = null, ?array $context = null, string $method = null, object|array $author = null)
+    {
+        if ($method) {
+            $firstPiece = explode('\\', $method);
+            if (isset($firstPiece[2])) {
+                $secondPiece = explode('::', $firstPiece[2]);
+                if (isset($secondPiece[0]) && isset($secondPiece[1])) {
+                    $controller = $secondPiece[0];
+                    $controllerMethod = $secondPiece[1];
+                    $desc = sprintf(
+                        'A request was made from %s on the %s method %sby %s @ %s. %sThe request was successful.' . PHP_EOL . '%s',
+                        $controller,
+                        $controllerMethod,
+                        PHP_EOL,
+                        $author->firstname . ' ' . $author->lastname,
+                        date('Y-m-d : H:i:s'),
+                        PHP_EOL,
+                        json_encode($context)
+                    );
+
+                    return [
+                        $desc,
+                        'Route request made on ' . $controllerMethod
+                    ];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function unsetter(array $array = [], array $optionalData = []): array
+    {
+        return array_map(function($key) use ($optionalData) {
+            unset($optionalData[$key]);
+        }, $array);
+
+    }
 }
+
+
