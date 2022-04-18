@@ -66,7 +66,7 @@ class RegistrationForm extends ClientFormBuilder implements ClientFormBuilderInt
             ->add(
                 $this->blueprint->submit(
                     'register-registration',
-                    ['uk-button', 'uk-button-primary'],
+                    ['uk-button', 'uk-button-secondary'],
                     'Register new account'
                 ),
                 null,

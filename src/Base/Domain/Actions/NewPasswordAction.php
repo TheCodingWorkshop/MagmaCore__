@@ -70,7 +70,7 @@ class NewPasswordAction implements DomainActionLogicInterface
                     );
                 } else {
                     if ($controller->error) {
-                        $controller->error->addError([Error::display('err_invalid_user')], $controller)->dispatchError($controller->onSelf());
+                        $controller->error->addError(Error::display('err_invalid_user'), $controller)->dispatchError($controller->onSelf());
                     }
                 }
             }

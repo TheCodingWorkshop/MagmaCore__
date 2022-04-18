@@ -132,6 +132,9 @@ class UserValidate extends AbstractDataRepositoryValidation
      */
     public function getErrors(): array
     {
+        /**
+         * Errors are now being handles through the validationRule class
+         */
         return [];
     }
 
@@ -171,10 +174,13 @@ class UserValidate extends AbstractDataRepositoryValidation
                         'email' => $rules->addRule("required|email"),
                         'firstname', 'lastname' => $rules->addRule("required"),
                         'status' => $rules->addRule('string'),
-                        default => NULL
+                        default => $rule->addRule('catchAll')
                     };
                 }
             }
         );
+
     }
+
+
 }

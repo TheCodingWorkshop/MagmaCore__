@@ -64,7 +64,7 @@ class Error implements ErrorInterface
             $this->hasError = true; /* If array contains at least 1 element then we have an error */
             foreach ($this->errors as $error) {
                 //$keys = array_keys((array)$error);
-                $this->object->flashMessage($error, $this->object->flashWarning());
+                $this->object->flashMessage(array_values($error)[0], $this->object->flashWarning());
                 $this->object->redirect($redirectPath !==null ? $redirectPath : $this->object->onSelf());
             }
         }

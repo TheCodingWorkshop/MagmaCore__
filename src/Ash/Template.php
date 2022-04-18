@@ -12,8 +12,6 @@ declare (strict_types = 1);
 
 namespace MagmaCore\Ash;
 
-use JetBrains\PhpStorm\Pure;
-
 class Template extends AbstractTemplate
 {
 
@@ -25,7 +23,7 @@ class Template extends AbstractTemplate
      *
      * @param TemplateEnvironment $templateEnvironment
      */
-    #[Pure] public function __construct(TemplateEnvironment $templateEnvironment)
+    public function __construct(TemplateEnvironment $templateEnvironment)
     {
         $this->templateEnvironment = $templateEnvironment;
         parent::__construct($templateEnvironment);

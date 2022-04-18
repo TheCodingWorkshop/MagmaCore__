@@ -50,7 +50,7 @@ class Yaml
         }
     }
 
-    public function _getYaml(string $ymlFile)
+    public function getYaml(string $ymlFile)
     {
         if (defined('CORE_CONFIG_PATH')) {
             $coreConfig = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
@@ -71,39 +71,6 @@ class Yaml
         }
     }
 
-    /**
-     * Load a yaml configuration from either the core config directory or the application
-     * config directory
-     *
-     * @param string $yamlFile
-     * @return void
-     * @throws ParseException|Exception
-     */
-    public function getYaml(string $yamlFile)
-    {
-        return $this->_getYaml($yamlFile);
-        // die;
-        // if (defined('CONFIG_PATH') && defined('CORE_CONFIG_PATH')) {
-        //     $coreConfigDir = glob(CORE_CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
-        //     $appConfigDir = glob(CONFIG_PATH . DIRECTORY_SEPARATOR . '*.yml');
-        //     /* Prevent name collision by throwing an exception */
-        //     $this->throwExceptionIfNameCollision($appConfigDir);
-
-        //     try {
-        //         $mergeDir = array_merge($coreConfigDir, $appConfigDir);
-        //         foreach ($mergeDir as $file) {
-        //             $this->isFileExists($file);
-        //             $parts = parse_url($file);
-        //             $path = $parts['path'];
-        //             if (str_contains($path, $yamlFile)) {
-        //                 return SymfonyYaml::parseFile($file);
-        //             }
-        //         }
-        //     } catch(\Throwable $throw) {
-        //     }
-
-        // }
-    }
 
     /**
      * Prevent name collision if a user create an application config file which is already

@@ -88,7 +88,7 @@ trait DataSchemaTypesTrait
         return (isset($length) && $length !== 0) ? "({$length})" : '';
     }
 
-    public function _extra()
+    public function _extra(): mixed
     {
         extract($this->getRow());
         return (isset($auto_increment) && $auto_increment === true) ? ' AUTO_INCREMENT' : '';
@@ -112,7 +112,7 @@ trait DataSchemaTypesTrait
         return (isset($options) && count($options) > 0) ? ' enum(' . implode(', ', $options) . ')' : [];
     }
 
-    public function _default(): string
+    public function _default()
     {
         extract($this->getRow());
         if (isset($default)) {

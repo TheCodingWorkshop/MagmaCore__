@@ -61,7 +61,7 @@ class ResetForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->add(
                 $this->blueprint->submit(
                     'reset-password',
-                    ['uk-button', 'uk-button-primary'],
+                    ['uk-button', 'uk-button-secondary'],
                     'Reset Password'
                 ),
                 null,

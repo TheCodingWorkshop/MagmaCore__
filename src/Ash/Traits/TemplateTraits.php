@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagmaCore\Ash\Traits;
 
 use Exception;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Widget\WidgetFactory;
 use MagmaCore\Ash\Exception\FileNotFoundException;
@@ -24,6 +25,23 @@ trait TemplateTraits
 {
 
     use ControllerSessionTrait;
+
+    /**
+     * Merge extended assests with core assets. for a simplify output
+     * @param string|null $type
+     * @return array
+     * @throws Exception
+     * @throws BaseInvalidArgumentException
+     */
+    private function getExtendedAssets(?string $type = null): array
+    {
+        $extendedAssets = Yaml::file('extend_assets');
+        if (!is_array($extendedAssets) && count($extendedAssets) > 0) {
+            throw new BaseInvalidArgumentException('Please add reference to your extend_assets.yml file. This is currently empty or invalid format.');
+        }
+
+        return $extendedAssets[$type] ?? [];
+    }
 
     /**
      * Add one or more js file. Can be used within the layout.html template to add template
@@ -39,7 +57,7 @@ trait TemplateTraits
     public function addjs(mixed $js = null, string $location = 'footer'): void
     {
         $this->js = $js;
-        $jsYmls = Yaml::file('assets')['scripts'];
+        $jsYmls = array_merge(Yaml::file('assets')['scripts'], $this->getExtendedAssets('scripts'));
         $allJs = array_merge($jsYmls, $this->js ?? []);
         if (is_array($allJs) && count($allJs) > 0) {
             foreach ($allJs as $file) {
@@ -72,7 +90,7 @@ trait TemplateTraits
     public function addcss(mixed $css = null): void
     {
         $this->css = $css;
-        $cssYmls = Yaml::file('assets')['stylesheets'];
+        $cssYmls = array_merge(Yaml::file('assets')['stylesheets'], $this->getExtendedAssets('stylesheets'));
         $allCss = array_merge($cssYmls, $this->css ?? []);
         if (is_array($allCss) && count($allCss) > 0) {
 

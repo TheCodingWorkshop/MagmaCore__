@@ -182,9 +182,9 @@ class DashboardRepository
     public function mainCards(): array
     {
         return [
-            'Registered' => [
+            'Registration' => [
                 'icon' => 'users',
-                'path' => '/admin/team/index',
+                'path' => '/admin/user/team',
                 'desc' => [
                     '15+ new user account registered over the pass 28 days.',
                 ]

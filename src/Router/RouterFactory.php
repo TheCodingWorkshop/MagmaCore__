@@ -58,8 +58,6 @@ class RouterFactory
     }
 
     /**
-     * Undocumented function
-     *
      * @param array $definedRoutes
      * @return void
      */

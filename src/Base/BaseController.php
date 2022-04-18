@@ -88,6 +88,7 @@ class BaseController extends AbstractBaseController
         }
         $this->pingMethods();
         $this->showDiscoveries();
+        $this->recordHistory();
     }
 
     /**
@@ -292,6 +293,12 @@ class BaseController extends AbstractBaseController
 //        $themeBuilder = GlobalManager::get('themeBuilder_global');
 //        return $themeBuilder;
 //    }
+
+    public function recordHistory(): void
+    {
+        $session = $this->getSession();
+        $session->setArray('sesson_history_trace', ['history_path' => $_SERVER['HTTP_REFERER'], 'history_user' => $session->get('user_id'), 'history_browser_agent' => $_SERVER['HTTP_USER_AGENT'], 'history_timestamp' => date('h:i:s')]);
+    }
 
 
 

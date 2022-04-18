@@ -16,8 +16,6 @@ use MagmaCore\Widget\Widget;
 use MagmaCore\Widget\Widgets\BaseWidget;
 use MagmaCore\Widget\Widgets\WidgetBuilderInterface;
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
-use MagmaCore\Numbers\Number;
-use MagmaCore\Utility\Utilities;
 
 class NotificationWidget extends Widget implements WidgetBuilderInterface
 {
@@ -38,15 +36,15 @@ class NotificationWidget extends Widget implements WidgetBuilderInterface
         if ($widgetName === self::WIDGET_NAME) {
             $widgetID = (isset($widgetData) && is_array($widgetData) && array_key_exists('id', $widgetData)) ? $widgetData['id'] : '';
             return $baseWidget::offCanvas(
-                function($base) use ($clientRepo, $widgetID) {
-                    return sprintf('%s', self::notifier($clientRepo));
+                function($base) use ($clientRepo, $widgetID, $widgetData) {
+                    return sprintf('%s', self::notifier($clientRepo, $widgetData));
                 },
                 $widgetID
             );
         }
     }
 
-    private static function notifier(object $clientRepo = null)
+    private static function notifier(object $clientRepo = null, mixed $widgetData)
     {
         return sprintf('
           <div>
@@ -67,20 +65,20 @@ class NotificationWidget extends Widget implements WidgetBuilderInterface
             %s
             </div>
             %s
-        </div>
-
-    ',
+        </div>',
             IconLibrary::getIcon('bell', 3.5),
-            self::resolveNotifierLists($clientRepo),
+            self::resolveNotifierLists($clientRepo, $widgetData),
             self::panelAction($clientRepo)
         );
 
 
     }
 
-    private static function resolveNotifierLists(object $clientRepo = null)
+    private static function resolveNotifierLists(object $clientRepo = null, mixed $widgetData)
     {
-        $notifier = $clientRepo->getClientCrud()->read(['notify_title', 'notify_description', 'id'], ['notify_status' => 'unread']);
+        $limit = (isset($widgetData) && is_array($widgetData) && array_key_exists('limit', $widgetData)) ? $widgetData['limit'] : '';
+        $orderby = (isset($widgetData) && is_array($widgetData) && array_key_exists('orderby', $widgetData)) ? $widgetData['orderby'] : '';
+        $notifier = $clientRepo->getClientCrud()->read(['notify_title', 'notify_description', 'id'], ['notify_status' => 'unread'], ['limit' => $limit, 'offset' => 0], ['orderby' => $orderby]);
         $html = '';
         $html .= '<ul uk-tab>';
             $html .= '<li><a href="#">Recent</a></li>';
@@ -97,7 +95,7 @@ class NotificationWidget extends Widget implements WidgetBuilderInterface
                             $num++;
                             $html .= '<li><a class="uk-link-reset" href="/admin/notification/' . $value['id'] . '/show">' . $value['notify_description'] . ' @ ' . $value['created_at'] . '</a></li>';
                             $count++;
-                            if ($count === 5) {
+                            if ($count === 3) {
                                 break;
                             }
                         }

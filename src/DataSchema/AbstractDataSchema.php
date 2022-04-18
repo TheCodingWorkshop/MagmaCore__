@@ -39,9 +39,9 @@ abstract class AbstractDataSchema implements DataSchemaInterface
      * Throw an exception of the key is empty
      *
      * @param mixed $key
-     * @return boolean
+     * @return void
      */
-    protected function isEmptyThrowException(mixed $key): bool
+    protected function isEmptyThrowException(mixed $key): void
     {
         if (empty($key)) {
             throw new DataSchemaInvalidArgumentException('Invalid or empty schema. Ensure the schema is not empty and is valid.');

@@ -38,13 +38,20 @@ class BaseWidget
         return $html;
     }
 
+    /**
+     * off-canvas slide out panel
+     *
+     * @param Closure|null $callback
+     * @param string|null $trigger
+     * @return string
+     */
     public static function offCanvas(Closure $callback = null, ?string $trigger): string
     {
         if (!$callback instanceof Closure) {
             throw new WidgetException(sprintf('%s is not a Closure', $callback));
         }
         $html = '<div id="' . $trigger . '" uk-offcanvas="flip: true; overlay: true">';
-            $html .= '<div class="uk-offcanvas-bar">';
+            $html .= '<div class="uk-offcanvas-bar uk-background-secondary">';
                 $html .= '<button class="uk-offcanvas-close" type="button" uk-close></button>';
                 $html .= $callback(new self);
             $html .= '</div>';

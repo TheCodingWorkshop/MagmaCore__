@@ -51,7 +51,7 @@ class UserPrivilegeForm extends ClientFormBuilder implements ClientFormBuilderIn
             ->add(
                 $this->blueprint->submit(
                    'privilege-user',
-                    ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
+                    ['uk-button', 'uk-button-secondary', 'uk-form-width-medium'],
                     'Save'
                 ),
                 null,

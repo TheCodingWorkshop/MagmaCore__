@@ -30,7 +30,8 @@ class ValidationRule implements ValidationRuleInterface
         'required',
         'unique',
         'equal',
-        'email'
+        'email',
+        'catchAll'
     ];
     private ValidationRuleMethods $validationRuleFuncs;
     private mixed $rule;

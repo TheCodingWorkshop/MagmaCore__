@@ -22,3 +22,4 @@ err_invalid_string: Your value needs to be a string.
 err_invalid_int: Your value needs to be an integer.
 err_invalid_numeric: Your value needs to be an numeric value.
 err_password_force: You've entered your password incorrectly too many times. Please wait 30 seconds
+catch_error: Undefined error occured!

@@ -36,16 +36,15 @@ class ListsWidget extends Widget implements WidgetBuilderInterface
         if ($widgetName === self::WIDGET_NAME) {
             return $baseWidget::card(function($base) use ($widgetData) {
 
+                $output = '';
                 if (is_array($widgetData) && count($widgetData) > 0) {
                     foreach ($widgetData as $key => $value) {
-                        return sprintf(
+                        $output .= sprintf(
                             '   
                             <div class="uk-card-header">
                                 <div class="uk-grid-small uk-flex-middle" uk-grid>
                                     <div class="uk-width-auto">
-                                        <a data-turbo="false" href="%s" class="uk-link-reset">
-                                        %s
-                                        </a>
+                                        <a href="%s" class="uk-link-reset">%s</a>
                                     </div>
                                     <div class="uk-width-expand">
                                         <h3 class="uk-card-title uk-text-bolder uk-margin-remove-bottom">%s</h3>
@@ -63,6 +62,8 @@ class ListsWidget extends Widget implements WidgetBuilderInterface
                         );
         
                     }
+
+                    return $output;
                 }
             },
             ''

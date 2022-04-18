@@ -96,7 +96,7 @@ trait ControllerTrait
             if (is_array($services) && count($services) > 0) {
                 foreach ($services as $serviceParams) {
                     foreach ($serviceParams as $key => $params) {
-                        $extendedParams = array_merge($params, $extendedEventsParams ?? []);
+                        $extendedParams = array_merge($extendedEventsParams ?? [], $params);
                         if (isset($key) && is_string($key) && $key !== '') {
                             switch ($key) {
                                 case 'listeners':

@@ -18,6 +18,7 @@ use MagmaCore\Base\BaseConstants;
 use MagmaCore\Session\SessionConfig;
 use MagmaCore\Base\AbstractBaseBootLoader;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Utility\Yaml;
 
 class BaseApplication extends AbstractBaseBootLoader
 {
@@ -369,7 +370,9 @@ class BaseApplication extends AbstractBaseBootLoader
      */
     public function setRoutes(array $ymlRoutes, string|null $routeHandler = null, string|null $newRouter = null): self
     {
-        $this->routes = $ymlRoutes;
+        // if the extended routes isn't empty then merge it with the core routes. Note any dupliate will get remove
+        $extendedRoutes = Yaml::file('extend_routes');
+        $this->routes = ($extendedRoutes !==null) ? array_merge($ymlRoutes, $extendedRoutes) : $ymlRoutes;
         $this->routeHandler = ($routeHandler !== null) ? $routeHandler : $this->defaultRouteHandler();
         $this->newRouter = ($newRouter !== null) ? $newRouter : '';
         return $this;

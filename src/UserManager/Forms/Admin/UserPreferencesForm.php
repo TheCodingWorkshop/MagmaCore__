@@ -97,7 +97,7 @@ class UserPreferencesForm extends ClientFormBuilder implements ClientFormBuilder
             ->add(
                 $this->blueprint->submit(
                     $this->hasValue('id') ? 'preferences-user' : 'preferences-user',
-                    ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
+                    ['uk-button', 'uk-button-secondary', 'uk-form-width-medium'],
                     'Update'
                 ),
                 null,

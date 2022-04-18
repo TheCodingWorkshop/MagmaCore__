@@ -32,6 +32,10 @@ stylesheets:
     href: "/public/assets/css/uikit/custom.css"
     enable: true
     cdn: false
+  sidebar:
+    href: "/public/assets/css/uikit/sidebar.css"
+    enable: false
+    cdn: false
 
 
 scripts:

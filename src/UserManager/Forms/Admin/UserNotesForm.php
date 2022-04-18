@@ -70,7 +70,7 @@ class UserNotesForm extends ClientFormBuilder implements ClientFormBuilderInterf
             ->add(
                 $this->blueprint->submit(
                     $this->hasValue('id') ? 'notes-user' : 'notes-user',
-                    ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
+                    ['uk-button', 'uk-button-secondary', 'uk-form-width-medium'],
                     'Add Note'
                 ),
                 null,

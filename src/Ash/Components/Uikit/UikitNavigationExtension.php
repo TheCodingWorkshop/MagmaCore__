@@ -60,21 +60,12 @@ class UikitNavigationExtension
         $element = $active = '';
         if (isset($controller)) {
 
-            $query = 'SELECT * FROM menus ORDER BY menu_order DESC';
+            $query = 'SELECT * FROM menus WHERE parent_menu = 1 AND deleted_at != 1  ORDER BY menu_order DESC';
 
             $data = $this->repo->getClientCrud()->rawQuery($query, [], 'fetch_all');
             if (is_array($data) && count($data) > 0) {
-                $element = '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background">';
-                $element .= '<li class="uk-nav-header">
-                <span>Manage</span>
-                <ul class="uk-iconnav uk-margin">
-                    <li><a href="#" uk-icon="icon: plus"></a></li>
-                    <li><a href="#" uk-icon="icon: file-edit"></a></li>
-                    <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
-                    <li><a uk-toggle="target: #notification-panel" uk-tooltip="Notifications"><span uk-icon="icon: bell"></span> ' . $this->hasNotification($controller) . '</a></li>
-                </ul>
-                </li>';
-                $element .= '<hr>';
+                $element .= '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background">';
+                $element .= $this->topNav($controller);
                 foreach ($data as $key => $item) {
                     
                     if ($controller->thisRouteController() === $item['menu_name']) {
@@ -107,6 +98,7 @@ class UikitNavigationExtension
                 }
 
                 $element .= '</ul>';
+                $element .= $this->bottomNav($controller);
                 $element .= PHP_EOL;
             }
         }
@@ -155,6 +147,51 @@ class UikitNavigationExtension
     {
         $notify = new NotificationModel();
         $count = $notify->getRepo()->count(['notify_status' => 'unread']);
-        return ($count !==0) ? '<sup class="uk-badge">' . $count . '</sup>' : null;
+        return ($count !==0) ? '<sup class="uk-badge badge-secondary">' . $count . '</sup>' : null;
+    }
+
+    private function topNav(object $controller): string
+    {
+        $element = '';
+        $element .= ' <h5>Actions</h5>';
+        $element .= '<li class="uk-nav-header">
+        <ul class="uk-iconnav uk-margin-right-small">
+            <li><a href="/admin/ticket/index" uk-icon="icon: tag" uk-tooltip="Tickets"></a></li>
+            <li><a href="/admin/history/index" uk-icon="icon: history" uk-tooltip="Your History"></a></li>
+            <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
+            <li><a uk-toggle="target: #notification-panel" uk-tooltip="Notifications"><span uk-icon="icon: bell"></span> ' . $this->hasNotification($controller) . '</a></li>
+        </ul>
+        </li>';
+        $element .= '<progress class="uk-progress secondary" value="100" max="100"></progress>';
+
+        return $element;
+
+    }
+
+    private function bottomNav(object $controller = null)
+    {
+        $element = '';
+        $element .= '
+        <div class="left-content-box uk-margin-top">
+            
+                <h5>Daily Reports</h5>
+                <div>
+                    <span class="uk-text-small">Traffic <small>(+50)</small></span>
+                    <progress class="uk-progress" value="50" max="100"></progress>
+                </div>
+                <div>
+                    <span class="uk-text-small">Income <small>(+78)</small></span>
+                    <progress class="uk-progress success" value="78" max="100"></progress>
+                </div>
+                <div>
+                    <span class="uk-text-small">Feedback <small>(-12)</small></span>
+                    <progress class="uk-progress warning" value="12" max="100"></progress>
+                </div>
+            
+        </div>
+        ';
+
+        return $element;
+
     }
 }

@@ -73,7 +73,7 @@ class LoginForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->add(
                 $this->blueprint->submit(
                     'index-security',
-                    ['uk-button', 'uk-button-primary'],
+                    ['uk-button', 'uk-button-secondary'],
                     'Login'
                 ),
                 null,

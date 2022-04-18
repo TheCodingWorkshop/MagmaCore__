@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
-use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Base\Domain\DomainActionLogicInterface;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -22,7 +22,7 @@ use MagmaCore\Base\Domain\DomainTraits;
  * event dispatching which provide usable data for event listeners to perform other
  * necessary tasks and message flashing
  */
-class BulkUpdateAction implements DomainActionLogicInterface
+class HistoryAction implements DomainActionLogicInterface
 {
 
     use DomainTraits;
@@ -37,7 +37,7 @@ class BulkUpdateAction implements DomainActionLogicInterface
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @return BulkDeleteAction
+     * @return ActivateAction
      */
     public function execute(
         object $controller,
@@ -53,31 +53,20 @@ class BulkUpdateAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        $formBuilder = $controller->formBuilder;
 
-        if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
+        $session = $controller->getSession();
+        if ($session->has('sesson_history_trace')) {
+            $this->sessionHistoryTrace = $session->get('sesson_history_trace');
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    ['action' => true],
+                    $additionalContext
+                );
 
-            $formData = $this->isAjaxOrNormal();
+        }
 
-            if ($this->isArrayGood($formData)) {
-                $schemaID = $controller->repository->getSchemaID();
-                $action = array_map(fn($id) => $controller?->repository
-                ->getRepo()
-                ->getEm()
-                ->getCrud()
-                ->update(array_merge([$schemaID => $id], $optional), $schemaID), isset($formData[$schemaID]) ? $formData[$schemaID] : []);
-                if ($action) {
-                    $this->dispatchSingleActionEvent(
-                        $controller,
-                        $eventDispatcher,
-                        $method,
-                        ['action' => $action],
-                        $additionalContext
-                    );
-                }
-
-            }
-        endif;
         return $this;
     }
 }

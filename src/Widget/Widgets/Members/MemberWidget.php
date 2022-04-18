@@ -68,7 +68,7 @@ class MemberWidget extends Widget implements WidgetBuilderInterface
                     self::resolver($clientRepo)
                 );
             },
-            'primary'
+            'secondary'
             );
         }        
     }

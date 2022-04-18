@@ -45,12 +45,12 @@ trait MigrationTrait
             $pattern = array_merge($commonPattern, ['{{ extendClass }}', '{{ change }}']);
             $replacement = array_merge($commonReplacement, [$parentClass, $schemaContent]);
             $content = str_replace($pattern, $replacement, $content);
-        file_put_contents(
-            $this->rootPath . $this->migrationFiles . $hashClassName . '.php',
-            trim($content),
-            LOCK_EX
-        );
-    }
+            file_put_contents(
+                $this->rootPath . $this->migrationFiles . $hashClassName . '.php',
+                trim($content),
+                LOCK_EX
+            );
+        }
 
     }
 
@@ -110,7 +110,7 @@ trait MigrationTrait
      * @param string $dir
      * @return array
      */
-    public function scan(string $dir): array
+    public function scan(string $dir)
     {
         return scandir(ROOT_PATH . '/' . $dir);
     }

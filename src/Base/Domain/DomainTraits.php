@@ -302,6 +302,12 @@ trait DomainTraits
 
     }
 
+    public function list(mixed $listData = null): self
+    {
+        $this->superContext = array_merge($this->context, ['list_data' => !is_null($listData) ? $listData : $this->sessionHistoryTrace]);
+        return $this;
+    }
+
     /**
      * @param Closure|null $callback
      * @return $this

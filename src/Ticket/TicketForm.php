@@ -115,7 +115,7 @@ class TicketForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->add(
                 $this->blueprint->submit(
                     $this->hasValue('id') ? 'edit-ticket' : 'new-ticket',
-                    ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
+                    ['uk-button', 'uk-button-secondary', 'uk-form-width-medium'],
                     'Update'
                 ),
                 null,

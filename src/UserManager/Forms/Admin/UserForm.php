@@ -133,7 +133,7 @@ class UserForm extends ClientFormBuilder implements ClientFormBuilderInterface
 //            )
             ->add($this->blueprint->submit(
                 $this->hasValue('id') ? 'edit-user' : 'new-user',
-                ['uk-button', 'uk-button-primary', 'uk-form-width-medium'],
+                ['uk-button', 'uk-button-secondary', 'uk-form-width-medium'],
                 'Save & Continue'
             ),
 

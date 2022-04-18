@@ -53,7 +53,7 @@ class LogoutForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->add(
                 $this->blueprint->submit(
                     'logout-logout',
-                    ['uk-button', 'uk-button-primary'],
+                    ['uk-button', 'uk-button-secondary'],
                     'Logout'
                 ),
                 null,

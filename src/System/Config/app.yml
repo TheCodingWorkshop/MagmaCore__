@@ -10,6 +10,18 @@ app:
   app_email: magmacore@lavastudio.co.uk
   app_author: Ricardo Miller
 
+# TEMPLATE CONFIGURATIONS
+#=============================================================================
+#=============================================================================
+template:
+  template_ext:
+    - .html
+  autoescaping: false
+  cache_reset: 1800
+  template_cache:
+    enable: false
+    path: cache/
+
 # GENERAL SETTINGS CONFIGURATIONS
 #=============================================================================
 #=============================================================================

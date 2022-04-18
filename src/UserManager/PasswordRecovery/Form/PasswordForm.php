@@ -55,7 +55,7 @@ class PasswordForm extends ClientFormBuilder implements ClientFormBuilderInterfa
             ->add(
                 $this->blueprint->submit(
                     'forgot-password',
-                    ['uk-button', 'uk-button-primary'],
+                    ['uk-button', 'uk-button-secondary'],
                     'Send Password Reset Email'
                 ),
                 null,

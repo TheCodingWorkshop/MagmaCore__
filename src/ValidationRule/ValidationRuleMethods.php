@@ -12,19 +12,12 @@ declare(strict_types=1);
 
 namespace MagmaCore\ValidationRule;
 
+/**
+ * Handles all erorrs coming through the core validation classes ie UserValidate, PostValidate etc..
+ */
 class ValidationRuleMethods
 {
-
-    protected array $errors = [];
-    /**
-     * Main constructor class
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
+    
     /**
      * Dispatch the validation error
      *
@@ -38,15 +31,15 @@ class ValidationRuleMethods
         $controller->flashMessage($msg, $controller->flashWarning());
         $controller->redirect($controller->onSelf());
 
-        // if (isset($controller->error)) {
-        //     $controller
-        //         ->error
-        //         ->addError($this->errors, $controller)
-        //         ->dispatchError(
-        //             ($validationClass->validationRedirect() !== '') ? $validationClass->validationRedirect() :
-        //                 $controller->onSelf()
-        //         );
-
-        // }
+//         if (isset($controller->error)) {
+//             $controller
+//                 ->error
+//                 ->addError(array_values($this->errors)[0], $controller)
+//                 ->dispatchError(
+//                     ($validationClass->validationRedirect() !== '') ? $validationClass->validationRedirect() :
+//                         $controller->onSelf()
+//                 );
+//
+//         }
     }
 }

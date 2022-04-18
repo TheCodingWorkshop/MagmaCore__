@@ -24,6 +24,7 @@ trait EventDispatcherTrait
 {
 
     use DataLayerTrait;
+    use EventDispatcherExtendedTrait;
 
     /**
      * Helper method which allows filtering of the various routes. This enables us to
@@ -97,6 +98,7 @@ trait EventDispatcherTrait
             }
         }
     }
+
 
     /**
      * @param $event

@@ -137,14 +137,14 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 [
                     'table_tabs' => [
                         'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
-                        
-                        'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount, 
+
+                        'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount,
                         'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
-                        
+
                         'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
-                        
+
                         'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
-                        
+
                         'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
 
                     ],
@@ -194,7 +194,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     {
         $this->showAction
             ->setAccess($this, Access::CAN_SHOW)
-            ->execute($this, NULL, NULL, NULL, __METHOD__)
+            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
             ->render()
             ->with(
                 [
@@ -537,7 +537,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     protected function settingsAction()
-    {        
+    {
         $this->sessionUpdateAction
             ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
             ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
