@@ -232,8 +232,10 @@ class DashboardRepository
             'members' => ['icon' => 'user', 'include' => 'block_links'],
             'ticket' => ['icon' => 'tag', 'include' => 'block_ticket'],
             'session' => ['icon' => 'history', 'include' => 'block_statistics'],
-            'health' => ['icon' => 'lifesaver', 'include' => 'block_health_status'],
+            'comments' => ['icon' => 'comments', 'include' => 'block_threaded_comments'],
             'project' => ['icon' => 'git-branch', 'include' => 'block_project'],
+            'lifesaver' => ['icon' => 'lifesaver', 'include' => 'block_health_status'],
+
         ];
     }
 

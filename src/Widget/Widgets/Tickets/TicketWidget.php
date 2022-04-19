@@ -74,7 +74,7 @@ class TicketWidget extends Widget implements WidgetBuilderInterface
                     self::resolveTickets($clientRepo)
                 );
             },
-            ' uk-background-muted'
+            'secondary'
             );
         }        
     }

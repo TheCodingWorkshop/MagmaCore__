@@ -114,7 +114,6 @@ scripts:
     enable: true
     cdn: false
   uikit_icons:
-    #src: "https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit-icons.min.js"
     src: "https://cdn.jsdelivr.net/npm/uikit@3.10.1/dist/js/uikit-icons.min.js"
     integrity: ""
     crossorigin: ""
@@ -123,20 +122,20 @@ scripts:
     enable: true
     cdn: true
   ionicons:
-    src: "https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"
+    src: "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
     integrity: ""
     crossorigin: ""
-    type: javascript
+    type: module
     location: header
-    enable: false
+    enable: true
     cdn: true
   ionicon:
-    src: "https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"
+    src: "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
     integrity: ""
     crossorigin: ""
-    type: javascript
+    type: nomodule
     location: header
-    enable: false
+    enable: true
     cdn: true
   fontawesome:
     src: "https://kit.fontawesome.com/b60c3fbedf.js"

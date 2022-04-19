@@ -16,6 +16,7 @@ use MagmaCore\Widget\Exception\WidgetException;
 use MagmaCore\Widget\Widgets\Notifications\NotificationWidget;
 use MagmaCore\Widget\Widgets\Tickets\TicketWidget;
 use MagmaCore\Widget\Widgets\Cards\ActiveNowWidget;
+use MagmaCore\Widget\Widgets\Cards\ContentWidget;
 use MagmaCore\Widget\Widgets\Cards\BounceRateWidget;
 use MagmaCore\Widget\Widgets\Cards\TotalVisitWidget;
 use MagmaCore\Widget\Widgets\ListsWidget\ListsWidget;
@@ -37,6 +38,7 @@ class Widget extends AbstractWidget
         ActiveNowWidget::WIDGET_NAME => ['class' => ActiveNowWidget::class],
         BounceRateWidget::WIDGET_NAME => ['class' => BounceRateWidget::class],
         TotalVisitWidget::WIDGET_NAME => ['class' => TotalVisitWidget::class],
+        ContentWidget::WIDGET_NAME => ['class' => ContentWidget::class],
         BackupStatusWidget::WIDGET_NAME => ['class' => BackupStatusWidget::class],
         SystemLoggerWidget::WIDGET_NAME => ['class' => SystemLoggerWidget::class],
         WebsiteTrafficWidget::WIDGET_NAME => ['class' => WebsiteTrafficWidget::class],

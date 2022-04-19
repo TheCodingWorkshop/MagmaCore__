@@ -14,10 +14,6 @@ namespace MagmaCore\Ticket;
 
 use MagmaCore\Collection\Collection;
 use MagmaCore\DataObjectLayer\DataRepository\AbstractDataRepositoryValidation;
-use MagmaCore\Utility\ClientIP;
-use MagmaCore\Utility\GravatarGenerator;
-use MagmaCore\Utility\HashGenerator;
-use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\ValidationRule\ValidationRule;
 use Exception;

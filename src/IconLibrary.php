@@ -26,7 +26,7 @@ class IconLibrary
     {
         return match($type) {
             'uikit' => sprintf('<span uk-icon="%s%s"></span>', (isset($iconName) ? 'icon: ' . $iconName: ''), (isset($iconSize) ? ' ;ratio: ' . $iconSize : '')),
-            'ion' => sprintf('<ion-icon name="%s" class="%s"></ion-icon>', (isset($iconName) ?'icon: ' . $iconName : ''), (isset($iconSize) ?: ' ;ratio: ' . $iconSize)),
+            'ion' => sprintf('<ion-icon name="%s" class="%s"></ion-icon>', (isset($iconName) ? $iconName : ''), (isset($iconSize) ? 'ion-' . $iconSize : 'ion-18')),
             'fontawesome' => '',
             default => ''
         };
