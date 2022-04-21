@@ -159,7 +159,7 @@ class UikitNavigationExtension
             <li><a href="/admin/ticket/index" uk-icon="icon: tag" uk-tooltip="Tickets"></a></li>
             <li><a href="/admin/history/index" uk-icon="icon: history" uk-tooltip="Your History"></a></li>
             <li><a uk-tooltip="Discover" href="/admin/discovery/discover" uk-icon="icon: location"></a></li>
-            <li><a uk-toggle="target: #notification-panel" uk-tooltip="Notifications"><span uk-icon="icon: bell"></span> ' . $this->hasNotification($controller) . '</a></li>
+            <li><a uk-toggle="target: #notification-panel" uk-tooltip="Notifications"><span uk-icon="icon: bell"></span> <sup>' . $this->hasNotification($controller) . '</a></sup></li>
         </ul>
         </li>';
         $element .= '<progress class="uk-progress secondary" value="100" max="100"></progress>';

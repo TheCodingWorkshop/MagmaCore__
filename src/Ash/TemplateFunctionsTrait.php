@@ -397,5 +397,17 @@ trait TemplateFunctionsTrait
         return $html;
     }
 
+    /**
+     * Return the breadcrumbs trail
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function getBreadcrumbs(string $separator = ' &raquo; ', string $home = 'Home'): string
+    {
+        $breadcrumbs = new \MagmaCore\Utility\Breadcrumbs;
+        return $breadcrumbs->breadcrumbs($separator, $home);
+    }
+
 
 }

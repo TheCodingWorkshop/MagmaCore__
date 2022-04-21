@@ -40,6 +40,7 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
+use MagmaCore\Utility\Breadcrumbs;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -86,8 +87,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userRelationship' => UserRelationship::class,
                 'userNotesForm' => UserNotesForm::class,
                 'userNoteModel' => UserNoteModel::class,
-                'userNoteEntity' => UserNoteEntity::class
-
+                'userNoteEntity' => UserNoteEntity::class,
             ]
         );
 
@@ -112,7 +112,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     public function schemaAsString(): string
     {
         return UserSchema::class;
-    }
+    }    
 
     /**
      * Entry method which is hit on request. This method should be implemented within
@@ -121,7 +121,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function indexAction()
     {
-
         $trashCount = $this->repository->getRepo()->count(['status' => 'trash']);
         $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
         $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);

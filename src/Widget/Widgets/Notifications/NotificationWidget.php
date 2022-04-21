@@ -104,7 +104,34 @@ class NotificationWidget extends Widget implements WidgetBuilderInterface
                     $html .= 'No new notifications';
                 }
             $html .= '</li>';
-            $html .= '<li>Ut enim ad minim veniam, quis nostrud exercitation.</li>';
+            $html .= '<li>
+            <div class="uk-width-1-2@s">
+            <ul class="uk-nav-default uk-nav-divider" uk-nav>
+                <li class="uk-active"><a href="#">Active</a></li>
+                <li><a href="#">Item</a></li>
+                <li><a href="#">Item</a></li>
+            </ul>
+        </div>            
+        <div class="left-content-box uk-margin-top">
+            
+        <h5>Daily Reports</h5>
+        <div>
+            <span class="uk-text-small">Traffic <small>(+50)</small></span>
+            <progress class="uk-progress" value="50" max="100"></progress>
+        </div>
+        <div>
+            <span class="uk-text-small">Income <small>(+78)</small></span>
+            <progress class="uk-progress success" value="78" max="100"></progress>
+        </div>
+        <div>
+            <span class="uk-text-small">Feedback <small>(-12)</small></span>
+            <progress class="uk-progress warning" value="12" max="100"></progress>
+        </div>
+    
+</div>
+
+        
+        </li>';
         $html .= '</ul>';
 
         return $html;

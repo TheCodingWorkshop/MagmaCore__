@@ -28,6 +28,7 @@ class IconLibrary
             'uikit' => sprintf('<span uk-icon="%s%s"></span>', (isset($iconName) ? 'icon: ' . $iconName: ''), (isset($iconSize) ? ' ;ratio: ' . $iconSize : '')),
             'ion' => sprintf('<ion-icon name="%s" class="%s"></ion-icon>', (isset($iconName) ? $iconName : ''), (isset($iconSize) ? 'ion-' . $iconSize : 'ion-18')),
             'fontawesome' => '',
+            'img' => '<span><img src="/public/assets/images/' . (isset($iconName) ? $iconName : '') . '" width="' . (isset($iconSize) ? $iconSize : '') . 'px"></span>',
             default => ''
         };
     }

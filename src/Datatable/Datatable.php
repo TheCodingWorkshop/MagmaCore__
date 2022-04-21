@@ -15,8 +15,6 @@ namespace MagmaCore\Datatable;
 use MagmaCore\Ash\Extensions\TemplateExtension;
 use MagmaCore\Base\BaseApplication;
 use MagmaCore\Themes\Exception\ThemeBuilderInvalidArgumentException;
-use MagmaCore\Themes\Uikit\Uikit;
-use MagmaCore\Twig\TwigExtension;
 use MagmaCore\Themes\ThemeBuilder;
 use MagmaCore\Datatable\Exception\DatatableUnexpectedValueException;
 use MagmaCore\IconLibrary;
@@ -197,11 +195,10 @@ class Datatable extends AbstractDatatable
         $element = '';
         if (isset($column['sortable']) && $column['sortable'] != false) {
             $element .= '<a data-turbo="true" class="uk-link-reset" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
-
             $element .= $column['dt_row'];
-            $element .= '<span uk-icon="icon: expand ' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '; ratio: 0.8"></span>';
-
-           // $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
+            //$element .= '<span uk-icon="icon: expand ' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '; ratio: 0.8"></span>';
+            //$element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
+            $element .= IconLibrary::getIcon('sort/sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '.svg', 10, 'img');
 
             $element .= '</a>';
         } else {
