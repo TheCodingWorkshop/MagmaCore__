@@ -504,6 +504,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function notesAction()
     {
         $this->updateOnEvent
+            ->setAccess($this, Access::CAN_NOTE)
             ->exists($this, $this->userNoteModel, 'user_id', self::NO_USER_NOTE, ['user_id'])
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [], $this->userNoteModel)
             ->render()

@@ -18,7 +18,7 @@ class Role
 {
 
     /** @var array  */
-    protected array $permissions;
+    public array $permissions;
     protected array $gRoles;
 
     /**

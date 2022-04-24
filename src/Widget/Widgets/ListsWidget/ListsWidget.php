@@ -48,7 +48,7 @@ class ListsWidget extends Widget implements WidgetBuilderInterface
                                     </div>
                                     <div class="uk-width-expand">
                                         <h3 class="uk-card-title uk-text-bolder uk-margin-remove-bottom">%s</h3>
-                                        <p class="uk-text-meta uk-margin-remove-top">
+                                        <p class="uk-text-meta uk-margin-remove-top uk-text-%s">
                                             %s
                                         </p>
                                     </div>
@@ -58,6 +58,7 @@ class ListsWidget extends Widget implements WidgetBuilderInterface
                             $value['path'],
                             IconLibrary::getIcon($value['icon'], 2.2),
                             $key,
+                            $value['label'] ? $value['label'] : 'secondary',
                             self::resolveDesc($value)
                         );
         

@@ -90,7 +90,7 @@ class BaseWidget
         if (!$callback instanceof Closure) {
             throw new WidgetException(sprintf('%s is not a Closure', $callback));
         }
-        $html = '<div class="uk-grid uk-grid-divider uk-grid-medium uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-margin uk-padding-small" data-uk-grid">';
+        $html = '<div class="uk-grid uk-grid-divider uk-grid-medium uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-margin uk-padding-small" data-uk-grid>';
         $html .= $callback(new self);
         $html .= '</div>';
 

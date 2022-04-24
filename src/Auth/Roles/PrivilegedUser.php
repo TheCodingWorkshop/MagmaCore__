@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace MagmaCore\Auth\Roles;
 
 use MagmaCore\Auth\Authorized;
+use MagmaCore\Session\SessionTrait;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 
 class PrivilegedUser
 {
+    use SessionTrait;
 
     /** @var array  */
     protected array $roles = [];
@@ -140,6 +142,7 @@ class PrivilegedUser
             return $role;
         }
     }
+
 
     // public function getRoleByGroupID(int $groupID)
     // {

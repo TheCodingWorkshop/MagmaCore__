@@ -15,12 +15,14 @@ use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
 use MagmaCore\Base\Traits\BaseAnchorTrait;
+use MagmaCore\Session\SessionTrait;
 
 trait TemplateFunctionsTrait
 {
 
     use BaseAnchorTrait,
-        UtilityTrait;
+        UtilityTrait,
+        SessionTrait;
 
 
     /**
@@ -407,6 +409,13 @@ trait TemplateFunctionsTrait
     {
         $breadcrumbs = new \MagmaCore\Utility\Breadcrumbs;
         return $breadcrumbs->breadcrumbs($separator, $home);
+    }
+
+    public function canAccess($privilegeUser, string $permission = null): bool
+    {
+        $session = self::sessionFromGlobal()->get('current_permission');
+        $permissionArray = array_column((array)$privilegeUser, $privilegeUser->getRole())[0]->permissions;
+        return array_key_exists(($permission !==null ? $permission : $session), $permissionArray) ?? true;
     }
 
 

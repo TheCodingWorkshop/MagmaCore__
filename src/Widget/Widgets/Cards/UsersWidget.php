@@ -24,6 +24,7 @@ class UsersWidget extends Widget implements WidgetBuilderInterface
 
     /* @var string the widget name */
     public const WIDGET_NAME = 'users_widget';
+    private const LABEL = 'Today\'s Gained';
 
     /**
      * @inheritDoc
@@ -56,7 +57,7 @@ class UsersWidget extends Widget implements WidgetBuilderInterface
                     %s
                     ',
                     'Members 12.7k',
-                    'Gained',
+                    self::LABEL,
                     '+263',
                     '8%',
                     'down',

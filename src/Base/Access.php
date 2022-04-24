@@ -21,6 +21,8 @@ class Access
     public const CAN_DELETE = 'can_delete';
     public const CAN_HARD_DELETE = 'can_hard_delete';
     public const CAN_CLONE = 'can_clone';
+    public const CAN_NOTE = 'can_note';
+
     public const CAN_LOCK = 'can_lock';
     public const CAN_UNLOCK = 'can_unlock';
     public const CAN_TRASH = 'can_trash';

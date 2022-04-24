@@ -182,25 +182,28 @@ class DashboardRepository
     public function mainCards(): array
     {
         return [
-            'Registration' => [
-                'icon' => 'users',
+            'Tickets' => [
+                'icon' => 'tag',
                 'path' => '/admin/user/team',
+                //'label' => 'danger',
                 'desc' => [
-                    '15+ new user account registered over the pass 28 days.',
+                    '15+ new tickets assigned to you. By Admin 1d ago.',
                 ]
             ],
             'Tasks' => [
                 'icon' => 'push',
                 'path' => '/admin/task/index',
+                //'label' => 'danger',
                 'desc' => [
-                    'There are 12 incomplete tasks and 3 completed tasks.'
+                    'You have 12 incomplete tasks and 3 completed tasks.'
                 ]
             ],
             'Events' => [
                 'icon' => 'calendar',
                 'path' => '/admin/event/index',
+                //'label' => 'danger',
                 'desc' => [
-                    '2 events coming up next week'
+                    'You have 2 events coming up this week'
                 ]
             ]
         ];
@@ -230,11 +233,11 @@ class DashboardRepository
     {
         return [
             'activities' => ['icon' => 'rss', 'include' => 'block_just_now'],
-            'members' => ['icon' => 'user', 'include' => 'block_links'],
-            'ticket' => ['icon' => 'tag', 'include' => 'block_ticket'],
-            'session' => ['icon' => 'history', 'include' => 'block_statistics'],
-            'comments' => ['icon' => 'comments', 'include' => 'block_threaded_comments'],
-            'project' => ['icon' => 'git-branch', 'include' => 'block_project'],
+            // 'members' => ['icon' => 'user', 'include' => 'block_links'],
+            // 'ticket' => ['icon' => 'tag', 'include' => 'block_ticket'],
+            // 'session' => ['icon' => 'history', 'include' => 'block_statistics'],
+            // 'comments' => ['icon' => 'comments', 'include' => 'block_threaded_comments'],
+            // 'project' => ['icon' => 'git-branch', 'include' => 'block_project'],
             //'lifesaver' => ['icon' => 'lifesaver', 'include' => 'block_health_status'],
 
         ];

@@ -600,7 +600,9 @@ trait DomainTraits
     {
         $privilege = PrivilegedUser::getUser();
         $this->privilege = $privilege;
-        if (!$privilege->hasPrivilege($permission . '_' . $controller->thisRouteController())){
+        $permissionString = $permission . '_' . $controller->thisRouteController();
+        $controller->getSession()->set('current_permission', $permissionString);
+        if (!$privilege->hasPrivilege($permissionString)){
             $controller->flashMessage('Access Denied!', $controller->flashWarning());
             $controller->redirect('/admin/accessDenied/index');
         }
