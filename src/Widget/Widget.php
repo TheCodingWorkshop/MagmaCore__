@@ -17,6 +17,7 @@ use MagmaCore\Widget\Widgets\Notifications\NotificationWidget;
 use MagmaCore\Widget\Widgets\Tickets\TicketWidget;
 use MagmaCore\Widget\Widgets\Cards\ActiveNowWidget;
 use MagmaCore\Widget\Widgets\Cards\ContentWidget;
+use MagmaCore\Widget\Widgets\Cards\UsersWidget;
 use MagmaCore\Widget\Widgets\Cards\BounceRateWidget;
 use MagmaCore\Widget\Widgets\Cards\TotalVisitWidget;
 use MagmaCore\Widget\Widgets\ListsWidget\ListsWidget;
@@ -24,7 +25,9 @@ use MagmaCore\Widget\Widgets\BackupStatus\BackupStatusWidget;
 use MagmaCore\Widget\Widgets\SystemLogger\SystemLoggerWidget;
 use MagmaCore\Widget\Widgets\WebsiteTraffic\WebsiteTrafficWidget;
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
+use MagmaCore\Widget\Widgets\Cards\MoneyCardWidget;
 use MagmaCore\Widget\Widgets\Members\MemberWidget;
+use MagmaCore\Widget\Widgets\ProgressBar\ProgressBarWidget;
 
 /**
  * All widgets must be registered within this Widget class before it becomes available for use
@@ -39,6 +42,7 @@ class Widget extends AbstractWidget
         BounceRateWidget::WIDGET_NAME => ['class' => BounceRateWidget::class],
         TotalVisitWidget::WIDGET_NAME => ['class' => TotalVisitWidget::class],
         ContentWidget::WIDGET_NAME => ['class' => ContentWidget::class],
+        UsersWidget::WIDGET_NAME => ['class' => UsersWidget::class],
         BackupStatusWidget::WIDGET_NAME => ['class' => BackupStatusWidget::class],
         SystemLoggerWidget::WIDGET_NAME => ['class' => SystemLoggerWidget::class],
         WebsiteTrafficWidget::WIDGET_NAME => ['class' => WebsiteTrafficWidget::class],
@@ -46,6 +50,8 @@ class Widget extends AbstractWidget
         TicketWidget::WIDGET_NAME => ['class' => TicketWidget::class],
         MemberWidget::WIDGET_NAME => ['class' => MemberWidget::class],
         NotificationWidget::WIDGET_NAME => ['class' => NotificationWidget::class],
+        ProgressBarWidget::WIDGET_NAME => ['class' => ProgressBarWidget::class],
+        MoneyCardWidget::WIDGET_NAME => ['class' => MoneyCardWidget::class],
 
     ];
 

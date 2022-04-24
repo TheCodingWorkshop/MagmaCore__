@@ -15,48 +15,52 @@ use MagmaCore\Widget\Widget;
 use MagmaCore\Widget\Widgets\BaseWidget;
 use MagmaCore\Widget\Widgets\WidgetBuilderInterface;
 use MagmaCore\DataObjectLayer\ClientRepository\ClientRepositoryInterface;
+use MagmaCore\Widget\Widgets\Members\MembersWidgetTrait;
 
-class TotalVisitWidget extends Widget implements WidgetBuilderInterface
+class UsersWidget extends Widget implements WidgetBuilderInterface
 {   
 
-    /* @var string the widget name */
-    public const WIDGET_NAME = 'total_visit_widget';
-    private const LABEL = 'Visitor Sessions';
+    use MembersWidgetTrait;
 
+    /* @var string the widget name */
+    public const WIDGET_NAME = 'users_widget';
 
     /**
      * @inheritDoc
      */
     public static function render(?string $widgetName = null, ClientRepositoryInterface $clientRepo, BaseWidget $baseWidget, mixed $widgetData = null): string
     {
-        if ($widgetName === self::WIDGET_NAME) {
-            return $baseWidget::card(function($base) {
+        if ($widgetName === self::WIDGET_NAME) {            
+            return $baseWidget::card(function($base) use ($widgetData, $clientRepo) {
+                $total = self::totalUsers($clientRepo->getClientCrud());
                 return sprintf(
-                    '      
+                    '            
                     <div class="uk-clearfix">
                         <div class="uk-float-left">
                             <h3 class="uk-card-title uk-text-bolder uk-margin-remove">%s</h3>
-                            <span class="uk-margin-remove uk-text-meta">%s</span>
+                            <span class="uk-margin-remove uk-text-meta uk-text-wrap">%s</span>
+        
                             <span class="uk-text-small">
                                 %s
-                                <span class="uk-text-success uk-margin-left">
+                                <span class="uk-text-warning uk-margin-left">
                                     %s <span uk-icon="icon: triangle-%s"></span>
                             </span>
                             </span>
         
                         </div>
                         <div class="uk-float-right">
-                            <div id="visitor_sessions"></div>
+                            <div id="users_widget"></div>
                         </div>
+                        
                     </div>
                     %s
                     ',
-                    self::LABEL,
-                    'Total visits today',
-                    '1.4k',
-                    '15.9%',
-                    'up',
-                    self::script()
+                    'Members 12.7k',
+                    'Gained',
+                    '+263',
+                    '8%',
+                    'down',
+                    self::script($clientRepo)
                 );
             },
             'default'
@@ -70,15 +74,21 @@ class TotalVisitWidget extends Widget implements WidgetBuilderInterface
      * @param object $clientRepo
      * @return string
      */
-    private static function script(): string
+    private static function script(object $clientRepo): string
     {
+        $pending = self::totalPendingUsers($clientRepo->getClientCrud()) ?? 0;
+        $active = self::totalActiveUsers($clientRepo->getClientCrud()) ?? 0;
+        $trash = self::totalTrashUsers($clientRepo->getClientCrud()) ?? 0;
+        $total = self::totalUsers($clientRepo->getClientCrud());
+        $locked = self::totalLockedUsers($clientRepo->getClientCrud());
+
         $output = '
         <script>
-        $("#visitor_sessions").sparkline([1432, 874, 972, 643], {
+        $("#users_widget").sparkline([' . $total . ', ' . $active . ', ' . $pending . ', -' . $trash . ', -' . $locked . '], {
             type: "bar",
             height: "60",
             barWidth: "10",
-            barColor: "#FF4444"
+            barColor: "#222222"
         });
     
         </script>
@@ -86,6 +96,5 @@ class TotalVisitWidget extends Widget implements WidgetBuilderInterface
 
         return $output;
     }
-
 
 }

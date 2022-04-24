@@ -176,15 +176,15 @@ class UikitNavigationExtension
             
                 <h5>Daily Reports</h5>
                 <div>
-                    <span class="uk-text-small">Traffic <small>(+50)</small></span>
+                    <span class="uk-text-small">CPU <small>(+50)</small></span>
                     <progress class="uk-progress" value="50" max="100"></progress>
                 </div>
                 <div>
-                    <span class="uk-text-small">Income <small>(+78)</small></span>
+                    <span class="uk-text-small">Memory <small>(+78)</small></span>
                     <progress class="uk-progress success" value="78" max="100"></progress>
                 </div>
                 <div>
-                    <span class="uk-text-small">Feedback <small>(-12)</small></span>
+                    <span class="uk-text-small">HDD <small>(-12)</small></span>
                     <progress class="uk-progress warning" value="12" max="100"></progress>
                 </div>
             

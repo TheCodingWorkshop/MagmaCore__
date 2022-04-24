@@ -60,4 +60,43 @@ class BaseWidget
         return $html;
     }
 
+    /**
+     * Base card widget wrapper for all card based widgets within this cards directory
+     *
+     * @param Closure|null $callback
+     * @param string|null $cardColor
+     * @return string
+     */
+    public static function blankWrapper(Closure $callback = null): string
+    {
+        if (!$callback instanceof Closure) {
+            throw new WidgetException(sprintf('%s is not a Closure', $callback));
+        }
+       // $html = '<div class="uk-card uk-card-' . $cardColor . ' uk-card-body">';
+        return $callback(new self);
+        //$html .= '</div>';
+
+    }
+
+    /**
+     * Base card widget wrapper for all card based widgets within this cards directory
+     *
+     * @param Closure|null $callback
+     * @param string|null $cardColor
+     * @return string
+     */
+    public static function gridWrapper(Closure $callback = null, string $columns = null): string
+    {
+        if (!$callback instanceof Closure) {
+            throw new WidgetException(sprintf('%s is not a Closure', $callback));
+        }
+        $html = '<div class="uk-grid uk-grid-divider uk-grid-medium uk-child-width-1-2 uk-child-width-1-4@l uk-child-width-1-5@xl uk-margin uk-padding-small" data-uk-grid">';
+        $html .= $callback(new self);
+        $html .= '</div>';
+
+        return $html;
+
+    }
+
+
 }

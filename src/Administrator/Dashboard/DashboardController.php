@@ -70,7 +70,9 @@ class DashboardController extends \MagmaCore\Administrator\Controller\AdminContr
             [
                 'nav_switcher' => $this->repo->getNavSwitcher(),
                 'main_cards' => $this->repo->mainCards(),
-                'todays_datetime' => date("F j, Y, g:i a")
+                'todays_datetime' => date("F j, Y, g:i a"),
+                'progress_bar_data' => $this->repo->getProgressBarData(),
+                'money_card_data' => $this->repo->getMoneyCardData(),
             ]
         );
     }
