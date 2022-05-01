@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace MagmaCore\System\App\Controller;
 
-use MagmaCore\Administrator\Controller\AdminController;
-use MagmaCore\System\App\Commander\SystemCommander;
+use MagmaCore\Utility\Yaml;
 use MagmaCore\System\App\Model\EventModel;
-use MagmaCore\Base\BaseController;
-use MagmaCore\Base\Domain\Actions\SystemAction;
-use MagmaCore\System\App\DataColumns\SystemColumn;
 use MagmaCore\System\App\Schema\EventSchema;
 use MagmaCore\System\Event\SystemActionEvent;
-use MagmaCore\Utility\Yaml;
+use MagmaCore\Base\Domain\Actions\SystemAction;
+use MagmaCore\System\App\DataColumns\SystemColumn;
+use MagmaCore\System\App\Commander\SystemCommander;
+use MagmaCore\Administrator\Controller\AdminController;
 
 class SystemController extends AdminController
 {
@@ -113,6 +112,12 @@ class SystemController extends AdminController
             ->with()
             ->singular()
             ->end();
+    }
+
+
+    protected function trashAction()
+    {
+        $this->view('admin/system/trash.html', ['models' => $this->repository->getTrashModel()]);
     }
 
 }

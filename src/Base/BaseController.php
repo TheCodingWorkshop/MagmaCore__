@@ -62,7 +62,7 @@ class BaseController extends AbstractBaseController
     /** @var array */
     protected array $callAfterMiddlewares = [];
     protected array $controllerContext = [];
-
+    protected array $addLinkModelToArray = [];
     protected array $noSettingsController = [
         'setting',
         'dashboard'
@@ -202,7 +202,6 @@ class BaseController extends AbstractBaseController
                 return $object;
             });
     }
-
 
     /**
      * @return array

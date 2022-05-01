@@ -34,6 +34,7 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
     /* @var array COLUMN_STATUS */
     public const COLUMN_STATUS = ['status' => ['pending', 'active', 'trash', 'lock', '']];
 
+
     /** @var array $fillable - an array of fields that should not be null */
     protected array $fillable = [
         'firstname',

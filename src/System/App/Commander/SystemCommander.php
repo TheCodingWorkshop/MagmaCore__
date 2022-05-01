@@ -16,7 +16,6 @@ use MagmaCore\System\App\Model\EventModel;
 use MagmaCore\CommanderBar\ApplicationCommanderInterface;
 use MagmaCore\CommanderBar\ApplicationCommanderTrait;
 use MagmaCore\CommanderBar\CommanderUnsetterTrait;
-use MagmaCore\Utility\Stringify;
 use Exception;
 
 class SystemCommander extends EventModel implements ApplicationCommanderInterface
@@ -31,7 +30,8 @@ class SystemCommander extends EventModel implements ApplicationCommanderInterfac
      */
     protected const INNER_ROUTES = [
         'index',
-        'show'
+        'show',
+        'trash',
     ];
 
     private array $noCommander = ['index'];
@@ -81,6 +81,7 @@ class SystemCommander extends EventModel implements ApplicationCommanderInterfac
         return match ($controller->thisRouteAction()) {
             'index' => $this->getStatusColumnFromQueryParams($controller),
             'show' => 'View Log Entry #' . $controller->thisRouteID(),
+            'trash' => 'All Trash',
             default => "Unknown"
         };
     }

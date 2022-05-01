@@ -35,6 +35,8 @@ class SupportController extends \MagmaCore\Administrator\Controller\AdminControl
         $this->addDefinitions(
             [
                 'commander' => SupportCommander::class,
+                'repository' => SupportModel::class,
+                'repo' => SupportRepository::class,
 
             ]
         );
@@ -48,7 +50,12 @@ class SupportController extends \MagmaCore\Administrator\Controller\AdminControl
 
     protected function changelogAction()
     {
-        $this->render('/admin/support/changelog.html', []);
+        $this->render(
+            '/admin/support/changelog.html', 
+            [
+                'changelogs' => $this->repo->changelogData()
+            ]
+        );
     }
 
 

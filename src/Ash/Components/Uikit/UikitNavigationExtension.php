@@ -174,20 +174,20 @@ class UikitNavigationExtension
         $element .= '
         <div class="left-content-box uk-margin-top">
             
-                <h5>Daily Reports</h5>
+                <h5>Environment</h5>
                 <div>
-                    <span class="uk-text-small">CPU <small>(+50)</small></span>
-                    <progress class="uk-progress" value="50" max="100"></progress>
-                </div>
-                <div>
-                    <span class="uk-text-small">Memory <small>(+78)</small></span>
+                    <span class="uk-text-small">Notifications <small>(+78)</small></span>
                     <progress class="uk-progress success" value="78" max="100"></progress>
                 </div>
                 <div>
-                    <span class="uk-text-small">HDD <small>(-12)</small></span>
+                    <span class="uk-text-small">Tickets <small>(-12)</small></span>
                     <progress class="uk-progress warning" value="12" max="100"></progress>
                 </div>
-            
+                <div>
+                <span class="uk-text-small"><a class="uk-link-reset" href="/admin/system/trash">Trash</a> <small>(+50)</small></span>
+                <progress class="uk-progress" value="50" max="100"></progress>
+            </div>
+
         </div>
         ';
 

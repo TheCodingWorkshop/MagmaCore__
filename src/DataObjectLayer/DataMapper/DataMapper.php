@@ -74,6 +74,20 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
         return $this->dbh;
     }
 
+    public function getTables()
+    {
+        $db = $this->dbh->open();
+        $stmt = $db->prepare('show tables');
+        $stmt->execute();
+        $results = [];
+        while ($rows = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $results[] = $rows;
+        }
+
+        return $results;
+
+    }
+
     /**
      * @inheritDoc
      */

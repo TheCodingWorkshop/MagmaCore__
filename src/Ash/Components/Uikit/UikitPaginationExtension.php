@@ -40,7 +40,7 @@ class UikitPaginationExtension
             <nav aria-label="Pagination" uk-navbar>
                 <div class="uk-navbar-left" style="margin-top: -15px;">';
                 
-                if ($this->hasYamlSupport($controller) === true) {
+                if ($this->hasYamlSupport($controller) !==false) {
                     $html .= $this->repositoryTrash($controller);
                 } else {
                     $html .= '';

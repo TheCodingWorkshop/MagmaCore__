@@ -61,6 +61,7 @@ trait ControllerTrait
         return $this->diContainer($args);
     }
 
+
     /**
      * Return only the parameter array of the extended event configurations
      *

@@ -209,7 +209,6 @@ trait TemplateTraits
     {
         $key = $controller->thisRouteController() . '_settings';
         $trashSupport = $this->getSessionData($key, $controller);
-
         return ($trashSupport['trash_can_support'] === "true") ? true : false;
     }
 

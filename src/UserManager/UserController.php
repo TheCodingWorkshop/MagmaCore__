@@ -14,6 +14,7 @@ namespace MagmaCore\UserManager;
 use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Utility\Breadcrumbs;
 use MagmaCore\Base\Events\BulkActionEvent;
 use MagmaCore\UserManager\UserRelationship;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
@@ -23,6 +24,7 @@ use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Forms\Admin\UserForm;
 use MagmaCore\UserManager\Schema\UserLogSchema;
+use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\UserManager\Entity\UserNoteEntity;
 use MagmaCore\UserManager\Entity\UserRoleEntity;
 use MagmaCore\UserManager\Event\UserActionEvent;
@@ -40,12 +42,13 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Event\UserPreferenceActionEvent;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
-use MagmaCore\Utility\Breadcrumbs;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
-    use DataLayerTrait;
+    use DataLayerTrait,
+        ControllerCommonTrait;
+        
     private const NO_USER_NOTE = 'The Queried ID is missing the starter notes. You can update the account, to generate a starter note.';
 
     /**
@@ -224,7 +227,12 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->setAccess($this, Access::CAN_ADD)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__)
             ->render()
-            ->with(['userYml' => Yaml::file('user')])
+            ->with(
+                [
+                    'userYml' => Yaml::file('user'),
+                    'last_5_users' => $this->repository->getRepo()->findBy(['firstname', 'lastname', 'id', 'created_at'],['status' => 'active'], ['limit' => 5, 'offset' => 0], ['orderby' => 'id DESC'])
+                ]
+            )
             ->form($this->formUser)
             ->end();
     }
@@ -286,6 +294,15 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
 
     }
+    /**
+     * Bulk action route
+     *
+     * @return void
+     */
+    // public function bulkAction()
+    // {
+    //     $this->chooseBulkAction($this, TagActionEvent::class);
+    // }
 
     /**
      * The bulk delete action request. is responsible for deleting multiple record from
@@ -391,6 +408,21 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [],
                 ['status' => 'trash', 'deleted_at' => 1, 'deleted_at_datetime' => date('Y-m-d H:i:s')])
             ->endAfterExecution();
+    }
+
+    /**
+     * As trashing an item changes the deleted_at column to 1 we can reset that to 0
+     * for individual items.
+     *
+     * @return void
+     */
+    protected function untrashAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0])
+        ->endAfterExecution();
+
     }
 
     /**

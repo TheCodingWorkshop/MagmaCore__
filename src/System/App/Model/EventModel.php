@@ -11,8 +11,16 @@ declare(strict_types=1);
 
 namespace MagmaCore\System\App\Model;
 
+use App\Model\TagModel;
+use App\Model\PostModel;
+use App\Model\MessageModel;
+use App\Model\CategoryModel;
+use MagmaCore\Ticket\TicketModel;
+use MagmaCore\UserManager\UserModel;
 use MagmaCore\Base\AbstractBaseModel;
+use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 
 class EventModel extends AbstractBaseModel
 {
@@ -21,6 +29,7 @@ class EventModel extends AbstractBaseModel
     protected const TABLESCHEMA = 'event_log';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
+    protected const COLUMN_IDENTIFIER = 'event_log_name';
 
     /**
      * Main constructor class which passes the relevant information to the
@@ -44,6 +53,36 @@ class EventModel extends AbstractBaseModel
     {
         return [];
     }
+
+    public function getTrashModel()
+    {
+        $models = [
+            'user' => UserModel::class,
+            'role' => RoleModel::class,
+            'permission' => PermissionModel::class,
+            'post' => PostModel::class,
+            'tag' => TagModel::class,
+            'category' => CategoryModel::class,
+            'ticket' => TicketModel::class,
+            'message' => MessageModel::class,
+        ];
+        $data = [];
+        foreach ($models as $model) {
+            $object = $this->getOtherModel($model);
+            $ch = explode('\\', $model);
+            array_push($data, [
+                'object' => end(str_replace('Model', '', $ch)), /** the name of the trash object */
+                'object_path' => $model, /** the namespace path of the trash object */
+                'items_in_trash' => $object->getRepo()->count(['deleted_at' => 1]), /** how many trash items is there */
+                'items_id' => $object->getRepo()->findBy(['id', 'created_at'], ['deleted_at' => 1]), /** the id(s) of the trash items */
+            ]);
+        }
+
+        return $data;
+
+
+    }
+
 
 }
 
