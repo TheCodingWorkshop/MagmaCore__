@@ -45,6 +45,7 @@ class BaseModel extends BaseModelRelationship
     protected array $nullableClone = [];
     protected array $unsettableClone = [];
     protected array $cloneableKeys = [];
+    protected array $columnStatus = [];
 
     /** @var array */
     protected const ALLOWED_CASTING_TYPES = ['array_json'];
@@ -353,6 +354,16 @@ class BaseModel extends BaseModelRelationship
             throw new BaseInvalidArgumentException('Your second argument is null. This needs to represent a column name for the matching repository.');
         }
         return $name->$field;
+    }
+
+    /**
+     * Return an array of column values if table supports the column field
+     *
+     * @return array
+     */
+    public function getColumnStatus(): array
+    {
+        return $this->columnStatus;
     }
 
 

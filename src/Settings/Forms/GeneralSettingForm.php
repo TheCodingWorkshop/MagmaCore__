@@ -150,6 +150,17 @@ class GeneralSettingForm extends ClientFormBuilder implements ClientFormBuilderI
                 null,
                 $this->blueprint->settings(false, null, false, 'Name', true, null, 'Alter the size of your menu icon (18, 21 or 23px)')
             )
+            ->add(
+                $this->blueprint->text(
+                    'timezone',
+                    ['uk-form-large', 'uk-form-blank', 'uk-border-bottom'],
+                    $this->settings->get('timezone'),
+                    false,
+                    'Timezone'
+                ),
+                null,
+                $this->blueprint->settings(false, null, false, null, true, null, 'Choose either a city in the same time zone as you or a UTC (Coordinated Universal Time) time offset.')
+            )
 
             ->add(
                 $this->blueprint->submit(

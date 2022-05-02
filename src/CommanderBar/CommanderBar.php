@@ -54,15 +54,15 @@ class CommanderBar implements CommanderBarInterface
     {
         if (!in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetCommander())) {
             $commander = PHP_EOL;
-            $commander .= '<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
+            $commander .= '<div style="z-index:10000;" uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; animation: uk-animation-slide-top; bottom: #transparent-sticky-navbar">';
             $commander .= '<nav class="uk-navbar" uk-navbar style="position: relative; z-index: 980; color: white!important;">';
             $commander .= PHP_EOL;
             $commander .= ' <div class="uk-navbar-left">';
             $commander .= $this->heading();
             $commander .= '<ul class="uk-navbar-nav">';
             $commander .= $this->notifications();
-            //$commander .= $this->manager();
-            //$commander .= $this->customizer();
+            $commander .= $this->manager();
+            $commander .= $this->customizer();
             $commander .= '</ul>';
             $commander .= '</div>';
             $commander .= PHP_EOL;

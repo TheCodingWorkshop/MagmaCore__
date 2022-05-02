@@ -61,25 +61,22 @@ class BulkCloneAction implements DomainActionLogicInterface
 
             if ($this->isArrayGood($formData)) {
                 unset($formData[$this->getSubmitValue()]);
-                $suffix = '-clone';
+                $suffix = '-copy';
                 $action = '';
 
                 foreach (array_map('intval', $formData[$schemaID]) as $itemID) {
                     if ($itemID !==null) {
                         $itemObject = $controller->repository
                         ->getRepo()
-                        ->findObjectBy(
-                            [$schemaID => $itemID], 
-                            $controller->repository->getClonableKeys()
-                        );
-                        $itemObjectToArray = $controller->toArray($itemObject);
+                        ->findObjectBy([$schemaID => $itemID], $controller->repository->getClonableKeys());
+                        $itemObjectToArray = $controller->toArray($itemObject);   
 
-                        /* new clone modified firstname, lastname and email strings */
+                        /* new clone modified columns strings */
                         $modifiedArray = array_map(
-                            fn($item) => $this->resolvedCloning($item),
+                            fn($item) => $item . $suffix,
                             $itemObjectToArray
                         );
-
+                        /* original data object|array */
                         $baseArray = $controller->repository
                         ->getRepo()
                         ->findOneBy([$schemaID => $itemID]);
@@ -89,11 +86,12 @@ class BulkCloneAction implements DomainActionLogicInterface
                             fn($array) => array_merge($array, $modifiedArray), 
                             $baseArray
                         );
+
                         $newClone = $this->flattenArray($newCloneArray);
                         /* We want the id to auto incremented so we will remove the id key from the array */
                         $_newClone = $controller->repository->unsetCloneKeys($newClone);
 
-                        /* Now lets imsert the clone data within the database */
+                        /* Now lets insert the clone data within the database */
                         $action = $controller->repository
                         ->getRepo()
                         ->getEm()

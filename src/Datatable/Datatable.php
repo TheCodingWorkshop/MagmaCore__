@@ -152,7 +152,7 @@ class Datatable extends AbstractDatatable
                     $this->element .= '</tr>' . "\n";
                 }
                 $this->element .= '</tbody>' . "\n";
-                //$this->element .= ($show_table_tfoot) ? $this->tableGridElements($status, true) : '';
+                $this->element .= ($show_table_tfoot) ? $this->tableGridElements($status, true) : '';
                 $this->element .= '</table>' . "\n";
             }
         }

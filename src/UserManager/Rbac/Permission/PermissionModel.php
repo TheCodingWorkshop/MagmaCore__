@@ -28,6 +28,10 @@ class PermissionModel extends AbstractBaseModel
         'permission_description',
         'created_byid',
     ];
+    /* columns to include when cloning object */
+    protected array $cloneableKeys = ['permission_name', 'permission_description'];
+    /* columns to exclude when cloning objects */
+    protected array $unsettableClone = ['id'];
 
 
     /**

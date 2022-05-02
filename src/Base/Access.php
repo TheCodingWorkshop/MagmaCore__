@@ -26,6 +26,7 @@ class Access
     public const CAN_LOCK = 'can_lock';
     public const CAN_UNLOCK = 'can_unlock';
     public const CAN_TRASH = 'can_trash';
+    public const CAN_COPY = 'can_copy';
     public const CAN_RESTORE_TRASH = 'can_restore_trash';
     public const CAN_CHANGE_STATUS = 'can_change_status';
     public const CAN_EDIT_PREFERENCES = 'can_edit_preferences';

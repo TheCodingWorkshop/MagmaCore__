@@ -63,16 +63,16 @@ class CommanderCustomizer
         $command .= '<div>';
         $command .= '<div class="uk-card">';
         $command .= '<h3 class="uk-card-title">Settings</h3>';
-        $command .= $comm->controller
-            ->controllerSettings
-            ->createForm(
-                "/admin/{$comm->controller->thisRouteController()}/settings",
-                $comm->controller
-                    ->controllerRepository
-                    ->getRepo()
-                    ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
-                $comm->controller
-            );
+        // $command .= $comm->controller
+        //     ->controllerSettings
+        //     ->createForm(
+        //         "/admin/{$comm->controller->thisRouteController()}/settings",
+        //         $comm->controller
+        //             ->controllerRepository
+        //             ->getRepo()
+        //             ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
+        //         $comm->controller
+        //     );
 
         $command .= '</div>';
         $command .= '</div>';

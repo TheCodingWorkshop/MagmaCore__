@@ -226,10 +226,8 @@ class UikitPaginationExtension
     private function getTableRows(object $controller): mixed
     {
         $globalTableRows = (int)$controller->settings->get('global_table_rows_per_page');
-
-        //$controllerTableRows = $this->sessionRecordsPerPage($controller) ?? 5;
         $sessionData = $this->getSessionData($controller->thisRouteController() . '_settings', $controller);
-        $controllerTableRows = $sessionData['records_per_page'];
+        $controllerTableRows = (int)$sessionData['records_per_page'];
         /* We want to return the greater value */
         if (!empty($globalTableRows) && !empty($controllerTableRows))
             return ($controllerTableRows >= $globalTableRows) ? $controllerTableRows : $globalTableRows;

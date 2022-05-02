@@ -114,6 +114,8 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
             ->execute($this, SettingEntity::class, SettingActionEvent::class, NULL, __METHOD__)
             ->render()
             ->with([
+                'form_formatting' => $this->formattingSettingForm->createForm('/admin/setting/general', null, $this),
+                // 'form_avatar' => $this->formattingSettingForm->createForm('/admin/setting/general', null, $this)
             ])
             ->form($this->generalSettingForm)
             ->end();

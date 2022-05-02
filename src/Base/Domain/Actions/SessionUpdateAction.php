@@ -85,7 +85,7 @@ class SessionUpdateAction implements DomainActionLogicInterface
                     $oldSession = Serializer::unCompress($sessionData);
                     if ($oldSession['controller'] === $controller->thisRouteController()) {
                         $key = $controller->thisRouteController() . '_settings';
-                        /* override the old session with new form data */
+                        /* override the old session with new session form post data */
                         $newArray = $formData + $oldSession;
                         if (is_array($newArray) && count($newArray) > 0) {
                             /* flush the old session data */

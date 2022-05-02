@@ -52,6 +52,9 @@ services:
         MagmaCore\UserManager\Rbac\Group\GroupController::deleteAction:
           msg: Group Deleted!
           redirect: group.index
+        MagmaCore\UserManager\Rbac\Group\GroupController::hardDeleteAction:
+          msg: Group Deleted!
+          redirect: group.index
 
     role.subscriber:
       class: \MagmaCore\UserManager\Rbac\Role\EventSubscriber\RoleActionSubscriber

@@ -16,7 +16,6 @@ use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Base\Traits\ControllerSessionTrait;
-use MagmaCore\Console\ConsoleTrait;
 
 class UikitSimplePaginationExtension
 {
@@ -57,7 +56,7 @@ class UikitSimplePaginationExtension
             $html .= '
             <div class="uk-form-search">
             <span uk-search-icon></span>
-            <input class="uk-search-input" name="' . $filter['filter_alias'] . '" type="search" placeholder="Search">
+            <input class="uk-search-input" name="' . $filter['filter_alias'] . '" type="search" placeholder="Filter ' . $name . '...">
             <code>You can search by [' . implode(' ', $filter['filter_by']) . '], this can be change from the settings page. <a href="/admin/' . $_name . '/settings">click here</a> filter_by option</code>
             </div>
         
@@ -67,11 +66,6 @@ class UikitSimplePaginationExtension
         $html .= '</section>';
 
         return $html;
-
-    //     <li>
-    //     <a href="#" uk-tooltip="Filter ' . $name . '"><span class="ion-28"><ion-icon name="filter-outline"></ion-icon></span></a>
-    //     ' . $this->getSearchableColumns($controller) . '
-    //  </li>
 
     }
 
@@ -86,7 +80,7 @@ class UikitSimplePaginationExtension
         
         <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash">' . IconLibrary::getIcon('trash') . '</button></li>
 
-        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulk-clone" id="bulk_clone" uk-tooltip="Bulk Copy">' . IconLibrary::getIcon('copy') . '</button>
+        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkClone-' . $controller->thisRouteController() . '" id="bulk_clone" uk-tooltip="Bulk Copy">' . IconLibrary::getIcon('copy') . '</button>
         </li>
 
         <li>
@@ -115,12 +109,12 @@ class UikitSimplePaginationExtension
 
     private function navContentCentre(object $controller, string $name)
     {
-        return '
-        <div class="uk-search">
-             <a href="" class="uk-search-icon-flip" uk-search-icon></a>
-             <input type="search" class="uk-search-input uk-form-blank uk-border-bottom" onkeyup="tableFilter()" id="table_filter" placeholder="Filter ' . $name . '..." />
-         </div>
-        ';
+        // return '
+        // <div class="uk-search">
+        //      <a href="" class="uk-search-icon-flip" uk-search-icon></a>
+        //      <input type="search" class="uk-search-input uk-form-blank uk-border-bottom" onkeyup="tableFilter()" id="table_filter" placeholder="Filter ' . $name . '..." />
+        //  </div>
+        // ';
     }
 
     /**

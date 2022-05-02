@@ -53,28 +53,17 @@ class FormattingSettingForm extends ClientFormBuilder implements ClientFormBuild
     {
         return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "tableForm"])
             ->addRepository($dataRepository)
-            ->add(
-                $this->blueprint->text(
-                    'timezone',
-                    ['uk-form-large', 'uk-width-1-2', 'uk-form-blank', 'uk-border-bottom'],
-                    $this->settings->get('locale'),
-                    false,
-                    'Site Name'
-                ),
-                null,
-                $this->blueprint->settings(false, null, false, null, true, null, 'Choose your default locale when using this application.')
-            )
-            ->add(
-                $this->blueprint->text(
-                    'timezone',
-                    ['uk-form-large', 'uk-form-blank', 'uk-border-bottom'],
-                    $this->settings->get('timezone'),
-                    false,
-                    'Site Name'
-                ),
-                null,
-                $this->blueprint->settings(false, null, false, null, true, null, 'Choose either a city in the same time zone as you or a UTC (Coordinated Universal Time) time offset.')
-            )
+            // ->add(
+            //     $this->blueprint->text(
+            //         'timezone',
+            //         ['uk-form-large', 'uk-form-blank', 'uk-border-bottom'],
+            //         $this->settings->get('timezone'),
+            //         false,
+            //         'Timezone'
+            //     ),
+            //     null,
+            //     $this->blueprint->settings(false, null, false, null, true, null, 'Choose either a city in the same time zone as you or a UTC (Coordinated Universal Time) time offset.')
+            // )
             ->add(
                 $this->blueprint->select(
                     'week_starts_on',

@@ -183,11 +183,11 @@ class DataRepository implements DataRepositoryInterface
      * @return array
      * @throws DataLayerInvalidArgumentException|Throwable
      */
-    public function findOneBy(array $conditions): array
+    public function findOneBy(array $conditions, array $selectors = []): array
     {
         $this->isArray($conditions);
         try {
-            return $this->em->getCrud()->read([], $conditions);
+            return $this->em->getCrud()->read($selectors, $conditions);
         } catch (Throwable $err) {
             throw new DataLayerException(
                 sprintf('Unable to the queried object by the following conditions. %s', $err->getMessage()));
@@ -326,9 +326,6 @@ class DataRepository implements DataRepositoryInterface
     public function findWithSearchAndPaging(Object $request, array $args = [], ?object $controller = null): array|false
     {
 
-        // $key = $controller->thisRouteController() . '_settings';
-        // var_dump($this->resolveAdditionalConditions($key, $controller));
-        // die;
         list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
 
         $sorting = new Sortable($args['sort_columns']);

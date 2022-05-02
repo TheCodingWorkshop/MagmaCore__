@@ -26,7 +26,7 @@ trait CustomizerTrait
             }
         }
         $commander = '<li>';
-        $commander .= sprintf('<a class="uk-icon-link" href="#"></a>', IconLibrary::getIcon('settings', 1.2));
+        $commander .= sprintf('<a class="uk-icon-link" href="#">%s</a>', IconLibrary::getIcon('settings', 1.2));
 
         $commander .= '<div uk-dropdown="mode: click" class="uk-navbar-dropdown uk-navbar-dropdown-width-3">';
 
@@ -69,7 +69,7 @@ trait CustomizerTrait
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
         $commander .= '<h3 class="uk-card-title">Settings</h3>';
-        $commander .= $this->customizerSettings();
+        //$commander .= $this->customizerSettings();
         $commander .= '</div>';
         $commander .= '</div>';
         $commander .= '</div>';

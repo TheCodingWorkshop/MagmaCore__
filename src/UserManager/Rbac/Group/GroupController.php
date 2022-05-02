@@ -15,6 +15,7 @@ namespace MagmaCore\UserManager\Rbac\Group;
 use MagmaCore\Base\Access;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\UserManager\Rbac\Group\Model\GroupRoleModel;
 use MagmaCore\UserManager\Rbac\Group\Model\UserGroupModel;
 use MagmaCore\UserManager\Rbac\Group\Entity\GroupRoleEntity;
@@ -26,6 +27,9 @@ use MagmaCore\UserManager\Rbac\Group\Event\GroupRoleAssignedActionEvent;
 
 class GroupController extends \MagmaCore\Administrator\Controller\AdminController
 {
+
+    use ControllerCommonTrait;
+
 
     public function __construct(array $routeParams)
     {

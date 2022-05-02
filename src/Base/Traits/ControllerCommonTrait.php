@@ -38,10 +38,12 @@ trait ControllerCommonTrait
         $_name = strtolower($controller->thisRouteController());
 
         foreach (
-            ['emptyTrash-' . $_name, 
-            'restoreTrash-' . $_name, 
-            'bulkTrash-' . $_name, 
-            'bulkClone-' . $_name] as $action) {
+            [
+                'emptyTrash-' . $_name, 
+                'restoreTrash-' . $_name, 
+                'bulkTrash-' . $_name, 
+                'bulkClone-' . $_name
+            ] as $action) {
             if (array_key_exists($action, $this->formBuilder->getData())) {
                 $data = $this->formBuilder->getData();
                 switch ($action) :
@@ -60,6 +62,9 @@ trait ControllerCommonTrait
                             $action, $data, $actionEvent, [$field => 1]
                         );
                         break;
+                    case 'bulkClone-' . $_name :
+                        $this->bulkClone($action, $data, $actionEvent);
+                        break;
                 endswitch;
              }
         }
@@ -68,7 +73,7 @@ trait ControllerCommonTrait
     }
 
     /**
-     * Undocumented function
+     * Bulk empty the trash from any controller
      *
      * @param string|null $action
      * @param array $data
@@ -83,7 +88,7 @@ trait ControllerCommonTrait
         mixed $optional = null
         )
     {
-        if (array_key_exists($action, $this->formBuilder->getData())) {
+        if (array_key_exists($action, $data)) {
             $this->bulkDeleteAction
                 ->setAccess($this, Access::CAN_BULK_DELETE)
                 ->execute($this, NULL, $eventDispatcher, NULL, __METHOD__, [], [], $optional)
@@ -92,7 +97,7 @@ trait ControllerCommonTrait
     }
 
     /**
-     * Undocumented function
+     * Bulk restore trash from any controller
      *
      * @param string|null $action
      * @param array $data
@@ -107,7 +112,7 @@ trait ControllerCommonTrait
         mixed $optional = null
         )
     {
-        if (array_key_exists($action, $this->formBuilder->getData())) {
+        if (array_key_exists($action, $data)) {
             $this->bulkUpdateAction 
                 ->setAccess($this, Access::CAN_BULK_RESTORE)
                 ->execute($this, NULL, $eventDispatcher, NULL, __METHOD__, [], [], $optional)
@@ -116,7 +121,7 @@ trait ControllerCommonTrait
     }
 
     /**
-     * Undocumented function
+     * bulk update the trash from any controller
      *
      * @param string|null $action
      * @param array $data
@@ -131,7 +136,7 @@ trait ControllerCommonTrait
         mixed $optional = null
         )
     {
-        if (array_key_exists($action, $this->formBuilder->getData())) {
+        if (array_key_exists($action, $data)) {
             $this->bulkUpdateAction 
                 ->setAccess($this, Access::CAN_BULK_TRASH)
                 ->execute($this, NULL, $eventDispatcher, NULL, __METHOD__, [], [], $optional)
@@ -140,7 +145,7 @@ trait ControllerCommonTrait
     }
 
     /**
-     * Undocumented function
+     * Bulk clone selected items
      *
      * @param string|null $action
      * @param array $data
@@ -148,14 +153,15 @@ trait ControllerCommonTrait
      * @param mixed $optional
      * @return void
      */
-    private function bulkClone(
-        string $action = null, 
-        array $data = [], 
-        ?string $eventDispatcher = null,
-        mixed $optional = null
-        )
+    private function bulkClone(string $action = null, array $data = [], ?string $eventDispatcher = null,mixed $optional = null)
     {
-        die('bulk cloning');
+        // $data variables contains the selected object ids only. We can use these to fetch the data which belongs to those ids
+        if (array_key_exists($action, $data)) {
+            $this->bulkCloneAction
+                ->setAccess($this, Access::CAN_BULK_CLONE)
+                ->execute($this, NULL, $eventDispatcher, NULL, __METHOD__)
+                ->endAfterExecution();
+        }
     }
 
 

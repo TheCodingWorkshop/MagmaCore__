@@ -34,6 +34,10 @@ class RoleModel extends AbstractBaseModel
         'role_description',
         'created_byid',
     ];
+    /* columns to include when cloning object */
+    protected array $cloneableKeys = ['role_name', 'role_description'];
+    /* columns to exclude when cloning objects */
+    protected array $unsettableClone = ['id'];
 
     /**
      * Main constructor class which passes the relevant information to the

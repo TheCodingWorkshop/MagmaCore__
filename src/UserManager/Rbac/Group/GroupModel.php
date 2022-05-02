@@ -29,6 +29,10 @@ class GroupModel extends AbstractBaseModel
         'group_description',
         'created_byid',
     ];
+    /* columns to include when cloning object */
+    protected array $cloneableKeys = ['group_name', 'group_description'];
+    /* columns to exclude when cloning objects */
+    protected array $unsettableClone = ['id'];
 
 
     /**

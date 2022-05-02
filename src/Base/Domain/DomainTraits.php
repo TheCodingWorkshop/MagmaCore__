@@ -705,18 +705,21 @@ trait DomainTraits
      * @param string $value
      * @return string
      */
-    private function resolvedCloning(string $value): string
+    private function resolvedCloning(mixed $value)
     {
-        $suffix = '-clone';
-        if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
-            $ex = explode('@', $value); /* explode the argument by the @ symbol */
-            if (is_array($ex)) {
-                /* safely get the first and last index of the array */
-                return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
-            }
-        } else {
-            return $value . $suffix;
-        }
+        // $suffix = '-clone';
+        // if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
+        //     $ex = explode('@', $value); /* explode the argument by the @ symbol */
+        //     if (is_array($ex)) {
+        //         /* safely get the first and last index of the array */
+        //         return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
+        //     }
+        // } else {
+        //     return $value . $suffix;
+        // }
+
+        return $value;
+
     }
 
     public function flattenArray(array $context): array

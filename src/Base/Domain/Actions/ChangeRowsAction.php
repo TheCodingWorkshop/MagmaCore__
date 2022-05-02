@@ -64,7 +64,7 @@ class ChangeRowsAction implements DomainActionLogicInterface
             /* Unset the old key and value */
             unset($oldSession['records_per_page']);
             /* push the new value back onto the old session array */
-            array_push($oldSession, ['records_per_page' => $formData['records_per_page']]);
+            array_push($oldSession, ['records_per_page' => (int)$formData['records_per_page']]);
 
             /* flush the session then re-populate */
             $key = $controller->thisRouteController() . '_settings';
@@ -74,8 +74,6 @@ class ChangeRowsAction implements DomainActionLogicInterface
 
                 /* serialized the modified array */
                 $session->set($key, Serializer::compress($oldSession));
-                var_dump($controller->controllerSessionData());
-                die;
                 $controller->flashMessage('Changes saved');
                 $controller->redirect('/admin/user/index');
                 // $this->dispatchSingleActionEvent(

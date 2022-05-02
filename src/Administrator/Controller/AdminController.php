@@ -203,7 +203,7 @@ class AdminController extends BaseController
      */
     protected function changeRowAction()
     {
-        $this->changeRowsAction
+        $this->sessionUpdateAction
             ->execute($this, NULL, ControllerSettingActionEvent::class, NULL, __METHOD__)
             ->endAfterExecution();
     }
