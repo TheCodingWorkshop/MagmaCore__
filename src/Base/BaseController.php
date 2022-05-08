@@ -65,7 +65,10 @@ class BaseController extends AbstractBaseController
     protected array $addLinkModelToArray = [];
     protected array $noSettingsController = [
         'setting',
-        'dashboard'
+        'dashboard',
+        'history',
+        'discovery',
+        'notification'
     ];
 
     /**

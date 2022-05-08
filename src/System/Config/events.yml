@@ -7,14 +7,17 @@ services:
           msg: New user added!
         MagmaCore\UserManager\UserController::editAction:
           msg: Changes saved!
-        MagmaCore\UserManager\UserController::deleteAction:
+        MagmaCore\UserManager\UserController::hardDeleteAction:
           msg: User deleted successfully!
           redirect: user.index
-        MagmaCore\UserManager\UserController::bulkAction:
-          msg: Bulk action successful!
-          redirect: user.index
+        # MagmaCore\UserManager\UserController::bulkAction:
+        #   msg: Bulk action successful!
+        #   redirect: user.index
         MagmaCore\UserManager\UserController::trashAction:
           msg: Account is in located within the trash!
+          redirect: user.index
+        MagmaCore\UserManager\UserController::untrashAction:
+          msg: Account removed from trash!
           redirect: user.index
         MagmaCore\UserManager\UserController::trashRestoreAction:
           msg: Account restored from trash!
@@ -27,12 +30,6 @@ services:
           redirect: user.index
         MagmaCore\UserManager\UserController::activeAction:
           msg: User account is now active
-          redirect: user.index
-        MagmaCore\UserManager\UserController::bulkDeleteAction:
-          msg: Multiple items deleted successfully.
-          redirect: user.index
-        MagmaCore\UserManager\UserController::bulkCloneAction:
-          msg: Multiple items cloned successfully.
           redirect: user.index
         MagmaCore\UserManager\UserController::cloneAction:
           msg: Item cloned successfully.

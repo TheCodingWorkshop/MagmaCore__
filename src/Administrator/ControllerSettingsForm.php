@@ -117,6 +117,47 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Enable the trash bin for your table. This allows you to put items in the trash without permanently deleting the item. <code>Note this only works on supported models only</code>'
                 )
             )
+            ->add(
+                $this->blueprint->radio(
+                    'paging_top', 
+                    [], 
+                    $sessionData['paging_top']
+                ),
+                $this->blueprint->choices(
+                    $this->trashSupport(), 
+                    $sessionData['paging_top']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    'Pagination Top', 
+                    true, 
+                    null, 
+                    'Enable pagination above the data table.'
+                )
+            )
+
+            ->add(
+                $this->blueprint->radio(
+                    'paging_bottom', 
+                    [], 
+                    $sessionData['paging_bottom']
+                ),
+                $this->blueprint->choices(
+                    $this->trashSupport(), 
+                    $sessionData['paging_bottom']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    'Pagination Bottom', 
+                    true, 
+                    null, 
+                    'Enable pagination below the data table.'
+                )
+            )
 
             ->add(
                 $this->blueprint->text(
@@ -146,6 +187,29 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     true, 
                     null, 
                     'Filter alias is essentially the field name which $_GET query uses to fetch your search result it looks something like this. <code>&lt;input type="search" name="' . $sessionData['filter_alias'] . '" /&gt;. which internally looks like this $_GET[`' . $sessionData['filter_alias'] . '`]</code>'
+                )
+            )
+            ->add(
+                $this->blueprint->multipleCheckbox('table_options', [], null),
+                $this->blueprint->choices(
+                    [
+                        'paging_top' => $sessionData['table_options']['paging_top'],
+                        'paging_bottom' => $sessionData['table_options']['paging_bottom'],
+                        'bulk_trash' => $sessionData['table_options']['bulk_trash'],
+                        'bulk_clone' => $sessionData['table_options']['bulk_clone'],
+                        'trash_can' => $sessionData['table_options']['trash_can']
+                    ], 
+                    null, 
+                    $this
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    'Bottom Pagination', 
+                    true, 
+                    null, 
+                    'Enable the top pagination for this table.'
                 )
             )
 

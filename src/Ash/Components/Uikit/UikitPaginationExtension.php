@@ -40,20 +40,26 @@ class UikitPaginationExtension
             <nav aria-label="Pagination" uk-navbar>
                 <div class="uk-navbar-left" style="margin-top: -15px;">';
                 
-                if ($this->hasYamlSupport($controller) !==false) {
+                if ($this->hasYamlSupport($controller, 'trash_can_support') !==false) {
                     $html .= $this->repositoryTrash($controller);
                 } else {
                     $html .= '';
                 }
-                $html .= '</div>
-                <div class="uk-navbar-right">
+                $html .= '</div>';
+
+                if ($this->hasYamlSupport($controller, 'paging_bottom') !==false) {
+                $html .= '<div class="uk-navbar-right">
                 ' . $this->getRowsPerPage($controller) . '
                 <small>' . $this->infoPaging($controller) . '</small>
                     <ul class="uk-pagination">
                     ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
                     </ul>
-                </div>
-            </nav>
+                </div>';
+                } else {
+                    $html .= '<div class="uk-navbar-right uk-margin"></div>';
+                }
+
+            $html .= '</nav>
         </section>
         ' . PHP_EOL;
 

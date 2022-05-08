@@ -41,5 +41,16 @@ class Formify
             return ' selected="selected"';
     }
 
+    public static function checked(mixed $needle = null, mixed $haystack = null): string
+    {
+        $checked = '';
+        if ($haystack) {
+            $checked =  in_array($needle, $haystack) ? ' checked' : '';
+        }
+
+        return $checked;
+
+    }
+
 
 }

@@ -15,6 +15,15 @@ namespace MagmaCore\Base\Traits;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Utility\Serializer;
 
+/**
+ * Handles registering a session array for each controller on first initialization. This array contains valible data 
+ * which can alter and adjust the controller behaviour. ie we can alter the base query which renders the data table on the
+ * index route. We can assign any data table to be sortable etc..
+ * The base parameters for the session array is define within a .yml config file and acts as a fallback if the session data fails
+ * 
+ * This file is executed if a new route is visited which isn't already registered
+ */
+
 trait TableSettingsTrait
 {
 
@@ -39,7 +48,16 @@ trait TableSettingsTrait
             'filter_by' => $args['filter_by'] ?? [],
             'filter_alias' => $args['filter_alias'] ?? '',
             'sort_columns' => $args['sort_columns'] ?? [],
-            'trash_can_support' => $args['trash_can_support'] ?? 'false'
+            'trash_can_support' => $args['trash_can_support'] ?? 'false',
+            //'table_options' => [
+                'paging_top' => 'true',
+                'paging_bottom' => 'false',
+                'bulk_clone' => 'false',
+                'bulk_trash' => 'true',
+                'trash_can' => 'false',
+                'advance_table' => 'false'
+    
+           // ]
         ];
 
     }

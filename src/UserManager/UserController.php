@@ -133,12 +133,12 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                     'table_tabs' => [
                         'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
 
-                        'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount,
-                        'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
+                        // 'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount,
+                        // 'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
 
                         'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
 
-                        'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
+                        // 'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
 
                         'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
 
@@ -278,93 +278,22 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 
     protected function hardDeleteAction()
     {
-        $this->showAction
+        $this->deleteAction
             ->setAccess($this, Access::CAN_HARD_DELETE)
-            ->execute($this, NULL, NULL, NULL, __METHOD__)
-            ->render()
-            ->with()
-            ->singular()
-            ->end();
+            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
+            ->endAfterExecution();
 
     }
+
     /**
      * Bulk action route
      *
      * @return void
      */
-    // public function bulkAction()
-    // {
-    //     $this->chooseBulkAction($this, TagActionEvent::class);
-    // }
-
-    /**
-     * The bulk delete action request. is responsible for deleting multiple record from
-     * the database. This method is not a submittable method hence why this check has
-     * been omitted. This a simple click based action. which is triggered within the
-     * datatable. An event will be dispatch by this action
-     */
-    protected function bulkAction()
+    public function bulkAction()
     {
-        foreach (['bulk-delete', 'bulk-clone', 'bulkUnlockAll', 'bulkDeleteAll'] as $action) {
-            if (array_key_exists($action, $this->formBuilder->getData())) {
-                $id = $this->repository->getSchemaID();
-                $this->showBulkAction
-                    ->setAccess($this, Access::CAN_BULK_DELETE)
-                    ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
-                    ->render()
-                    ->with(
-                        [
-                            'selected' => $this->formBuilder->getData()[$id] ?? $_POST[$id],
-                            'action' => $action,
-                        ]
-                    )
-                    ->form($this->bulkDeleteForm)
-                    ->end();
-            }
-        }
+        $this->chooseBulkAction($this, UserActionEvent::class, null,  ['status' => 'active', 'deleted_at' => 0]);
     }
-
-    /**
-     * The bulk delete action request. is responsible for deleting multiple record from
-     * the database. This method is not a submittable method hence why this check has
-     * been omitted. This a simple click based action. which is triggered within the
-     * datatable. An event will be dispatch by this action
-     */
-    protected function bulkDeleteAction()
-    {
-        if (array_key_exists('bulkDelete-user', $this->formBuilder->getData())) {
-            $this->bulkDeleteAction
-                ->setAccess($this, Access::CAN_BULK_DELETE)
-                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
-                ->endAfterExecution();
-        }
-    }
-
-    /**
-     * Clone a user account and append a unique index to prevent email unique key
-     * collision
-     */
-    protected function bulkCloneAction()
-    {
-        if (array_key_exists('bulkClone-user', $this->formBuilder->getData())) {
-            $this->bulkCloneAction
-                ->setAccess($this, Access::CAN_BULK_CLONE)
-                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__)
-                ->endAfterExecution();
-        }
-    }
-
-    protected function bulkUnlockAllAction()
-    {
-        if (array_key_exists('bulkUnlockAll-user', $this->formBuilder->getData())) {
-            $this->bulkUpdateAction
-                ->setAccess($this, Access::CAN_BULK_DELETE)
-                ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ['status' => 'active'])
-                ->endAfterExecution();
-        }
-
-    }
-
 
     /**
      * Change a user status to lock
@@ -399,7 +328,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $this->changeStatusAction
             ->setAccess($this, Access::CAN_TRASH)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [],
-                ['status' => 'trash', 'deleted_at' => 1, 'deleted_at_datetime' => date('Y-m-d H:i:s')])
+                ['deleted_at' => 1, 'deleted_at_datetime' => date('Y-m-d H:i:s')])
             ->endAfterExecution();
     }
 
@@ -413,7 +342,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     {
         $this->changeStatusAction
         ->setAccess($this, Access::CAN_UNTRASH)
-        ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0])
+        ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0, 'deleted_at_datetime' => null])
         ->endAfterExecution();
 
     }
@@ -427,7 +356,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $this->changeStatusAction
             ->setAccess($this, Access::CAN_RESTORE_TRASH)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [],
-            ['status' => 'active', 'deleted_at' => NULL, 'deleted_at_datetime' => NULL])
+            ['deleted_at' => NULL, 'deleted_at_datetime' => NULL])
             ->endAfterExecution();
     }
 

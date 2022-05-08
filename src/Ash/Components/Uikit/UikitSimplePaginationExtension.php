@@ -97,14 +97,21 @@ class UikitSimplePaginationExtension
         ';
     }
 
-    private function navContentRight(object $controller)
+    private function navContentRight(object $controller): string
     {
-        return '
-        <small>' . $this->infoPaging($controller) . '</small>
-        <ul class="uk-pagination">
-        ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
-        </ul>
-        ';
+        $html = '';
+        if ($this->hasYamlSupport($controller, 'paging_top') !==false) {
+            $html .= '
+            <small>' . $this->infoPaging($controller) . '</small>
+            <ul class="uk-pagination">
+            ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
+            </ul>
+            ';
+        } else {
+            $html .= '<div class="uk-margin-large"></div>';
+        }
+
+        return $html;
     }
 
     private function navContentCentre(object $controller, string $name)

@@ -2,19 +2,21 @@
 
 namespace MagmaCore\Ash;
 
+use DateTime;
 use Exception;
 use MagmaCore\IconLibrary;
-use MagmaCore\Utility\Serializer;
-use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\Utility\Yaml;
+use MagmaCore\Auth\Authorized;
+use MagmaCore\Utility\Serializer;
+use MagmaCore\Session\SessionTrait;
+use MagmaCore\Utility\UtilityTrait;
 use MagmaCore\UserManager\UserModel;
 use MagmaCore\Utility\DateFormatter;
 use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Base\Traits\BaseAnchorTrait;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Ash\Exception\TemplateLocaleOutOfBoundException;
-use MagmaCore\Base\Traits\BaseAnchorTrait;
-use MagmaCore\Session\SessionTrait;
 
 trait TemplateFunctionsTrait
 {
@@ -104,6 +106,29 @@ trait TemplateFunctionsTrait
     public function altDateFormat(string $format, $datetime)
     {
         return date($format, strtotime($datetime));
+    }
+
+    public function getUser(mixed $field = null): string
+    {
+        $string = '';
+        /* check the argument against a list of valid fields for the user object throw ex exception is no match found */
+        if ($field !==null) {
+            if (is_array($field) && count($field) > 0) {
+                foreach ($field as $col) {
+                    $string = $col . ' ';
+                }
+            } else {
+                $string = Authorized::grantedUser()->$field;
+            }
+            
+        }
+
+        return $string;
+    }
+
+    public function getYear()
+    {
+        return date('Y');
     }
 
     /**

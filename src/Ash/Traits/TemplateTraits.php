@@ -205,11 +205,11 @@ trait TemplateTraits
      * @param object $controller
      * @return boolean
      */
-    private function hasYamlSupport(object $controller): bool
+    private function hasYamlSupport(object $controller, ?string $key = null): bool
     {
-        $key = $controller->thisRouteController() . '_settings';
-        $trashSupport = $this->getSessionData($key, $controller);
-        return ($trashSupport['trash_can_support'] === "true") ? true : false;
+        $_key = $controller->thisRouteController() . '_settings';
+        $yml = $this->getSessionData($_key, $controller);
+        return ($yml[$key] === "true") ? true : false;
     }
 
     /**

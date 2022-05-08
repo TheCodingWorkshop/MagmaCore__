@@ -16,12 +16,16 @@ use MagmaCore\FormBuilder\FormBuilderTrait;
 use MagmaCore\FormBuilder\FormBuilderTypeInterface;
 use MagmaCore\FormBuilder\FormExtensionTypeInterface;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
-
+use MagmaCore\Session\SessionTrait;
+use MagmaCore\Utility\Formify;
+use MagmaCore\Utility\Serializer;
+use MagmaCore\Utility\Utilities;
 
 class InputType implements FormBuilderTypeInterface
 {
 
-    use FormBuilderTrait;
+    use FormBuilderTrait,
+        SessionTrait;
 
     /** @var string - returns the name of the extension. IMPORTANT */
     protected string $type = '';
@@ -184,6 +188,8 @@ class InputType implements FormBuilderTypeInterface
      */
     public function view() : string
     {
+        $session = SessionTrait::sessionFromGlobal();
+        $sessionData = Serializer::unCompress($session->get('user_settings'));
         switch ($this->getType()) :
             case 'radio' :
                 return sprintf("%s", $this->filtering());
@@ -213,9 +219,17 @@ class InputType implements FormBuilderTypeInterface
                     isset($this->options) && 
                     is_array($this->options) && 
                     count($this->options) > 0) {
+                        $html = '';
+                        $html .= '<div>';
                         foreach ($this->options['choices'] as $key => $option) {    
-                           return '<input type="checkbox" class="uk-checkbox" name="visibility[]" id="' . $key . '" value="' . $key . '">&nbsp;' . Stringify::capitalize($key);
+                           $html .= '<label name="' . $key . '" class="uk-display-block">';
+                           $html .= '<input type="checkbox" class="uk-checkbox" name="' . $this->fields['name'] . '[]" id="' . $key . '" value="' . $key . '">&nbsp;' . str_replace(['-', '_'], ' ', Stringify::capitalize($key));
+                           $html .= '</label>';
+
                         }   
+                        $html .= '</div>';
+
+                        return $html;
                 }
                 break;
             default :

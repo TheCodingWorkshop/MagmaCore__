@@ -31,7 +31,7 @@ use MagmaCore\Base\Exception\BaseNoClassFoundExeption;
 /**
  * This class is responsible for creating allowable sidebar menu and its related items. Menu items
  * are defined within the $usables array. Meaning all controller which will have a sidebar menu
- * must consists a index, new, log menu item
+ * must consists of index, new, log menu item
  */
 
 trait ControllerMenuTrait

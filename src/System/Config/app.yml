@@ -9,6 +9,9 @@ app:
   core_db_version: 1.0.0
   app_email: magmacore@lavastudio.co.uk
   app_author: Ricardo Miller
+  github_label: LavaStudio MagmaCore Framework
+  github_framework: https://github.com/TheCodingWorkshop/MagmaCore__
+  github: https://github.com/TheCodingWorkshop/
 
 # TEMPLATE CONFIGURATIONS
 #=============================================================================

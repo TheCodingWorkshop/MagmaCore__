@@ -88,6 +88,7 @@ class SessionUpdateAction implements DomainActionLogicInterface
                         /* override the old session with new session form post data */
                         $newArray = $formData + $oldSession;
                         if (is_array($newArray) && count($newArray) > 0) {
+                                
                             /* flush the old session data */
                             $session->delete($key);
                             /* generate the new session data */

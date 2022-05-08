@@ -106,7 +106,7 @@ class UserActionSubscriber implements EventSubscriberInterface
                 ['addUserPreferences', -800],
                 ['updateUserPreferences'],
                 ['addUserNote'],
-                ['userNotification', -800],
+                //['userNotification', -800],
                 ['updateStatusIfStatusIsTrash', -900]
             ]
         ];

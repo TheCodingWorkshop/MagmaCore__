@@ -32,7 +32,7 @@ trait ControllerCommonTrait
         ?object $controller = null, 
         ?string $actionEvent = null, 
         ?string $redirectMsg = null, 
-        string $field = 'deleted_at'
+        mixed $field = 'deleted_at'
     ): void
     {
         $_name = strtolower($controller->thisRouteController());
@@ -44,6 +44,7 @@ trait ControllerCommonTrait
                 'bulkTrash-' . $_name, 
                 'bulkClone-' . $_name
             ] as $action) {
+
             if (array_key_exists($action, $this->formBuilder->getData())) {
                 $data = $this->formBuilder->getData();
                 switch ($action) :
@@ -55,11 +56,12 @@ trait ControllerCommonTrait
                             $action, 
                             $data, 
                             $actionEvent, 
-                            [$field => 0]);
+                            (isset($fields) && is_array($fields) && count($fields) > 0 ? $fields : ['deleted_at' => 0])
+                        );
                         break;
                     case 'bulkTrash-' . $_name :
                         $this->bulkTrash(
-                            $action, $data, $actionEvent, [$field => 1]
+                            $action, $data, $actionEvent, (isset($fields) && is_array($fields) && count($fields) > 0 ? $fields : ['deleted_at' => 1])
                         );
                         break;
                     case 'bulkClone-' . $_name :
