@@ -49,15 +49,13 @@ trait TableSettingsTrait
             'filter_alias' => $args['filter_alias'] ?? '',
             'sort_columns' => $args['sort_columns'] ?? [],
             'trash_can_support' => $args['trash_can_support'] ?? 'false',
-            //'table_options' => [
-                'paging_top' => 'true',
-                'paging_bottom' => 'false',
-                'bulk_clone' => 'false',
-                'bulk_trash' => 'true',
-                'trash_can' => 'false',
-                'advance_table' => 'false'
+            'paging_top' => 'true',
+            'paging_bottom' => 'false',
+            'bulk_clone' => 'false',
+            'bulk_trash' => 'true',
+            'trash_can' => 'false',
+            'advance_table' => 'false'
     
-           // ]
         ];
 
     }

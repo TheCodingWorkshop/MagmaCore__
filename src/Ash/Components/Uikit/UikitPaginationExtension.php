@@ -47,7 +47,7 @@ class UikitPaginationExtension
                 }
                 $html .= '</div>';
 
-                if ($this->hasYamlSupport($controller, 'paging_bottom') !==false) {
+                if ($this->hasYamlSupport($controller, 'paging_top') !==false) {
                 $html .= '<div class="uk-navbar-right">
                 ' . $this->getRowsPerPage($controller) . '
                 <small>' . $this->infoPaging($controller) . '</small>
@@ -132,7 +132,7 @@ class UikitPaginationExtension
                     $html .= '<button class="uk-button uk-button-small uk-button-danger" name="emptyTrash-' . $this->controllerName($controller) . '" type="submit">Empty</button>';
                     $html .= '<button class="uk-margin-small-left uk-button uk-button-small uk-button-default" name="restoreTrash-' . $this->controllerName($controller) . '" type="submit">Restore</button>';
                 } else {
-                    $html .= '<p class="uk-text-lead uk-text-center">No Trash!</p>';
+                    $html .= '<h3 class="uk-text-center uk-card-title uk-text-bolder uk-margin-remove-bottom">Empty!</h3>';
                 }
 
                 $html .= '<div class="uk-panel uk-margin">';

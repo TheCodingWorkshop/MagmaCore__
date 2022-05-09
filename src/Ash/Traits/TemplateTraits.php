@@ -111,6 +111,24 @@ trait TemplateTraits
     }
 
     /**
+     * Add local css stylesheets to individual html template
+     *
+     * @param mixed $styles
+     * @return string
+     */
+    public function localCss(mixed $styles = null): string
+    {
+        $css = '';
+        if ($styles !==null && is_array($styles) && count($styles) > 1) {
+            for ($i = 0; $i < count($styles); $i++) {
+                $css .= sprintf('<link rel="stylesheet" href="/public/assets/css%s">', $styles[$i]);
+            }
+        }
+        $css .= sprintf('<link rel="stylesheet" href="/public/assets/css%s">', $styles); 
+        return $css;
+    }
+
+    /**
      * Return the index position of the route. index[0] = the route namespace
      * index[1] = the route controller and index[2] = the route controller method. 
      *

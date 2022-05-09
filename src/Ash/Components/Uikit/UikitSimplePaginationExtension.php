@@ -71,19 +71,24 @@ class UikitSimplePaginationExtension
 
     private function navContentLeft($controller, $name)
     {
-        return '
+        $html = '';
+        $html .= '
         <ul class="uk-iconnav">
         <li><button uk-tooltip="Select All" type="button" class="uk-button uk-button-small uk-button-default">
         <input type="checkbox" class="uk-checkbox" name="selectAllDomainList" id="selectAllDomainList" />
         </button></li>
-        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '">' . IconLibrary::getIcon('plus') . '</a></li>
+        <li><a data-turbo="true" href="/admin/' . $controller->thisRouteController() . '/new" uk-tooltip="Add New ' . $name . '">' . IconLibrary::getIcon('plus') . '</a></li>';
         
-        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash">' . IconLibrary::getIcon('trash') . '</button></li>
+        if ($this->hasYamlSupport($controller, 'bulk_trash') !==false) {
+        $html .= '<li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkTrash-' . $controller->thisRouteController() . '" id="bulk_trash" uk-tooltip="Bulk Trash">' . IconLibrary::getIcon('trash') . '</button></li>';
+        }
 
-        <li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkClone-' . $controller->thisRouteController() . '" id="bulk_clone" uk-tooltip="Bulk Copy">' . IconLibrary::getIcon('copy') . '</button>
-        </li>
+        if ($this->hasYamlSupport($controller, 'bulk_clone') !==false) {
+        $html .= '<li><button type="submit" class="uk-button uk-button-small uk-button-text" name="bulkClone-' . $controller->thisRouteController() . '" id="bulk_clone" uk-tooltip="Bulk Copy">' . IconLibrary::getIcon('copy') . '</button>
+        </li>';
+        }
 
-        <li>
+        $html .= '<li>
         <a uk-tooltip="Refresh" href="/admin/' . $controller->thisRouteController() . '/index">' . IconLibrary::getIcon('refresh') .  '</a>
         </li>
 
@@ -95,12 +100,14 @@ class UikitSimplePaginationExtension
         </ul>
        
         ';
+
+        return $html;
     }
 
     private function navContentRight(object $controller): string
     {
         $html = '';
-        if ($this->hasYamlSupport($controller, 'paging_top') !==false) {
+        if ($this->hasYamlSupport($controller, 'paging_bottom') !==false) {
             $html .= '
             <small>' . $this->infoPaging($controller) . '</small>
             <ul class="uk-pagination">

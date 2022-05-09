@@ -38,10 +38,10 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
         parent::__construct();
     }
 
-    private function trashSupport()
+    private function radioOptions(string $key = null)
     {
         return [
-            'trash' => [
+            $key => [
                 'true' => 'true',
                 'false' => 'false'
             ]
@@ -104,7 +104,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['trash_can_support']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('trash_can_support'), 
                     $sessionData['trash_can_support']
                 ),
                 $this->blueprint->settings(
@@ -124,20 +124,19 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['paging_top']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('paging_top'), 
                     $sessionData['paging_top']
                 ),
                 $this->blueprint->settings(
                     false, 
                     null, 
                     true, 
-                    'Pagination Top', 
+                    null, 
                     true, 
                     null, 
-                    'Enable pagination above the data table.'
+                    'Enable the top pagination links above the data table.'
                 )
             )
-
             ->add(
                 $this->blueprint->radio(
                     'paging_bottom', 
@@ -145,17 +144,57 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['paging_bottom']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('paging_bottom'), 
                     $sessionData['paging_bottom']
                 ),
                 $this->blueprint->settings(
                     false, 
                     null, 
                     true, 
-                    'Pagination Bottom', 
+                    null, 
                     true, 
                     null, 
-                    'Enable pagination below the data table.'
+                    'Enable the top pagination links below the data table.'
+                )
+            )
+            ->add(
+                $this->blueprint->radio(
+                    'bulk_trash', 
+                    [], 
+                    $sessionData['bulk_trash']
+                ),
+                $this->blueprint->choices(
+                    $this->radioOptions('bulk_trash'), 
+                    $sessionData['bulk_trash']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    null, 
+                    true, 
+                    null, 
+                    'Enable the bulk trash options. Which allows you to select 1 or more items below to trash. Note this doesn\'t deleted the records permanently. You should carry this action out from the trash'
+                )
+            )
+            ->add(
+                $this->blueprint->radio(
+                    'bulk_clone', 
+                    [], 
+                    $sessionData['bulk_clone']
+                ),
+                $this->blueprint->choices(
+                    $this->radioOptions('bulk_clone'), 
+                    $sessionData['bulk_clone']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    null, 
+                    true, 
+                    null, 
+                    'Enable the bulk clone options. Which allows you to select 1 or more items below to clone'
                 )
             )
 
@@ -187,29 +226,6 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     true, 
                     null, 
                     'Filter alias is essentially the field name which $_GET query uses to fetch your search result it looks something like this. <code>&lt;input type="search" name="' . $sessionData['filter_alias'] . '" /&gt;. which internally looks like this $_GET[`' . $sessionData['filter_alias'] . '`]</code>'
-                )
-            )
-            ->add(
-                $this->blueprint->multipleCheckbox('table_options', [], null),
-                $this->blueprint->choices(
-                    [
-                        'paging_top' => $sessionData['table_options']['paging_top'],
-                        'paging_bottom' => $sessionData['table_options']['paging_bottom'],
-                        'bulk_trash' => $sessionData['table_options']['bulk_trash'],
-                        'bulk_clone' => $sessionData['table_options']['bulk_clone'],
-                        'trash_can' => $sessionData['table_options']['trash_can']
-                    ], 
-                    null, 
-                    $this
-                ),
-                $this->blueprint->settings(
-                    false, 
-                    null, 
-                    true, 
-                    'Bottom Pagination', 
-                    true, 
-                    null, 
-                    'Enable the top pagination for this table.'
                 )
             )
 
