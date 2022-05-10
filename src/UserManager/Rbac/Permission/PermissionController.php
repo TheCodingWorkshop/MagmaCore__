@@ -203,4 +203,9 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             ->end();
     }
 
+    protected function permTest()
+    {
+        
+    }
+
 }

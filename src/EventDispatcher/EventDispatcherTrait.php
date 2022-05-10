@@ -246,6 +246,23 @@ trait EventDispatcherTrait
         }, $array);
 
     }
+
+    private function isBulk(string $controller = null, array $postData = null): bool
+    {
+        if (array_key_exists('bulkTrash-' . $controller, $postData) || array_key_exists('bulkClone-' . $controller, $postData)) {
+            return true;
+        }
+        return false;
+
+    }
+
+    private function flash(object $event = null, ?string $message = null, ?string $redirect = null)
+    {
+        $event->getObject()->flashMessage(sprintf('%s', $message), $event->getObject()->flashWarning());
+        $event->getObject()->redirect($redirect);
+
+    }
+
 }
 
 
