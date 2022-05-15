@@ -53,8 +53,8 @@ class DiscoveryController extends AdminController
             ->render()
             ->with(
                 [
-                    'controllers' => $this->repository->getRepo()->findAll(),
-                    'count_controller' => (int)$this->repository->getRepo()->count(),
+                    'controllers' => $repository->getRepo()->findAll(),
+                    'count_controller' => (int)$repository->getRepo()->count(),
                     'controller_singular' => $singular,
                     'methods' => Serializer::unCompress($singular->methods ?? []),
                     'new_methods' => Serializer::unCompress($singular->current_new_method ?? []),
@@ -150,9 +150,9 @@ class DiscoveryController extends AdminController
 
     }
 
-    protected function refreshAction()
+    protected function testAction()
     {
-//       $this->pingMethods('tag', '\App\Controller\Admin\TagController');
-//       $this->redirect('/admin/discovery/discover');
+
     }
+
 }

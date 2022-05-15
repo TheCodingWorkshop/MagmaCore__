@@ -15,6 +15,8 @@ namespace MagmaCore\UserManager;
 use MagmaCore\UserManager\Rbac\Role\RoleRelationship;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\Auth\Contracts\UserSecurityInterface;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Auth\Roles\PrivilegeTrait;
 use MagmaCore\Base\AbstractBaseModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Utility\PasswordEncoder;
@@ -24,6 +26,7 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
 {
 
     use UtilityTrait;
+    use PrivilegeTrait;
 
     /** @var string */
     protected const TABLESCHEMA = 'users';
@@ -185,6 +188,47 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
         }
 
         return null;
+    }
+
+    /**
+     * j
+     *
+     * @param object|null $userRole
+     * @param integer|null $queryID
+     * @return integer|null
+     */
+    public function getUserRoleID(object $userRole = null, int $queryID = null): ?int
+    {
+        $userRoleID = $userRole->getRepo()->findObjectBy(['user_id' => $queryID], ['role_id']);
+        if ($userRoleID !==null) {
+            return $userRoleID->role_id;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Returns the role name for the current queried user. This methods workd in conjunction with getUserRoleID()
+     * which the result of needs to be passed as the second argument for this method.
+     *
+     * @param object|null $role
+     * @param integer|null $roleID
+     * @return string|null
+     */
+    public function getUserRole(object $role = null, int $roleID = null): ?string
+    {
+        $roleName = $role->getRepo()->findObjectBy(['id' => $roleID], ['role_name']);
+        if ($roleName !==null) {
+            return $roleName->role_name;
+        }
+        return null;
+    }
+
+    public function getUserRolePermissions(int $roleID = null): ?array
+    {
+        $perms = $this->getPermissionByRoleID($roleID);
+        return $perms;
     }
 
 }

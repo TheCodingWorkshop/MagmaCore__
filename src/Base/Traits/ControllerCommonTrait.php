@@ -18,6 +18,21 @@ trait ControllerCommonTrait
 {
 
     /**
+     * Returns a 404 error page if the data is not present within the database
+     * else return the requested object
+     *
+     * @return mixed
+     */
+    public function findOr404(): mixed
+    {
+        if (isset($this)) {
+            return $this->repository->getRepo()
+                ->findAndReturn($this->thisRouteID())
+                ->or404();
+        }
+    }
+
+    /**
      * index route contains various submit button with unique name attributes that
      * performs different task. The page is typically encapsulated by one form which 
      * actions post back to this route

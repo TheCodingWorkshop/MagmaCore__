@@ -81,12 +81,12 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
      *
      * @return mixed
      */
-    public function findOr404(): mixed
-    {
-        return $this->repository->getRepo()
-            ->findAndReturn($this->thisRouteID())
-            ->or404();
-    }
+    // public function findOr404(): mixed
+    // {
+    //     return $this->repository->getRepo()
+    //         ->findAndReturn($this->thisRouteID())
+    //         ->or404();
+    // }
 
     /**
      * Return the schema as a string

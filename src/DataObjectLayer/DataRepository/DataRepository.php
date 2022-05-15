@@ -467,4 +467,9 @@ class DataRepository implements DataRepositoryInterface
         
     }
 
+    public function findByRawQuery()
+    {
+
+    }
+
 }

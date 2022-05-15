@@ -23,6 +23,9 @@ class UserNoteModel extends AbstractBaseModel
     protected const TABLESCHEMA = 'user_note';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
+    /** @var string */
+    public const FOREIGNKEY = 'user_id';
+
     /** @var object $relationship */
     protected object $relationship;
 

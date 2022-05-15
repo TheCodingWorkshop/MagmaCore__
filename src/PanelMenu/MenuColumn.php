@@ -60,7 +60,13 @@ class MenuColumn extends AbstractDatatableColumn
                 'formatter' => function ($row, $tempExt) use ($callingController) {
                     $html = '<div class="uk-clearfix">';
                     $html .= '<div class="uk-float-left uk-margin-small-right">';
-                    $html .= '<span class="uk-text-teal" uk-icon="icon: info"></span>';
+                    $html .= '<a data-turbo="true" href="/admin/menu/' . $row['id'] . '/' . (isset($row['parent_menu']) && $row['parent_menu'] === 0 ? 'untoggle' : 'toggle') . '">';
+                    if ($row['parent_menu'] === 0) {
+                        $html .= '<span uk-tooltip="Bookmark item to side navigation" class="uk-text-teal" uk-icon="icon: bookmark; ratio: 0.7"></span>';
+                    } else {
+                        $html .= '<span uk-tooltip="Remove bookmark from navigation" class="uk-text-teal" uk-icon="icon: minus-circle; ratio: 0.7"></span>';
+                    }
+                    $html .= '</a>';
                     $html .= $tempExt->action(
                         [
                             'edit_modal' => [
@@ -222,38 +228,38 @@ class MenuColumn extends AbstractDatatableColumn
 
     private function quickEditForm(string $action = null, mixed $row = null, object $controller = null)
     {
-         $html = '<form method="post" id="menuQuickEdit" class="uk-form-stacked">';
-         $html .= '<legend>' . sprintf('Quickly edit this item without entering the full edit route. <code>You are editing [%s] menu item</code>', $row['menu_name']) . '</legend>';
-         $html .= '
-         <div class="uk-margin">
-            <label class="uk-form-label" for="menu_order">Menu Order</label>
-            <div class="uk-form-controls">
-                <input class="uk-input uk-form-width-small" id="menu_order" name="menu_order" type="number" value="' . $row['menu_order']. '">
-            </div>
-            <span class="uk-text-meta">The order in which the menu item is displayed in the sidebr navigation. Higher the number the higher up the item will be placed, upto <code>100 maximum</code></span>
+         $html = '<form method="post" id="menuQuickEdit" action="/admin/menu/' . $row['id'] . '/quickEdit" class="uk-form-stacked">';
+            $html .= '<legend>' . sprintf('Quickly edit this item without entering the full edit route. <code>You are editing [%s] menu item</code>', $row['menu_name']) . '</legend>';
+            $html .= '
+            <div class="uk-margin">
+                <label class="uk-form-label" for="menu_order">Menu Order</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input uk-form-width-small" id="menu_order" name="menu_order" type="number" value="' . $row['menu_order']. '">
+                </div>
+                <span class="uk-text-meta">The order in which the menu item is displayed in the sidebr navigation. Higher the number the higher up the item will be placed, upto <code>100 maximum</code></span>
 
-        </div> 
-         ';
+            </div> 
+            ';
 
-         $html .= '
-         <div class="uk-margin">
-            <label class="uk-form-label" for="menu_icon">Menu Icon</label>
-            <div class="uk-form-controls">
-                <input class="uk-input uk-form-width-medium" id="menu_icon" name="menu_icon" type="text" value="' . $row['menu_icon'] . '">
-                ' . IconLibrary::getIcon($row['menu_icon']) . '
-            </div>
-            <span class="uk-text-meta">This is the small icon which sits beside your navigation menu item.</span>
-        </div> 
-         ';
-         $html .= '
-         <div class="uk-margin">
-            <div class="uk-form-controls">
-                <input class="uk-button uk-button-secondary uk-button-small" id="index_quick_save" name="index-quick-save" value="Quick Save" type="submit">
-                <a class="uk-button uk-button-small uk-button-text uk-text-secondary" href="/admin/menu/' . $row['id'] . '/edit">Full Edit</a>
-            </div>
-            <div id="quickSaveMessage"></div>
-        </div> 
-         ';
+            $html .= '
+            <div class="uk-margin">
+                <label class="uk-form-label" for="menu_icon">Menu Icon</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input uk-form-width-medium" id="menu_icon" name="menu_icon" type="text" value="' . $row['menu_icon'] . '">
+                    ' . IconLibrary::getIcon($row['menu_icon']) . '
+                </div>
+                <span class="uk-text-meta">This is the small icon which sits beside your navigation menu item.</span>
+            </div> 
+            ';
+            $html .= '
+            <div class="uk-margin">
+                <div class="uk-form-controls">
+                    <input class="uk-button uk-button-secondary uk-button-small" id="index_quick_save" name="quickEdit-menu" value="Quick Save" type="submit">
+                    <a class="uk-button uk-button-small uk-button-text uk-text-secondary" href="/admin/menu/' . $row['id'] . '/edit">Full Edit</a>
+                </div>
+                <div id="quickSaveMessage"></div>
+            </div> 
+            ';
         $html .= '</form>';
 
         return $html;

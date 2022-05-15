@@ -241,6 +241,15 @@ class AdminController extends BaseController
         return false;
     }
 
+
+    protected function discoveryRefreshAction()
+    {
+      $this->pingMethods($this->thisRouteController(), sprintf('\App\Controller\Admin\%sController', ucwords($this->thisRouteController())));
+      $this->redirect('/admin/discovery/discover');
+
+    }
+
+
     // public function isRestoredRequired(object $controller = null): bool
     // {
     //     $currentSession = $this->controllerSessionData($controller);

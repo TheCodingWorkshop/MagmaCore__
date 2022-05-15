@@ -170,6 +170,15 @@ services:
         MagmaCore\PanelMenu\MenuController::untrashAction:
           msg: Item remove from trash successfully!
           redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::toggleAction:
+          msg: Item hidden from main navigation menu!
+          redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::untoggleAction:
+          msg: Item added to main navigation menu!
+          redirect: menu.index
+        MagmaCore\PanelMenu\MenuController::quickEditAction:
+          msg: Updated successfully!
+          redirect: menu.index
 
     message.subscriber:
       class: \App\EventSubscriber\MessageActionSubscriber

@@ -106,7 +106,7 @@ trait EventDispatcherTrait
      * @throws Exception
      */
     private function autoRedirect($event): string
-    {
+    {        
         $redirect = '';
         $routesArray = $this->trailingRoutes($event);
         $optionalRedirect = array_key_exists('redirect', $routesArray[$event->getMethod()]);

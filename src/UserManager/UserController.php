@@ -14,6 +14,7 @@ namespace MagmaCore\UserManager;
 use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
+use App\Resource\UserResource;
 use MagmaCore\UserManager\UserRelationship;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\UserManager\Model\UserLogModel;
@@ -69,6 +70,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'commander' => UserCommander::class,
                 'rolePermission' => RolePermissionModel::class,
                 'roles' => RoleModel::class,
+                'apiResource' => UserResource::class,
                 'userMeta' => UserMetaDataModel::class,
                 'entity' => UserEntity::class,
                 'column' => UserColumn::class,
@@ -83,6 +85,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userRelationship' => UserRelationship::class,
                 'userNotesForm' => UserNotesForm::class,
                 'userNoteModel' => UserNoteModel::class,
+                'userMetaData' => UserMetaDataModel::class,
                 'userNoteEntity' => UserNoteEntity::class,
             ]
         );
@@ -96,19 +99,58 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      *
      * @return mixed
      */
-    public function findOr404(): mixed
-    {
-        if (isset($this)) {
-            return $this->repository->getRepo()
-                ->findAndReturn($this->thisRouteID())
-                ->or404();
-        }
-    }
+    // public function findOr404(): mixed
+    // {
+    //     if (isset($this)) {
+    //         return $this->repository->getRepo()
+    //             ->findAndReturn($this->thisRouteID())
+    //             ->or404();
+    //     }
+    // }
 
     public function schemaAsString(): string
     {
         return UserSchema::class;
     }    
+
+    protected function getAction()
+    {
+        $data = [];
+        $queryID = $_GET['id'] ?? null;
+        $limit = $_GET['limit'] ?? null;
+        $orderby = $_GET['orderby'] ?? null;
+        $order = $_GET['order'] ?? null;
+
+        if ($limit !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],['limit' => $limit, 'offset' => 1]);
+        } elseif ($orderby !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],[],['orderby' => $orderby . ' ' . $order]);
+        } elseif ($limit !==null && $orderby !==null && $order !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],['limit' => $limit, 'offset' => 1],['orderby' => $orderby . ' ' . $order]);
+        } elseif ($queryID === null) {
+            $data = $this->repository->getRepo()->findAll();
+        } elseif (isset($queryID)) {
+            $queryID = (int)$queryID;
+            $data = $this->repository->getRepo()->findOneBy(['id' => $queryID]);
+            $meta['extended_data'] = [
+                'preferences' => $this->userPreferenceRepo->getRepo()->findObjectBy(['user_id' => $queryID]) ?? null,
+                'notes' => $this->userNoteModel->getRepo()->findBy([], ['user_id' => $queryID]) ?? null,
+                'metadata' => $this->userMetaData->getRepo()->findObjectBy(['user_id' => $queryID]) ?? null
+            ];
+            array_push($data, $meta);
+            $privi['privilege'] = [
+                'role' => $this->repository->getUserRole($this->roles, $this->repository->getUserRoleID($this->userRole, $queryID)) ?? null,
+                'permissions' => [$this->repository->getUserRolePermissions($this->repository->getUserRoleID($this->userRole, $queryID))] ?? null
+            ];
+            array_push($data, $privi);
+        }
+
+        $response = $this->restful->response($data);
+
+        echo $response;
+        die;
+
+    }
 
     /**
      * Entry method which is hit on request. This method should be implemented within
@@ -117,13 +159,10 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function indexAction()
     {
-        $trashCount = $this->repository->getRepo()->count(['status' => 'trash']);
         $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
         $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);
         $lockCount = $this->repository->getRepo()->count(['status' => 'lock']);
-        $logCount = $this->userLogRepo->getRepo()->count();
-        $logCriticalCount = $this->userLogRepo->getRepo()->count(['level' => 500]);
-
+        
         $this->indexAction
             ?->setAccess($this, Access::CAN_VIEW)
             ?->execute($this, NULL, NULL, UserSchema::class, __METHOD__)

@@ -70,12 +70,12 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
      *
      * @return mixed
      */
-    public function findOr404(): mixed
-    {
-        return $this->repository->getRepo()
-            ->findAndReturn($this->thisRouteID())
-            ->or404();
-    }
+    // public function findOr404(): mixed
+    // {
+    //     return $this->repository->getRepo()
+    //         ->findAndReturn($this->thisRouteID())
+    //         ->or404();
+    // }
 
     public function schemaAsString(): string
     {
@@ -126,6 +126,14 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
+    protected function quickEditAction()
+    {
+        $this->simpleUpdateAction
+        ->setAccess($this, Access::CAN_EDIT)
+        ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__, [], [], $this->repository)
+        ->endAfterExecution();
+    }
+
     /**
      * Route which puts the item within the trash. This is only for supported models
      * and is effectively changing the deleted_at column to 1. All datatable queries 
@@ -137,11 +145,10 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
     protected function trashAction()
     {
 
-        die('workj');
-        // $this->ifCanTrashAction
-        //     ->setAccess($this, Access::CAN_TRASH)
-        //     ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__, [], [], MenuSchema::class)
-        //     ->endAfterExecution();
+        $this->changeStatusAction
+            ->setAccess($this, Access::CAN_TRASH)
+            ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__, [], [], ['deleted_at' => 1])
+            ->endAfterExecution();
     }
 
     /**
@@ -206,6 +213,24 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
             }
         }
         return false;
+    }
+
+    protected function toggleAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__,[], [],['parent_menu' => 0])
+        ->endAfterExecution();
+
+    }
+
+    protected function untoggleAction()
+    {
+        $this->changeStatusAction
+        ->setAccess($this, Access::CAN_UNTRASH)
+        ->execute($this, MenuEntity::class, MenuActionEvent::class, NULL, __METHOD__,[], [],['parent_menu' => 1])
+        ->endAfterExecution();
+
     }
 
     protected function settingsAction()

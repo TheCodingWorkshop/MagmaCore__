@@ -70,7 +70,6 @@ class PurgeAction implements DomainActionLogicInterface
 
                 if ($data = $entityCollection->all()) {
                     $this->removeCsrfToken($data, $this->getSubmitValue());
-                    //unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['purge-setting']);
                 }
                 $this->clear(TEMPLATE_CACHE);
             }

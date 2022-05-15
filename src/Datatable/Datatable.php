@@ -197,8 +197,8 @@ class Datatable extends AbstractDatatable
             $element .= '<a data-turbo="true" class="uk-link-reset" href="' . ($status ? '?status=' . $status . '&column=' . $column['db_row'] . '&order=' . $this->sortDirection . '' : '?column=' . $column['db_row'] . '&order=' . $this->sortDirection . '') . '">';
             $element .= $column['dt_row'];
             //$element .= '<span uk-icon="icon: expand ' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '; ratio: 0.8"></span>';
-            //$element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
-            $element .= IconLibrary::getIcon('sort/sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '.svg', 10, 'img');
+            $element .= '<i class="fas fa-sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '"></i>';
+            //$element .= IconLibrary::getIcon('sort/sort' . ($this->tableColumn == $column['db_row'] ? '-' . $this->direction : '') . '.svg', 10, 'img');
 
             $element .= '</a>';
         } else {

@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base;
 
+use Closure;
+use Throwable;
 use ReflectionClass;
 use ReflectionProperty;
 use MagmaCore\Base\BaseEntity;
@@ -21,7 +23,6 @@ use MagmaCore\DataSchema\DataSchemaBuilderInterface;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepository;
 use MagmaCore\DataObjectLayer\DataRepository\DataRepositoryFactory;
-use Throwable;
 
 class BaseModel extends BaseModelRelationship
 {
@@ -364,6 +365,152 @@ class BaseModel extends BaseModelRelationship
     public function getColumnStatus(): array
     {
         return $this->columnStatus;
+    }
+
+    public function relationship(Closure $closure = null)
+    {
+        if (!$closure instanceof Closure) {
+            throw new \Exception(sprintf('%s is not an instance of closure', $closure));
+        }
+        return $closure($this);
+    }
+
+    public function addParent(object $parentModel = null): self
+    {
+        $this->parentModel = $parentModel;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string|null $alias
+     * @param mixed|null $data
+     * @return self
+     */
+    public function select(string $alias = null, mixed $data = null): self
+    {
+        $this->parentAlias = $alias;
+        $selectors = (isset($data) && is_array($data) && count($data) > 0 ? implode(', ', $data) : '*');
+        $this->joinQuery .= sprintf('SELECT %s FROM %s %s ', $selectors, $this->parentModel->getSchema(), $alias);
+
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string|null $model
+     * @param Closure|null $fn
+     * @return self
+     */
+    public function addChild(string $model = null, Closure $fn = null): self
+    {
+        $this->childModel = BaseApplication::diGet($model);
+        if (!$this->childModel instanceof BaseModel) {
+            throw new \Exception(sprintf('%s is not an instance of BaseModel', $model));
+        }
+        $this->joinQuery .= $fn($this, $this->childModel);
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string|null $foreignKey
+     * @param string $alias
+     * @return void
+     */
+    public function leftJoin(string $foreignKey = null, string $alias = '')
+    {
+        return  sprintf(
+            'LEFT JOIN %s %s ON %s.%s = %s.%s ', 
+                $this->childModel->getSchema(), 
+                $alias, 
+                $this->parentAlias,
+                $this->parentModel->getSchemaID(),
+                $alias,
+                $foreignKey
+            );
+
+    }
+    
+    /**
+     * Undocumented function
+     *
+     * @param string|null $foreignKey
+     * @param string $alias
+     * @return void
+     */
+    public function rightJoin(string $foreignKey = null, string $alias = '')
+    {
+        return  sprintf(
+            'RIGHT JOIN %s %s ON %s.%s = %s.%s ', 
+                $this->childModel->getSchema(), 
+                $alias, 
+                $this->parentAlias,
+                $this->parentModel->getSchemaID(),
+                $alias,
+                $foreignKey
+            );
+
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string|null $foreignKey
+     * @param string $alias
+     * @return void
+     */
+    public function innerJoin(string $foreignKey = null, string $alias = '')
+    {
+        return  sprintf(
+            'INNER JOIN %s %s ON %s.%s = %s.%s ', 
+                $this->childModel->getSchema(), 
+                $alias, 
+                $this->parentAlias,
+                $this->parentModel->getSchemaID(),
+                $alias,
+                $foreignKey
+            );
+
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param integer|null $itemID
+     * @return self
+     */
+    public function where(int $itemID = null): self
+    {
+        $this->joinQuery .= sprintf(
+            ' WHERE %s.%s = :%s', 
+                $this->parentAlias, 
+                $this->parentModel->getSchemaID(),
+                $this->parentModel->getSchemaID()
+            );
+        $this->whereID = $itemID;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $type
+     * @return mixed
+     */
+    public function getRelations(string $type = 'fetch_all'): mixed
+    {
+        if (isset($this->whereID) && $this->whereID !==null) {
+            $data = $this->getRepo()->getEm()->getCrud()->rawQuery($this->joinQuery, [$this->parentModel->getSchemaID() => $this->whereID], $type);
+        } else {
+            $data = $this->getRepo()->getEm()->getCrud()->rawQuery($this->joinQuery, [], $type);
+        }
+        if ($data !==null) {
+            return $data;
+        }
     }
 
 
