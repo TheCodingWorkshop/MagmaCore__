@@ -152,6 +152,25 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 
     }
 
+    protected function testAction()
+    {
+        $relationship = $this->repository->relationship(function($baseModel){
+            return $baseModel
+                ->addParent($this->repository)
+                ->addRelation(UserMetadataModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u2'))
+                ->addRelation(UserNoteModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u3'))
+                ->addRelation(UserPreferenceModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u4'))
+                ->addRelation(UserRoleModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u5'))
+                ->limit(1) /* optional use where() when a single item is required. argument required in item ID */
+                ->getRelations(); /* must return this method at the end */
+        });
+
+        // $this->dump($relationship);
+        echo $this->restful->response($relationship);
+        die;
+
+    }
+
     /**
      * Entry method which is hit on request. This method should be implemented within
      * all sub controller class as a default landing point when a request is

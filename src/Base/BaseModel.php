@@ -375,36 +375,47 @@ class BaseModel extends BaseModelRelationship
         return $closure($this);
     }
 
-    public function addParent(object $parentModel = null): self
-    {
-        $this->parentModel = $parentModel;
-        return $this;
-    }
-
     /**
-     * Undocumented function
+     * Creating relationships between tables starts by with addParent() method. This is the method which
+     * acts as the main parent table. The method will automatically create a alias or the second argument
+     * can be used to specify a custom alias for the query. The 3rd argument allow customizing of the data
+     * columns from the database table which is returned. We can add as much relative to a parent table
+     * which exists. All column from all relations will be return. The 3rd argument allows us to limit what result
+     * we want to get back.
      *
-     * @param string|null $alias
-     * @param mixed|null $data
+     * @param object|null $parentModel
+     * @param string|null $parentAlias
+     * @param array|null $selectors
      * @return self
      */
-    public function select(string $alias = null, mixed $data = null): self
+    public function addParent(object $parentModel = null, string $parentAlias = null, array $selectors = null): self
     {
-        $this->parentAlias = $alias;
-        $selectors = (isset($data) && is_array($data) && count($data) > 0 ? implode(', ', $data) : '*');
-        $this->joinQuery .= sprintf('SELECT %s FROM %s %s ', $selectors, $this->parentModel->getSchema(), $alias);
-
+        $this->parentModel = $parentModel;
+        /* this should get the first character of the parent table schema name */
+        $this->parentAlias = ($parentAlias !==null ? $parentAlias : substr($parentModel->getSchema(), 0, 1));
+        $this->selectors = (isset($selectors) && is_array($selectors) && count($selectors) > 0 ? implode(', ', $selectors) : '*');
+        $this->joinQuery .= sprintf(
+            'SELECT %s FROM %s %s ', 
+                $this->selectors, 
+                $this->parentModel->getSchema(), 
+                $this->parentAlias
+            );
         return $this;
     }
 
     /**
-     * Undocumented function
+     * This method allows us to add a relationship table to our parent table. only if the foreign key of the 
+     * child table is link to the primary key in the parent table. The method will return an exception otherwise
+     * saying no relationship exists between the child and the parent table. The first argument takes the qualified 
+     * namespace of the child model. Which is then converted to the child model object. The 2nd argument is a closure
+     * which has access to the current base model object and its own model object
      *
      * @param string|null $model
      * @param Closure|null $fn
      * @return self
+     * @throws Exception
      */
-    public function addChild(string $model = null, Closure $fn = null): self
+    public function addRelation(string $model = null, Closure $fn = null): self
     {
         $this->childModel = BaseApplication::diGet($model);
         if (!$this->childModel instanceof BaseModel) {
@@ -421,7 +432,7 @@ class BaseModel extends BaseModelRelationship
      * @param string $alias
      * @return void
      */
-    public function leftJoin(string $foreignKey = null, string $alias = '')
+    public function leftJoin(string $foreignKey = null, string $alias = null)
     {
         return  sprintf(
             'LEFT JOIN %s %s ON %s.%s = %s.%s ', 
@@ -495,6 +506,20 @@ class BaseModel extends BaseModelRelationship
         return $this;
     }
 
+    public function limit(int $limit = null, float|int $offset = 0): self
+    {
+        $this->limit = $limit;
+        $this->offset = $offset;
+        if (isset($this->limit) && $this->limit !==null && $this->limit > 0) {
+            $this->joinQuery .= sprintf(
+                ' LIMIT %s, %s', 
+                    ':offset', 
+                    ':limit'
+                );
+        }
+        return $this;
+    }
+
     /**
      * Undocumented function
      *
@@ -503,10 +528,14 @@ class BaseModel extends BaseModelRelationship
      */
     public function getRelations(string $type = 'fetch_all'): mixed
     {
+        $crud = $this->getRepo()->getEm()->getCrud();
+        
         if (isset($this->whereID) && $this->whereID !==null) {
-            $data = $this->getRepo()->getEm()->getCrud()->rawQuery($this->joinQuery, [$this->parentModel->getSchemaID() => $this->whereID], $type);
+            $data = $crud->rawQuery($this->joinQuery, [$this->parentModel->getSchemaID() => $this->whereID], $type);
+        } elseif (isset($this->limit) && $this->limit !==null && $this->offset !==null) {
+            $data = $crud->rawQuery($this->joinQuery, ['limit' => $this->limit, 'offset' => $this->offset], $type);
         } else {
-            $data = $this->getRepo()->getEm()->getCrud()->rawQuery($this->joinQuery, [], $type);
+            $data = $crud->rawQuery($this->joinQuery, [], $type);
         }
         if ($data !==null) {
             return $data;
