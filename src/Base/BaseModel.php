@@ -426,7 +426,8 @@ class BaseModel extends BaseModelRelationship
     }
 
     /**
-     * Undocumented function
+     * Uses the left join. This will return all rows from the left even if theres no match from the
+     * right table
      *
      * @param string|null $foreignKey
      * @param string $alias
@@ -447,7 +448,8 @@ class BaseModel extends BaseModelRelationship
     }
     
     /**
-     * Undocumented function
+     * Uses the right join. This will return all rows from the right even if theres no match from the
+     * left table
      *
      * @param string|null $foreignKey
      * @param string $alias
@@ -468,7 +470,8 @@ class BaseModel extends BaseModelRelationship
     }
 
     /**
-     * Undocumented function
+     * Uses the inner join. This will only return results when theres match in all the related 
+     * tables.
      *
      * @param string|null $foreignKey
      * @param string $alias
@@ -489,7 +492,7 @@ class BaseModel extends BaseModelRelationship
     }
 
     /**
-     * Undocumented function
+     * Add a where clause within the relationship query to filter the result for something specific
      *
      * @param integer|null $itemID
      * @return self
@@ -506,6 +509,14 @@ class BaseModel extends BaseModelRelationship
         return $this;
     }
 
+    /**
+     * Use the limit clause to limit the amount of result required. coupled with the offset to start
+     * fetching data from a specific row.
+     *
+     * @param integer|null $limit
+     * @param integer $offset
+     * @return self
+     */
     public function limit(int $limit = null, float|int $offset = 0): self
     {
         $this->limit = $limit;
@@ -521,22 +532,23 @@ class BaseModel extends BaseModelRelationship
     }
 
     /**
-     * Undocumented function
+     * Bind all the relevant relationships queries and parameters to get the desired results.
      *
      * @param string $type
      * @return mixed
      */
     public function getRelations(string $type = 'fetch_all'): mixed
     {
-        $crud = $this->getRepo()->getEm()->getCrud();
-        
+        $conditions = [];
         if (isset($this->whereID) && $this->whereID !==null) {
-            $data = $crud->rawQuery($this->joinQuery, [$this->parentModel->getSchemaID() => $this->whereID], $type);
+            $conditions = [$this->parentModel->getSchemaID() => $this->whereID];
         } elseif (isset($this->limit) && $this->limit !==null && $this->offset !==null) {
-            $data = $crud->rawQuery($this->joinQuery, ['limit' => $this->limit, 'offset' => $this->offset], $type);
+            $conditions = ['limit' => $this->limit, 'offset' => $this->offset];
         } else {
-            $data = $crud->rawQuery($this->joinQuery, [], $type);
+            $conditions = [];
         }
+
+        $data = $this->getRepo()->findByRawQuery($this->joinQuery, $conditions, $type);
         if ($data !==null) {
             return $data;
         }

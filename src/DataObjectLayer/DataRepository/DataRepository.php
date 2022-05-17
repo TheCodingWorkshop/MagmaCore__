@@ -456,20 +456,45 @@ class DataRepository implements DataRepositoryInterface
     }
 
     /**
-     * Undocumented function
+     * Returns the latest results from a specified table by the quantity amount passed in as the 1st
+     * argument. This defaults to asc mode but can be change using the 3rd argument. Defuault orderby column
+     * is set to id. But can also be specified in 2nd argument. query limit offset is set to 0 by default can 
+     * be change in 4th argument. The offset value is used together with the LIMIT keyword. This allows us to 
+     * specify which row to start retrieving the data. So by specifying 0 as the default we will start fetching
+     * data from the first row (as 0 = first row and 1 = second row etc..)
      *
      * @param integer $quantity
      * @param string $orderBy
-     * @return void
+     * @param string $pos
+     * @param integer $offset
+     * @return array|null
      */
-    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id')
+    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id', string $pos = 'asc', int $offset = 0): ?array
     {
-        
+        $results = $this->findBy([],[],['limit' => $quantity, 'offset' => $offset], ['orderby' => $orderBy . ' ' . $pos]);
+        if ($results !==null) {
+            return $results;
+        }
+
+        return null;
+
     }
 
-    public function findByRawQuery()
+    /**
+     * Allow access from the core repository to pass custom raw query. The 3rd argument can be used
+     * to modified the results of the output
+     *
+     * @param string|null $query
+     * @param array $conditions
+     * @param string|null $mode
+     * @return mixed
+     */
+    public function findByRawQuery(string $query = null, array $conditions = [], string $mode = null): mixed
     {
-
+        if (empty($query)) {
+            throw new DataLayerException(sprintf('Your query is empty. Please insert your query to continue', $query));
+        }
+        return $this->getEm()->getCrud()->rawQuery($query, $conditions, $mode);
     }
 
 }

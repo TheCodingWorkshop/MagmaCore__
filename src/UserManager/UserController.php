@@ -161,7 +161,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 ->addRelation(UserNoteModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u3'))
                 ->addRelation(UserPreferenceModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u4'))
                 ->addRelation(UserRoleModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u5'))
-                ->limit(1) /* optional use where() when a single item is required. argument required in item ID */
+                ->limit(2) /* optional use where() when a single item is required. argument required in item ID */
                 ->getRelations(); /* must return this method at the end */
         });
 

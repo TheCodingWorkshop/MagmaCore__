@@ -97,12 +97,17 @@ class Router implements RouterInterface
     private function dispatchWithException(string $url): array
     {
         $url = $this->removeQueryStringVariables($url);
-        if (!$this->match($url)) {
+        if (!$this->matched($url)) {
             http_response_code(404);
+            header('Location: http://localhost/error/error');
             throw new RouterNoRoutesFound("Route " . $url . " does not match any valid route.", 404);
+            exit;
         }
         if (!class_exists($controller = $this->createController())) {
-            throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
+            http_response_code(500);
+            header('Location: http://localhost/error/missingController');
+            //throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
+            exit;
         }
         return [$controller];
     }
@@ -126,7 +131,12 @@ class Router implements RouterInterface
                 $controllerObject->$action();
             }
         } else {
-            throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
+            http_response_code(500);
+            // header('Location: http://localhost/error/missingController');
+            // //throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
+            // exit;
+
+            // throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
         }
     }
 
@@ -172,7 +182,7 @@ class Router implements RouterInterface
      * @param string $url The route URL
      * @return boolean  true if a match found, false otherwise
      */
-    public function match(string $url): bool
+    public function matched(string $url): bool
     {
         foreach ($this->routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
