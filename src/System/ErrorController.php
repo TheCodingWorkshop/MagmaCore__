@@ -31,30 +31,43 @@ class ErrorController extends BaseController
     public function __construct(array $routeParams)
     {
         parent::__construct($routeParams);
-        $this->addDefinitions(
-            [
-            ]
-        );
-
+ 
     }
 
     protected function errorAction()
     {
-        $this->render('client/error/error.html');
-    }
-    protected function missingControllerAction()
-    {
-        $this->render('client/error/error.html');
-    }
+        $session = $this->getSession();
+        $this->render(
+            'client/error/error.html',
+            [
+                'invalid_route_request' => $session->get('invalid_route_request'),
+                'invalid_controller_request' => $session->get('invalid_controller_request'),
 
-    protected function error500Action()
-    {
-        $this->render('client/error/error500.html');
+            ]
+        );
     }
-
-    protected function error404Action()
+    protected function errormAction()
     {
-        $this->render('client/error/error404.html');
+        $session = $this->getSession();
+        $this->render(
+            'client/error/errorm.html',
+            [
+                'invalid_method_request' => $session->get('invalid_method_request'),
+                'route_controler_object' => $session->get('route_controler_object'),
+
+            ]
+        );
+    }
+    protected function erroraAction()
+    {
+        $session = $this->getSession();
+        $this->render(
+            'client/error/errora.html',
+            [
+                'invalid_method' => $session->get('invalid_method'),
+
+            ]
+        );
     }
 
 }

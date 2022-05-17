@@ -139,7 +139,11 @@ class BaseController extends AbstractBaseController
                     $this->after();
                 }
             } else {
-                throw new BaseBadMethodCallException("Method {$method} does not exists.");
+                http_response_code(404);
+                $this->getSession()->set('invalid_method', $method);
+                header('Location: http://localhost/error/errora');
+                exit;        
+                //throw new BaseBadMethodCallException("Method {$method} does not exists.");
             }
         } else {
             throw new Exception;
@@ -311,4 +315,13 @@ class BaseController extends AbstractBaseController
             die();
         }
     }
+
+    public function getHttpCode($url) {
+        $handle = curl_init($url);
+        curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
+        $response = curl_exec($handle);
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
+        return $httpCode;         
+      }    
 }

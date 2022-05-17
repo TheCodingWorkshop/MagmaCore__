@@ -21,12 +21,14 @@ use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\Exception\RouterNoRoutesFound;
 use MagmaCore\Router\Exception\NoActionFoundException;
 use MagmaCore\Router\Exception\RouterBadFunctionCallException;
+use MagmaCore\Session\SessionTrait;
 
 class Router implements RouterInterface
 {
 
     /** @var Object - returns extended router methods */
     use RouterTrait;
+    use SessionTrait;
 
     /** @var array - Associative array of routes (the routing table) */
     protected array $routes = [];
@@ -97,17 +99,14 @@ class Router implements RouterInterface
     private function dispatchWithException(string $url): array
     {
         $url = $this->removeQueryStringVariables($url);
+        $session = SessionTrait::sessionFromGlobal();
         if (!$this->matched($url)) {
-            http_response_code(404);
-            header('Location: http://localhost/error/error');
-            throw new RouterNoRoutesFound("Route " . $url . " does not match any valid route.", 404);
-            exit;
+            $session->set('invalid_route_request', $_SERVER['REQUEST_URI']);
+            $this->errorPage(404, 'errora');
         }
         if (!class_exists($controller = $this->createController())) {
-            http_response_code(500);
-            header('Location: http://localhost/error/missingController');
-            //throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
-            exit;
+            $session->set('invalid_controller_request', $controller);
+            $this->errorPage(500);
         }
         return [$controller];
     }
@@ -121,22 +120,20 @@ class Router implements RouterInterface
      */
     public function dispatch(string $url)
     {
+        $session = SessionTrait::sessionFromGlobal();
         list($controller) = $this->dispatchWithException($url);
         $controllerObject = new $controller($this->params);
         $action = $this->createAction();
         if (preg_match('/action$/i', $action) == 0) {
-            if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
-                $this->resolveControllerActionDependencies($controllerObject, $action);
-            } else {
+            // if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
+            //     $this->resolveControllerActionDependencies($controllerObject, $action);
+            // } else {
                 $controllerObject->$action();
-            }
+            // }
         } else {
-            http_response_code(500);
-            // header('Location: http://localhost/error/missingController');
-            // //throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
-            // exit;
-
-            // throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
+            $session->set('invalid_method_request', $action);
+            $session->set('route_controler_object', $controller);
+            $this->errorPage(500, 'errorm');
         }
     }
 
@@ -258,5 +255,12 @@ class Router implements RouterInterface
             $this->namespace .= $this->params['namespace'] . '\\';
         }
         return $this->namespace;
+    }
+
+    private function errorPage(int $status, string $template = 'error')
+    {
+        http_response_code($status);
+        header('Location: http://localhost/error/' . $template);
+        exit;
     }
 }
