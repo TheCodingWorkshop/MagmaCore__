@@ -12,14 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
+use PDO;
+use PDOException;
+use PDOStatement;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\DatabaseTransaction\DatabaseTransaction;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use PDOStatement;
-use PDO;
 
 class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {
@@ -254,14 +255,15 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      *
      * @param string $sqlQuery
      * @param array $parameters
+     * @param bool $search defaults to false
      * @return void
      * @throws DataLayerException
      */
-    public function persist(string $sqlQuery, array $parameters): void
+    public function persist(string $sqlQuery, array $parameters, bool $search = false): void
     {
         $this->start();
         try {
-            $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
+            $this->prepare($sqlQuery)->bindParameters($parameters, $search)->execute();
            $this->commit();
         } catch (PDOException $e) {
             $this->revert();

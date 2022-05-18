@@ -68,8 +68,11 @@ trait CustomizerTrait
         $commander .= '<div class="uk-width-expand">';
         $commander .= '<div>';
         $commander .= '<div class="uk-card">';
-        $commander .= '<h3 class="uk-card-title">Settings</h3>';
-        //$commander .= $this->customizerSettings();
+        $commander .= '<h3 class="uk-card-title">Search</h3>';
+        $commander .= '<form class="uk-search uk-search-default">
+        <input class="uk-search-input" type="search" name="s" placeholder="Search">
+        <p class="uk-text-meta">Searching is mode is currently set to <code>firstname</code> only. Meaning you can onky search by firstname.</p>
+    </form>';
         $commander .= '</div>';
         $commander .= '</div>';
         $commander .= '</div>';

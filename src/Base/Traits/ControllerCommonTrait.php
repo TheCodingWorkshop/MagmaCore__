@@ -57,7 +57,8 @@ trait ControllerCommonTrait
                 'emptyTrash-' . $_name, 
                 'restoreTrash-' . $_name, 
                 'bulkTrash-' . $_name, 
-                'bulkClone-' . $_name
+                'bulkClone-' . $_name,
+                's-' . $_name,
             ] as $action) {
 
             if (array_key_exists($action, $this->formBuilder->getData())) {

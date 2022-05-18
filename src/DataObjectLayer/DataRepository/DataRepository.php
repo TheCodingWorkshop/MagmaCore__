@@ -336,7 +336,7 @@ class DataRepository implements DataRepositoryInterface
         $searchConditions = [];
         if ($request->query->getAlnum($args['filter_alias'])) {
             $searchRequest = $request->query->getAlnum($args['filter_alias']);
-            if (is_array($args['filter_by'])) {
+            if (is_array($args['filter_by'])) { /* instead of looping why not try array_push to create the selectors */
                 for ($i = 0; $i < count($args['filter_by']); $i++) {
                     $searchConditions = [$args['filter_by'][$i] => $searchRequest];
                 }

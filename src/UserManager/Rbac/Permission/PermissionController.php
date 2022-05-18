@@ -183,6 +183,11 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
         $this->chooseBulkAction($this, PermissionActionEvent::class);
     }
 
+    protected function searchAction()
+    {
+        die('working');
+    }
+
     protected function settingsAction()
     {
         $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
