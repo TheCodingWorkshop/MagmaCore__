@@ -178,6 +178,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function indexAction()
     {
+
         $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
         $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);
         $lockCount = $this->repository->getRepo()->count(['status' => 'lock']);

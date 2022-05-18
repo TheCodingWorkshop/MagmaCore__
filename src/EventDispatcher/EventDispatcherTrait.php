@@ -14,9 +14,7 @@ namespace MagmaCore\EventDispatcher;
 
 use Closure;
 use Exception;
-use MagmaCore\Base\BaseActionEvent;
 use MagmaCore\Notification\NotificationModel;
-use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
@@ -115,7 +113,7 @@ trait EventDispatcherTrait
         } elseif ($optionalRedirect == true){
             $redirect = $this->resolveRedirect($routesArray[$event->getMethod()]['redirect'], $event);
         } else {
-            $redirect = $event->getObject()->onSelf();
+            $redirect = $_SERVER['HTTP_REFERER'];
         }
         return $redirect;
     }

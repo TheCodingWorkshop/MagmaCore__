@@ -125,11 +125,11 @@ class Router implements RouterInterface
         $controllerObject = new $controller($this->params);
         $action = $this->createAction();
         if (preg_match('/action$/i', $action) == 0) {
-            // if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
-            //     $this->resolveControllerActionDependencies($controllerObject, $action);
-            // } else {
+            if (Yaml::file('app')['system']['use_resolvable_action'] === true) {
+                $this->resolveControllerActionDependencies($controllerObject, $action);
+            } else {
                 $controllerObject->$action();
-            // }
+            }
         } else {
             $session->set('invalid_method_request', $action);
             $session->set('route_controler_object', $controller);

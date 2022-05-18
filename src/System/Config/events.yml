@@ -10,9 +10,6 @@ services:
         MagmaCore\UserManager\UserController::hardDeleteAction:
           msg: User deleted successfully!
           redirect: user.index
-        # MagmaCore\UserManager\UserController::bulkAction:
-        #   msg: Bulk action successful!
-        #   redirect: user.index
         MagmaCore\UserManager\UserController::trashAction:
           msg: Account is in located within the trash!
           redirect: user.index
@@ -172,10 +169,9 @@ services:
           redirect: menu.index
         MagmaCore\PanelMenu\MenuController::toggleAction:
           msg: Item hidden from main navigation menu!
-          redirect: menu.index
+          # By not defining the redirect key. the page will redirect using HTTP_REFERER
         MagmaCore\PanelMenu\MenuController::untoggleAction:
           msg: Item added to main navigation menu!
-          redirect: menu.index
         MagmaCore\PanelMenu\MenuController::quickEditAction:
           msg: Updated successfully!
           redirect: menu.index

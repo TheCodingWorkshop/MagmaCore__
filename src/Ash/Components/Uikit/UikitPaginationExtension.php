@@ -51,9 +51,14 @@ class UikitPaginationExtension
                 $html .= '<div class="uk-navbar-right">
                 ' . $this->getRowsPerPage($controller) . '
                 <small>' . $this->infoPaging($controller) . '</small>
-                    <ul class="uk-pagination">
-                    ' . $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller)) . $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller)) . '
-                    </ul>
+                    <ul class="uk-pagination">';
+
+                    $html .= $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller));
+                    $html .= $controller->tableGrid->pagingSteps();
+
+                    $html .= $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller));
+                    
+                    $html .= '</ul>
                 </div>';
                 } else {
                     $html .= '<div class="uk-navbar-right uk-margin"></div>';

@@ -229,11 +229,24 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage - 1)
             );
         } else {
-            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage - 1));
+            $element .= sprintf('<a uk-tooltip="Previous" href="?page=%s">', ($this->currentPage - 1));
         }
         $element .= IconLibrary::getIcon('triangle-left', 0.9);
         $element .= '</a>' . PHP_EOL;
         $element .= '</li>' . PHP_EOL;
+
+        return $element;
+    }
+
+    public function pagingSteps()
+    {
+        $element = '<li class="' . ($this->totalPages == $this->currentPage ? 'uk-disabled' : 'uk-active') . '">';
+        $element .= '<select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" class="uk-select uk-blank uk-form-width-xsmall uk-form-small">';
+        $element .= sprintf('<option value="?page=%s">%s</option>', $this->currentPage, $this->currentPage);
+        for ($cp = 1; $cp <= $this->totalPages; $cp++) {
+            $element .= sprintf('<option value="?page=%s">%s</option>', $cp, $cp);
+        }
+        $element .= '</select>';
 
         return $element;
     }
@@ -260,7 +273,7 @@ class Datatable extends AbstractDatatable
                 ($this->currentPage + 1)
             );
         } else {
-            $element .= sprintf('<a data-turbo="true" href="?page=%s">', ($this->currentPage + 1));
+            $element .= sprintf('<a uk-tooltip="Next" href="?page=%s">', ($this->currentPage + 1));
         }
         $element .= IconLibrary::getIcon('triangle-right', 0.9);
         $element .= '</a>' . PHP_EOL;
