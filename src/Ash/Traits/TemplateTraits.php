@@ -218,6 +218,27 @@ trait TemplateTraits
     }
 
     /**
+     * Get the controller settings from the session within the html templates.
+     *
+     * @param object|null $controller
+     * @param mixed $filterKey
+     * @return mixed
+     */
+    public function getSessionSettings(object $controller = null, mixed $filterKey = null): mixed
+    {
+        $key = $controller->thisRouteController() . '_settings';
+        $settings = $this->getSessionData($key);
+        if (is_array($settings) && count($settings) > 0) {
+            if (isset($filterKey) && $filterKey !==null && array_key_exists($filterKey, $settings)) {
+                return $settings[$filterKey];
+            }
+            return $settings;
+        }
+
+        return null;
+    }
+
+    /**
      * Show the trash can if and enable and the model supports it
      *
      * @param object $controller

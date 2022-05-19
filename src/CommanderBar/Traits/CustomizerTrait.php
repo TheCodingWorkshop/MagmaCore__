@@ -12,14 +12,18 @@ declare(strict_types=1);
 
 namespace MagmaCore\CommanderBar\Traits;
 
+use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\IconLibrary;
 use MagmaCore\Utility\Stringify;
 
 trait CustomizerTrait
 {
 
+    use ControllerSessionTrait;
+
     private function customizer(): string
     {
+        $filter = $this->getSessionData($this->controller->thisRouteController() . '_settings', $this->controller);
         if (isset($this->controller)) {
             if (in_array($this->controller->thisRouteAction(), $this->controller->commander->unsetCustomizer())) {
                 return '';
@@ -70,7 +74,7 @@ trait CustomizerTrait
         $commander .= '<div class="uk-card">';
         $commander .= '<h3 class="uk-card-title">Search</h3>';
         $commander .= '<form class="uk-search uk-search-default">
-        <input class="uk-search-input" type="search" name="s" placeholder="Search">
+        <input class="uk-search-input" type="search" name="' . (array_key_exists('filter_alias', $filter) ? $filter['filter_alias'] : 's') . '" placeholder="Search">
         <p class="uk-text-meta">Searching is mode is currently set to <code>firstname</code> only. Meaning you can onky search by firstname.</p>
     </form>';
         $commander .= '</div>';
@@ -88,12 +92,6 @@ trait CustomizerTrait
 
     private function customizerSettings(): string
     {
-        //return '';
-        // $this->controller
-        // ->controllerRepository
-        // ->getRepo()
-        // ->findObjectBy(['controller_name' => $this->controller->thisRouteController()]) ?? '<span class="ion-64 uk-float-left"><ion-icon name="alert-circle-outline"></ion-icon></span><small class="uk-float-left uk-margin-medium-top">Settings Unavailable.</small>',
-
         return $this->controller
         ->controllerSettingsForm
         ->createForm(

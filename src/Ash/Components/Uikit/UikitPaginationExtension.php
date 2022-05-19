@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagmaCore\Ash\Components\Uikit;
 
-use MagmaCore\Utility\Yaml;
 use MagmaCore\Ash\Traits\TemplateTraits;
 use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\IconLibrary;

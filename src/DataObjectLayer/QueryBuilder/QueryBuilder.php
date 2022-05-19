@@ -172,12 +172,7 @@ class QueryBuilder extends AbstractQueryBuilder
     public function rawQuery(): string
     {
         if ($this->isQueryTypeValid('raw')) {
-//            $index = array_keys($this->key['conditions']);
             $this->sqlQuery = $this->key['raw'];
-//            if (isset($this->key['conditions']) && count($this->key['conditions']) > 0) {
-//                $this->sqlQuery .= " WHERE {$index[1]} = :{$index[1]}";
-//            }
-
             return $this->sqlQuery;
         }
     }
@@ -199,9 +194,6 @@ class QueryBuilder extends AbstractQueryBuilder
         } else if (empty($this->key['conditions'])) {
             $this->sqlQuery = " WHERE 1";
         }
-        // if (isset($this->key['limit']) && $this->key['limit'] !== '') {
-        //     $this->sqlQuery .= ' LIMIT ' . $this->key['limit'];
-        // } 
         $this->sqlQuery .= $this->orderByQuery();
         $this->sqlQuery .= $this->queryOffset();
         
