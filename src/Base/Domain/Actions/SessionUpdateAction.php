@@ -59,7 +59,6 @@ class SessionUpdateAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
-        $action = false;
         $formBuilder = $controller->formBuilder;
 
 

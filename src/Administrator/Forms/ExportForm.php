@@ -67,6 +67,18 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->addRepository($dataRepository)
             ->add(
                 $this->blueprint->text(
+                    'export_filename',
+                    ['uk-form-large', 'uk-form-width-medium', 'uk-border-bottom', 'uk-form-blank'],
+                    $sessionData['export_filename'], /* how much data to return */
+                    false,
+                    'Export filename'
+                ),
+                null,
+                $this->blueprint->settings(false, null, true, null, true, null, 'Leaving this field blank will automatically revert the filename set internally. Which is <code>user-data_ follow by the current date.</code>')
+            )
+
+            ->add(
+                $this->blueprint->text(
                     'log_records',
                     ['uk-form-large', 'uk-form-width-small', 'uk-border-bottom', 'uk-form-blank'],
                     $sessionData['log_records'], /* how much data to return */
@@ -117,13 +129,12 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
             ->add(
                 $this->blueprint->submit(
                     'export-' . $callingController->thisRouteController() . '',
-                    ['uk-button', 'uk-button-primary'],
-                    'Export'
+                    ['uk-button', 'uk-button-secondary'],
+                    'Save & Export'
                 ),
                 null,
-                $this->blueprint->settings(false, null, false, null, true, null, '<code>If changes are made. Please hit the save button first.</code>')
+                $this->blueprint->settings(false, null, false, null, true, null, 'If you made any changes please save before exporting.')
             )
-
             ->build(['before' => '<div class="uk-margin">', 'after' => '</div>'], false);
     }
 }

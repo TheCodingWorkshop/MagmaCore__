@@ -15,7 +15,6 @@ namespace MagmaCore\Base\Domain\Actions;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Traits\SessionSettingsTrait;
-use MagmaCore\Utility\Serializer;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -31,6 +30,7 @@ class ExportAction implements DomainActionLogicInterface
     use SessionSettingsTrait;
 
     public bool $passwordRequired = false;
+    private $sessionKey = 'session_export_settings';
 
     /**
      * execute logic for adding new items to the database()
@@ -61,65 +61,59 @@ class ExportAction implements DomainActionLogicInterface
         $this->actionOptional = $optional;
 
         $formBuilder = $controller->formBuilder;
-        $key = 'session_export_settings';
-        $exportSettings = ['log_records' => '1000', 'export_format' => 'csv', 'export_conditions' => '1_year', 'custom_export_conditions' => ''];  
-        $this->createSessionSettings($this->controller, $key, $exportSettings);
-        $exportOptions = $this->getSessionSettings($this->controller, $key);
+        $this->exportReset($formBuilder);
+        list($exportOptions) = $this->exportSessionInit();
 
         if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
             if ($formBuilder?->csrfValidate()) {       
-                $postData = $formBuilder->getData();
-                foreach ($exportOptions as $key => $value) {
-                    if (array_key_exists($key, $postData)) {
-                        unset($postData['_CSRF_INDEX'], $postData['_CSRF_TOKEN'], $postData[$this->getSubmitValue()]);
-                        /* if the value of the submitted data isn't the same as the old session data lets update the session data with the new submitted data */
-                        if ($postData[$key] !== $value) {
-                            /* override the old values with the new ones */
-                            $key = $value;
-                        }
-                    }
-                }
-                
-                /* If array is equal to 0. Then this section will be skip as this will interpret array = 0 as no changes made */
-                $comparison = array_diff($postData, $exportOptions);
-                $newExportSession = [];
-                /* if theres a change then a populated array will return the changes. This way we can trigger ourt session to handle the chnages */
-                if (is_array($comparison) && count($comparison) > 0) {
-                    /* we will just delete the old session and create a new one with the new post data */
-                    $this->flushSessionSettings($this->controller, $key, $postData);
-                }
-                /* Get a fresh copy of the new session data */
-                $newExportSession = Serializer::unCompress($this->controller->getSession()->get($key));
-                var_dump($newExportSession);
-                die;
+                $formData = $formBuilder->getData();
+                if (is_array($formData) && count($formData) > 0) {
+                    
+                    /* Unset unwanted data */
+                    unset(
+                        $formData['_CSRF_INDEX'], 
+                        $formData['_CSRF_TOKEN'], 
+                        $formData[$this->getSubmitValue()]
+                    );
 
-                $delimiter  = ",";
-                $filename = $this->controller->thisRouteController() . "-data-" . date("Y-m-d") . ".csv";
-                $output = fopen("php://output", 'w');
-                header('Content-Type: text/csv'); 
-                header('Content-Disposition: attachment; filename="' . $filename . '";'); 
-                $columns = $this->controller->repository->getColumns($objectSchema);
-                $dbData = $this->controller->repository->getRepo()->findBy([], [], [], ['orderby' => 'id ASC']);
-                fputcsv($output, $columns, $delimiter);
-                foreach ($dbData as $data) {
-                    fputcsv($output, $data, $delimiter);
+                    $oldExportSession = $exportOptions;
+                    $newExportSession = $formData + $oldExportSession;
+                    if (is_array($newExportSession) && count($newExportSession) > 0) {
+                        /* flush old session */
+                        $this->flushSessionSettings($this->controller, $this->sessionKey, $newExportSession);
+                    }
+                    $this->csvExport($objectSchema, $newExportSession);
+                    $this->controller->flashMessage('Data exported.');
+                    $this->controller->redirect($this->controller->onSelf());
+        
                 }
-                fseek($output, 0);
-                fpassthru($output);
-                exit;
 
             }
         endif;
         return $this;
     }
 
-    private function csvExport(string $objectSchema = null, string $filename = null, string $delimiter = null): void
+    /**
+     * csv export
+     *
+     * @param string|null $objectSchema
+     * @param array|null $exportData
+     * @return void
+     */
+    private function csvExport(string $objectSchema = null, array $exportData = null): void
     {
+        $delimiter  = ",";
+        $appendDate = date('Y-m-d');
+        $exportFormat = (isset($exportData['export_format']) ? $exportData['export_format'] : 'csv');
+        $defaultFileanme = $this->controller->thisRouteController() . "-data_" . $appendDate . '.' . $exportFormat;
+        $filename = (isset($exportData['export_filename']) && $exportData['export_filename'] !=='' ? $exportData['export_filename'] . '_' . $appendDate . '.' . $exportFormat : $defaultFileanme);
+
         $output = fopen("php://output", 'w');
-        header('Content-Type: text/csv'); 
+        header('Content-Type: text/' . $exportFormat); 
         header('Content-Disposition: attachment; filename="' . $filename . '";'); 
         $columns = $this->controller->repository->getColumns($objectSchema);
-        $dbData = $this->controller->repository->getRepo()->findBy([], [], [], ['orderby' => 'id ASC']);
+        $logLimit = ['limit' => (int)$exportData['log_records'], 'offset' => 0] ?? [];
+        $dbData = $this->controller->repository->getRepo()->findBy([], [], $logLimit, ['orderby' => 'id ASC']);
         fputcsv($output, $columns, $delimiter);
         foreach ($dbData as $data) {
             fputcsv($output, $data, $delimiter);
@@ -129,4 +123,35 @@ class ExportAction implements DomainActionLogicInterface
         exit;
 
     }
+
+    /**
+     * Initialize the session data for the export settings page.
+     *
+     * @return array
+     */
+    private function exportSessionInit(): array
+    {
+        $exportSettings = ['export_filename' => '', 'log_records' => '1000', 'export_format' => 'csv', 'export_conditions' => '1_year', 'custom_export_conditions' => '', 'last_export_timestamp' => time()];  
+        $this->createSessionSettings($this->controller, $this->sessionKey, $exportSettings);
+        $exportOptions = $this->getSessionSettings($this->controller, $this->sessionKey);
+
+        return [$exportOptions];
+
+    }
+
+    private function exportReset(object $formBuilder)
+    {
+        if ($formBuilder->isFormValid('export-' . $this->controller->thisRouteController() . '-reset')) {
+            $session = $this->controller->getSession();
+            if ($session->has($this->sessionKey)) {
+                $session->delete($this->sessionKey);
+
+                $this->exportSessionInit();
+            }
+            $this->controller->flashMessage('Export settings reset.');
+            $this->controller->redirect($this->controller->onSelf());
+
+        }
+    }
+
 }

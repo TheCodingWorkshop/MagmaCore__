@@ -36,12 +36,14 @@ use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
+use MagmaCore\Base\Traits\SessionSettingsTrait;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait,
-        ControllerCommonTrait;
+        ControllerCommonTrait,
+        SessionSettingsTrait;
         
     private const NO_USER_NOTE = 'The Queried ID is missing the starter notes. You can update the account, to generate a starter note.';
 
@@ -515,6 +517,16 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 
     protected function importAction()
     {
+        $this->importAction
+        ->execute($this, null, null, UserSchema::class, __METHOD__)
+        ->render('admin/_global/_global_import.html')
+        ->with(
+            [
+            ]
+        )
+        ->form($this->importForm)
+        ->end();
+
     }
 
     protected function exportAction()
@@ -522,10 +534,15 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $this->exportAction
             ->execute($this, null, null, UserSchema::class, __METHOD__)
             ->render('admin/_global/_global_export.html')
-            ->with()
+            ->with(
+                [
+                    'export' => $this->getSessionSettings($this, 'session_export_settings')
+                ]
+            )
             ->form($this->exportForm)
             ->end();
     }
+
 
     protected function settingsAction()
     {

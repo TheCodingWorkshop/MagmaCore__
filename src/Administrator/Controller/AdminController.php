@@ -19,6 +19,7 @@ use MagmaCore\RestFul\RestHandler;
 use MagmaCore\Session\SessionTrait;
 use MagmaCore\Base\Domain\Actions\NewAction;
 use MagmaCore\Administrator\Forms\ExportForm;
+use MagmaCore\Administrator\Forms\ImportForm;
 use MagmaCore\Base\Domain\Actions\EditAction;
 use MagmaCore\Base\Domain\Actions\ShowAction;
 use MagmaCore\Base\Traits\TableSettingsTrait;
@@ -27,6 +28,7 @@ use MagmaCore\Base\Domain\Actions\CloneAction;
 use MagmaCore\Base\Domain\Actions\IndexAction;
 use MagmaCore\Base\Domain\Actions\DeleteAction;
 use MagmaCore\Base\Domain\Actions\ExportAction;
+use MagmaCore\Base\Domain\Actions\ImportAction;
 use MagmaCore\Base\Domain\Actions\UpdateOnEvent;
 use MagmaCore\Base\Domain\Actions\LogIndexAction;
 use MagmaCore\Base\Domain\Actions\SettingsAction;
@@ -108,7 +110,9 @@ class AdminController extends BaseController
                 'sessionUpdateAction' => SessionUpdateAction::class,
                 'controllerSessionBackupModel' => ControllerSessionBackupModel::class,
                 'exportForm' => ExportForm::class,
-                'exportAction' => ExportAction::class
+                'importForm' => ImportForm::class,
+                'exportAction' => ExportAction::class,
+                'importAction' => ImportAction::class,
 
             ]
         );

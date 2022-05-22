@@ -38,9 +38,7 @@ trait SessionSettingsTrait
     public function flushSessionSettings(object $controller = null, string $key = null, mixed $data = null): void
     {
         $session = $controller->getSession();
-        if ($session->has($key)) {
-            $session->delete($key);
-        }
+        $session->delete($key);
         $session->set($key, Serializer::compress($data));
     }
 
