@@ -674,12 +674,13 @@ trait DomainTraits
         return false;
     }
 
-    public function removeCsrfTokens(array $data, string $field): void
+    public function removeCsrfTokens(array $data, string $field = null): void
     {
-        if ($data) {
-            unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
+       // if ($data) {
+            unset($data['_CSRF_TOKEN']);
+            unset($data['_CSRF_INDEX']);
             unset($data[$this->getSubmitValue()]);
-        }
+       // }
 
     }
 
@@ -813,5 +814,6 @@ trait DomainTraits
         }
 
     }
+
 
 }

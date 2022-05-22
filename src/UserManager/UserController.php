@@ -179,53 +179,17 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     protected function indexAction()
     {
 
-        $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
-        $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);
-        $lockCount = $this->repository->getRepo()->count(['status' => 'lock']);
-        
         $this->indexAction
             ?->setAccess($this, Access::CAN_VIEW)
             ?->execute($this, NULL, NULL, UserSchema::class, __METHOD__)
             ?->render()
             ?->with(
                 [
-                    'table_tabs' => [
-                        'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
-
-                        // 'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount,
-                        // 'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
-
-                        'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
-
-                        // 'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
-
-                        'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
-
-                    ],
-                    'lists' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'id', 'deleted_at_datetime'],
-                            ['status' => 'trash', 'deleted_at' => 1]
-                        ),
-                    'lock' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'],
-                            ['status' => 'lock']
-                        ),
-                    'pendings' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'],
-                            ['status' => 'pending']
-                        ),
-
-                    'logs' => $this->userLogRepo
-                        ->getRepo()
-                        ->findAll(),
-                    'count_active' => $activeCount,
-                    'count_pending' => $pendingCount,
+                    'table_tabs' => $this->repository->getUserDataTableTabs(),
+                    'lock' => $this->repository->getUserData($this->repository->tabDbSelectors(), ['status' => 'lock']),
+                    'pendings' => $this->repository->getUserData($this->repository->tabDbSelectors(), ['status' => 'pending']),
+                    'count_active' => $this->repository->active,
+                    'count_pending' => $this->repository->pending,
                     'status' => $this->request->handler()->query->get('status')
 
                 ]
@@ -546,6 +510,20 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 ]
             )
             ->singular()
+            ->end();
+    }
+
+    protected function importAction()
+    {
+    }
+
+    protected function exportAction()
+    {
+        $this->exportAction
+            ->execute($this, null, null, UserSchema::class, __METHOD__)
+            ->render('admin/_global/_global_export.html')
+            ->with()
+            ->form($this->exportForm)
             ->end();
     }
 

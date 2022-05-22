@@ -99,6 +99,8 @@ trait EventDispatcherTrait
 
 
     /**
+     * Determine the redirect path based on the properties set within the event configuration
+     * 
      * @param $event
      * @return mixed|string|null
      * @throws Exception
@@ -237,6 +239,13 @@ trait EventDispatcherTrait
         return false;
     }
 
+    /**
+     * Helper method use for unsetting data from the input array ie first arguments
+     *
+     * @param array $array
+     * @param array $optionalData
+     * @return array
+     */
     public function unsetter(array $array = [], array $optionalData = []): array
     {
         return array_map(function($key) use ($optionalData) {
@@ -244,7 +253,14 @@ trait EventDispatcherTrait
         }, $array);
 
     }
-
+    
+    /**
+     * isBulk action selected returns true or false
+     *
+     * @param string|null $controller
+     * @param array|null $postData
+     * @return boolean
+     */
     private function isBulk(string $controller = null, array $postData = null): bool
     {
         if (array_key_exists('bulkTrash-' . $controller, $postData) || array_key_exists('bulkClone-' . $controller, $postData)) {
@@ -254,6 +270,14 @@ trait EventDispatcherTrait
 
     }
 
+    /**
+     * Helper method for creating a flash message with redirect
+     *
+     * @param object|null $event
+     * @param string|null $message
+     * @param string|null $redirect
+     * @return void
+     */
     private function flash(object $event = null, ?string $message = null, ?string $redirect = null)
     {
         $event->getObject()->flashMessage(sprintf('%s', $message), $event->getObject()->flashWarning());

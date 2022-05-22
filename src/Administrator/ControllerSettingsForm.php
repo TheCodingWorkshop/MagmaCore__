@@ -74,28 +74,28 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                 null,
                 $this->blueprint->settings(false, null, false, null, true, null, 'Your data table pagination can be set here or on the actual index route from the dropdown option beside the lower paging links. <code>Your ' . $callingController->repository->getSchema() . ' table is currently displaying ' . $sessionData['records_per_page'] . ' records per page.</code>')
             )
-            ->add($this->blueprint->select(
-                'additional_conditions[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
-                'additional_conditions',
-                20,
-                true,
-                ),
-                $this->blueprint->choices(
-                    Yaml::file('controller')[$callingController->thisRouteController()]['status_choices'],
-                    $sessionData['additional_conditions'],
-                    $this
-                ),
-                $this->blueprint->settings(
-                    false, 
-                    null, 
-                    true, 
-                    'Additional Conditions', 
-                    true, 
-                    null, 
-                    'Only use this option, if you fully understand how it works. Addition conditions allows you to add additional conditions (aka where clause) to the existing query. <code>current additional conditions running on this query is ' . $sessionData['additional_conditions'] . '</code>. Which means <code><a class="uk-text-danger" href="/admin/user/index">/admin/' . $callingController->thisRouteController() . '/index</a> is only display results based on the conditions set.</code>.'
-                )
-            )
+            // ->add($this->blueprint->select(
+            //     'additional_conditions[]',
+            //     ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+            //     'additional_conditions',
+            //     20,
+            //     true,
+            //     ),
+            //     $this->blueprint->choices(
+            //         Yaml::file('controller')[$callingController->thisRouteController()]['status_choices'],
+            //         $sessionData['additional_conditions'],
+            //         $this
+            //     ),
+            //     $this->blueprint->settings(
+            //         false, 
+            //         null, 
+            //         true, 
+            //         'Additional Conditions', 
+            //         true, 
+            //         null, 
+            //         'Only use this option, if you fully understand how it works. Addition conditions allows you to add additional conditions (aka where clause) to the existing query. <code>current additional conditions running on this query is ' . $sessionData['additional_conditions'] . '</code>. Which means <code><a class="uk-text-danger" href="/admin/user/index">/admin/' . $callingController->thisRouteController() . '/index</a> is only display results based on the conditions set.</code>.'
+            //     )
+            // )
 
             ->add(
                 $this->blueprint->radio(

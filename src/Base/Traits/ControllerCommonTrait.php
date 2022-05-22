@@ -83,6 +83,9 @@ trait ControllerCommonTrait
                     case 'bulkClone-' . $_name :
                         $this->bulkClone($action, $data, $actionEvent);
                         break;
+                    default :
+                        echo 'test';
+                        break;
                 endswitch;
              }
         }
@@ -154,6 +157,7 @@ trait ControllerCommonTrait
         mixed $optional = null
         )
     {
+
         if (array_key_exists($action, $data)) {
             $this->bulkUpdateAction 
                 ->setAccess($this, Access::CAN_BULK_TRASH)

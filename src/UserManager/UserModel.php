@@ -15,11 +15,9 @@ namespace MagmaCore\UserManager;
 use MagmaCore\UserManager\Rbac\Role\RoleRelationship;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\Auth\Contracts\UserSecurityInterface;
-use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\Auth\Roles\PrivilegeTrait;
 use MagmaCore\Base\AbstractBaseModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Utility\PasswordEncoder;
 use MagmaCore\Utility\UtilityTrait;
 
 class UserModel extends AbstractBaseModel implements UserSecurityInterface
@@ -230,5 +228,53 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
         $perms = $this->getPermissionByRoleID($roleID);
         return $perms;
     }
+
+    public function getUserData(array $selectors = [], array $conditions = []): ?array
+    {
+        $data = $this->getRepo()->findBy($selectors, $conditions);
+        if ($data !==null) {
+            return $data;
+        }
+        return null;
+
+    }
+
+    public function getUserCount(array $conditions = []): ?int
+    {
+        return $this->getRepo()->count($conditions);
+    }
+
+    /**
+     * Return an array of table column data which will be used to populate the tabs in the user datatable.
+     *
+     * @return array
+     */
+    public function tabDbSelectors(): array
+    {
+        return ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    public function getUserDataTableTabs(): array
+    {
+        $this->active = $this->getUserCount(['status' => 'active']);
+        $this->pending = $this->getUserCount(['status' => 'pending']);
+        $this->lock = $this->getUserCount(['status' => 'lock']);
+
+        $tabs = [
+            'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $this->active, 'data' => "{$this->pending} New", 'meta' => "{$this->active} active user"],
+            // 'search' => ['tab' => 'Search', 'icon' => 'search', 'value' => $this->active, 'data' => "", 'meta' => "{$this->active} results"],
+            'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $this->pending, 'data' => '', 'meta' => "{$this->pending} awaiting."],
+            'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $this->lock, 'data' => '', 'meta' => "{$this->lock} account locked"],
+        ];
+
+        return $tabs;
+
+    }
+
 
 }

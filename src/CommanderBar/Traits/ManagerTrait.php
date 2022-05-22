@@ -92,7 +92,7 @@ trait ManagerTrait
                     $commander .= '</ul>' . PHP_EOL;
                 }
             } else {
-                    $commander .= '<p>Not enough data to generate a graph</p>';
+                    $commander .= '<p>Exporting</p>';
                 /* display individual user graph */
             }
         }

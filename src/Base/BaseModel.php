@@ -255,7 +255,7 @@ class BaseModel extends BaseModelRelationship
 
     /**
      * Return the schema object database column name as an array. Which can be used
-     * to mapp the columns within the dataColumn object. To construct the datatable
+     * to map the columns within the dataColumn object. To construct the datatable
      *
      * @param integer $indexPosition
      * @return array

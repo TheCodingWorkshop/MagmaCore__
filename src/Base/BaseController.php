@@ -143,7 +143,6 @@ class BaseController extends AbstractBaseController
                 $this->getSession()->set('invalid_method', $method);
                 header('Location: http://localhost/error/errora');
                 exit;        
-                //throw new BaseBadMethodCallException("Method {$method} does not exists.");
             }
         } else {
             throw new Exception;

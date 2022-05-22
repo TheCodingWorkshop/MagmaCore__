@@ -58,12 +58,18 @@ class BeforeControllerActionSubscriber implements EventSubscriberInterface
         $controller = $event->getObject()->thisRouteController();
         $postData = $event->getObject()->formBuilder->getData();
 
+
         if ($this->isBulk($controller, $postData)) {
-            if (in_array($userID, $postData['id'])) {
-                $this->flash($event, 'The action was rejected. Because an item in your bulk selection is yourself', '/admin/user/index');
+            /* return error page here if bulk is selected without IDs */
+            if (array_key_exists('id', $postData)) {
+                if (in_array($userID, $postData['id'])) {
+                    $this->flash($event, 'The action was rejected. Because an item in your bulk selection is yourself', sprintf('/admin/%s/index', $controller));
+                }    
+            } else {
+                $this->flash($event, 'Looks like you\'ve not selected any bulk items.', sprintf('/admin/%s/index', $controller));
             }
         } else if (isset($token) && $token === $userID && in_array($action, self::PREVENTION_ROUTES)) {
-            $this->flash($event, 'The action was rejected. The action is not permitted on yourself', '/admin/user/index');
+            $this->flash($event, 'The action was rejected. The action is not permitted on yourself', sprintf('/admin/%s/index', $controller));
         }
                 
     }

@@ -42,7 +42,9 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'personal',
         'notes',
         'overview',
-        'settings'
+        'settings',
+        'export',
+        'import'
     ];
 
     private array $noCommander = [];
@@ -105,6 +107,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'notes' => 'Add Notes',
             'overview' => 'Users Overview',
             'settings' => Stringify::capitalize($controller->thisRouteController()) . ' Settings',
+            'export' => 'Export',
+            'import' => 'Import',
             default => "Unknown"
         };
     }
