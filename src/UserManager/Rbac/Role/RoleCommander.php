@@ -34,7 +34,9 @@ class RoleCommander extends RoleModel implements ApplicationCommanderInterface
         'assigned',
         'log',
         'bulk',
-        'settings'
+        'settings',
+        'export',
+        'import'
     ];
 
     private array $noCommander = [];
@@ -87,6 +89,8 @@ class RoleCommander extends RoleModel implements ApplicationCommanderInterface
             'assigned' => 'Role Assignment',
             'bulk' => 'Bulk',
             'settings' => 'Role Settings',
+            'import' => 'Import Data',
+            'export' => 'Export Data',
             default => "Unknown"
         };
     }

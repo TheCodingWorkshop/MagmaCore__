@@ -54,12 +54,14 @@ use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
+use MagmaCore\Base\Traits\SessionSettingsTrait;
 
 class AdminController extends BaseController
 {
 
     use SessionTrait;
     use TableSettingsTrait;
+    use SessionSettingsTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -256,24 +258,34 @@ class AdminController extends BaseController
       $this->redirect('/admin/discovery/discover');
 
     }
+    protected function importAction()
+    {
+        $this->importAction
+        ->execute($this, null, null, $this->rawSchema, __METHOD__)
+        ->render('admin/_global/_global_import.html')
+        ->with(
+            [
+            ]
+        )
+        ->form($this->importForm)
+        ->end();
 
+    }
 
-    // public function isRestoredRequired(object $controller = null): bool
-    // {
-    //     $currentSession = $this->controllerSessionData($controller);
-    //     $databaseSession = $this->sessionModelContext($controller);
-    //     if (is_array($databaseSession)) {
-    //         foreach ($databaseSession as $key => $value) {
-    //             if ($currentSession[$key] === $value) {
-    //                 return true;
-    //             } else {
-    //                 return false;
-    //             }
-    //         }
-    //     }
+    protected function exportAction()
+    {
+        $this->exportAction
+            ->execute($this, null, null, $this->rawSchema, __METHOD__)
+            ->render('admin/_global/_global_export.html')
+            ->with(
+                [
+                    'export' => $this->getSessionSettings($this, 'session_export_settings')
+                ]
+            )
+            ->form($this->exportForm)
+            ->end();
+    }
 
-    //     return false;
-    // }
 
 
 }

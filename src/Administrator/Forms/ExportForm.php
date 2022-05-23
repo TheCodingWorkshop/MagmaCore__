@@ -74,7 +74,7 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
                     'Export filename'
                 ),
                 null,
-                $this->blueprint->settings(false, null, true, null, true, null, 'Leaving this field blank will automatically revert the filename set internally. Which is <code>user-data_ follow by the current date.</code>')
+                $this->blueprint->settings(false, null, true, null, true, null, 'Leaving this field blank will automatically revert the filename set internally. Which is <code>' . $callingController->thisRouteController() . '-data_ follow by the current date.</code>')
             )
 
             ->add(
@@ -103,7 +103,7 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
             )
             ->add(
                 $this->blueprint->radio('export_conditions', [], $sessionData['export_conditions']),
-                $this->blueprint->choices(['export_conditions' => ['7 days ago' => '7_days', '1 mo ago' => '1_mo', '6 mo ago' => '6_mo', '1 y ago' => '1_year']], '1 y ago'),
+                $this->blueprint->choices(['export_conditions' => ['7_days' => '7_days', '1_month' => '1_month', '6_month' => '6_month', '1_year' => '1_year', 'all' => 'all']], $sessionData['export_conditions']),
                 $this->blueprint->settings(
                     false, 
                     null, 
@@ -111,19 +111,19 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
                     null, 
                     true, 
                     null, 
-                    'csv or xml format file available for exporting. This however defaults to .csv format. Only one can be selected at any one time.'
+                    'Set a timescale for when your exported data should export from. Or use the custom box below to specify a more specific date.'
                 )
             )
             ->add(
                 $this->blueprint->text(
-                    'custom_export_conditions',
+                    'log_order',
                     ['uk-form-large', 'uk-form-width-large', 'uk-border-bottom', 'uk-form-blank'],
-                    $sessionData['custom_export_conditions'] ?? 'null', /* how much data to return */
+                    $sessionData['log_order'] ?? 'null', /* how much data to return */
                     false,
                     'Custom export conditions'
                 ),
                 null,
-                $this->blueprint->settings(false, null, true, null, true, null, 'If you want a more specific date line for data export. Use the datepicker below to further narrow the results. If necessary.')
+                $this->blueprint->settings(false, null, true, null, true, null, sprintf('Defaults to <code>%s</code>. You can change this based on the columns your current model supports. This model supports <code>[%s]</code>.<br>Using any of those string along with either <code>%s</code> will alter the order of the exported data.', $sessionData['log_order'], implode('<br>', $callingController->repository->getColumns($callingController->rawSchema)), 'ASC or DESC'))
             )
 
             ->add(

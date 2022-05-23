@@ -113,7 +113,8 @@ class ExportAction implements DomainActionLogicInterface
         header('Content-Disposition: attachment; filename="' . $filename . '";'); 
         $columns = $this->controller->repository->getColumns($objectSchema);
         $logLimit = ['limit' => (int)$exportData['log_records'], 'offset' => 0] ?? [];
-        $dbData = $this->controller->repository->getRepo()->findBy([], [], $logLimit, ['orderby' => 'id ASC']);
+        $conditions = $this->resolvedExportConditions($exportData);
+        $dbData = $this->controller->repository->getRepo()->findBy([], $conditions, $logLimit, ['orderby' => 'id ASC']);
         fputcsv($output, $columns, $delimiter);
         foreach ($dbData as $data) {
             fputcsv($output, $data, $delimiter);
@@ -124,6 +125,20 @@ class ExportAction implements DomainActionLogicInterface
 
     }
 
+    private function resolvedExportConditions(array $exportData): array
+    {
+        if (is_array($exportData) && count($exportData) > 0) {
+            return match($exportData['export_conditions']) {
+                '7_days' => ['created_at' => '>= DATE_SUB(DATE(NOW()), INTERVAL 7 DAY)'],
+                '1_month' => ['created_at' => ''],
+                '6_month' => ['created_at' => ''],
+                '1_year' => ['created_at' => ''],
+                'all' => []
+            };
+        }
+        return [];
+    }
+
     /**
      * Initialize the session data for the export settings page.
      *
@@ -131,7 +146,7 @@ class ExportAction implements DomainActionLogicInterface
      */
     private function exportSessionInit(): array
     {
-        $exportSettings = ['export_filename' => '', 'log_records' => '1000', 'export_format' => 'csv', 'export_conditions' => '1_year', 'custom_export_conditions' => '', 'last_export_timestamp' => time()];  
+        $exportSettings = ['export_filename' => '', 'log_records' => '1000', 'export_format' => 'csv', 'export_conditions' => 'all', 'log_order' => 'id ASC', 'last_export_timestamp' => time()];  
         $this->createSessionSettings($this->controller, $this->sessionKey, $exportSettings);
         $exportOptions = $this->getSessionSettings($this->controller, $this->sessionKey);
 

@@ -50,6 +50,7 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             [
                 'repository' => PermissionModel::class,
                 'entity' => PermissionEntity::class,
+                'rawSchema' => PermissionSchema::class,
                 'column' => PermissionColumn::class,
                 'commander' => PermissionCommander::class,
                 'formPermission' => PermissionForm::class,
@@ -58,19 +59,6 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
         );
 
     }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    // public function findOr404(): mixed
-    // {
-    //     return $this->repository->getRepo()
-    //         ->findAndReturn($this->thisRouteID())
-    //         ->or404();
-    // }
 
     /**
      * Return the schema as a string
@@ -181,11 +169,6 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
     public function bulkAction()
     {
         $this->chooseBulkAction($this, PermissionActionEvent::class);
-    }
-
-    protected function searchAction()
-    {
-        die('working');
     }
 
     protected function settingsAction()

@@ -61,6 +61,7 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
                 'repository' => RoleModel::class,
                 'userRepository' => UserModel::class,
                 'commander' => RoleCommander::class,
+                'rawSchema' => RoleSchema::class,
                 'entity' => RoleEntity::class,
                 'column' => RoleColumn::class,
                 'formRole' => RoleForm::class,
@@ -74,19 +75,6 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
             ]
         );
     }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    // public function findOr404(): mixed
-    // {
-    //     return $this->repository->getRepo()
-    //         ->findAndReturn($this->thisRouteID())
-    //         ->or404();
-    // }
 
     /**
      * Return the schema as a string

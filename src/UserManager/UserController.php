@@ -15,12 +15,14 @@ use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
 use App\Resource\UserResource;
+use MagmaCore\UserManager\UserSchema;
 use MagmaCore\UserManager\UserRelationship;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\UserManager\Model\UserLogModel;
 use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\Base\Traits\SessionSettingsTrait;
 use MagmaCore\UserManager\Forms\Admin\UserForm;
 use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\UserManager\Entity\UserNoteEntity;
@@ -36,7 +38,6 @@ use MagmaCore\UserManager\Rbac\Model\RolePermissionModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Forms\Admin\UserPreferencesForm;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
-use MagmaCore\Base\Traits\SessionSettingsTrait;
 
 class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
@@ -70,6 +71,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             [
                 'repository' => UserModel::class,
                 'commander' => UserCommander::class,
+                'rawSchema' => UserSchema::class,
                 'rolePermission' => RolePermissionModel::class,
                 'roles' => RoleModel::class,
                 'apiResource' => UserResource::class,
@@ -95,20 +97,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         /** Initialize database with table settings */
     }
 
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    // public function findOr404(): mixed
-    // {
-    //     if (isset($this)) {
-    //         return $this->repository->getRepo()
-    //             ->findAndReturn($this->thisRouteID())
-    //             ->or404();
-    //     }
-    // }
 
     public function schemaAsString(): string
     {
@@ -514,35 +502,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->singular()
             ->end();
     }
-
-    protected function importAction()
-    {
-        $this->importAction
-        ->execute($this, null, null, UserSchema::class, __METHOD__)
-        ->render('admin/_global/_global_import.html')
-        ->with(
-            [
-            ]
-        )
-        ->form($this->importForm)
-        ->end();
-
-    }
-
-    protected function exportAction()
-    {
-        $this->exportAction
-            ->execute($this, null, null, UserSchema::class, __METHOD__)
-            ->render('admin/_global/_global_export.html')
-            ->with(
-                [
-                    'export' => $this->getSessionSettings($this, 'session_export_settings')
-                ]
-            )
-            ->form($this->exportForm)
-            ->end();
-    }
-
 
     protected function settingsAction()
     {
