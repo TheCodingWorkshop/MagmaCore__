@@ -212,19 +212,15 @@ class UikitPaginationExtension
     private function getRowsPerPage(object $controller)
     {
         $tableRows = $this->getTableRows($controller);
-        return '<small class="uk-margin-large-right">
-        ' . sprintf('Rows per page %s', $tableRows) . '
-        <div class="uk-inline">
-            <span class="uk-margin-top uk-margin-left">
-            ' . IconLibrary::getIcon('triangle-down', 0.8) . '
-            <div uk-dropdown="mode: click">
-            ' . sprintf('Currently @ %s RPP.', $tableRows) . '
-            <hr>
-            ' . $this->dropdownForm($controller) . '
-            </div>
-        </div>
-
-        </small>';
+        $html = '';
+        $html .= '<div class="uk-margin-large-right uk-text-meta uk-inline">';
+        $html .= '<span>Rows per page.</span>';
+        $html .= '<select name="rows_per_page" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" class="uk-select uk-blank uk-form-width-xsmall uk-form-small">';
+        $html .= sprintf('<option value="%s">%s</option>', $tableRows, $tableRows);
+        $html .= $this->numberRange($controller);
+        $html .= '</select>';
+        $html .= '</div>';
+        return $html;
     }
 
     /**
@@ -241,21 +237,6 @@ class UikitPaginationExtension
         /* We want to return the greater value */
         if (!empty($globalTableRows) && !empty($controllerTableRows))
             return ($controllerTableRows >= $globalTableRows) ? $controllerTableRows : $globalTableRows;
-    }
-
-    /**
-     * @param object $controller
-     * @return string
-     */
-    private function dropdownForm(object $controller): string
-    {
-        // $tableRow = $this->getTableRows($controller);
-        // $html = '<form method="post" action="/admin/' . $controller->thisRouteController() . '/changeRow" class="uk-form-horizontal">';
-        // $html .= '<input name="records_per_page" id="records_per_page" type="number" class="uk-input uk-form-width-small uk-form-blank uk-border-bottom" value="' . $tableRow . '" />';
-        // $html .= '<button type="submit" name="rows_per_page" class="uk-button uk-button-small uk-button-primary">Go</button>';
-        // $html .= '</form>' . PHP_EOL;
-        // return $html;
-        return '';
     }
 
     /**
@@ -290,5 +271,14 @@ class UikitPaginationExtension
     private function infoPaging(object $controller): string
     {
         return sprintf('Showing %s - %s of %s results', $controller->tableGrid->getCurrentPage(), $controller->tableGrid->getTotalPages(), $controller->tableGrid->getTotalRecords());
+    }
+
+    private function numberRange(object $controller = null)
+    {
+        $num = '';
+        foreach (range(10, 150, 10) as $number) {
+            $num .= '<option value="/admin/' . $controller->thisRouteController() . '/changeRow?rpp=' . $number . '">' . $number . '</option>';
+        }
+        return $num;
     }
 }

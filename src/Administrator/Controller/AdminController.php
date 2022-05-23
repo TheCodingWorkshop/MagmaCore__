@@ -54,6 +54,7 @@ use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\Base\Traits\SessionSettingsTrait;
 
 class AdminController extends BaseController
@@ -62,6 +63,7 @@ class AdminController extends BaseController
     use SessionTrait;
     use TableSettingsTrait;
     use SessionSettingsTrait;
+    use ControllerSessionTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -213,9 +215,21 @@ class AdminController extends BaseController
      */
     protected function changeRowAction()
     {
-        $this->sessionUpdateAction
-            ->execute($this, NULL, ControllerSettingActionEvent::class, NULL, __METHOD__)
-            ->endAfterExecution();
+        $key = $this->thisRouteController() . '_settings';
+        $newRecordsPerPage = (string)$this->request->handler()->query->getAlnum('rpp');
+        $session = $this->getSessionData($key, $this);
+        if ($session['records_per_page'] !== $newRecordsPerPage) {
+            unset($session['records_per_page']);
+            $updatedSession = ['records_per_page' => $newRecordsPerPage];
+            $this->getSession()->delete('user_settings');
+            $newArray = $session + $updatedSession;
+
+            $this->getSession()->set($key, $newArray);
+            
+        }
+        $this->flashMessage('updated!');
+        $this->redirect($_SERVER['HTTP_REFERER']);
+
     }
 
     public function sessionModel(object $controller = null): ?object

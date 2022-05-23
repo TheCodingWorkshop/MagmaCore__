@@ -62,7 +62,7 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
     {
 
         $sessionData = $this->getSessionSettings($callingController, $this->exportSessionKey);
-        
+        // sprintf('Defaults to <code>%s</code>. You can change this based on the columns your current model supports. This model supports <code>[%s]</code>.<br>Using any of those string along with either <code>%s</code> will alter the order of the exported data.', $sessionData['log_order'], implode('<br>', $callingController->repository->getColumns($callingController->rawSchema)), 'ASC or DESC')
         return $this->form(['action' => $action, 'class' => ['uk-form-stacked'], "id" => "tableForm"])
             ->addRepository($dataRepository)
             ->add(
@@ -123,7 +123,7 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
                     'Custom export conditions'
                 ),
                 null,
-                $this->blueprint->settings(false, null, true, null, true, null, sprintf('Defaults to <code>%s</code>. You can change this based on the columns your current model supports. This model supports <code>[%s]</code>.<br>Using any of those string along with either <code>%s</code> will alter the order of the exported data.', $sessionData['log_order'], implode('<br>', $callingController->repository->getColumns($callingController->rawSchema)), 'ASC or DESC'))
+                $this->blueprint->settings(false, null, true, null, true, null, '')
             )
 
             ->add(

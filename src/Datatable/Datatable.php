@@ -238,13 +238,20 @@ class Datatable extends AbstractDatatable
         return $element;
     }
 
-    public function pagingSteps()
+    /**
+     * Add a step jumper between the previous and next navigation link
+     *
+     * @return string
+     */
+    public function pagingSteps(): string
     {
         $element = '<li class="' . ($this->totalPages == $this->currentPage ? 'uk-disabled' : 'uk-active') . '">';
         $element .= '<select onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" class="uk-select uk-blank uk-form-width-xsmall uk-form-small">';
         $element .= sprintf('<option value="?page=%s">%s</option>', $this->currentPage, $this->currentPage);
         for ($cp = 1; $cp <= $this->totalPages; $cp++) {
-            $element .= sprintf('<option value="?page=%s">%s</option>', $cp, $cp);
+            if ($cp !== $this->currentPage) { /* remove the current page count from list */
+                $element .= sprintf('<option value="?page=%s">%s</option>', $cp, $cp);
+            }
         }
         $element .= '</select>';
 
@@ -277,7 +284,6 @@ class Datatable extends AbstractDatatable
         }
         $element .= IconLibrary::getIcon('triangle-right', 0.9);
         $element .= '</a>' . PHP_EOL;
-
         $element .= '</li>' . PHP_EOL;
 
         return $element;
