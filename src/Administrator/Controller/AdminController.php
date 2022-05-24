@@ -47,7 +47,6 @@ use MagmaCore\Base\Domain\Actions\SimpleUpdateAction;
 use MagmaCore\UserManager\Forms\Admin\BulkDeleteForm;
 use MagmaCore\Base\Domain\Actions\SessionUpdateAction;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Settings\Event\ControllerSettingActionEvent;
 use MagmaCore\Administrator\Middleware\Before\LoginRequired;
 use MagmaCore\Administrator\Middleware\Before\SessionExpires;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
@@ -139,7 +138,6 @@ class AdminController extends BaseController
             'AdminAuthentication' => AdminAuthentication::class,
             'AuthorizedIsNull' => AuthorizedIsNull::class,
             'SessionExpires' => SessionExpires::class,
-            //'IntegrityConstraints' => IntegrityConstraints::class
         ];
     }
 

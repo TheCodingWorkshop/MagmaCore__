@@ -49,8 +49,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes', 'overview'];
-    private array $noManager = ['trash', 'new', 'bulk', 'personal', 'overview'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes', 'overview', 'log'];
+    private array $noManager = ['trash', 'new', 'bulk', 'personal', 'overview', 'log'];
     private array $noAction = ['trash', 'personal'];
     private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences', 'personal'];
 

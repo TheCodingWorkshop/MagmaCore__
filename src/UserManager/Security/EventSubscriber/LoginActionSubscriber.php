@@ -17,7 +17,6 @@ use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use JetBrains\PhpStorm\ArrayShape;
 use function array_map;
 use function array_reduce;
 use function date;
@@ -45,7 +44,7 @@ class LoginActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    #[ArrayShape([LoginActionEvent::NAME => "array"])] public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             LoginActionEvent::NAME => [

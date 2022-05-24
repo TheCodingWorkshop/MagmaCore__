@@ -130,7 +130,7 @@ class ExportForm extends ClientFormBuilder implements ClientFormBuilderInterface
                 $this->blueprint->submit(
                     'export-' . $callingController->thisRouteController() . '',
                     ['uk-button', 'uk-button-secondary'],
-                    'Save & Export'
+                    'Go'
                 ),
                 null,
                 $this->blueprint->settings(false, null, false, null, true, null, 'If you made any changes please save before exporting.')

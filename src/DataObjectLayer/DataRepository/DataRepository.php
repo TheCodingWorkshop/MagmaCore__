@@ -19,7 +19,6 @@ use Throwable;
 use MagmaCore\Utility\Sortable;
 use MagmaCore\Utility\Paginator;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManager;
-use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
@@ -325,26 +324,27 @@ class DataRepository implements DataRepositoryInterface
      */
     public function findWithSearchAndPaging(Object $request, array $args = [], ?object $controller = null): array|false
     {
+        $arg = $this->resolveConditions($args);
 
-        list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
+        list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $arg);
 
         $sorting = new Sortable($args['sort_columns']);
-        $paging = new Paginator($totalRecords, (int)$args['records_per_page'], $request->query->getInt('page', 1));
-        $parameters = ['limit' => (int)$args['records_per_page'], 'offset' => $paging->getOffset()];
+        $paging = new Paginator($totalRecords, (int)$arg['records_per_page'], $request->query->getInt('page', 1));
+        $parameters = ['limit' => (int)$arg['records_per_page'], 'offset' => $paging->getOffset()];
         $optional = ['orderby' => $sorting->getColumn() . ' ' . $sorting->getDirection()];
 
         $searchConditions = [];
-        if ($request->query->getAlnum($args['filter_alias'])) {
-            $searchRequest = $request->query->getAlnum($args['filter_alias']);
-            if (is_array($args['filter_by'])) { 
-                for ($i = 0; $i < count($args['filter_by']); $i++) {
-                    $searchConditions += [$args['filter_by'][$i] => $searchRequest];
+        if ($request->query->getAlnum($arg['filter_alias'])) {
+            $searchRequest = $request->query->getAlnum($arg['filter_alias']);
+            if (is_array($arg['filter_by'])) { 
+                for ($i = 0; $i < count($arg['filter_by']); $i++) {
+                    $searchConditions += [$arg['filter_by'][$i] => $searchRequest];
                 }
             }    
-            $results = $this->findBySearch($args['filter_by'], $searchConditions);
+            $results = $this->findBySearch($arg['filter_by'], $searchConditions);
         } else {
-            $queryConditions = array_merge($args['additional_conditions'], $conditions);
-            $results = $this->findBy($args['selectors'], $queryConditions, $parameters, $optional);
+            $queryConditions = array_merge($arg['additional_conditions'], $conditions);
+            $results = $this->findBy([], $queryConditions, $parameters, $optional);
         }
         return [
             $results,
@@ -371,12 +371,16 @@ class DataRepository implements DataRepositoryInterface
         $totalRecords = 0;
         $req = $request->query;
         $status = $req->getAlnum($args['query']);
+
         $searchResults = $req->getAlnum($args['filter_alias']);
         $conditions = [];
+
         if ($searchResults) {
-            for ($i = 0; $i < count($args['filter_by']); $i++) {
-                $conditions = [$args['filter_by'][$i] => $searchResults];
-                $totalRecords = $this->em->getCrud()->countRecords($conditions, $args['filter_by'][$i]);
+            if (isset($args['filter_by']) && $args['filter_by'] !==null) {
+                for ($i = 0; $i < count($args['filter_by']); $i++) {
+                    $conditions = [$args['filter_by'][$i] => $searchResults];
+                    $totalRecords = $this->em->getCrud()->countRecords($conditions, $args['filter_by'][$i]);
+                }
             }
         } else if ($status) {
             $conditions = [$args['query'] => $status];
@@ -392,6 +396,26 @@ class DataRepository implements DataRepositoryInterface
             $conditions,
             $totalRecords
         ];
+    }
+
+    private function resolveConditions(array $args = null)
+    {
+        if (is_array($args) && count($args)) {
+            $stringConditions = $args['additional_conditions'];
+            $splitComma = explode(',', $stringConditions);
+            if (isset($splitComma)) {
+                $arr = [];
+                foreach ($splitComma as $splitDot) {
+                    $dot = explode(':', $splitDot);
+                    if (isset($dot) && $dot !=='') {
+                        $arr += array(trim($dot[0]) => $dot[1]);
+                    }
+                }
+            }
+            $selectors = $args['selectors'] ?? [];
+            $query = array_merge($args, ['additional_conditions' => $arr], $selectors);
+            return $query;
+        }
     }
 
 

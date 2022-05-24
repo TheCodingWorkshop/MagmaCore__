@@ -61,13 +61,15 @@ class SessionUpdateAction implements DomainActionLogicInterface
         $this->schema = $objectSchema;
         $formBuilder = $controller->formBuilder;
 
-
         $this->preExecute($controller, $formBuilder, $optional);
+        $this->postExecute($controller, $formBuilder);
         
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
             if ($formBuilder?->csrfValidate()) {
                 /* the data being submitted from the form which will become the new session data*/
                 $formData = $formBuilder->getData() ?? $optional;
+                // var_dump($formData);
+                // die;
                 /* Get the old session data */
                 $session = $controller->getSession();
                 $sessionData = $session->get($channel = $controller->thisRouteController() . '_settings');

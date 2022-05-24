@@ -14,12 +14,10 @@ namespace MagmaCore\UserManager\Security;
 
 use MagmaCore\UserManager\Security\Event\LogoutActionEvent;
 use MagmaCore\UserManager\Security\Form\LogoutForm;
-use MagmaCore\UserManager\Security\Middleware\After\LogoutIfNoSession;
 use MagmaCore\Auth\Authenticator;
 use MagmaCore\Base\BaseController;
 use MagmaCore\Base\Domain\Actions\LogoutAction;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 
 class LogoutController extends BaseController
 {

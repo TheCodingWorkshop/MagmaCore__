@@ -68,7 +68,8 @@ class BaseController extends AbstractBaseController
         'dashboard',
         'history',
         'discovery',
-        'notification'
+        'notification',
+        'error'
     ];
     protected array $headers = ["User-Agent:", "Authorization:"];
 

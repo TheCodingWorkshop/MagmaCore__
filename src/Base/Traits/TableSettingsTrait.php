@@ -41,7 +41,7 @@ trait TableSettingsTrait
         return [
             'channel_name' => $channel,
             'controller' => $controller->thisRouteController(),
-            'records_per_page' => (string)$args['records_per_page'] ?? "5",
+            'records_per_page' => (string)$args['records_per_page'] ?? "15",
             'additional_conditions' => $args['additional_conditions'] ?? [],
             'selectors' => $args['selectors'] ?? [],
             'query' => $args['query'] ?? '',

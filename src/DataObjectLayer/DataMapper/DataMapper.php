@@ -89,6 +89,21 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
 
     }
 
+    public function getTableSize()
+    {
+        $db = $this->dbh->open();
+        $stmt = $db->prepare('SHOW TABLE STATUS');
+        $stmt->execute();
+        $size = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $size += $row["Data_length"] + $row["Index_length"];
+        }
+
+        $decimals = 2;
+        $mbytes = number_format($size/(1024*1024), $decimals);
+        return $mbytes . ' MB';
+    }
+
     /**
      * @inheritDoc
      */

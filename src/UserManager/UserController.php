@@ -91,6 +91,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userNoteModel' => UserNoteModel::class,
                 'userMetaData' => UserMetaDataModel::class,
                 'userNoteEntity' => UserNoteEntity::class,
+
             ]
         );
 
@@ -180,7 +181,8 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                     'pendings' => $this->repository->getUserData($this->repository->tabDbSelectors(), ['status' => 'pending']),
                     'count_active' => $this->repository->active,
                     'count_pending' => $this->repository->pending,
-                    'status' => $this->request->handler()->query->get('status')
+                    'status' => $this->request->handler()->query->get('status'),
+                    'table_size' => $this->repository->getRepo()->getEm()->getCrud()->getMapping()->getTableSize()
 
                 ]
             )

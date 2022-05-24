@@ -68,7 +68,7 @@ trait FormBuilderTrait
                     $selected = '';
                     $disabled = '';
                 }
-                $output .= '<option' . $disabled . ' value="' . $choice . '"' . $selected . '>' . (is_int($choice) ? $this->getNameFromID($choice, $options['object']) : $choice) . '' . $selected . '</option>' . "\n";
+                $output .= '<option value="' . $choice . '"' . $selected . '>' . (is_int($choice) ? $this->getNameFromID($choice, $options['object']) : $choice) . '' . $selected . '</option>' . "\n";
             }
             return $output;
         }

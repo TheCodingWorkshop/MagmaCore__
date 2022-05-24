@@ -38,8 +38,8 @@ class HistoryCommander extends HistoryModel implements ApplicationCommanderInter
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new'];
-    private array $noManager = [];
+    private array $noCustomizer = ['edit', 'show', 'new', 'index'];
+    private array $noManager = ['index'];
     private array $noAction = [];
     private array $noFilter = ['edit', 'show', 'new'];
 

@@ -698,31 +698,6 @@ trait DomainTraits
 
     }
 
-    /**
-     * Returns a modified clone array modifying the selected elements within the item object
-     * which was return by concatinating the a clone string to create a clone but unique item
-     * which will be re-inserted within the database.
-     *
-     * @param string $value
-     * @return string
-     */
-    private function resolvedCloning(mixed $value)
-    {
-        // $suffix = '-clone';
-        // if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
-        //     $ex = explode('@', $value); /* explode the argument by the @ symbol */
-        //     if (is_array($ex)) {
-        //         /* safely get the first and last index of the array */
-        //         return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
-        //     }
-        // } else {
-        //     return $value . $suffix;
-        // }
-
-        return $value;
-
-    }
-
     public function flattenArray(array $context): array
     {
         if (is_array($context)) {
@@ -768,7 +743,7 @@ trait DomainTraits
                 ->create(
                     [
                         'controller' => $controller->thisRouteController() . '_settings',
-                        'context' => serialize($formData)
+                        'context' => Serializer::compress($formData)
                     ]
                 );
 
@@ -782,6 +757,27 @@ trait DomainTraits
         return false;
 
     }
+
+    public function postExecute(object $controller = null, object $formBuilder = null)
+    {
+        $channel = $controller->thisRouteController() . '_settings';
+        if ($formBuilder->isFormValid('settings-' . $controller->thisRouteController() . '-restore')) {
+            $restoreSessionData = $this->controller->controllerSessionBackupModel->getRepo()->findObjectBy(['controller' => $channel]);
+            $context = $restoreSessionData->context;
+            $dbSessionData = Serializer::unCompress($context);
+            $session = $controller->getSession();
+            if ($session->has($channel)) {
+                $session->delete($channel);
+
+                $session->set($channel, Serializer::compress($dbSessionData));
+        
+            }
+            $controller->flashMessage('Settings restored!');
+            $controller->redirect($controller->onSelf());
+
+        }
+    }
+
 
     /**
      * Allows resetting of the controller settings page back to all default values defined
