@@ -276,12 +276,12 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      */
     public function persist(string $sqlQuery, array $parameters, bool $search = false): void
     {
-        $this->start();
+       // $this->start();
         try {
             $this->prepare($sqlQuery)->bindParameters($parameters, $search)->execute();
-           $this->commit();
+           //$this->commit();
         } catch (PDOException $e) {
-            $this->revert();
+           // $this->revert();
            throw new PDOException('Data persistant error ' . $e->getMessage());
         }
 

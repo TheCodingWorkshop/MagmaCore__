@@ -68,8 +68,6 @@ class SessionUpdateAction implements DomainActionLogicInterface
             if ($formBuilder?->csrfValidate()) {
                 /* the data being submitted from the form which will become the new session data*/
                 $formData = $formBuilder->getData() ?? $optional;
-                // var_dump($formData);
-                // die;
                 /* Get the old session data */
                 $session = $controller->getSession();
                 $sessionData = $session->get($channel = $controller->thisRouteController() . '_settings');
@@ -84,6 +82,7 @@ class SessionUpdateAction implements DomainActionLogicInterface
                     );
                     /* Uncompress the old session data */
                     $oldSession = Serializer::unCompress($sessionData);
+    
                     if ($oldSession['controller'] === $controller->thisRouteController()) {
                         $key = $controller->thisRouteController() . '_settings';
                         /* override the old session with new session form post data */

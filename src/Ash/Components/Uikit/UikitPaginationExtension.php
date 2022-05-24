@@ -46,7 +46,7 @@ class UikitPaginationExtension
                 }
                 $html .= '</div>';
 
-                if ($this->hasYamlSupport($controller, 'paging_top') !==false) {
+                if ($this->hasYamlSupport($controller, 'paging_bottom') !==false) {
                 $html .= '<div class="uk-navbar-right">
                 ' . $this->getRowsPerPage($controller) . '
                 <small>' . $this->infoPaging($controller) . '</small>

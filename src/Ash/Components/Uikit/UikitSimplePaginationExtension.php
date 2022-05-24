@@ -107,7 +107,7 @@ class UikitSimplePaginationExtension
     private function navContentRight(object $controller): string
     {
         $html = '';
-        if ($this->hasYamlSupport($controller, 'paging_bottom') !==false) {
+        if ($this->hasYamlSupport($controller, 'paging_top') !==false) {
             $html .= '
             <small>' . $this->infoPaging($controller) . '</small>
             <ul class="uk-pagination">

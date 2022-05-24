@@ -50,7 +50,7 @@ trait TableSettingsTrait
             'sort_columns' => $args['sort_columns'] ?? [],
             'trash_can_support' => $args['trash_can_support'] ?? 'false',
             'paging_top' => 'true',
-            'paging_bottom' => 'false',
+            'paging_bottom' => 'true',
             'bulk_clone' => 'false',
             'bulk_trash' => 'true',
             'trash_can' => 'false',

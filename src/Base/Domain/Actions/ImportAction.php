@@ -56,14 +56,62 @@ class ImportAction implements DomainActionLogicInterface
         $this->actionOptional = $optional;
 
         $formBuilder = $controller->formBuilder;
+       if (isset($formBuilder) && $formBuilder->isFormvalid('import-category')) :
+            if ($formBuilder?->csrfValidate()) {    
+                $filename = $_FILES['data_import']['tmp_name'];
+                if ($_FILES['data_import']['size'] > 0) {
 
-        if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
-            if ($formBuilder?->csrfValidate()) {       
-                $formData = $formBuilder->getData();
+                    $file = fopen($filename, "r");
+                    $importCount = 0;
+                    while (($column = fgetcsv($file, 10000, ",")) !== false) {
+                        if (!empty($column) && is_array($column)) {
+                            if ($this->hasEmptyRow($column)) {
+                                continue;
+                            }
+                            $_newData = [];
+                            if (isset($column)) {
+                                $combine = array_combine($this->controller->repository->getColumns($objectSchema), $column);
+                                if (array_key_exists('created_at', $combine)) {
+                                    $newDate = ['created_at' => str_replace('/', '-', $combine['created_at'])];
+                                    // $newDate = ['created_at' => date('Y-m-d H:i:s', strtotime(str_replace('-', '/', $combine['created_at'])))];
+                                    // array_filter($combine, fn($comb) => str_replace('/', '-', $comb));
+                                    $_newData = $newDate + $combine;
+                                } else {
+                                    $_newData = $combine;
+                                }
+
+                                $insertID = $this->controller->repository->getRepo()->getEm()->getCrud()->create($_newData);
+                                if (!empty($insertID)) {
+                                    $output['type'] = "success";
+                                    $output["message"] = "Import complete";
+                                    $importCount++;
+                                }
+                            }
+                        } else {
+                            $output['type'] = "error";
+                            $output["message"] = "Problem in importing data.";                
+                        }
+                    }
+                }
+                if ($importCount == 0) {
+                    $output['type'] = "error";
+                    $output["message"] = "Duplicate data found.";
+                }
+                
             }
         endif;
         return $this;
     }
 
-
+    private function hasEmptyRow(array $column)
+    {
+        $columnCount = count($column);
+        $isEmpty = true;
+        for ($i = 0; $i < $columnCount; $i ++) {
+            if (! empty($column[$i]) || $column[$i] !== '') {
+                $isEmpty = false;
+            }
+        }
+        return $isEmpty;
+    }
 }

@@ -90,6 +90,20 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Only use this option, if you fully understand how it works. Addition conditions allows you to add additional conditions (aka where clause) to the existing query. <code>current additional conditions running on this query is ' . $sessionData['additional_conditions'] . '</code>. Which means <code><a class="uk-text-danger" href="/admin/user/index">/admin/' . $callingController->thisRouteController() . '/index</a> is only display results based on the conditions set.</code>.'
                 )
             )
+            // ->add(
+            //     $this->blueprint->multipleCheckbox('table_options', [], ['top_paging' => 'top_paging', 'trash_can' => 'trash_can']),
+            //     $this->blueprint->choices(
+            //         [
+            //             'top_paging' => 'top_paging', 
+            //             'bottom_paging' => 'bottom_paging',
+            //             'bulk_trash' => 'bulk_trash',
+            //             'bulk_clone' => 'bulk_clone',
+            //             'trash_can' => 'trash_can'
+            //         ],
+            //         ['top_paging', 'trash_can']
+            //     ),
+            //     $this->blueprint->settings(false, null, true, 'Options', true, null, '')
+            // )
 
             ->add(
                 $this->blueprint->radio(
@@ -108,7 +122,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the trash bin for your table. This allows you to put items in the trash without permanently deleting the item. <code>Note this only works on supported models only</code>'
+                    ''
                 )
             )
             ->add(
@@ -128,7 +142,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the top pagination links above the data table.'
+                    ''
                 )
             )
             ->add(
@@ -148,7 +162,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the top pagination links below the data table.'
+                    ''
                 )
             )
             ->add(
@@ -168,7 +182,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the bulk trash options. Which allows you to select 1 or more items below to trash. Note this doesn\'t deleted the records permanently. You should carry this action out from the trash'
+                    ''
                 )
             )
             ->add(
@@ -188,7 +202,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the bulk clone options. Which allows you to select 1 or more items below to clone'
+                    ''
                 )
             )
 
@@ -225,7 +239,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
 
             ->add($this->blueprint->select(
                 'filter_by[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'filter_by_column',
                 $sessionData['filter_by'],
                 true,
@@ -239,7 +253,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
             )
             ->add($this->blueprint->select(
                 'sort_columns[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'sort_column',
                 $sessionData['sort_columns'],
                 true,
@@ -262,7 +276,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
 
             ->add($this->blueprint->select(
                 'selectors[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'selectors',
                 $sessionData['selectors'],
                 true,

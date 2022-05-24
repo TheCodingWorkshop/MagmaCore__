@@ -17,9 +17,6 @@ use MagmaCore\FormBuilder\FormBuilderTypeInterface;
 use MagmaCore\FormBuilder\FormExtensionTypeInterface;
 use MagmaCore\FormBuilder\Exception\FormBuilderInvalidArgumentException;
 use MagmaCore\Session\SessionTrait;
-use MagmaCore\Utility\Formify;
-use MagmaCore\Utility\Serializer;
-use MagmaCore\Utility\Utilities;
 
 class InputType implements FormBuilderTypeInterface
 {
@@ -188,16 +185,14 @@ class InputType implements FormBuilderTypeInterface
      */
     public function view() : string
     {
-        $session = SessionTrait::sessionFromGlobal();
-        $sessionData = Serializer::unCompress($session->get('user_settings'));
         switch ($this->getType()) :
             case 'radio' :
                 return sprintf("%s", $this->filtering());
                 break;
             case 'file' :
                 return sprintf(
-                    '<div class="js-upload" uk-form-custom>
-                    <input type="file" name="%s" id="%s multiple>
+                    '<label><div class="js-upload" uk-form-custom>
+                    <input type="file" name="%s" id="%s multiple></label>
                     <button %s type="button" tabindex="-1">%s</button>
                     %s
                 </div>', 
