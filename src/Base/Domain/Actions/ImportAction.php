@@ -71,15 +71,15 @@ class ImportAction implements DomainActionLogicInterface
                             $_newData = [];
                             if (isset($column)) {
                                 $combine = array_combine($this->controller->repository->getColumns($objectSchema), $column);
+                                // var_dump($combine);
+                                // die;
                                 if (array_key_exists('created_at', $combine)) {
-                                    $newDate = ['created_at' => str_replace('/', '-', $combine['created_at'])];
-                                    // $newDate = ['created_at' => date('Y-m-d H:i:s', strtotime(str_replace('-', '/', $combine['created_at'])))];
-                                    // array_filter($combine, fn($comb) => str_replace('/', '-', $comb));
-                                    $_newData = $newDate + $combine;
+                                    $createdAt = $this->convertExportDatetime('created_at', $combine);
+                                    $modifiedAt = $this->convertExportDatetime('modified_at', $combine);
+                                    $_newData = $createdAt + $modifiedAt + $combine;
                                 } else {
                                     $_newData = $combine;
                                 }
-
                                 $insertID = $this->controller->repository->getRepo()->getEm()->getCrud()->create($_newData);
                                 if (!empty($insertID)) {
                                     $output['type'] = "success";
@@ -97,7 +97,14 @@ class ImportAction implements DomainActionLogicInterface
                     $output['type'] = "error";
                     $output["message"] = "Duplicate data found.";
                 }
-                
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    $output,
+                    $additionalContext
+                );
+
             }
         endif;
         return $this;
@@ -113,5 +120,11 @@ class ImportAction implements DomainActionLogicInterface
             }
         }
         return $isEmpty;
+    }
+
+    private function convertExportDatetime(string $key = null, mixed $context = []): array
+    {
+       return [$key => date('Y-m-d H:i:s', (int)strtotime(str_replace('/', '-', $context[$key])))];
+
     }
 }

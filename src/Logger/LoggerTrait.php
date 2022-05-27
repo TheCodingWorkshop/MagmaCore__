@@ -22,10 +22,10 @@ trait LoggerTrait
 {
 
     /**
-     * @param string $level
+     * @param mixed $level
      * @return bool
      */
-    public function logLevelReached(string $level): bool
+    public function logLevelReached(mixed $level): bool
     {
         return array_search($level, $this->getLogLevels()) >= array_search($this->getMinLogLevel(), $this->getLogLevels());
     }
@@ -66,6 +66,6 @@ trait LoggerTrait
         if ($timestamp == null) {
             $timestamp = date('Y-m-d H:i:s');
         }
-        return '[' . $timestamp . '] ' . strtoupper($level) . ':' . $this->interpolate($message, $context) . "\n";
+        return '[' . $timestamp . '] ' . strtoupper((string)$level) . ':' . $this->interpolate($message, $context) . "\n";
     }
 }

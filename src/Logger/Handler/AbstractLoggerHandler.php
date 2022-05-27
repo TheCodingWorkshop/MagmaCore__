@@ -42,7 +42,7 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
      * @param array $options
      * @return void
      */
-    public function __construct(string $file, string $minLevel, array $options = [])
+    public function __construct(string $file, mixed $minLevel, array $options = [])
     {
         $this->options = $options;
         $this->minLevel = $minLevel;
@@ -66,7 +66,7 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getMinLogLevel()
     {

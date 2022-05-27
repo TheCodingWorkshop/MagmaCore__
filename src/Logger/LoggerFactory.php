@@ -15,7 +15,7 @@ namespace MagmaCore\Logger;
 use MagmaCore\Logger\Exception\LoggerHandlerInvalidArgumentException;
 use MagmaCore\Logger\Handler\LoggerHandlerInterface;
 use MagmaCore\Logger\Handler\NativeLoggerHandler;
-use MagmaCore\Logger\LoggerInterface;
+use MagmaCore\Logger\LoggerInterface;Natui
 use MagmaCore\Logger\Logger;
 use function get_class;
 

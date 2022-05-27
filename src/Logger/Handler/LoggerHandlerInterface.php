@@ -15,6 +15,6 @@ namespace MagmaCore\Logger\Handler;
 interface LoggerHandlerInterface
 {
 
-    public function write(string $level, string $message, array $context = []): void;
+    public function write(mixed $level, string $message, array $context = []): void;
 
 }

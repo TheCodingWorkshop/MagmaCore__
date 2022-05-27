@@ -55,6 +55,7 @@ use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\Base\Traits\SessionSettingsTrait;
+use MagmaCore\System\Event\SystemActionEvent;
 
 class AdminController extends BaseController
 {
@@ -273,7 +274,7 @@ class AdminController extends BaseController
     protected function importAction()
     {
         $this->importAction
-        ->execute($this, null, null, $this->rawSchema, __METHOD__)
+        ->execute($this, null, SystemActionEvent::class, $this->rawSchema, __METHOD__)
         ->render('admin/_global/_global_import.html')
         ->with(
             [
@@ -287,7 +288,7 @@ class AdminController extends BaseController
     protected function exportAction()
     {
         $this->exportAction
-            ->execute($this, null, null, $this->rawSchema, __METHOD__)
+            ->execute($this, null, SystemActionEvent::class, $this->rawSchema, __METHOD__)
             ->render('admin/_global/_global_export.html')
             ->with(
                 [
