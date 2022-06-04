@@ -54,7 +54,6 @@ class UikitPaginationExtension
 
                     $html .= $controller->tableGrid->previousPaging($this->status($controller), $this->statusQueried($controller));
                     $html .= $controller->tableGrid->pagingSteps();
-
                     $html .= $controller->tableGrid->nextPaging($this->status($controller), $this->statusQueried($controller));
                     
                     $html .= '</ul>

@@ -12,11 +12,9 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
-use MagmaCore\Utility\Utilities;
 use MagmaCore\Utility\Serializer;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
 /**
  * Class which handles the domain logic when adding a new item to the database

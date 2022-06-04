@@ -267,7 +267,8 @@ trait TemplateTraits
         if (!method_exists($controller, 'schemaAsString')) {
             throw new \Exception(sprintf('Your controller class is missing [%s] method. This is now required as of version [%s]', 'schemaAsString', '1.3.9'));
         }
-        $columns = $controller->repository->getColumns($controller->schemaAsString());
+        $schema = (isset($controller->rawSchema) ? $controller->rawSchema : $controller->schemaAsString());
+        $columns = $controller->repository->getColumns($schema);
         if (is_array($columns)) {
             if (!in_array($controller->repository->trashSupport(), $columns)) {
                 throw new \Exception('Trash feature is not supported by your model');

@@ -21,6 +21,7 @@ use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\Exception\RouterNoRoutesFound;
 use MagmaCore\Router\Exception\NoActionFoundException;
 use MagmaCore\Router\Exception\RouterBadFunctionCallException;
+use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Session\SessionTrait;
 
 class Router implements RouterInterface
@@ -57,7 +58,7 @@ class Router implements RouterInterface
         $route = preg_replace('/\{([a-z]+):([^\}]+)\}/', '(?P<\1>\2)', $route);
         // Add start and end delimiters, and case insensitive flag
         $route = '/^' . $route . '$/i';
-
+       
         $this->routes[$route] = $params;
     }
 
@@ -98,13 +99,16 @@ class Router implements RouterInterface
      */
     private function dispatchWithException(string $url): array
     {
+        $logger = GlobalManager::get('logger');
         $url = $this->removeQueryStringVariables($url);
         $session = SessionTrait::sessionFromGlobal();
         if (!$this->matched($url)) {
+            // $logger->alert(sprintf('Error requesting the route %s. This route does not within the application', $url));
             $session->set('invalid_route_request', $_SERVER['REQUEST_URI']);
             $this->errorPage(404, 'errora');
         }
         if (!class_exists($controller = $this->createController())) {
+            $logger->alert(sprintf('Error requesting the controller %s. This route does not within the application', $controller));
             $session->set('invalid_controller_request', $controller);
             $this->errorPage(500);
         }
@@ -130,7 +134,7 @@ class Router implements RouterInterface
             } else {
                 $controllerObject->$action();
             }
-        } else {
+        } else {    
             $session->set('invalid_method_request', $action);
             $session->set('route_controler_object', $controller);
             $this->errorPage(500, 'errorm');

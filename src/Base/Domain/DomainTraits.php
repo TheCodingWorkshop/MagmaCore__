@@ -12,21 +12,22 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use Exception;
 use Closure;
+use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseModel;
 use MagmaCore\Utility\Stringify;
+use MagmaCore\Utility\Serializer;
+use MagmaCore\Base\BaseApplication;
 use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use MagmaCore\Base\BaseApplication;
-use MagmaCore\Base\Traits\ControllerSessionTrait;
-use MagmaCore\Base\Traits\TableSettingsTrait;
-use MagmaCore\Utility\Serializer;
 
 trait DomainTraits
 {
@@ -808,6 +809,20 @@ trait DomainTraits
             }
 
         }
+
+    }
+
+    /**
+     * Initialize and set log
+     *
+     * @param string|null $message
+     * @param array $context
+     * @return void
+     */
+    public function setLog(string $logName = null, string $message = null, array $context = []): void
+    {
+        $log = GlobalManager::get('logger');
+        $log->$logName($message, $context);
 
     }
 

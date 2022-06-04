@@ -195,17 +195,17 @@ class AdminController extends BaseController
         return false;
     }
 
-    protected function settingsAction()
-    {
-        $this->editAction
-            ->execute(
-                $this, 
-                ControllerSettingsEntity::class, 
-                ControllerSettingsActionEvent::class, 
-                NULL, 
-                __METHOD__
-            );
-    }
+    // protected function settingsAction()
+    // {
+    //     $this->editAction
+    //         ->execute(
+    //             $this, 
+    //             ControllerSettingsEntity::class, 
+    //             ControllerSettingsActionEvent::class, 
+    //             NULL, 
+    //             __METHOD__
+    //         );
+    // }
 
     /**
      * Global 
@@ -298,7 +298,6 @@ class AdminController extends BaseController
             ->form($this->exportForm)
             ->end();
     }
-
 
 
 }

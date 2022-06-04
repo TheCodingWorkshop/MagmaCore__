@@ -42,12 +42,12 @@ class UikitSimplePaginationExtension
 
         $html = '<section class="' . $this->disabledClass($controller) . '">';
             $html .= '<nav aria-label="Pagination" uk-navbar>';
-                $html .= '<div class="uk-navbar-left">';
+                $html .= '<div class="uk-navbar-left uk-width-expand">';
                 $html .= $this->navContentLeft($controller, $name);
                 $html .= '</div>';
-                $html .= '<div class="uk-navbar-center">';
-                $html .= $this->navContentCentre($controller, $name);
-                $html .= '</div>';
+                // $html .= '<div class="uk-navbar-center">';
+                // $html .= $this->navContentCentre($controller, $name);
+                // $html .= '</div>';
                 $html .= '<div class="uk-navbar-right">';
                 $html .= $this->navContentRight($controller);
                 $html .= '</div>';
@@ -98,7 +98,7 @@ class UikitSimplePaginationExtension
 
         <li><a uk-tooltip="Total ' . $name . '" class="uk-link-reset uk-text-meta" href="#"> (' . $controller->tableGrid->getTotalRecords() . ')</a></li>
         </ul>
-       
+        
         ';
 
         return $html;
