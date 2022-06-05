@@ -21,16 +21,13 @@ use MagmaCore\PanelMenu\MenuSchema;
 use MagmaCore\PanelMenu\MenuCommander;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\PanelMenu\Event\MenuActionEvent;
-use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\PanelMenu\MenuItems\MenuItemModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\PanelMenu\EventSubscriber\MenuActionSubscriber;
-use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 
 class MenuController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
-    use ControllerCommonTrait;
     use DataLayerTrait;
 
     /**
@@ -60,26 +57,10 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
                 'entity' => MenuEntity::class,
                 'formMenu' => MenuForm::class,
                 'menuItem' => MenuItemModel::class,
+                'rawSchema' => MenuSchema::class,
+                'actionEvent' => MenuActionEvent::class
             ]
         );
-    }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    // public function findOr404(): mixed
-    // {
-    //     return $this->repository->getRepo()
-    //         ->findAndReturn($this->thisRouteID())
-    //         ->or404();
-    // }
-
-    public function schemaAsString(): string
-    {
-        return MenuSchema::class;
     }
 
     protected function indexAction()
@@ -185,16 +166,6 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, MenuActionEvent::class);
-    }
-
-    /**
      * Remove a menu item from the usable list of items
      * @return bool
      */
@@ -233,25 +204,6 @@ class MenuController extends \MagmaCore\Administrator\Controller\AdminController
 
     }
 
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, MenuActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Menu Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
-            ->end();
-    }
 
     protected function quickSaveAction()
     {

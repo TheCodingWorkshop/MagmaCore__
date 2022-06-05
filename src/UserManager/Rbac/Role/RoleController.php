@@ -72,18 +72,9 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
                 'relationship' => RoleRelationship::class,
                 'privilegeUser' => PrivilegedUser::class,
                 'permission' => PermissionModel::class,
+                'actionEvent' => RoleActionEvent::class
             ]
         );
-    }
-
-    /**
-     * Return the schema as a string
-     *
-     * @return string
-     */
-    public function schemaAsString(): string
-    {
-        return RoleSchema::class;
     }
 
     /**
@@ -177,16 +168,6 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, RoleActionEvent::class);
-    }
-
-    /**
      * Assigned role route
      *
      * @return void
@@ -271,26 +252,6 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
             }
         }
         return false;
-    }
-
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, RoleActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Role Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
-            ->end();
     }
 
 

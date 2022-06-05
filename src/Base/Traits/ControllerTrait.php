@@ -42,7 +42,11 @@ trait ControllerTrait
             foreach ($args as $arg) {
                 foreach ($arg as $property => $class) {
                     if ($class) {
-                        $output = ($property === 'dataColumns' || $property === 'column' || $property === 'rawSchema') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
+                        $output = (
+                            $property === 'dataColumns' || 
+                            $property === 'column' || 
+                            $property === 'rawSchema' ||
+                            $property === 'actionEvent') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
                     }
                 }
             }

@@ -12,6 +12,7 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
+use MagmaCore\Base\Access;
 use MagmaCore\Utility\Serializer;
 use MagmaCore\Base\BaseController;
 use MagmaCore\Datatable\Datatable;
@@ -23,16 +24,20 @@ use MagmaCore\Administrator\Forms\ImportForm;
 use MagmaCore\Base\Domain\Actions\EditAction;
 use MagmaCore\Base\Domain\Actions\ShowAction;
 use MagmaCore\Base\Traits\TableSettingsTrait;
+use MagmaCore\System\Event\SystemActionEvent;
 use MagmaCore\Base\Domain\Actions\BlankAction;
 use MagmaCore\Base\Domain\Actions\CloneAction;
 use MagmaCore\Base\Domain\Actions\IndexAction;
 use MagmaCore\Base\Domain\Actions\DeleteAction;
 use MagmaCore\Base\Domain\Actions\ExportAction;
 use MagmaCore\Base\Domain\Actions\ImportAction;
+use MagmaCore\Base\Traits\SessionSettingsTrait;
 use MagmaCore\Base\Domain\Actions\UpdateOnEvent;
+use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\Base\Domain\Actions\LogIndexAction;
 use MagmaCore\Base\Domain\Actions\SettingsAction;
 use MagmaCore\Base\Domain\Actions\ShowBulkAction;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
 use MagmaCore\Base\Domain\Actions\BulkCloneAction;
 use MagmaCore\Administrator\ControllerSettingsForm;
 use MagmaCore\Base\Domain\Actions\BulkDeleteAction;
@@ -53,9 +58,6 @@ use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
-use MagmaCore\Base\Traits\ControllerSessionTrait;
-use MagmaCore\Base\Traits\SessionSettingsTrait;
-use MagmaCore\System\Event\SystemActionEvent;
 
 class AdminController extends BaseController
 {
@@ -64,6 +66,7 @@ class AdminController extends BaseController
     use TableSettingsTrait;
     use SessionSettingsTrait;
     use ControllerSessionTrait;
+    use ControllerCommonTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -195,18 +198,6 @@ class AdminController extends BaseController
         return false;
     }
 
-    // protected function settingsAction()
-    // {
-    //     $this->editAction
-    //         ->execute(
-    //             $this, 
-    //             ControllerSettingsEntity::class, 
-    //             ControllerSettingsActionEvent::class, 
-    //             NULL, 
-    //             __METHOD__
-    //         );
-    // }
-
     /**
      * Global 
      *
@@ -298,6 +289,82 @@ class AdminController extends BaseController
             ->form($this->exportForm)
             ->end();
     }
+
+    private function throwNoEventException(): void
+    {
+        if (!isset($this->actionEvent)) {
+            throw new \Exception(
+                sprintf('%s string is not defined within your controller %s', 
+                $this->actionEvent, 
+                $this->thisRouteController())
+            );
+        }
+
+    }
+    private function throwNoSchemaException(): void
+    {
+        if (!isset($this->rawSchema)) {
+            throw new \Exception(
+                sprintf('%s string is not defined within your controller %s', 
+                $this->rawSchema, 
+                $this->thisRouteController())
+            );
+        }
+
+    }
+
+    /**
+     * Return the qualified namespace for the schema class. throw a exception if the class
+     * does not define the nameapace property.
+     *
+     * @return void
+     */
+    public function schemaAsString()
+    {
+        $this->throwNoSchemaException();
+        return $this->rawSchema;
+    }
+
+
+    /**
+     * Bulk action route which will be available to any controller which inherits this 
+     * main admin controller
+     *
+     * @return void
+     */
+    public function bulkAction()
+    {
+        $this->throwNoEventException();
+        $this->chooseBulkAction($this, $this->actionEvent);
+    }
+
+
+    /**
+     * settings page which all registered controller will inherit
+     *
+     * @return Response
+     */
+    protected function settingsAction()
+    {
+        $this->throwNoEventException();
+        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
+        $this->sessionUpdateAction
+            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
+            ->execute($this, NULL, $this->actionEvent, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
+            ->render()
+            ->with(
+                [
+                    'session_data' => $sessionData,
+                    'page_title' => ucwords($this->thisRouteController()) . ' Settings',
+                    'last_updated' => $this->controllerSessionBackupModel
+                        ->getRepo()
+                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
+                ]
+            )
+            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
+            ->end();
+    }
+
 
 
 }

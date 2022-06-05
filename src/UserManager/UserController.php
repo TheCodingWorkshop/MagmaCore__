@@ -91,6 +91,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userNoteModel' => UserNoteModel::class,
                 'userMetaData' => UserMetaDataModel::class,
                 'userNoteEntity' => UserNoteEntity::class,
+                'actionEvent' => UserActionEvent::class,
 
             ]
         );
@@ -505,23 +506,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
-    protected function settingsAction()
-    {
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $this->controllerSessionData($this),
-                    'page_title' => 'User Settings',
-                    'session_model' => $this->sessionModel($this),
-                    'database_session_context' => $this->sessionModelContext($this),
-                ]
-            )
-            ->form($this->controllerSettingsForm)
-            ->end();
-    }
 
 
 }
