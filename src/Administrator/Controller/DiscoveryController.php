@@ -12,13 +12,13 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
-use MagmaCore\Administrator\Model\ControllerDbModel;
-use MagmaCore\Base\Domain\Actions\DiscoverAction;
-use MagmaCore\Utility\Serializer;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Utility\Utilities;
+use MagmaCore\Utility\Serializer;
 use MagmaCore\Utility\UtilityTrait;
 use App\Commander\DiscoveryCommander;
+use MagmaCore\Base\Domain\Actions\DiscoverAction;
+use MagmaCore\Administrator\Model\ControllerDbModel;
+use MagmaCore\Administrator\Forms\DiscoveryPermissionsForm;
 
 class DiscoveryController extends AdminController
 {
@@ -37,6 +37,7 @@ class DiscoveryController extends AdminController
                 'discoverAction' => DiscoverAction::class,
                 'discoveryAction' => DiscoverAction::class,
                 'commander' => DiscoveryCommander::class,
+                'discoveryPermissionsForm' => DiscoveryPermissionsForm::class
             ]
         );
     }
@@ -61,7 +62,8 @@ class DiscoveryController extends AdminController
                     'session' => $this->getSession(),
                     'session_discovery' => $this->getSession()->get('controller_discovery'),
                     'discoveries' => $this->showDiscoveries(),
-                    'new_controller_discovery' => $this->getSession()->get('new_controller_discovered')
+                    'new_controller_discovery' => $this->getSession()->get('new_controller_discovered'),
+                    'discovery_permission_form' => $this->discoveryPermissionsForm->createForm('', null, $this)
                 ]
             )
             ->callback(fn($controller) => '')
@@ -147,11 +149,6 @@ class DiscoveryController extends AdminController
         }
 
         return false;
-
-    }
-
-    protected function testAction()
-    {
 
     }
 
