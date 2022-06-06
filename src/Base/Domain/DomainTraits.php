@@ -32,9 +32,7 @@ use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 trait DomainTraits
 {
 
-    use DomainActionLogTrait,
-        ControllerSessionTrait,
-        TableSettingsTrait;
+    use DomainActionLogTrait, ControllerSessionTrait, TableSettingsTrait;
 
     protected array $allowedRules = [
         'password_required',
@@ -365,8 +363,6 @@ trait DomainTraits
     }
 
     /**
-     * Undocumented function
-     *
      * @param object $controller
      * @param object $repository
      * @param string $primaryKey

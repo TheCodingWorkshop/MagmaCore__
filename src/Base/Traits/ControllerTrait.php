@@ -45,6 +45,7 @@ trait ControllerTrait
                         $output = (
                             $property === 'dataColumns' || 
                             $property === 'column' || 
+                            $property === 'rawEntity' || 
                             $property === 'rawSchema' ||
                             $property === 'actionEvent') ? $this->$property = $class : $this->$property = BaseApplication::diGet($class);
                     }

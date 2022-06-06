@@ -45,7 +45,6 @@ use MagmaCore\Base\Domain\Actions\BulkUpdateAction;
 use MagmaCore\Base\Domain\Actions\ChangeRowsAction;
 use MagmaCore\Base\Domain\Actions\IfCanTrashAction;
 use MagmaCore\Administrator\ControllerSettingsModel;
-use MagmaCore\Administrator\ControllerSettingsEntity;
 use MagmaCore\Base\Domain\Actions\ChangeStatusAction;
 use MagmaCore\Base\Domain\Actions\SimpleCreateAction;
 use MagmaCore\Base\Domain\Actions\SimpleUpdateAction;
@@ -56,9 +55,32 @@ use MagmaCore\Administrator\Middleware\Before\LoginRequired;
 use MagmaCore\Administrator\Middleware\Before\SessionExpires;
 use MagmaCore\Administrator\Middleware\Before\AuthorizedIsNull;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
-use MagmaCore\Administrator\Event\ControllerSettingsActionEvent;
 use MagmaCore\Administrator\Middleware\Before\AdminAuthentication;
 
+/**
+ * Basic controller protected route methods
+ * 
+ * indexAction()
+ * showAction() (optional)
+ * newAction()
+ * editAction()
+ * deleteAction()
+ * trashAction()
+ * untrashAction()
+ * activeAction
+ * inactiveAction()
+ * 
+ * INHERITED ROUTES
+ * ===============================
+ * 
+ * bulkAction()
+ * settingsAction()
+ * importAction()
+ * exportAction()
+ * helpAction()
+ * logAction() (optional)
+ * 
+ */
 class AdminController extends BaseController
 {
 
@@ -262,6 +284,14 @@ class AdminController extends BaseController
       $this->redirect('/admin/discovery/discover');
 
     }
+
+    /**
+     * Controller import route. All routes which inherits this admin controller we automatically
+     * be able to import content to the database. Uses the SystemActionEvent globally.
+     * All controller must also define the $this->rawSchema property within the addDefinition array
+     *
+     * @return void
+     */                    
     protected function importAction()
     {
         $this->importAction
@@ -276,6 +306,13 @@ class AdminController extends BaseController
 
     }
 
+    /**
+     * Controller export route. All routes which inherits this admin controller we automatically
+     * be able to export its content from the database. Uses the SystemActionEvent globally.
+     * All controller must also define the $this->rawSchema property within the addDefinition array
+     *
+     * @return void
+     */
     protected function exportAction()
     {
         $this->exportAction
@@ -301,6 +338,7 @@ class AdminController extends BaseController
         }
 
     }
+
     private function throwNoSchemaException(): void
     {
         if (!isset($this->rawSchema)) {
@@ -364,7 +402,6 @@ class AdminController extends BaseController
             ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
             ->end();
     }
-
 
 
 }
