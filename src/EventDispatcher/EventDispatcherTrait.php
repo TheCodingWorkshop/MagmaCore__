@@ -14,9 +14,7 @@ namespace MagmaCore\EventDispatcher;
 
 use Closure;
 use Exception;
-use MagmaCore\Base\BaseActionEvent;
 use MagmaCore\Notification\NotificationModel;
-use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 
@@ -101,12 +99,14 @@ trait EventDispatcherTrait
 
 
     /**
+     * Determine the redirect path based on the properties set within the event configuration
+     * 
      * @param $event
      * @return mixed|string|null
      * @throws Exception
      */
     private function autoRedirect($event): string
-    {
+    {        
         $redirect = '';
         $routesArray = $this->trailingRoutes($event);
         $optionalRedirect = array_key_exists('redirect', $routesArray[$event->getMethod()]);
@@ -115,7 +115,7 @@ trait EventDispatcherTrait
         } elseif ($optionalRedirect == true){
             $redirect = $this->resolveRedirect($routesArray[$event->getMethod()]['redirect'], $event);
         } else {
-            $redirect = $event->getObject()->onSelf();
+            $redirect = $_SERVER['HTTP_REFERER'];
         }
         return $redirect;
     }
@@ -239,6 +239,13 @@ trait EventDispatcherTrait
         return false;
     }
 
+    /**
+     * Helper method use for unsetting data from the input array ie first arguments
+     *
+     * @param array $array
+     * @param array $optionalData
+     * @return array
+     */
     public function unsetter(array $array = [], array $optionalData = []): array
     {
         return array_map(function($key) use ($optionalData) {
@@ -246,6 +253,38 @@ trait EventDispatcherTrait
         }, $array);
 
     }
+    
+    /**
+     * isBulk action selected returns true or false
+     *
+     * @param string|null $controller
+     * @param array|null $postData
+     * @return boolean
+     */
+    private function isBulk(string $controller = null, array $postData = null): bool
+    {
+        if (array_key_exists('bulkTrash-' . $controller, $postData) || array_key_exists('bulkClone-' . $controller, $postData)) {
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Helper method for creating a flash message with redirect
+     *
+     * @param object|null $event
+     * @param string|null $message
+     * @param string|null $redirect
+     * @return void
+     */
+    private function flash(object $event = null, ?string $message = null, ?string $redirect = null)
+    {
+        $event->getObject()->flashMessage(sprintf('%s', $message), $event->getObject()->flashWarning());
+        $event->getObject()->redirect($redirect);
+
+    }
+
 }
 
 

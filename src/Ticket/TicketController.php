@@ -14,13 +14,9 @@ namespace MagmaCore\Ticket;
 use MagmaCore\Base\Access;
 use MagmaCore\Ticket\TicketSchema;
 use MagmaCore\Ticket\Event\TicketActionEvent;
-use MagmaCore\Base\Traits\ControllerCommonTrait;
-use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 
 class TicketController extends \MagmaCore\Administrator\Controller\AdminController
 {
-
-    use ControllerCommonTrait;
 
     /**
      * Extends the base constructor method. Which gives us access to all the base
@@ -47,7 +43,9 @@ class TicketController extends \MagmaCore\Administrator\Controller\AdminControll
                 'column' => TicketColumn::class,
                 'commander' => TicketCommander::class,
                 'ticketForm' => TicketForm::class,
-                'ticketEntity' => TicketEntity::class
+                'ticketEntity' => TicketEntity::class,
+                'rawSchema' => TicketSchema::class,
+                'actionEvent' => TicketActionEvent::class
             ]
         );
 
@@ -63,26 +61,6 @@ class TicketController extends \MagmaCore\Administrator\Controller\AdminControll
         return [
             'ticket_message_sidebar' => $this->repository->ticketStatusMenu()
         ];
-    }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    public function findOr404(): mixed
-    {
-        if (isset($this)) {
-            return $this->repository->getRepo()
-                ->findAndReturn($this->thisRouteID())
-                ->or404();
-        }
-    }
-
-    public function schemaAsString(): string
-    {
-        return TicketSchema::class;
     }
 
     /**
@@ -181,35 +159,6 @@ class TicketController extends \MagmaCore\Administrator\Controller\AdminControll
 
     }
 
-    /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, TicketActionEvent::class);
-    }
-
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, TicketActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Ticket Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
-            ->end();
-    }
 
 }
 

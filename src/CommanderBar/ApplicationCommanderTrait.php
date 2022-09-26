@@ -64,15 +64,16 @@ trait ApplicationCommanderTrait
      * controller.
      *
      * @param object $controller
+     * @param string $suffix
      * @return string
      */
-    public function getStatusColumnFromQueryParams(object $controller): string
+    public function getStatusColumnFromQueryParams(object $controller, string $suffix = 'Listing'): string
     {
         $queriedValue = $this->getStatusColumn($controller);
         if (isset($_GET[$queriedValue]) && $_GET[$queriedValue] !== '') {
             return $this->getName($controller, 'pluralize') . ' ' . Stringify::capitalize($_GET[$queriedValue]);
         } else {
-            return $this->getName($controller, 'pluralize') . ' Listing';
+            return $this->getName($controller, 'pluralize') . ' ' . $suffix;
         }
     }
 

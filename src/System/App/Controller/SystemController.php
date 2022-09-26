@@ -11,6 +11,8 @@ use MagmaCore\Base\Domain\Actions\SystemAction;
 use MagmaCore\System\App\DataColumns\SystemColumn;
 use MagmaCore\System\App\Commander\SystemCommander;
 use MagmaCore\Administrator\Controller\AdminController;
+use MagmaCore\System\App\Forms\RequestPermissionForm;
+use MagmaCore\Base\Domain\Actions\RequestPermissionAction;
 
 class SystemController extends AdminController
 {
@@ -36,6 +38,8 @@ class SystemController extends AdminController
                 'column' => SystemColumn::class,
                 'schema' => EventSchema::class,
                 'commander' => SystemCommander::class,
+                'requestPermissionAction' => RequestPermissionAction::class,
+                'requestPermissionForm' => RequestPermissionForm::class
             ]
         );
     }
@@ -118,6 +122,16 @@ class SystemController extends AdminController
     protected function trashAction()
     {
         $this->view('admin/system/trash.html', ['models' => $this->repository->getTrashModel()]);
+    }
+
+    protected function requestPermissionAction()
+    {
+        $this->requestPermissionAction
+            ->execute($this, NULL, SystemActionEvent::class, NULL, __METHOD__)
+            ->render()
+            ->with()
+            ->form($this->requestPermissionForm)
+            ->end();
     }
 
 }

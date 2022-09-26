@@ -15,20 +15,16 @@ namespace MagmaCore\UserManager\Rbac\Group;
 use MagmaCore\Base\Access;
 use MagmaCore\Auth\Roles\PrivilegedUser;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
-use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\UserManager\Rbac\Group\Model\GroupRoleModel;
 use MagmaCore\UserManager\Rbac\Group\Model\UserGroupModel;
 use MagmaCore\UserManager\Rbac\Group\Entity\GroupRoleEntity;
 use MagmaCore\UserManager\Rbac\Group\Event\GroupActionEvent;
 use MagmaCore\UserManager\Rbac\Group\Form\GroupAssignedForm;
-use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\UserManager\Rbac\Group\Event\GroupRoleAssignedActionEvent;
 
 
 class GroupController extends \MagmaCore\Administrator\Controller\AdminController
 {
-
-    use ControllerCommonTrait;
 
 
     public function __construct(array $routeParams)
@@ -45,7 +41,9 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
                 'groupRole' => GroupRoleModel::class,
                 'userGroup' => UserGroupModel::class,
                 'roles' => RoleModel::class,
-                'privilegeUser' => PrivilegedUser::class
+                'privilegeUser' => PrivilegedUser::class,
+                'rawSchema' => GroupeSchema::class,
+                'actionEvent' => GroupActionEvent::class
             ]
         );
 
@@ -177,17 +175,6 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
     }
 
     /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, GroupActionEvent::class);
-    }
-
-
-    /**
      * Assigned role route
      *
      * @return void
@@ -210,26 +197,6 @@ class GroupController extends \MagmaCore\Administrator\Controller\AdminControlle
                 ]
             )
             ->form($this->groupAssignedForm)
-            ->end();
-    }
-
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, GroupActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Group Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
             ->end();
     }
 

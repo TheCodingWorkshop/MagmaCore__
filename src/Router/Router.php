@@ -21,12 +21,15 @@ use MagmaCore\Base\BaseApplication;
 use MagmaCore\Router\Exception\RouterNoRoutesFound;
 use MagmaCore\Router\Exception\NoActionFoundException;
 use MagmaCore\Router\Exception\RouterBadFunctionCallException;
+use MagmaCore\Session\GlobalManager\GlobalManager;
+use MagmaCore\Session\SessionTrait;
 
 class Router implements RouterInterface
 {
 
     /** @var Object - returns extended router methods */
     use RouterTrait;
+    use SessionTrait;
 
     /** @var array - Associative array of routes (the routing table) */
     protected array $routes = [];
@@ -55,7 +58,7 @@ class Router implements RouterInterface
         $route = preg_replace('/\{([a-z]+):([^\}]+)\}/', '(?P<\1>\2)', $route);
         // Add start and end delimiters, and case insensitive flag
         $route = '/^' . $route . '$/i';
-
+       
         $this->routes[$route] = $params;
     }
 
@@ -96,13 +99,18 @@ class Router implements RouterInterface
      */
     private function dispatchWithException(string $url): array
     {
+        $logger = GlobalManager::get('logger');
         $url = $this->removeQueryStringVariables($url);
-        if (!$this->match($url)) {
-            http_response_code(404);
-            throw new RouterNoRoutesFound("Route " . $url . " does not match any valid route.", 404);
+        $session = SessionTrait::sessionFromGlobal();
+        if (!$this->matched($url)) {
+            // $logger->alert(sprintf('Error requesting the route %s. This route does not within the application', $url));
+            $session->set('invalid_route_request', $_SERVER['REQUEST_URI']);
+            $this->errorPage(404, 'errora');
         }
         if (!class_exists($controller = $this->createController())) {
-            throw new RouterBadFunctionCallException("Class " . $controller . " does not exists.");
+            $logger->alert(sprintf('Error requesting the controller %s. This route does not within the application', $controller));
+            $session->set('invalid_controller_request', $controller);
+            $this->errorPage(500);
         }
         return [$controller];
     }
@@ -116,6 +124,7 @@ class Router implements RouterInterface
      */
     public function dispatch(string $url)
     {
+        $session = SessionTrait::sessionFromGlobal();
         list($controller) = $this->dispatchWithException($url);
         $controllerObject = new $controller($this->params);
         $action = $this->createAction();
@@ -125,8 +134,10 @@ class Router implements RouterInterface
             } else {
                 $controllerObject->$action();
             }
-        } else {
-            throw new NoActionFoundException("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
+        } else {    
+            $session->set('invalid_method_request', $action);
+            $session->set('route_controler_object', $controller);
+            $this->errorPage(500, 'errorm');
         }
     }
 
@@ -172,7 +183,7 @@ class Router implements RouterInterface
      * @param string $url The route URL
      * @return boolean  true if a match found, false otherwise
      */
-    public function match(string $url): bool
+    public function matched(string $url): bool
     {
         foreach ($this->routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
@@ -248,5 +259,12 @@ class Router implements RouterInterface
             $this->namespace .= $this->params['namespace'] . '\\';
         }
         return $this->namespace;
+    }
+
+    private function errorPage(int $status, string $template = 'error')
+    {
+        http_response_code($status);
+        header('Location: http://localhost/error/' . $template);
+        exit;
     }
 }

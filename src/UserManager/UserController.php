@@ -14,12 +14,15 @@ namespace MagmaCore\UserManager;
 use Exception;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
+use App\Resource\UserResource;
+use MagmaCore\UserManager\UserSchema;
 use MagmaCore\UserManager\UserRelationship;
 use MagmaCore\DataObjectLayer\DataLayerTrait;
 use MagmaCore\UserManager\Model\UserLogModel;
 use MagmaCore\UserManager\Model\UserNoteModel;
 use MagmaCore\UserManager\Model\UserRoleModel;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
+use MagmaCore\Base\Traits\SessionSettingsTrait;
 use MagmaCore\UserManager\Forms\Admin\UserForm;
 use MagmaCore\Base\Traits\ControllerCommonTrait;
 use MagmaCore\UserManager\Entity\UserNoteEntity;
@@ -40,7 +43,8 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
 {
 
     use DataLayerTrait,
-        ControllerCommonTrait;
+        ControllerCommonTrait,
+        SessionSettingsTrait;
         
     private const NO_USER_NOTE = 'The Queried ID is missing the starter notes. You can update the account, to generate a starter note.';
 
@@ -67,8 +71,10 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             [
                 'repository' => UserModel::class,
                 'commander' => UserCommander::class,
+                'rawSchema' => UserSchema::class,
                 'rolePermission' => RolePermissionModel::class,
                 'roles' => RoleModel::class,
+                'apiResource' => UserResource::class,
                 'userMeta' => UserMetaDataModel::class,
                 'entity' => UserEntity::class,
                 'column' => UserColumn::class,
@@ -83,32 +89,79 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
                 'userRelationship' => UserRelationship::class,
                 'userNotesForm' => UserNotesForm::class,
                 'userNoteModel' => UserNoteModel::class,
+                'userMetaData' => UserMetaDataModel::class,
                 'userNoteEntity' => UserNoteEntity::class,
+                'actionEvent' => UserActionEvent::class,
+
             ]
         );
 
         /** Initialize database with table settings */
     }
 
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    public function findOr404(): mixed
-    {
-        if (isset($this)) {
-            return $this->repository->getRepo()
-                ->findAndReturn($this->thisRouteID())
-                ->or404();
-        }
-    }
 
     public function schemaAsString(): string
     {
         return UserSchema::class;
     }    
+
+    protected function getAction()
+    {
+        $data = [];
+        $queryID = $_GET['id'] ?? null;
+        $limit = $_GET['limit'] ?? null;
+        $orderby = $_GET['orderby'] ?? null;
+        $order = $_GET['order'] ?? null;
+
+        if ($limit !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],['limit' => $limit, 'offset' => 1]);
+        } elseif ($orderby !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],[],['orderby' => $orderby . ' ' . $order]);
+        } elseif ($limit !==null && $orderby !==null && $order !==null) {
+            $data = $this->repository->getRepo()->findBy([],[],['limit' => $limit, 'offset' => 1],['orderby' => $orderby . ' ' . $order]);
+        } elseif ($queryID === null) {
+            $data = $this->repository->getRepo()->findAll();
+        } elseif (isset($queryID)) {
+            $queryID = (int)$queryID;
+            $data = $this->repository->getRepo()->findOneBy(['id' => $queryID]);
+            $meta['extended_data'] = [
+                'preferences' => $this->userPreferenceRepo->getRepo()->findObjectBy(['user_id' => $queryID]) ?? null,
+                'notes' => $this->userNoteModel->getRepo()->findBy([], ['user_id' => $queryID]) ?? null,
+                'metadata' => $this->userMetaData->getRepo()->findObjectBy(['user_id' => $queryID]) ?? null
+            ];
+            array_push($data, $meta);
+            $privi['privilege'] = [
+                'role' => $this->repository->getUserRole($this->roles, $this->repository->getUserRoleID($this->userRole, $queryID)) ?? null,
+                'permissions' => [$this->repository->getUserRolePermissions($this->repository->getUserRoleID($this->userRole, $queryID))] ?? null
+            ];
+            array_push($data, $privi);
+        }
+
+        $response = $this->restful->response($data);
+
+        echo $response;
+        die;
+
+    }
+
+    protected function testAction()
+    {
+        $relationship = $this->repository->relationship(function($baseModel){
+            return $baseModel
+                ->addParent($this->repository)
+                ->addRelation(UserMetadataModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u2'))
+                ->addRelation(UserNoteModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u3'))
+                ->addRelation(UserPreferenceModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u4'))
+                ->addRelation(UserRoleModel::class, fn($baseModel, $model) => $baseModel->leftJoin($model::FOREIGNKEY, 'u5'))
+                ->limit(2) /* optional use where() when a single item is required. argument required in item ID */
+                ->getRelations(); /* must return this method at the end */
+        });
+
+        // $this->dump($relationship);
+        echo $this->restful->response($relationship);
+        die;
+
+    }
 
     /**
      * Entry method which is hit on request. This method should be implemented within
@@ -117,12 +170,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
      */
     protected function indexAction()
     {
-        $trashCount = $this->repository->getRepo()->count(['status' => 'trash']);
-        $activeCount = $this->repository->getRepo()->count(['status' => 'active']);
-        $pendingCount = $this->repository->getRepo()->count(['status' => 'pending']);
-        $lockCount = $this->repository->getRepo()->count(['status' => 'lock']);
-        $logCount = $this->userLogRepo->getRepo()->count();
-        $logCriticalCount = $this->userLogRepo->getRepo()->count(['level' => 500]);
 
         $this->indexAction
             ?->setAccess($this, Access::CAN_VIEW)
@@ -130,44 +177,13 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ?->render()
             ?->with(
                 [
-                    'table_tabs' => [
-                        'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $activeCount, 'data' => "{$pendingCount} New", 'meta' => "{$activeCount} active user"],
-
-                        // 'logs' => ['tab' => 'Logs', 'icon' => 'file-text', 'value' => $logCount,
-                        // 'data' => '', 'meta' =>"{$logCount} Logged {$logCriticalCount} critical"],
-
-                        'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $pendingCount, 'data' => '', 'meta' => "{$pendingCount} awaiting."],
-
-                        // 'trash' => ['tab' => 'Trash', 'icon' => 'trash', 'value' => $trashCount, 'data' => '', 'meta' => "{$trashCount} item in trash"],
-
-                        'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $lockCount, 'data' => '', 'meta' => "{$lockCount} account locked"],
-
-                    ],
-                    'lists' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'id', 'deleted_at_datetime'],
-                            ['status' => 'trash', 'deleted_at' => 1]
-                        ),
-                    'lock' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'],
-                            ['status' => 'lock']
-                        ),
-                    'pendings' => $this->repository
-                        ->getRepo()
-                        ->findBy(
-                            ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'],
-                            ['status' => 'pending']
-                        ),
-
-                    'logs' => $this->userLogRepo
-                        ->getRepo()
-                        ->findAll(),
-                    'count_active' => $activeCount,
-                    'count_pending' => $pendingCount,
-                    'status' => $this->request->handler()->query->get('status')
+                    'table_tabs' => $this->repository->getUserDataTableTabs(),
+                    'lock' => $this->repository->getUserData($this->repository->tabDbSelectors(), ['status' => 'lock']),
+                    'pendings' => $this->repository->getUserData($this->repository->tabDbSelectors(), ['status' => 'pending']),
+                    'count_active' => $this->repository->active,
+                    'count_pending' => $this->repository->pending,
+                    'status' => $this->request->handler()->query->get('status'),
+                    'table_size' => $this->repository->getRepo()->getEm()->getCrud()->getMapping()->getTableSize()
 
                 ]
             )
@@ -328,7 +344,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $this->changeStatusAction
             ->setAccess($this, Access::CAN_TRASH)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [],
-                ['status' => 'trash', 'deleted_at' => 1, 'deleted_at_datetime' => date('Y-m-d H:i:s')])
+                ['deleted_at' => 1, 'deleted_at_datetime' => date('Y-m-d H:i:s')])
             ->endAfterExecution();
     }
 
@@ -342,7 +358,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
     {
         $this->changeStatusAction
         ->setAccess($this, Access::CAN_UNTRASH)
-        ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__,[], [],['status' => 'active', 'deleted_at' => 0, 'deleted_at_datetime' => null])
+        ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__,[], [],['deleted_at' => 0, 'deleted_at_datetime' => null])
         ->endAfterExecution();
 
     }
@@ -356,7 +372,7 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
         $this->changeStatusAction
             ->setAccess($this, Access::CAN_RESTORE_TRASH)
             ->execute($this, UserEntity::class, UserActionEvent::class, NULL, __METHOD__, [], [],
-            ['status' => 'active', 'deleted_at' => NULL, 'deleted_at_datetime' => NULL])
+            ['deleted_at' => NULL, 'deleted_at_datetime' => NULL])
             ->endAfterExecution();
     }
 
@@ -490,23 +506,6 @@ class UserController extends \MagmaCore\Administrator\Controller\AdminController
             ->end();
     }
 
-    protected function settingsAction()
-    {
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, UserActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $this->controllerSessionData($this),
-                    'page_title' => 'User Settings',
-                    'session_model' => $this->sessionModel($this),
-                    'database_session_context' => $this->sessionModelContext($this),
-                ]
-            )
-            ->form($this->controllerSettingsForm)
-            ->end();
-    }
 
 
 }

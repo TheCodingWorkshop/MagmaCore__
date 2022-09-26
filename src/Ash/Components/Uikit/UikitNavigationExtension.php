@@ -67,13 +67,11 @@ class UikitNavigationExtension
                 $element .= '<ul class="uk-nav-default uk-nav-parent-icon" uk-nav uk-sortable="cls-custom: uk-box-shadow-small uk-flex uk-flex-middle uk-background">';
                 $element .= $this->topNav($controller);
                 foreach ($data as $key => $item) {
-                    
                     if ($controller->thisRouteController() === $item['menu_name']) {
                         $controller->getSession()->set('commander_icon', $item['menu_icon']);
                     }
                     $childQuery = 'SELECT * FROM menu_items WHERE item_original_id = ' . $item['id'];
                     $children = $this->repo->getClientCrud()->rawQuery($childQuery, [], 'fetch_all');
-
                     if (array_key_exists('parent_menu', $item) && $item['parent_menu'] === 1) {
                         $isParent = (isset($children) && count($children) > 0);
                         $active = ($routeController === $item['menu_name'] && $routeController !=='dashboard') ? 'uk-open' : '';
@@ -96,10 +94,10 @@ class UikitNavigationExtension
                     }
 
                 }
-
                 $element .= '</ul>';
                 $element .= $this->bottomNav($controller);
                 $element .= PHP_EOL;
+
             }
         }
         return $element;

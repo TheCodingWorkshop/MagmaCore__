@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
+use Throwable;
 use MagmaCore\Auth\Authorized;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Session\GlobalManager\GlobalManagerException;
-use Throwable;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -61,7 +61,6 @@ class LogoutAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
 
         if (isset($formBuilder) && $formBuilder->isFormValid($this->getSubmitValue())) :
-
             if ($controller->formBuilder->csrfValidate()) {
                 Authorized::logout();
 
@@ -72,11 +71,10 @@ class LogoutAction implements DomainActionLogicInterface
                     $controller->authenticator->getAuthUser(), /* @todo no context after session cleared,*/
                     $additionalContext
                 );
-
-
             }
         endif;
 
         return $this;
     }
+
 }

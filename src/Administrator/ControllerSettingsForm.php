@@ -38,10 +38,10 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
         parent::__construct();
     }
 
-    private function trashSupport()
+    private function radioOptions(string $key = null)
     {
         return [
-            'trash' => [
+            $key => [
                 'true' => 'true',
                 'false' => 'false'
             ]
@@ -74,18 +74,12 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                 null,
                 $this->blueprint->settings(false, null, false, null, true, null, 'Your data table pagination can be set here or on the actual index route from the dropdown option beside the lower paging links. <code>Your ' . $callingController->repository->getSchema() . ' table is currently displaying ' . $sessionData['records_per_page'] . ' records per page.</code>')
             )
-            ->add($this->blueprint->select(
-                'additional_conditions[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+            ->add($this->blueprint->text(
                 'additional_conditions',
-                20,
-                true,
+                ['uk-textarea', 'uk-form-width-large'],
+                $sessionData['additional_conditions'],
                 ),
-                $this->blueprint->choices(
-                    Yaml::file('controller')[$callingController->thisRouteController()]['status_choices'],
-                    $sessionData['additional_conditions'],
-                    $this
-                ),
+                null,
                 $this->blueprint->settings(
                     false, 
                     null, 
@@ -96,6 +90,20 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Only use this option, if you fully understand how it works. Addition conditions allows you to add additional conditions (aka where clause) to the existing query. <code>current additional conditions running on this query is ' . $sessionData['additional_conditions'] . '</code>. Which means <code><a class="uk-text-danger" href="/admin/user/index">/admin/' . $callingController->thisRouteController() . '/index</a> is only display results based on the conditions set.</code>.'
                 )
             )
+            // ->add(
+            //     $this->blueprint->multipleCheckbox('table_options', [], ['top_paging' => 'top_paging', 'trash_can' => 'trash_can']),
+            //     $this->blueprint->choices(
+            //         [
+            //             'top_paging' => 'top_paging', 
+            //             'bottom_paging' => 'bottom_paging',
+            //             'bulk_trash' => 'bulk_trash',
+            //             'bulk_clone' => 'bulk_clone',
+            //             'trash_can' => 'trash_can'
+            //         ],
+            //         ['top_paging', 'trash_can']
+            //     ),
+            //     $this->blueprint->settings(false, null, true, 'Options', true, null, '')
+            // )
 
             ->add(
                 $this->blueprint->radio(
@@ -104,7 +112,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['trash_can_support']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('trash_can_support'), 
                     $sessionData['trash_can_support']
                 ),
                 $this->blueprint->settings(
@@ -114,7 +122,7 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     null, 
                     true, 
                     null, 
-                    'Enable the trash bin for your table. This allows you to put items in the trash without permanently deleting the item. <code>Note this only works on supported models only</code>'
+                    ''
                 )
             )
             ->add(
@@ -124,20 +132,19 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['paging_top']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('paging_top'), 
                     $sessionData['paging_top']
                 ),
                 $this->blueprint->settings(
                     false, 
                     null, 
                     true, 
-                    'Pagination Top', 
+                    null, 
                     true, 
                     null, 
-                    'Enable pagination above the data table.'
+                    ''
                 )
             )
-
             ->add(
                 $this->blueprint->radio(
                     'paging_bottom', 
@@ -145,17 +152,57 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     $sessionData['paging_bottom']
                 ),
                 $this->blueprint->choices(
-                    $this->trashSupport(), 
+                    $this->radioOptions('paging_bottom'), 
                     $sessionData['paging_bottom']
                 ),
                 $this->blueprint->settings(
                     false, 
                     null, 
                     true, 
-                    'Pagination Bottom', 
+                    null, 
                     true, 
                     null, 
-                    'Enable pagination below the data table.'
+                    ''
+                )
+            )
+            ->add(
+                $this->blueprint->radio(
+                    'bulk_trash', 
+                    [], 
+                    $sessionData['bulk_trash']
+                ),
+                $this->blueprint->choices(
+                    $this->radioOptions('bulk_trash'), 
+                    $sessionData['bulk_trash']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    null, 
+                    true, 
+                    null, 
+                    ''
+                )
+            )
+            ->add(
+                $this->blueprint->radio(
+                    'bulk_clone', 
+                    [], 
+                    $sessionData['bulk_clone']
+                ),
+                $this->blueprint->choices(
+                    $this->radioOptions('bulk_clone'), 
+                    $sessionData['bulk_clone']
+                ),
+                $this->blueprint->settings(
+                    false, 
+                    null, 
+                    true, 
+                    null, 
+                    true, 
+                    null, 
+                    ''
                 )
             )
 
@@ -189,35 +236,12 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
                     'Filter alias is essentially the field name which $_GET query uses to fetch your search result it looks something like this. <code>&lt;input type="search" name="' . $sessionData['filter_alias'] . '" /&gt;. which internally looks like this $_GET[`' . $sessionData['filter_alias'] . '`]</code>'
                 )
             )
-            ->add(
-                $this->blueprint->multipleCheckbox('table_options', [], null),
-                $this->blueprint->choices(
-                    [
-                        'paging_top' => $sessionData['table_options']['paging_top'],
-                        'paging_bottom' => $sessionData['table_options']['paging_bottom'],
-                        'bulk_trash' => $sessionData['table_options']['bulk_trash'],
-                        'bulk_clone' => $sessionData['table_options']['bulk_clone'],
-                        'trash_can' => $sessionData['table_options']['trash_can']
-                    ], 
-                    null, 
-                    $this
-                ),
-                $this->blueprint->settings(
-                    false, 
-                    null, 
-                    true, 
-                    'Bottom Pagination', 
-                    true, 
-                    null, 
-                    'Enable the top pagination for this table.'
-                )
-            )
 
             ->add($this->blueprint->select(
                 'filter_by[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'filter_by_column',
-                20,
+                $sessionData['filter_by'],
                 true,
                 ),
                 $this->blueprint->choices(
@@ -229,9 +253,9 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
             )
             ->add($this->blueprint->select(
                 'sort_columns[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'sort_column',
-                20,
+                $sessionData['sort_columns'],
                 true,
                 ),
                 $this->blueprint->choices(
@@ -252,9 +276,9 @@ class ControllerSettingsForm extends ClientFormBuilder implements ClientFormBuil
 
             ->add($this->blueprint->select(
                 'selectors[]',
-                ['uk-select', 'uk-form-width-large uk-height-small', 'uk-panel'],
+                ['uk-select', 'uk-form-width-large', 'uk-panel'],
                 'selectors',
-                20,
+                $sessionData['selectors'],
                 true,
                 ),
                 $this->blueprint->choices(

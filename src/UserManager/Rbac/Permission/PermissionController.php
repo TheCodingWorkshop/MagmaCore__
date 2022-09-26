@@ -19,7 +19,6 @@ use MagmaCore\UserManager\Rbac\Permission\PermissionForm;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\UserManager\Rbac\Permission\PermissionEntity;
 use MagmaCore\UserManager\Rbac\Permission\PermissionSchema;
-use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\UserManager\Rbac\Permission\Event\PermissionActionEvent;
 
 class PermissionController extends \MagmaCore\Administrator\Controller\AdminController
@@ -50,36 +49,15 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             [
                 'repository' => PermissionModel::class,
                 'entity' => PermissionEntity::class,
+                'rawSchema' => PermissionSchema::class,
                 'column' => PermissionColumn::class,
                 'commander' => PermissionCommander::class,
                 'formPermission' => PermissionForm::class,
                 'rolePerm' => RolePermissionModel::class,
+                'actionEvent' => PermissionActionEvent::class
             ]
         );
 
-    }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    public function findOr404(): mixed
-    {
-        return $this->repository->getRepo()
-            ->findAndReturn($this->thisRouteID())
-            ->or404();
-    }
-
-    /**
-     * Return the schema as a string
-     *
-     * @return string
-     */
-    public function schemaAsString(): string
-    {
-        return PermissionSchema::class;
     }
 
     /**
@@ -173,34 +151,5 @@ class PermissionController extends \MagmaCore\Administrator\Controller\AdminCont
             ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__);
     }
 
-    /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, PermissionActionEvent::class);
-    }
-
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, PermissionActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Permission Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
-            ->end();
-    }
 
 }

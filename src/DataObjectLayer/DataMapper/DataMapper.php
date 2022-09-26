@@ -12,14 +12,15 @@ declare(strict_types=1);
 
 namespace MagmaCore\DataObjectLayer\DataMapper;
 
+use PDO;
+use PDOException;
+use PDOStatement;
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\DataObjectLayer\Exception\DataLayerException;
 use MagmaCore\DataObjectLayer\Drivers\DatabaseDriverInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\DatabaseTransaction\DatabaseTransaction;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
-use MagmaCore\Base\Exception\BaseInvalidArgumentException;
-use PDOStatement;
-use PDO;
 
 class DataMapper extends DatabaseTransaction implements DataMapperInterface
 {
@@ -86,6 +87,21 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
 
         return $results;
 
+    }
+
+    public function getTableSize()
+    {
+        $db = $this->dbh->open();
+        $stmt = $db->prepare('SHOW TABLE STATUS');
+        $stmt->execute();
+        $size = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $size += $row["Data_length"] + $row["Index_length"];
+        }
+
+        $decimals = 2;
+        $mbytes = number_format($size/(1024*1024), $decimals);
+        return $mbytes . ' MB';
     }
 
     /**
@@ -254,17 +270,18 @@ class DataMapper extends DatabaseTransaction implements DataMapperInterface
      *
      * @param string $sqlQuery
      * @param array $parameters
+     * @param bool $search defaults to false
      * @return void
      * @throws DataLayerException
      */
-    public function persist(string $sqlQuery, array $parameters): void
+    public function persist(string $sqlQuery, array $parameters, bool $search = false): void
     {
-        $this->start();
+       // $this->start();
         try {
-            $this->prepare($sqlQuery)->bindParameters($parameters)->execute();
-           $this->commit();
+            $this->prepare($sqlQuery)->bindParameters($parameters, $search)->execute();
+           //$this->commit();
         } catch (PDOException $e) {
-            $this->revert();
+           // $this->revert();
            throw new PDOException('Data persistant error ' . $e->getMessage());
         }
 

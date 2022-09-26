@@ -99,6 +99,11 @@ class BaseRedirect
             exit;
         }
     }
+    
+    public function onRefererer()
+    {
+        return $_SERVER['HTTP_REFERER'];
+    }
 
     /**
      * Determin the entire route string when using this method. In order to

@@ -14,6 +14,7 @@ namespace MagmaCore\Base\Domain\Actions;
 
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
 use MagmaCore\Base\Domain\DomainTraits;
+use MagmaCore\Session\GlobalManager\GlobalManager;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -59,7 +60,7 @@ class NewAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
 
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
-
+    
             if ($formBuilder?->csrfValidate()) {
                 $entityCollection = $controller?->repository?->getEntity()->wash($this->isAjaxOrNormal())->rinse()->dry();
                 $controller->getSession()->set('pre_action_' . $controller->thisRouteController(), (array)$entityCollection->all());
@@ -69,18 +70,16 @@ class NewAction implements DomainActionLogicInterface
                     ->validateRepository($entityCollection, $entityObject, null, $controller)
                     ->persistAfterValidation();
 
+                $this->setlog('error', 'Failed request ensure your form submit button name attributes matches the convention set out.');
+                $this->dispatchSingleActionEvent(
+                    $controller,
+                    $eventDispatcher,
+                    $method,
+                    $controller->repository->getRepo()->validatedDataBag(),
+                    $additionalContext
+                );
 
-                //if ($action) {
-                    $this->dispatchSingleActionEvent(
-                        $controller,
-                        $eventDispatcher,
-                        $method,
-                        $controller->repository->getRepo()->validatedDataBag(),
-                        $additionalContext
-                    );
-
-                //}
-                $this->domainAction = $action;
+                //$this->domainAction = $action;
 
             }
 

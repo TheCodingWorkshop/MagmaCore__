@@ -66,6 +66,14 @@ interface FormBuilderBlueprintInterface
         string|null $placeholder = null
     ): array;
 
+    public function datePicker(
+        string $name,
+        array $class = [],
+        mixed $value = null,
+        bool $required = true,
+    ): array;
+
+
     public function password(
         string $name,
         array $class = [],

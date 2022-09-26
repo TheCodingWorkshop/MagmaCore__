@@ -19,7 +19,6 @@ use Throwable;
 use MagmaCore\Utility\Sortable;
 use MagmaCore\Utility\Paginator;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManager;
-use MagmaCore\DataObjectLayer\Exception\DataLayerNoValueException;
 use MagmaCore\DataObjectLayer\EntityManager\EntityManagerInterface;
 use MagmaCore\DataObjectLayer\Exception\DataLayerInvalidArgumentException;
 
@@ -325,26 +324,27 @@ class DataRepository implements DataRepositoryInterface
      */
     public function findWithSearchAndPaging(Object $request, array $args = [], ?object $controller = null): array|false
     {
+        $arg = $this->resolveConditions($args);
 
-        list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $args);
+        list($conditions, $totalRecords) = $this->getCurrentQueryStatus($request, $arg);
 
         $sorting = new Sortable($args['sort_columns']);
-        $paging = new Paginator($totalRecords, (int)$args['records_per_page'], $request->query->getInt('page', 1));
-        $parameters = ['limit' => (int)$args['records_per_page'], 'offset' => $paging->getOffset()];
+        $paging = new Paginator($totalRecords, (int)$arg['records_per_page'], $request->query->getInt('page', 1));
+        $parameters = ['limit' => (int)$arg['records_per_page'], 'offset' => $paging->getOffset()];
         $optional = ['orderby' => $sorting->getColumn() . ' ' . $sorting->getDirection()];
 
         $searchConditions = [];
-        if ($request->query->getAlnum($args['filter_alias'])) {
-            $searchRequest = $request->query->getAlnum($args['filter_alias']);
-            if (is_array($args['filter_by'])) {
-                for ($i = 0; $i < count($args['filter_by']); $i++) {
-                    $searchConditions = [$args['filter_by'][$i] => $searchRequest];
+        if ($request->query->getAlnum($arg['filter_alias'])) {
+            $searchRequest = $request->query->getAlnum($arg['filter_alias']);
+            if (is_array($arg['filter_by'])) { 
+                for ($i = 0; $i < count($arg['filter_by']); $i++) {
+                    $searchConditions += [$arg['filter_by'][$i] => $searchRequest];
                 }
-            }
-            $results = $this->findBySearch($args['filter_by'], $searchConditions);
+            }    
+            $results = $this->findBySearch($arg['filter_by'], $searchConditions);
         } else {
-            $queryConditions = array_merge($args['additional_conditions'], $conditions);
-            $results = $this->findBy($args['selectors'], $queryConditions, $parameters, $optional);
+            $queryConditions = array_merge($arg['additional_conditions'], $conditions);
+            $results = $this->findBy([], $queryConditions, $parameters, $optional);
         }
         return [
             $results,
@@ -371,12 +371,16 @@ class DataRepository implements DataRepositoryInterface
         $totalRecords = 0;
         $req = $request->query;
         $status = $req->getAlnum($args['query']);
+
         $searchResults = $req->getAlnum($args['filter_alias']);
         $conditions = [];
+
         if ($searchResults) {
-            for ($i = 0; $i < count($args['filter_by']); $i++) {
-                $conditions = [$args['filter_by'][$i] => $searchResults];
-                $totalRecords = $this->em->getCrud()->countRecords($conditions, $args['filter_by'][$i]);
+            if (isset($args['filter_by']) && $args['filter_by'] !==null) {
+                for ($i = 0; $i < count($args['filter_by']); $i++) {
+                    $conditions = [$args['filter_by'][$i] => $searchResults];
+                    $totalRecords = $this->em->getCrud()->countRecords($conditions, $args['filter_by'][$i]);
+                }
             }
         } else if ($status) {
             $conditions = [$args['query'] => $status];
@@ -392,6 +396,26 @@ class DataRepository implements DataRepositoryInterface
             $conditions,
             $totalRecords
         ];
+    }
+
+    private function resolveConditions(array $args = null)
+    {
+        if (is_array($args) && count($args)) {
+            $stringConditions = $args['additional_conditions'];
+            $splitComma = explode(',', $stringConditions);
+            if (isset($splitComma)) {
+                $arr = [];
+                foreach ($splitComma as $splitDot) {
+                    $dot = explode(':', $splitDot);
+                    if (isset($dot) && $dot !=='') {
+                        $arr += array(trim($dot[0]) => $dot[1]);
+                    }
+                }
+            }
+            $selectors = $args['selectors'] ?? [];
+            $query = array_merge($args, ['additional_conditions' => $arr], $selectors);
+            return $query;
+        }
     }
 
 
@@ -456,15 +480,45 @@ class DataRepository implements DataRepositoryInterface
     }
 
     /**
-     * Undocumented function
+     * Returns the latest results from a specified table by the quantity amount passed in as the 1st
+     * argument. This defaults to asc mode but can be change using the 3rd argument. Defuault orderby column
+     * is set to id. But can also be specified in 2nd argument. query limit offset is set to 0 by default can 
+     * be change in 4th argument. The offset value is used together with the LIMIT keyword. This allows us to 
+     * specify which row to start retrieving the data. So by specifying 0 as the default we will start fetching
+     * data from the first row (as 0 = first row and 1 = second row etc..)
      *
      * @param integer $quantity
      * @param string $orderBy
-     * @return void
+     * @param string $pos
+     * @param integer $offset
+     * @return array|null
      */
-    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id')
+    public function findLatestByQuantity(int $quantity = 5, $orderBy = 'id', string $pos = 'asc', int $offset = 0): ?array
     {
-        
+        $results = $this->findBy([],[],['limit' => $quantity, 'offset' => $offset], ['orderby' => $orderBy . ' ' . $pos]);
+        if ($results !==null) {
+            return $results;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Allow access from the core repository to pass custom raw query. The 3rd argument can be used
+     * to modified the results of the output
+     *
+     * @param string|null $query
+     * @param array $conditions
+     * @param string|null $mode
+     * @return mixed
+     */
+    public function findByRawQuery(string $query = null, array $conditions = [], string $mode = null): mixed
+    {
+        if (empty($query)) {
+            throw new DataLayerException(sprintf('Your query is empty. Please insert your query to continue', $query));
+        }
+        return $this->getEm()->getCrud()->rawQuery($query, $conditions, $mode);
     }
 
 }

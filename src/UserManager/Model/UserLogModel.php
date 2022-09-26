@@ -22,6 +22,8 @@ class UserLogModel extends AbstractBaseModel
     protected const TABLESCHEMA = 'user_logs';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
+    /** @var string */
+    public const FOREIGNKEY = 'user_id';
 
     /**
      * Main constructor class which passes the relevant information to the

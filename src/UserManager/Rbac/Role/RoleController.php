@@ -61,6 +61,7 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
                 'repository' => RoleModel::class,
                 'userRepository' => UserModel::class,
                 'commander' => RoleCommander::class,
+                'rawSchema' => RoleSchema::class,
                 'entity' => RoleEntity::class,
                 'column' => RoleColumn::class,
                 'formRole' => RoleForm::class,
@@ -71,31 +72,9 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
                 'relationship' => RoleRelationship::class,
                 'privilegeUser' => PrivilegedUser::class,
                 'permission' => PermissionModel::class,
+                'actionEvent' => RoleActionEvent::class
             ]
         );
-    }
-
-    /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    public function findOr404(): mixed
-    {
-        return $this->repository->getRepo()
-            ->findAndReturn($this->thisRouteID())
-            ->or404();
-    }
-
-    /**
-     * Return the schema as a string
-     *
-     * @return string
-     */
-    public function schemaAsString(): string
-    {
-        return RoleSchema::class;
     }
 
     /**
@@ -189,16 +168,6 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
     }
 
     /**
-     * Bulk action route
-     *
-     * @return void
-     */
-    public function bulkAction()
-    {
-        $this->chooseBulkAction($this, RoleActionEvent::class);
-    }
-
-    /**
      * Assigned role route
      *
      * @return void
@@ -248,45 +217,41 @@ class RoleController extends \MagmaCore\Administrator\Controller\AdminController
     protected function unassignPermissionAction(): bool
     {
         /* Get the current role ID cast as an integre */
-        $queriedRoleID = (int)$_GET['role_id'] ?? null;
+        //$queriedRoleID = (int)$_GET['role_id'] ?? null;
+        $queriedRoleID = $this->request->handler()->query->getAlnum('role_id');
+        if ($queriedRoleID === null) {
+            throw new \Exception('Invalid role id pass. This action cannot be completed.');
+        }
         /* Get all the permission assigned to the $queriedRoleID and flatten the array */
         $permissionIDs = $this->flattenArray($this->rolePerm->getRepo()->findBy(['*'], ['role_id' => $queriedRoleID]));
         /* The queried permission to remove from the relationship */
         $queriedPermissionID = $this->thisRouteID();
+
+        /**
+         * permission ID = 117
+         * the $role variable within the html template is returning a different role from the one we deleting permissio from
+         * this is where the issue is coming from. Should pass $this_id to the teemplate as this gets the actual ID of the object
+         * being worked on
+         * 
+         * @todo - look at why their are permission selected in the dropdown list that isn't really selected
+         * @todo users table users registered with deleted_at set to null this needs to be set to 0
+         */
+
         /* Ensure our queried permission is within the list of permissions assigned to the queried role */
         if (in_array($queriedPermissionID, $permissionIDs)) {
+
             foreach ($permissionIDs as $permID) {
                 /* We have an exact match */
                 if ($permID === $queriedPermissionID) {
+                    
                     /* We are adding exact condition to ensure the correct permission is deleted from the queried role */
                     $delete = $this->rolePerm->getRepo()->getEm()->getCrud()->delete(['permission_id' => $queriedPermissionID, 'role_id' => $queriedRoleID]);
                     ($delete === true) ? $this->flashMessage('Permission remove') : $this->flashMessage('Permission failed to unassigned.');
                     return $this->redirect('/admin/role/' . $queriedRoleID . '/assigned');
-
                 }
             }
         }
         return false;
-    }
-
-    protected function settingsAction()
-    {
-        $sessionData = $this->getSession()->get($this->thisRouteController() . '_settings');
-        $this->sessionUpdateAction
-            ->setAccess($this, Access::CAN_MANANGE_SETTINGS)
-            ->execute($this, NULL, RoleActionEvent::class, NULL, __METHOD__, [], [], ControllerSessionBackupModel::class)
-            ->render()
-            ->with(
-                [
-                    'session_data' => $sessionData,
-                    'page_title' => 'Role Settings',
-                    'last_updated' => $this->controllerSessionBackupModel
-                        ->getRepo()
-                        ->findObjectBy(['controller' => $this->thisRouteController() . '_settings'], ['created_at'])->created_at
-                ]
-            )
-            ->form($this->controllerSettingsForm, null, $this->toObject($sessionData))
-            ->end();
     }
 
 

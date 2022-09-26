@@ -12,19 +12,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\EventSubscriber;
 
+use Exception;
+use MagmaCore\Utility\Yaml;
+use MagmaCore\Base\BaseView;
+use MagmaCore\Mailer\MailerFacade;
+use MagmaCore\UserManager\Model\UserNoteModel;
+use MagmaCore\UserManager\Model\UserRoleModel;
+use MagmaCore\Mailer\Exception\MailerException;
 use MagmaCore\UserManager\Event\UserActionEvent;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
-use MagmaCore\UserManager\Model\UserNoteModel;
-use MagmaCore\UserManager\Model\UserPreferenceModel;
-use MagmaCore\UserManager\Model\UserRoleModel;
-use MagmaCore\Base\BaseView;
-use MagmaCore\Base\Contracts\BaseActionEventInterface;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
+use MagmaCore\UserManager\Model\UserPreferenceModel;
+use MagmaCore\Base\Contracts\BaseActionEventInterface;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
-use MagmaCore\Mailer\Exception\MailerException;
-use MagmaCore\Mailer\MailerFacade;
-use MagmaCore\Utility\Yaml;
-use Exception;
 
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES
@@ -62,6 +62,8 @@ class UserActionSubscriber implements EventSubscriberInterface
     protected const ACTIVE_ACTION = 'active';
     protected const PREFERENCE_ACTION = 'preferences';
     protected const NOTES_ACTION = 'notes';
+    protected const SETTINGS_ROUTE = 'settings';
+
 
     protected const ACTIVATION_PATH = '/activation/activate';
 
@@ -425,7 +427,6 @@ class UserActionSubscriber implements EventSubscriberInterface
             }
         }
     }
-
 
     public function addUpdateUserNotes(UserActionEvent $event)
     {

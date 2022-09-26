@@ -42,13 +42,15 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
         'personal',
         'notes',
         'overview',
-        'settings'
+        'settings',
+        'export',
+        'import'
     ];
 
     private array $noCommander = [];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes', 'overview'];
-    private array $noManager = ['trash', 'new', 'bulk', 'personal', 'overview'];
+    private array $noCustomizer = ['edit', 'show', 'new', 'privilege', 'trash', 'preferences', 'bulk', 'personal', 'notes', 'overview', 'log'];
+    private array $noManager = ['trash', 'new', 'bulk', 'personal', 'overview', 'log'];
     private array $noAction = ['trash', 'personal'];
     private array $noFilter = ['edit', 'show', 'new', 'privilege', 'trash'. 'preferences', 'personal'];
 
@@ -105,6 +107,8 @@ class UserCommander extends UserModel implements ApplicationCommanderInterface
             'notes' => 'Add Notes',
             'overview' => 'Users Overview',
             'settings' => Stringify::capitalize($controller->thisRouteController()) . ' Settings',
+            'export' => 'Export',
+            'import' => 'Import',
             default => "Unknown"
         };
     }

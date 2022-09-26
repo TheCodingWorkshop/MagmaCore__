@@ -27,6 +27,8 @@ class UserRoleModel extends AbstractBaseModel
     protected const TABLESCHEMAID = 'user_id';
     /** @var object $relationship */
     protected object $relationship;
+    /** @var string */
+    public const FOREIGNKEY = 'user_id';
 
     /**
      * Main constructor class which passes the relevant information to the
