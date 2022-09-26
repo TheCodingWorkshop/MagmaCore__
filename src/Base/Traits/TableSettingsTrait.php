@@ -41,7 +41,7 @@ trait TableSettingsTrait
         return [
             'channel_name' => $channel,
             'controller' => $controller->thisRouteController(),
-            'records_per_page' => (string)$args['records_per_page'] ?? "15",
+            'records_per_page' => (string)$args['records_per_page'] ?? "5",
             'additional_conditions' => $args['additional_conditions'] ?? [],
             'selectors' => $args['selectors'] ?? [],
             'query' => $args['query'] ?? '',
@@ -49,13 +49,15 @@ trait TableSettingsTrait
             'filter_alias' => $args['filter_alias'] ?? '',
             'sort_columns' => $args['sort_columns'] ?? [],
             'trash_can_support' => $args['trash_can_support'] ?? 'false',
-            'paging_top' => 'true',
-            'paging_bottom' => 'true',
-            'bulk_clone' => 'false',
-            'bulk_trash' => 'true',
-            'trash_can' => 'false',
-            'advance_table' => 'false'
+            //'table_options' => [
+                'paging_top' => 'true',
+                'paging_bottom' => 'false',
+                'bulk_clone' => 'false',
+                'bulk_trash' => 'true',
+                'trash_can' => 'false',
+                'advance_table' => 'false'
     
+           // ]
         ];
 
     }

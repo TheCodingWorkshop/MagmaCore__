@@ -18,21 +18,6 @@ trait ControllerCommonTrait
 {
 
     /**
-     * Returns a 404 error page if the data is not present within the database
-     * else return the requested object
-     *
-     * @return mixed
-     */
-    public function findOr404(): mixed
-    {
-        if (isset($this)) {
-            return $this->repository->getRepo()
-                ->findAndReturn($this->thisRouteID())
-                ->or404();
-        }
-    }
-
-    /**
      * index route contains various submit button with unique name attributes that
      * performs different task. The page is typically encapsulated by one form which 
      * actions post back to this route
@@ -57,10 +42,8 @@ trait ControllerCommonTrait
                 'emptyTrash-' . $_name, 
                 'restoreTrash-' . $_name, 
                 'bulkTrash-' . $_name, 
-                'bulkClone-' . $_name,
-                's-' . $_name,
+                'bulkClone-' . $_name
             ] as $action) {
-
             if (array_key_exists($action, $this->formBuilder->getData())) {
                 $data = $this->formBuilder->getData();
                 switch ($action) :
@@ -72,19 +55,16 @@ trait ControllerCommonTrait
                             $action, 
                             $data, 
                             $actionEvent, 
-                            (isset($fields) && is_array($fields) && count($fields) > 0 ? $fields : ['deleted_at' => 0])
+                            (isset($))
                         );
                         break;
                     case 'bulkTrash-' . $_name :
                         $this->bulkTrash(
-                            $action, $data, $actionEvent, (isset($fields) && is_array($fields) && count($fields) > 0 ? $fields : ['deleted_at' => 1])
+                            $action, $data, $actionEvent, [$field => 1]
                         );
                         break;
                     case 'bulkClone-' . $_name :
                         $this->bulkClone($action, $data, $actionEvent);
-                        break;
-                    default :
-                        echo 'test';
                         break;
                 endswitch;
              }
@@ -157,7 +137,6 @@ trait ControllerCommonTrait
         mixed $optional = null
         )
     {
-
         if (array_key_exists($action, $data)) {
             $this->bulkUpdateAction 
                 ->setAccess($this, Access::CAN_BULK_TRASH)

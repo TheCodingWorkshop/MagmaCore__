@@ -23,10 +23,6 @@ register:
   controller: registration
   action: register
 
-error:
-  controller: error
-  action: error
-
 password/reset/{token:[\da-f]+}:
   controller: password
   action: reset

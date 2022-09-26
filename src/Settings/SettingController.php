@@ -163,7 +163,7 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
     protected function localisationAction()
     {
         $locales=  $this->localisationModel->getRepo()->findAll();
-        $totalLocale = $this->localisationModel->getRepo()->count();
+        $total_locale = $this->localisationModel->getRepo()->count();
 
         if ($queriedID = $this->request->handler()->query->getAlnum('delete_id')) {
             $this->localisationModel->getRepo()->findByIdAndDelete(['id' => (int)$queriedID]);
@@ -175,14 +175,14 @@ class SettingController extends \MagmaCore\Administrator\Controller\AdminControl
             $this->editAction
                 ->execute(new LocalisationController($this->routeParams), LocalisationEntity::class, SettingActionEvent::class, NULL, __METHOD__)
                 ->render()
-                ->with(['all' => $locales, 'total_locale' => $totalLocale, 'id' => $this->thisRouteID()])
+                ->with(['all' => $locales, 'total_locale' => $total_locale, 'id' => $this->thisRouteID()])
                 ->form($this->localisationSettingForm)
                 ->end();
         } else {
             $this->newAction
                 ->execute(new LocalisationController($this->routeParams), LocalisationEntity::class, SettingActionEvent::class, NULL, __METHOD__)
                 ->render()
-                ->with(['all' => $locales, 'total_locale' => $totalLocale])
+                ->with(['all' => $locales, 'total_locale' => $total_locale])
                 ->form($this->localisationSettingForm)
                 ->end();
         }

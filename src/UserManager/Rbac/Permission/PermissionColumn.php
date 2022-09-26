@@ -55,7 +55,7 @@ class PermissionColumn extends AbstractDatatableColumn
                     $html .= '</div>';
                     $html .= '<div class="uk-float-left">';
                     $html .= $row["permission_name"] . "<br/>";
-                    $html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["permission_description"] . '</small></div>';
+                    //$html .= '<div class="uk-text-truncate uk-width-3-4"><small>' . $row["permission_description"] . '</small></div>';
                     $html .= '</div>';
                     $html .= '</div>';
 

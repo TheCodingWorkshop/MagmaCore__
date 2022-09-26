@@ -91,7 +91,7 @@ class Logger implements LoggerInterface
         try{
             $this->loggerHandler->write($level, $message, $context);
         }catch(Throwable $throw) {
-            throw new LoggerException('An exception was thrown in writing the log to the handler.');
+            throw new LoggerException('An exception was thrown in writing the log to the handler.', 0, $throw);
         }
 
     }
@@ -105,7 +105,7 @@ class Logger implements LoggerInterface
      */
     public function emergency($message, array $context = array()): void
     {
-        $this->writeLog(self::EMERGENCY, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -120,7 +120,7 @@ class Logger implements LoggerInterface
      */
     public function alert(string $message, array $context = array()): void
     {
-        $this->writeLog(self::ALERT, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -134,7 +134,7 @@ class Logger implements LoggerInterface
      */
     public function critical(string $message, array $context = array()): void
     {
-        $this->writeLog(self::CRITICAL, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -147,7 +147,7 @@ class Logger implements LoggerInterface
      */
     public function error(string $message, array $context = array()): void
     {
-        $this->writeLog(self::ERROR, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -162,7 +162,7 @@ class Logger implements LoggerInterface
      */
     public function warning(string $message, array $context = array()): void
     {
-        $this->writeLog(self::WARNING, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -174,7 +174,7 @@ class Logger implements LoggerInterface
      */
     public function notice(string $message, array $context = array()): void
     {
-        $this->writeLog(self::NOTICE, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -188,7 +188,7 @@ class Logger implements LoggerInterface
      */
     public function info(string $message, array $context = array()): void
     {
-        $this->writeLog(self::INFO, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -200,7 +200,7 @@ class Logger implements LoggerInterface
      */
     public function debug($message, array $context = array()): void
     {
-        $this->writeLog(self::DEBUG, $message, $context);
+        $this->writeLog($message, $context);
     }
 
     /**
@@ -213,6 +213,5 @@ class Logger implements LoggerInterface
      */
     public function log(mixed $level, string $message, array $context = array()): void
     {
-        $this->writeLog($level, $message, $context);
     }
 }

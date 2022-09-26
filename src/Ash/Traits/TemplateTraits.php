@@ -111,24 +111,6 @@ trait TemplateTraits
     }
 
     /**
-     * Add local css stylesheets to individual html template
-     *
-     * @param mixed $styles
-     * @return string
-     */
-    public function localCss(mixed $styles = null): string
-    {
-        $css = '';
-        if ($styles !==null && is_array($styles) && count($styles) > 1) {
-            for ($i = 0; $i < count($styles); $i++) {
-                $css .= sprintf('<link rel="stylesheet" href="/public/assets/css%s">', $styles[$i]);
-            }
-        }
-        $css .= sprintf('<link rel="stylesheet" href="/public/assets/css%s">', $styles); 
-        return $css;
-    }
-
-    /**
      * Return the index position of the route. index[0] = the route namespace
      * index[1] = the route controller and index[2] = the route controller method. 
      *
@@ -218,27 +200,6 @@ trait TemplateTraits
     }
 
     /**
-     * Get the controller settings from the session within the html templates.
-     *
-     * @param object|null $controller
-     * @param mixed $filterKey
-     * @return mixed
-     */
-    public function getSessionSettings(object $controller = null, mixed $filterKey = null): mixed
-    {
-        $key = $controller->thisRouteController() . '_settings';
-        $settings = $this->getSessionData($key);
-        if (is_array($settings) && count($settings) > 0) {
-            if (isset($filterKey) && $filterKey !==null && array_key_exists($filterKey, $settings)) {
-                return $settings[$filterKey];
-            }
-            return $settings;
-        }
-
-        return null;
-    }
-
-    /**
      * Show the trash can if and enable and the model supports it
      *
      * @param object $controller
@@ -267,8 +228,7 @@ trait TemplateTraits
         if (!method_exists($controller, 'schemaAsString')) {
             throw new \Exception(sprintf('Your controller class is missing [%s] method. This is now required as of version [%s]', 'schemaAsString', '1.3.9'));
         }
-        $schema = (isset($controller->rawSchema) ? $controller->rawSchema : $controller->schemaAsString());
-        $columns = $controller->repository->getColumns($schema);
+        $columns = $controller->repository->getColumns($controller->schemaAsString());
         if (is_array($columns)) {
             if (!in_array($controller->repository->trashSupport(), $columns)) {
                 throw new \Exception('Trash feature is not supported by your model');

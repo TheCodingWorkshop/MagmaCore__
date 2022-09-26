@@ -33,14 +33,13 @@ class SimpleUpdateAction implements DomainActionLogicInterface
     /**
      * execute logic for adding new items to the database(). Post data is returned as a collection
      *
-     * @param object $controller - The controller object implementing this object
+     * @param Object $controller - The controller object implementing this object
      * @param string|null $entityObject
      * @param string|null $eventDispatcher - the eventDispatcher for the current object
      * @param string|null $objectSchema
      * @param string $method - the name of the method within the current controller object
      * @param array $rules
      * @param array $additionalContext - additional data which can be passed to the event dispatcher
-     * @param mixed $optional - can handle any argument the single action class wants to implement
      * @return NewAction
      */
     public function execute(

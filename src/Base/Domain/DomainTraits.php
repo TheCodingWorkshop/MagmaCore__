@@ -12,27 +12,28 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain;
 
-use Closure;
 use Exception;
+use Closure;
 use MagmaCore\Base\Access;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseModel;
 use MagmaCore\Utility\Stringify;
-use MagmaCore\Utility\Serializer;
-use MagmaCore\Base\BaseApplication;
 use MagmaCore\Auth\Roles\PrivilegedUser;
-use MagmaCore\Base\Traits\TableSettingsTrait;
 use MagmaCore\Base\Domain\DomainActionLogTrait;
-use MagmaCore\Base\Traits\ControllerSessionTrait;
-use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Base\Exception\BaseOutOfBoundsException;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Base\BaseApplication;
+use MagmaCore\Base\Traits\ControllerSessionTrait;
+use MagmaCore\Base\Traits\TableSettingsTrait;
+use MagmaCore\Utility\Serializer;
 
 trait DomainTraits
 {
 
-    use DomainActionLogTrait, ControllerSessionTrait, TableSettingsTrait;
+    use DomainActionLogTrait,
+        ControllerSessionTrait,
+        TableSettingsTrait;
 
     protected array $allowedRules = [
         'password_required',
@@ -363,6 +364,8 @@ trait DomainTraits
     }
 
     /**
+     * Undocumented function
+     *
      * @param object $controller
      * @param object $repository
      * @param string $primaryKey
@@ -671,13 +674,12 @@ trait DomainTraits
         return false;
     }
 
-    public function removeCsrfTokens(array $data, string $field = null): void
+    public function removeCsrfTokens(array $data, string $field): void
     {
-       // if ($data) {
-            unset($data['_CSRF_TOKEN']);
-            unset($data['_CSRF_INDEX']);
+        if ($data) {
+            unset($data['_CSRF_INDEX'], $data['_CSRF_TOKEN'], $data['settings-user']);
             unset($data[$this->getSubmitValue()]);
-       // }
+        }
 
     }
 
@@ -692,6 +694,31 @@ trait DomainTraits
                 continue;
             unlink($directory . '/' .$oldCacheFiles);
         }
+
+    }
+
+    /**
+     * Returns a modified clone array modifying the selected elements within the item object
+     * which was return by concatinating the a clone string to create a clone but unique item
+     * which will be re-inserted within the database.
+     *
+     * @param string $value
+     * @return string
+     */
+    private function resolvedCloning(mixed $value)
+    {
+        // $suffix = '-clone';
+        // if (str_contains($value, '@')) { /* check if the argument contains an @ symbol */
+        //     $ex = explode('@', $value); /* explode the argument by the @ symbol */
+        //     if (is_array($ex)) {
+        //         /* safely get the first and last index of the array */
+        //         return $ex[array_key_first($ex)] . $suffix . '-' . $ex[array_key_last($ex)];
+        //     }
+        // } else {
+        //     return $value . $suffix;
+        // }
+
+        return $value;
 
     }
 
@@ -740,7 +767,7 @@ trait DomainTraits
                 ->create(
                     [
                         'controller' => $controller->thisRouteController() . '_settings',
-                        'context' => Serializer::compress($formData)
+                        'context' => serialize($formData)
                     ]
                 );
 
@@ -754,27 +781,6 @@ trait DomainTraits
         return false;
 
     }
-
-    public function postExecute(object $controller = null, object $formBuilder = null)
-    {
-        $channel = $controller->thisRouteController() . '_settings';
-        if ($formBuilder->isFormValid('settings-' . $controller->thisRouteController() . '-restore')) {
-            $restoreSessionData = $this->controller->controllerSessionBackupModel->getRepo()->findObjectBy(['controller' => $channel]);
-            $context = $restoreSessionData->context;
-            $dbSessionData = Serializer::unCompress($context);
-            $session = $controller->getSession();
-            if ($session->has($channel)) {
-                $session->delete($channel);
-
-                $session->set($channel, Serializer::compress($dbSessionData));
-        
-            }
-            $controller->flashMessage('Settings restored!');
-            $controller->redirect($controller->onSelf());
-
-        }
-    }
-
 
     /**
      * Allows resetting of the controller settings page back to all default values defined
@@ -807,20 +813,5 @@ trait DomainTraits
         }
 
     }
-
-    /**
-     * Initialize and set log
-     *
-     * @param string|null $message
-     * @param array $context
-     * @return void
-     */
-    public function setLog(string $logName = null, string $message = null, array $context = []): void
-    {
-        $log = GlobalManager::get('logger');
-        $log->$logName($message, $context);
-
-    }
-
 
 }

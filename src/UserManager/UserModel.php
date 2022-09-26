@@ -15,16 +15,15 @@ namespace MagmaCore\UserManager;
 use MagmaCore\UserManager\Rbac\Role\RoleRelationship;
 use MagmaCore\UserManager\Rbac\Role\RoleModel;
 use MagmaCore\Auth\Contracts\UserSecurityInterface;
-use MagmaCore\Auth\Roles\PrivilegeTrait;
 use MagmaCore\Base\AbstractBaseModel;
 use MagmaCore\Base\Exception\BaseInvalidArgumentException;
+use MagmaCore\Utility\PasswordEncoder;
 use MagmaCore\Utility\UtilityTrait;
 
 class UserModel extends AbstractBaseModel implements UserSecurityInterface
 {
 
     use UtilityTrait;
-    use PrivilegeTrait;
 
     /** @var string */
     protected const TABLESCHEMA = 'users';
@@ -187,94 +186,5 @@ class UserModel extends AbstractBaseModel implements UserSecurityInterface
 
         return null;
     }
-
-    /**
-     * j
-     *
-     * @param object|null $userRole
-     * @param integer|null $queryID
-     * @return integer|null
-     */
-    public function getUserRoleID(object $userRole = null, int $queryID = null): ?int
-    {
-        $userRoleID = $userRole->getRepo()->findObjectBy(['user_id' => $queryID], ['role_id']);
-        if ($userRoleID !==null) {
-            return $userRoleID->role_id;
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Returns the role name for the current queried user. This methods workd in conjunction with getUserRoleID()
-     * which the result of needs to be passed as the second argument for this method.
-     *
-     * @param object|null $role
-     * @param integer|null $roleID
-     * @return string|null
-     */
-    public function getUserRole(object $role = null, int $roleID = null): ?string
-    {
-        $roleName = $role->getRepo()->findObjectBy(['id' => $roleID], ['role_name']);
-        if ($roleName !==null) {
-            return $roleName->role_name;
-        }
-        return null;
-    }
-
-    public function getUserRolePermissions(int $roleID = null): ?array
-    {
-        $perms = $this->getPermissionByRoleID($roleID);
-        return $perms;
-    }
-
-    public function getUserData(array $selectors = [], array $conditions = []): ?array
-    {
-        $data = $this->getRepo()->findBy($selectors, $conditions);
-        if ($data !==null) {
-            return $data;
-        }
-        return null;
-
-    }
-
-    public function getUserCount(array $conditions = []): ?int
-    {
-        return $this->getRepo()->count($conditions);
-    }
-
-    /**
-     * Return an array of table column data which will be used to populate the tabs in the user datatable.
-     *
-     * @return array
-     */
-    public function tabDbSelectors(): array
-    {
-        return ['firstname', 'lastname', 'email', 'id', 'created_at', 'status'];
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return array
-     */
-    public function getUserDataTableTabs(): array
-    {
-        $this->active = $this->getUserCount(['status' => 'active']);
-        $this->pending = $this->getUserCount(['status' => 'pending']);
-        $this->lock = $this->getUserCount(['status' => 'lock']);
-
-        $tabs = [
-            'primary' => ['tab' => 'Primary', 'icon' => 'user', 'value' => $this->active, 'data' => "{$this->pending} New", 'meta' => "{$this->active} active user"],
-            // 'search' => ['tab' => 'Search', 'icon' => 'search', 'value' => $this->active, 'data' => "", 'meta' => "{$this->active} results"],
-            'pending' => ['tab' => 'Pending', 'icon' => 'warning', 'value' => $this->pending, 'data' => '', 'meta' => "{$this->pending} awaiting."],
-            'lock' => ['tab' => 'Lock', 'icon' => 'lock', 'value' => $this->lock, 'data' => '', 'meta' => "{$this->lock} account locked"],
-        ];
-
-        return $tabs;
-
-    }
-
 
 }

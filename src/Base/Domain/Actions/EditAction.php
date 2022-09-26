@@ -60,7 +60,8 @@ class EditAction implements DomainActionLogicInterface
         $formBuilder = $controller->formBuilder;
 
         if (isset($formBuilder) && $formBuilder->isFormvalid($this->getSubmitValue())) :
-            if ($formBuilder?->csrfValidate()) {                
+            if ($formBuilder?->csrfValidate()) {
+                
                 /* enforce any set rules */
                 $this->enforceRules($rules, $controller);
 

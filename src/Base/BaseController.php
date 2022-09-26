@@ -13,28 +13,28 @@ declare(strict_types=1);
 namespace MagmaCore\Base;
 
 use MagmaCore\Base\BaseApplication;
-// use MagmaCore\Base\Events\BeforeRenderActionEvent;
+use MagmaCore\Base\Events\BeforeRenderActionEvent;
 use MagmaCore\Base\Events\BeforeControllerActionEvent;
 use MagmaCore\Base\Traits\ControllerFlashTrait;
 use MagmaCore\Base\Traits\ControllerMenuTrait;
 use MagmaCore\Base\Traits\ControllerMonitorTrait;
-// use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
+use MagmaCore\Base\Traits\ControllerPrivilegeTrait;
 use MagmaCore\Base\Traits\ControllerViewTrait;
-// use MagmaCore\Session\GlobalManager\GlobalManager;
+use MagmaCore\Session\GlobalManager\GlobalManager;
 use MagmaCore\Utility\Yaml;
 use MagmaCore\Base\BaseView;
-// use MagmaCore\Auth\Authorized;
+use MagmaCore\Auth\Authorized;
 use MagmaCore\Base\BaseRedirect;
-// use MagmaCore\Session\Flash\Flash;
+use MagmaCore\Session\Flash\Flash;
 use MagmaCore\Session\SessionTrait;
-// use MagmaCore\Ash\TemplateExtension;
+use MagmaCore\Ash\TemplateExtension;
 use MagmaCore\Middleware\Middleware;
-// use MagmaCore\Session\Flash\FlashType;
-// use MagmaCore\Base\Exception\BaseLogicException;
+use MagmaCore\Session\Flash\FlashType;
+use MagmaCore\Base\Exception\BaseLogicException;
 use MagmaCore\Base\Traits\ControllerCastingTrait;
-// use MagmaCore\Auth\Roles\PrivilegedUser;
-// use MagmaCore\UserManager\UserModel;
-// use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
+use MagmaCore\Auth\Roles\PrivilegedUser;
+use MagmaCore\UserManager\UserModel;
+use MagmaCore\UserManager\Rbac\Permission\PermissionModel;
 use MagmaCore\Base\Exception\BaseBadMethodCallException;
 use Exception;
 use MagmaCore\Base\Traits\TableSettingsTrait;
@@ -68,10 +68,8 @@ class BaseController extends AbstractBaseController
         'dashboard',
         'history',
         'discovery',
-        'notification',
-        'error'
+        'notification'
     ];
-    protected array $headers = ["User-Agent:", "Authorization:"];
 
     /**
      * Main class constructor
@@ -92,7 +90,6 @@ class BaseController extends AbstractBaseController
             $this->initalizeControllerSession($this);
         }
         $this->pingMethods();
-
         $this->showDiscoveries();
         $this->recordHistory();
     }
@@ -140,10 +137,7 @@ class BaseController extends AbstractBaseController
                     $this->after();
                 }
             } else {
-                http_response_code(404);
-                $this->getSession()->set('invalid_method', $method);
-                header('Location: http://localhost/error/errora');
-                exit;        
+                throw new BaseBadMethodCallException("Method {$method} does not exists.");
             }
         } else {
             throw new Exception;
@@ -308,20 +302,6 @@ class BaseController extends AbstractBaseController
         $session->setArray('sesson_history_trace', ['history_path' => $_SERVER['HTTP_REFERER'], 'history_user' => $session->get('user_id'), 'history_browser_agent' => $_SERVER['HTTP_USER_AGENT'], 'history_timestamp' => date('h:i:s')]);
     }
 
-    public function dump(mixed $var, bool $die = true, array $optional = [])
-    {
-        var_dump($var, $optional);
-        if ($die) {
-            die();
-        }
-    }
 
-    public function getHttpCode($url) {
-        $handle = curl_init($url);
-        curl_setopt($handle,  CURLOPT_RETURNTRANSFER, TRUE);
-        $response = curl_exec($handle);
-        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
-        return $httpCode;         
-      }    
+
 }

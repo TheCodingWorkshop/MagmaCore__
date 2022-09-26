@@ -136,11 +136,6 @@ trait FormTrait
 
     }
 
-    public function getFile()
-    {
-        //return (isset($_FILES[$filename]) )
-    }
-
     /**
      * Is the request an ajax request
      * @return boolean

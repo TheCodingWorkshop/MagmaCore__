@@ -12,18 +12,19 @@ declare(strict_types=1);
 
 namespace MagmaCore\UserManager\Security\EventSubscriber;
 
+use Exception;
+use function date;
+use function array_map;
+use function serialize;
+use function array_reduce;
 use MagmaCore\Auth\Authorized;
+use JetBrains\PhpStorm\ArrayShape;
 use MagmaCore\UserManager\Model\UserMetaDataModel;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
 use MagmaCore\Administrator\Model\ControllerSessionBackupModel;
 use MagmaCore\PanelMenu\MenuModel;
 use MagmaCore\UserManager\Security\Event\LogoutActionEvent;
-use function array_reduce;
-use function serialize;
-use function array_map;
-use function date;
-use Exception;
 
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES
@@ -37,15 +38,10 @@ class LogoutActionSubscriber implements EventSubscriberInterface
     /** @var int - we want this to execute last so it doesn't interrupt other process */
     private const FLASH_MESSAGE_PRIORITY = -1000;
     private const LOGOUT_ACTION = 'logout';
+
     private ControllerSessionBackupModel $sessionBackup;
     private MenuModel $menuModel;
 
-    /**
-     * Main class constructor 
-     *
-     * @param ControllerSessionBackupModel $sessionBackup
-     * @param MenuModel $menuModel
-     */
     public function __construct(ControllerSessionBackupModel $sessionBackup, MenuModel $menuModel)
     {
         $this->sessionBackup = $sessionBackup;
@@ -59,7 +55,7 @@ class LogoutActionSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    public static function getSubscribedEvents(): array
+    #[ArrayShape([LogoutActionEvent::NAME => "array[]"])] public static function getSubscribedEvents(): array
     {
         return [
             LogoutActionEvent::NAME => [
@@ -129,12 +125,6 @@ class LogoutActionSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param LogoutActionEvent $event
-     * @return void
-     */
     public function logControllerSession(LogoutActionEvent $event)
     {
         /* first we need to somehow get all the controller within the system. We should 
@@ -143,7 +133,9 @@ class LogoutActionSubscriber implements EventSubscriberInterface
         /* append the _settings suffix to the controller name */
         $sessionKey = array_map(fn($controller) => $controller . '_settings', $controllers );
 
-        /* Now we have the keys we will loop through and get the relevant session data belonging to the key */
+        /* Now we have the keys we will loop through and get the relevant session data belonging
+        to the key */
+
         if (is_array($sessionKey) && count($sessionKey) > 0) {
             /* This is safest way to retrive the index position of the $sessionKey array */
             $indexPosition = array_search('dashboard_settings', $sessionKey);
@@ -177,6 +169,7 @@ class LogoutActionSubscriber implements EventSubscriberInterface
         return true;
 
     }
+
 
 
 }

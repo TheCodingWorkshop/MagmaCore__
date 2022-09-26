@@ -241,17 +241,14 @@ trait ControllerMenuTrait
         $url .= '/';
         $url .= isset($routeParams['controller']) ? $routeParams['controller'] : '';
 
-        $actions = ['index', 'settings', 'log', 'new'];
-        if (in_array($itemName, $actions)) {
-            if (isset($routeParams['id']) && $routeParams['id'] !=='') {
-                $url .= '/';
-                $url .= $routeParams['id'];
-            } else {
-                $url .= '/';
-            }
-    
-            $url .= $itemName;    
+        if (isset($routeParams['id']) && $routeParams['id'] !=='') {
+            $url .= '/';
+            $url .= $routeParams['id'];
+        } else {
+            $url .= '/';
         }
+
+        $url .= $itemName;
 
         return strtolower($url);
     }

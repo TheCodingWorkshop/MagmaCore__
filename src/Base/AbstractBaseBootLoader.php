@@ -201,14 +201,13 @@ abstract class AbstractBaseBootLoader extends Singleton
      */
     protected function loadLogger()
     {
-        $logger = (new LoggerFactory())
+        return (new LoggerFactory())
             ->create(
                 $this->app()->getLoggerFile(),
                 $this->app()->getLogger(),
                 $this->app()->getLogMinLevel(),
                 $this->app()->getLoggerOptions()
             );
-            GlobalManager::set('logger', $logger);
     }
 
     /**

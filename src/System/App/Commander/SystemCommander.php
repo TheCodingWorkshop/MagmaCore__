@@ -36,10 +36,10 @@ class SystemCommander extends EventModel implements ApplicationCommanderInterfac
 
     private array $noCommander = ['index'];
     private array $noNotification = self::INNER_ROUTES;
-    private array $noCustomizer = ['trash'];
-    private array $noManager = ['trash'];
+    private array $noCustomizer = ['edit', 'show', 'new'];
+    private array $noManager = [];
     private array $noAction = [];
-    private array $noFilter = ['trash'];
+    private array $noFilter = ['edit', 'show', 'new'];
 
     private object $controller;
 

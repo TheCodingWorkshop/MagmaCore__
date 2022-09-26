@@ -52,11 +52,6 @@ class Role
         }
     }
 
-    public function relationship()
-    {
-        $sql = 'SELECT * FROM users, user_metadata, user_perferences, user_notes, user_role WHERE users.id = user_metadata.user_id AND user_preferences.user_id AND user_notes.user_id AND user_role.user_id';
-    }
-
     /**
      * Check if a permission is set
      * @param $permission

@@ -25,7 +25,6 @@ use MagmaCore\FormBuilder\Type\UploadType;
 use MagmaCore\FormBuilder\Type\CheckboxType;
 use MagmaCore\FormBuilder\Type\PasswordType;
 use MagmaCore\FormBuilder\Type\TextareaType;
-use MagmaCore\FormBuilder\Type\DateType;
 use MagmaCore\FormBuilder\Type\MultipleCheckboxType;
 use MagmaCore\FormBuilder\FormBuilderBlueprintInterface;
 
@@ -182,23 +181,6 @@ class FormBuilderBlueprint implements FormBuilderBlueprintInterface
             ]
         ];
     }
-
-    public function datePicker(
-        string $name,
-        array $class = [],
-        mixed $value = null,
-        bool $required = true,
-    ): array {
-        return [
-            DateType::class => [
-                array_merge(
-                    $this->arg($name, $class, $value),
-                    ['required' => $required,]
-                )
-            ]
-        ];
-    }
-
 
     public function password(
         string $name,

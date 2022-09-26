@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace MagmaCore\Settings\EventSubscriber;
 
-use Exception;
 use MagmaCore\Settings\Event\SettingActionEvent;
 use MagmaCore\EventDispatcher\EventDispatcherTrait;
 use MagmaCore\EventDispatcher\EventSubscriberInterface;
+use Exception;
 
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES

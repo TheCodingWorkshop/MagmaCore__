@@ -36,10 +36,12 @@ class MenuActionSubscriber implements EventSubscriberInterface
     /* @var string */
     protected const NEW_ACTION = 'new';
 
+    private MenuItemModel $menuItem;
+
     /**
      * @param MenuItemModel $menuItem
      */
-    public function __construct(private MenuItemModel $menuItem)
+    public function __construct(MenuItemModel $menuItem)
     {
         $this->menuItem = $menuItem;
     }

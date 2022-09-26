@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagmaCore\Logger\Handler;
 
+use MagmaCore\Base\Exception\BaseInvalidArgumentException;
 use MagmaCore\Logger\Exception\LoggerHandlerInvalidArgumentException;
 use MagmaCore\Logger\LoggerTrait;
 
@@ -50,7 +51,7 @@ class NativeLoggerHandler extends AbstractLoggerHandler
      * @param array $context
      * @return void
      */
-    public function write(mixed $level, string $message, array $context = []): void
+    public function write(string $level, string $message, array $context = []): void
     {
         if (!$this->logLevelReached($level)) {
             return;

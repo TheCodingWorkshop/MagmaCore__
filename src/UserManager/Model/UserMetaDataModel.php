@@ -24,9 +24,6 @@ class UserMetaDataModel extends AbstractBaseModel
     protected const TABLESCHEMA = 'user_metadata';
     /** @var string */
     protected const TABLESCHEMAID = 'id';
-    /** @var string */
-    public const FOREIGNKEY = 'user_id';
-
     /** @var object $relationship */
     protected object $relationship;
 

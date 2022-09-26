@@ -33,9 +33,7 @@ class PermissionCommander extends PermissionModel implements ApplicationCommande
         'new',
         'edit',
         'bulk',
-        'settings',
-        'import',
-        'export'
+        'settings'
     ];
 
     private array $noCommander = [];
@@ -88,8 +86,6 @@ class PermissionCommander extends PermissionModel implements ApplicationCommande
             'assigned' => 'Role Assignment',
             'settings' => 'Permission Settings',
             'bulk' => 'Bulk Delete',
-            'import' => 'Import Data',
-            'export' => 'Export Data',
             default => "Unknown"
         };
     }

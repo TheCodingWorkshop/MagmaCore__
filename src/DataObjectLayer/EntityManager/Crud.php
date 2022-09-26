@@ -207,7 +207,7 @@ class Crud implements CrudInterface
         $args = ['table' => $this->getSchema(), 'type' => 'search', 'selectors' => $selectors, 'conditions' => $conditions];
         $query = $this->queryBuilder->buildQuery($args)->searchQuery();
         $this->searchQuery = $query;
-        $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions), true);
+        $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
         return ($this->dataMapper->numRows() >= 1) ? $this->dataMapper->results() : array();
     }
 

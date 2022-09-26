@@ -400,13 +400,15 @@ trait TemplateFunctionsTrait
             $html .= '<ul class="uk-list uk-list-divider uk-list-collapse">';
             foreach ($methods as $method) {
                 $html .= '
-                <li>
-                    <div class="uk-clearfix">
-                        <div class="uk-float-left">Method [' . $method . ']</div>
-                        <input type="hidden" name="methods[]" value="' . $method . '" />
-                        <div class="uk-float-right"><a uk-tooltip="Push to methods" class="uk-link-reset" href="/admin/discovery/install">' . IconLibrary::getIcon('push') . '</a></div>
-                    </div>
-                </li>';
+                            <li>
+                                <div class="uk-clearfix">
+                                    <div class="uk-float-left">Method [' . $method . ']</div>
+                                    <input type="hidden" name="methods[]" value="' . $method . '" />
+                                    <div class="uk-float-right"><a uk-tooltip="Push to methods" class="uk-link-reset" href="/admin/discovery/install">' . IconLibrary::getIcon('push') . '</a></div>
+                                </div>
+                            </li>
+
+                        ';
 
             }
             $html .= '</ul>';

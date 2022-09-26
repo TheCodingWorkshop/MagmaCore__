@@ -12,13 +12,13 @@ declare (strict_types=1);
 
 namespace MagmaCore\Administrator\Controller;
 
-use MagmaCore\Utility\Stringify;
+use MagmaCore\Administrator\Model\ControllerDbModel;
+use MagmaCore\Base\Domain\Actions\DiscoverAction;
 use MagmaCore\Utility\Serializer;
+use MagmaCore\Utility\Stringify;
+use MagmaCore\Utility\Utilities;
 use MagmaCore\Utility\UtilityTrait;
 use App\Commander\DiscoveryCommander;
-use MagmaCore\Base\Domain\Actions\DiscoverAction;
-use MagmaCore\Administrator\Model\ControllerDbModel;
-use MagmaCore\Administrator\Forms\DiscoveryPermissionsForm;
 
 class DiscoveryController extends AdminController
 {
@@ -37,7 +37,6 @@ class DiscoveryController extends AdminController
                 'discoverAction' => DiscoverAction::class,
                 'discoveryAction' => DiscoverAction::class,
                 'commander' => DiscoveryCommander::class,
-                'discoveryPermissionsForm' => DiscoveryPermissionsForm::class
             ]
         );
     }
@@ -54,16 +53,15 @@ class DiscoveryController extends AdminController
             ->render()
             ->with(
                 [
-                    'controllers' => $repository->getRepo()->findAll(),
-                    'count_controller' => (int)$repository->getRepo()->count(),
+                    'controllers' => $this->repository->getRepo()->findAll(),
+                    'count_controller' => (int)$this->repository->getRepo()->count(),
                     'controller_singular' => $singular,
                     'methods' => Serializer::unCompress($singular->methods ?? []),
                     'new_methods' => Serializer::unCompress($singular->current_new_method ?? []),
                     'session' => $this->getSession(),
                     'session_discovery' => $this->getSession()->get('controller_discovery'),
                     'discoveries' => $this->showDiscoveries(),
-                    'new_controller_discovery' => $this->getSession()->get('new_controller_discovered'),
-                    'discovery_permission_form' => $this->discoveryPermissionsForm->createForm('', null, $this)
+                    'new_controller_discovery' => $this->getSession()->get('new_controller_discovered')
                 ]
             )
             ->callback(fn($controller) => '')
@@ -152,4 +150,9 @@ class DiscoveryController extends AdminController
 
     }
 
+    protected function refreshAction()
+    {
+//       $this->pingMethods('tag', '\App\Controller\Admin\TagController');
+//       $this->redirect('/admin/discovery/discover');
+    }
 }

@@ -54,7 +54,7 @@ class PermissionModel extends AbstractBaseModel
      */
     public function guardedID(): array
     {
-        return [77, 76];
+        return [];
     }
     /**
      * Return an array of column values if table supports the column field

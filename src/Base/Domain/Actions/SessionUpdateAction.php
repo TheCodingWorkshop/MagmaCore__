@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace MagmaCore\Base\Domain\Actions;
 
+use MagmaCore\Utility\Utilities;
 use MagmaCore\Utility\Serializer;
 use MagmaCore\Base\Domain\DomainTraits;
 use MagmaCore\Base\Domain\DomainActionLogicInterface;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
 /**
  * Class which handles the domain logic when adding a new item to the database
@@ -57,15 +59,16 @@ class SessionUpdateAction implements DomainActionLogicInterface
         $this->controller = $controller;
         $this->method = $method;
         $this->schema = $objectSchema;
+        $action = false;
         $formBuilder = $controller->formBuilder;
 
+
         $this->preExecute($controller, $formBuilder, $optional);
-        $this->postExecute($controller, $formBuilder);
         
         if (isset($formBuilder) && $formBuilder?->isFormValid($this->getSubmitValue())) :
             if ($formBuilder?->csrfValidate()) {
                 /* the data being submitted from the form which will become the new session data*/
-                $formData = $formBuilder->getData() ?? $optional;
+                $formData = $formBuilder->getData();
                 /* Get the old session data */
                 $session = $controller->getSession();
                 $sessionData = $session->get($channel = $controller->thisRouteController() . '_settings');
@@ -80,7 +83,6 @@ class SessionUpdateAction implements DomainActionLogicInterface
                     );
                     /* Uncompress the old session data */
                     $oldSession = Serializer::unCompress($sessionData);
-    
                     if ($oldSession['controller'] === $controller->thisRouteController()) {
                         $key = $controller->thisRouteController() . '_settings';
                         /* override the old session with new session form post data */

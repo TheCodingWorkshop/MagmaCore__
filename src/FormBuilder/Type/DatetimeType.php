@@ -45,8 +45,7 @@ class DatetimeType extends InputType implements FormExtensionTypeInterface
         $this->defaults = [
             'min' => '10',
             'max' => '100',
-            'step' => '',
-            'value' => ''
+            'step' => ''
         ];
 
         parent::configureOptions($this->defaults);
